@@ -42,7 +42,7 @@ export function ReminderBanner() {
   }, [hidden]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
 
   if (hidden || !item) return null;

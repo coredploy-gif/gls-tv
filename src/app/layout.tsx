@@ -6,6 +6,8 @@ import { LibraryProvider } from "@/lib/library";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { SupportChatWidget } from "@/components/SupportChatWidget";
 import { ReminderBanner } from "@/components/ReminderBanner";
+import { ManagedSystemLinks } from "@/components/ManagedSystemLinks";
+import { RemoteNavigation } from "@/components/RemoteNavigation";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -21,6 +23,9 @@ const bebas = Bebas_Neue({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://gls-tv.vercel.app",
+  ),
   title: {
     default: "GLS TV — Watch Live, Series & Movies",
     template: "%s · GLS TV",
@@ -28,6 +33,13 @@ export const metadata: Metadata = {
   description:
     "GLS TV — cinematic live TV, public series and movies. Professional 4K-ready streaming experience.",
   applicationName: "GLS TV",
+  openGraph: {
+    title: "GLS TV",
+    description: "Cinematic live TV, series and movies.",
+    type: "website",
+    url: "/",
+    siteName: "GLS TV",
+  },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -35,8 +47,11 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
   },
   icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
 };
 
@@ -61,8 +76,12 @@ export default function RootLayout({
           <ActiveViewerProvider>
             <LibraryProvider>
               <ServiceWorkerRegister />
+              <RemoteNavigation />
               <ReminderBanner />
               {children}
+              <footer className="mt-auto border-t border-white/10 px-4 py-8">
+                <ManagedSystemLinks placement="footer" />
+              </footer>
               <SupportChatWidget />
             </LibraryProvider>
           </ActiveViewerProvider>

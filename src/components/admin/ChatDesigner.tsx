@@ -32,7 +32,7 @@ export function ChatDesigner() {
 
   useEffect(() => {
     if (!previewQ.trim()) {
-      setHits([]);
+      queueMicrotask(() => setHits([]));
       return;
     }
     const t = setTimeout(() => {

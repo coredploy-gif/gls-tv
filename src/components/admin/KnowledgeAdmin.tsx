@@ -27,7 +27,7 @@ export function KnowledgeAdmin() {
   }, [q]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
 
   const save = async () => {

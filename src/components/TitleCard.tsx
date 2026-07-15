@@ -41,12 +41,20 @@ export function TitleCard({
           </span>
         )}
         {!item.categories.includes("My Playlist") &&
+          item.categories.includes("LinearPay") && (
+            <span className="absolute right-2 top-2 z-[2] rounded bg-amber-700/95 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-50">
+              Linear pay
+            </span>
+          )}
+        {!item.categories.includes("My Playlist") &&
+          !item.categories.includes("LinearPay") &&
           item.categories.includes("Playable") && (
             <span className="absolute right-2 top-2 z-[2] rounded bg-emerald-600/90 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
               Playable
             </span>
           )}
         {!item.categories.includes("My Playlist") &&
+          !item.categories.includes("LinearPay") &&
           !item.categories.includes("Playable") &&
           item.categories.includes("ProxyOk") && (
             <span className="absolute right-2 top-2 z-[2] rounded bg-sky-700/90 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
@@ -54,6 +62,7 @@ export function TitleCard({
             </span>
           )}
         {!item.categories.includes("My Playlist") &&
+          !item.categories.includes("LinearPay") &&
           !item.categories.includes("Playable") &&
           !item.categories.includes("ProxyOk") &&
           item.categories.includes("Verified") && (
@@ -62,6 +71,7 @@ export function TitleCard({
             </span>
           )}
         {!item.categories.includes("My Playlist") &&
+          !item.categories.includes("LinearPay") &&
           !item.categories.includes("Playable") &&
           !item.categories.includes("ProxyOk") &&
           !item.categories.includes("Verified") &&
@@ -84,9 +94,15 @@ export function TitleCard({
             {item.categories
               .filter(
                 (c) =>
-                  !["Playable", "ProxyOk", "Verified", "Catalog", "Healed"].includes(
-                    c,
-                  ),
+                  ![
+                    "Playable",
+                    "ProxyOk",
+                    "Verified",
+                    "Catalog",
+                    "Healed",
+                    "IptvOrg",
+                    "Unavailable",
+                  ].includes(c),
               )
               .slice(0, 2)
               .join(" · ")}

@@ -79,6 +79,20 @@ const NAV: NavItem[] = [
     ),
   },
   {
+    href: "/admin/inbox",
+    label: "Inbox",
+    icon: (
+      <path
+        d="M4 6h16v12H4V6Zm0 0 8 7 8-7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    ),
+  },
+  {
     href: "/admin/audit",
     label: "Audit",
     icon: (
@@ -144,6 +158,20 @@ const NAV: NavItem[] = [
     ),
   },
   {
+    href: "/admin/access",
+    label: "Roles & controls",
+    icon: (
+      <path d="M12 3 5 6v5c0 4.6 2.9 8.2 7 10 4.1-1.8 7-5.4 7-10V6l-7-3Zm0 5v5m0 3h.01" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    ),
+  },
+  {
+    href: "/admin/rights",
+    label: "Source rights",
+    icon: (
+      <path d="M7 4h10v16H7V4Zm3 4h4m-4 4h4m-4 4h3" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    ),
+  },
+  {
     href: "/admin/system",
     label: "System links",
     icon: (
@@ -198,11 +226,11 @@ export function AdminShell({
   useEffect(() => {
     try {
       const v = localStorage.getItem("gls-admin-sidebar");
-      if (v === "1") setCollapsed(true);
+      if (v === "1") queueMicrotask(() => setCollapsed(true));
     } catch {
       /* ignore */
     }
-    setReady(true);
+    queueMicrotask(() => setReady(true));
   }, []);
 
   const toggle = () => {

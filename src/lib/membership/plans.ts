@@ -68,4 +68,6 @@ export function maxViewerSlots(plan: GlsPlanId | string | null | undefined) {
 }
 
 export const ACTIVE_VIEWER_COOKIE = "gls_viewer_profile";
+/** HttpOnly opaque token for simultaneous adult/kids stream slots. */
+export const VIEWER_SESSION_COOKIE = "gls_viewer_session";
 export const DEVICE_ID_KEY = "gls-tv-device-id-v1";

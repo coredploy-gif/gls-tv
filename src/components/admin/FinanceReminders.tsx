@@ -36,7 +36,7 @@ export function FinanceReminders() {
   }, []);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
 
   const send = async () => {

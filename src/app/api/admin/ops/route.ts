@@ -1,18 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createServiceClient, isEadminEmail } from "@/lib/eadmin";
+import { NextResponse } from "next/server";
+import { createServiceClient } from "@/lib/eadmin";
+import { getAdminAccess, hasAdminPermission } from "@/lib/admin/access";
 import { isBillablePlan } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 async function assertAdmin() {
-  const sb = await createClient();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
-  if (!user || !isEadminEmail(user.email)) return null;
-  return user;
+  const access = await getAdminAccess();
+  if (!access || !hasAdminPermission(access, "ops.write")) return null;
+  return access.user;
 }
 
 /** Daily ops pack — tickets, collections, trials, streams, cron, reminders. */

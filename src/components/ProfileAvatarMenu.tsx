@@ -18,8 +18,15 @@ export function ProfileAvatarMenu() {
     const onDoc = (e: MouseEvent) => {
       if (!ref.current?.contains(e.target as Node)) setOpen(false);
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
     document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   const img =
@@ -46,6 +53,8 @@ export function ProfileAvatarMenu() {
         onClick={() => setOpen((v) => !v)}
         className="gls-avatar-ring h-8 w-8 overflow-hidden rounded focus:outline-none"
         aria-label={`Profile ${viewer.name}`}
+        aria-expanded={open}
+        aria-haspopup="menu"
         title={viewer.name}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -53,8 +62,11 @@ export function ProfileAvatarMenu() {
       </button>
 
       {open && (
-        <div className="gls-glass absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl shadow-xl">
-          <p className="border-b border-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-gls-pink-soft/80">
+        <div
+          role="menu"
+          className="fixed inset-x-3 top-[4.5rem] z-50 overflow-hidden rounded-xl border border-white/15 bg-[#12121a] shadow-2xl sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-56 sm:max-w-[calc(100vw-1.5rem)]"
+        >
+          <p className="border-b border-white/10 bg-[#1a1a24] px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#f5d0e0]">
             Watching as {viewer.name}
           </p>
           <div className="max-h-64 overflow-y-auto py-1">
@@ -62,8 +74,9 @@ export function ProfileAvatarMenu() {
               <button
                 key={v.id}
                 type="button"
-                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition hover:bg-white/10 ${
-                  v.id === viewer.id ? "text-white" : "text-gls-body"
+                role="menuitem"
+                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition hover:bg-[#1e1e2a] ${
+                  v.id === viewer.id ? "text-white" : "text-[#c4c4d4]"
                 }`}
                 onClick={async () => {
                   setOpen(false);
@@ -101,6 +114,7 @@ export function ProfileAvatarMenu() {
             {isAdmin && (
               <Link
                 href="/admin"
+                role="menuitem"
                 onClick={() => setOpen(false)}
                 className="block w-full px-3 py-2 text-left text-sm font-semibold text-gls-pink hover:bg-gls-pink/15"
               >
@@ -109,36 +123,64 @@ export function ProfileAvatarMenu() {
             )}
             <button
               type="button"
+              role="menuitem"
               onClick={() => {
                 setOpen(false);
                 switchToProfiles();
               }}
-              className="block w-full px-3 py-2 text-left text-sm text-gls-body hover:bg-white/10 hover:text-white"
+              className="block w-full px-3 py-2 text-left text-sm text-[#c4c4d4] hover:bg-[#1e1e2a] hover:text-white"
             >
               Switch profiles…
             </button>
             <Link
               href="/profiles/manage"
+              role="menuitem"
               onClick={() => setOpen(false)}
-              className="block w-full px-3 py-2 text-left text-sm text-gls-body hover:bg-white/10 hover:text-white"
+              className="block w-full px-3 py-2 text-left text-sm text-[#c4c4d4] hover:bg-[#1e1e2a] hover:text-white"
             >
               Manage profiles
             </Link>
             <Link
               href="/billing"
+              role="menuitem"
               onClick={() => setOpen(false)}
-              className="block w-full px-3 py-2 text-left text-sm text-gls-body hover:bg-white/10 hover:text-white"
+              className="block w-full px-3 py-2 text-left text-sm text-[#c4c4d4] hover:bg-[#1e1e2a] hover:text-white"
             >
               Membership & receipts
             </Link>
+            <Link
+              href="/account"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="block w-full px-3 py-2 text-left text-sm text-[#c4c4d4] hover:bg-[#1e1e2a] hover:text-white"
+            >
+              Account
+            </Link>
+            <Link
+              href="/support"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="block w-full px-3 py-2 text-left text-sm text-[#c4c4d4] hover:bg-[#1e1e2a] hover:text-white"
+            >
+              Support
+            </Link>
+            <Link
+              href="/notifications"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="block w-full px-3 py-2 text-left text-sm text-[#c4c4d4] hover:bg-[#1e1e2a] hover:text-white"
+            >
+              Notifications
+            </Link>
             <button
               type="button"
+              role="menuitem"
               onClick={async () => {
                 setOpen(false);
                 await signOut();
                 window.location.assign("/");
               }}
-              className="block w-full border-t border-white/10 px-3 py-2 text-left text-sm text-red-200 transition hover:bg-gls-red/15 hover:text-white"
+              className="block w-full border-t border-white/10 px-3 py-2 text-left text-sm text-red-300 transition hover:bg-gls-red/15 hover:text-white"
             >
               Sign out
             </button>

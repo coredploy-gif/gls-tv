@@ -51,14 +51,35 @@ export function ActiveViewerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    void refresh();
+    queueMicrotask(() => void refresh());
     const onFocus = () => void refresh();
     window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
+    const heartbeat = window.setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      void fetch("/api/membership/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "heartbeat" }),
+      }).then(async (res) => {
+        if (res.status === 409) {
+          document.cookie = `${ACTIVE_VIEWER_COOKIE}=; path=/; max-age=0; samesite=lax`;
+          window.location.assign("/profiles?reason=device");
+        }
+      });
+    }, 120_000);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      window.clearInterval(heartbeat);
+    };
   }, [refresh]);
 
   const switchToProfiles = useCallback(() => {
     document.cookie = `${ACTIVE_VIEWER_COOKIE}=; path=/; max-age=0; samesite=lax`;
+    void fetch("/api/membership/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "heartbeat" }),
+    }).catch(() => undefined);
     window.location.assign("/profiles");
   }, []);
 

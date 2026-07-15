@@ -12,6 +12,46 @@ import {
   type UserPlaylistRow,
 } from "@/lib/playlists";
 
+type PlaylistApiResponse = {
+  error?: string | { code?: string; message?: string; importId?: string };
+  playlists?: UserPlaylistRow[];
+  channels?: UserPlaylistChannelRow[];
+  entitled?: boolean;
+  page?: { hasMore?: boolean };
+  channelCount?: number;
+  stats?: { truncated?: number };
+  importId?: string;
+  playlist?: { id?: string };
+};
+
+async function readResponse(res: Response): Promise<PlaylistApiResponse> {
+  const text = await res.text();
+  let data: PlaylistApiResponse = {};
+  try {
+    data = text ? (JSON.parse(text) as PlaylistApiResponse) : {};
+  } catch {
+    data = {};
+  }
+  if (!res.ok) {
+    const detail =
+      typeof data.error === "object" && data.error
+        ? data.error
+        : {
+            code: `HTTP_${res.status}`,
+            message:
+              typeof data.error === "string"
+                ? data.error
+                : "The server returned an unexpected response.",
+          };
+    throw new Error(
+      `${detail.message || "Request failed"}${detail.code ? ` (${detail.code})` : ""}${
+        detail.importId ? ` · Import ${detail.importId}` : ""
+      }`,
+    );
+  }
+  return data;
+}
+
 export function PlaylistManager() {
   const { user, loading: authLoading } = useAuth();
   const [url, setUrl] = useState("");
@@ -25,6 +65,14 @@ export function PlaylistManager() {
     "all",
   );
   const [listLoading, setListLoading] = useState(false);
+  const [entitled, setEntitled] = useState(false);
+  const [hasMoreChannels, setHasMoreChannels] = useState(false);
+  const [operationStatus, setOperationStatus] = useState<
+    "idle" | "queued" | "fetching" | "parsing" | "applying" | "ready" | "error"
+  >("idle");
+  const [replacementPlaylistId, setReplacementPlaylistId] = useState<string | null>(
+    null,
+  );
 
   const load = useCallback(async () => {
     if (!user) {
@@ -35,19 +83,37 @@ export function PlaylistManager() {
     setListLoading(true);
     try {
       const res = await fetch("/api/playlists", { cache: "no-store" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to load playlists");
+      const data = await readResponse(res);
       setPlaylists(data.playlists || []);
       setChannels(data.channels || []);
-    } catch (e) {
+      setEntitled(data.entitled === true);
+      setHasMoreChannels(data.page?.hasMore === true);
+    } catch {
       setError("We couldn’t load your playlists right now. Please refresh and try again.");
     } finally {
       setListLoading(false);
     }
   }, [user]);
 
+  const loadMore = async () => {
+    setListLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/playlists?offset=${channels.length}`, {
+        cache: "no-store",
+      });
+      const data = await readResponse(res);
+      setChannels((current) => [...current, ...(data.channels || [])]);
+      setHasMoreChannels(data.page?.hasMore === true);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "More channels could not be loaded.");
+    } finally {
+      setListLoading(false);
+    }
+  };
+
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
 
   const visibleChannels = useMemo(() => {
@@ -78,34 +144,50 @@ export function PlaylistManager() {
       return;
     }
     setBusy(true);
+    setOperationStatus("queued");
     setError(null);
     setSuccess(null);
+    let parsingTimer: number | undefined;
+    let applyingTimer: number | undefined;
     try {
+      setOperationStatus("fetching");
+      parsingTimer = window.setTimeout(() => setOperationStatus("parsing"), 900);
+      applyingTimer = window.setTimeout(() => setOperationStatus("applying"), 1800);
       const res = await fetch("/api/playlists/import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.trim(), name: name.trim() }),
+        body: JSON.stringify({
+          url: url.trim(),
+          name: name.trim(),
+          playlistId: replacementPlaylistId,
+        }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Import failed");
+      const data = await readResponse(res);
+      window.clearTimeout(parsingTimer);
+      window.clearTimeout(applyingTimer);
+      setOperationStatus("ready");
       setSuccess(
         `Imported ${data.channelCount} channel${data.channelCount === 1 ? "" : "s"}${
-          data.truncated ? ` (capped from ${data.totalFound})` : ""
-        }.`,
+          data.stats?.truncated ? ` · ${data.stats.truncated} over the limit` : ""
+        } · Import ${data.importId}.`,
       );
       setUrl("");
+      setReplacementPlaylistId(null);
       await load();
       if (data.playlist?.id) setActivePlaylistId(data.playlist.id);
     } catch (err) {
-      setError("We couldn’t import that playlist. Please check the link and try again.");
+      setOperationStatus("error");
+      setError(err instanceof Error ? err.message : "Playlist import failed.");
     } finally {
+      if (parsingTimer) window.clearTimeout(parsingTimer);
+      if (applyingTimer) window.clearTimeout(applyingTimer);
       setBusy(false);
     }
   };
 
   const refreshPlaylist = async (playlist: UserPlaylistRow) => {
-    if (!playlist.source_url) return;
     setBusy(true);
+    setOperationStatus("fetching");
     setError(null);
     setSuccess(null);
     try {
@@ -113,17 +195,17 @@ export function PlaylistManager() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          url: playlist.source_url,
           name: playlist.name,
           playlistId: playlist.id,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Refresh failed");
-      setSuccess(`Refreshed · ${data.channelCount} channels`);
+      const data = await readResponse(res);
+      setOperationStatus("ready");
+      setSuccess(`Refreshed · ${data.channelCount} channels · Import ${data.importId}`);
       await load();
     } catch (err) {
-      setError("We couldn’t refresh that playlist right now. Please try again.");
+      setOperationStatus("error");
+      setError(err instanceof Error ? err.message : "Playlist refresh failed.");
     } finally {
       setBusy(false);
     }
@@ -139,8 +221,7 @@ export function PlaylistManager() {
       const res = await fetch(`/api/playlists?id=${encodeURIComponent(id)}`, {
         method: "DELETE",
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Delete failed");
+      await readResponse(res);
       if (activePlaylistId === id) setActivePlaylistId("all");
       await load();
       setSuccess("Playlist removed.");
@@ -149,6 +230,39 @@ export function PlaylistManager() {
     } finally {
       setBusy(false);
     }
+  };
+
+  const renamePlaylist = async (playlist: UserPlaylistRow) => {
+    const next = prompt("Playlist name", playlist.name)?.trim();
+    if (!next || next === playlist.name) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/playlists", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: playlist.id, name: next }),
+      });
+      await readResponse(res);
+      setSuccess("Playlist renamed.");
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Rename failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const replaceSource = async (playlist: UserPlaylistRow) => {
+    const replacement = prompt("New M3U source URL");
+    if (!replacement?.trim()) return;
+    setUrl(replacement.trim());
+    setName(playlist.name);
+    setReplacementPlaylistId(playlist.id);
+    setActivePlaylistId(playlist.id);
+    setError(null);
+    setSuccess("Source prepared. Submit Import playlist to validate and replace atomically.");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -202,16 +316,27 @@ export function PlaylistManager() {
             </p>
             <button
               type="submit"
-              disabled={busy || authLoading || !user}
+              disabled={busy || authLoading || !user || !entitled}
               className="gls-cta inline-flex h-14 w-full items-center justify-center rounded text-lg font-semibold disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-[220px] sm:px-10"
             >
-              {busy ? "Importing…" : "Import playlist"}
+              {busy ? `${operationStatus}…` : "Import playlist"}
             </button>
             {!user && !authLoading && (
               <p className="text-sm font-medium text-amber-200">
                 Sign in on the right first — then Import stays unlocked.
               </p>
             )}
+            {user && !listLoading && !entitled && (
+              <p className="text-sm text-amber-200">
+                An active trial or membership is required.{" "}
+                <Link href="/pricing" className="underline">
+                  View plans
+                </Link>
+              </p>
+            )}
+            <p aria-live="polite" className="text-xs capitalize text-gls-muted">
+              Import status: {operationStatus}
+            </p>
             {error && (
               <p className="rounded bg-gls-red/25 px-3 py-2 text-sm text-red-100">
                 {error}
@@ -240,7 +365,7 @@ export function PlaylistManager() {
               <p className="mt-1 text-sm text-gls-muted">
                 {listLoading
                   ? "Loading…"
-                  : `${playlists.length} playlist${playlists.length === 1 ? "" : "s"} · ${channels.length} channel${channels.length === 1 ? "" : "s"}`}
+                  : `${playlists.length} playlist${playlists.length === 1 ? "" : "s"} · showing ${channels.length} of ${playlists.reduce((sum, playlist) => sum + playlist.channel_count, 0)} channels`}
               </p>
             </div>
             <button
@@ -301,12 +426,15 @@ export function PlaylistManager() {
                 <div className="min-w-0">
                   <p className="font-semibold text-white">{p.name}</p>
                   <p className="mt-0.5 truncate text-xs text-gls-muted">
-                    {p.source_url}
+                    {p.source_redacted || "Saved source"}
                   </p>
                   <p className="mt-1 text-xs text-gls-body">
                     {p.channel_count} channels
                     {p.last_synced_at
-                      ? ` · synced ${new Date(p.last_synced_at).toLocaleString()}`
+                      ? ` · last success ${new Date(p.last_synced_at).toLocaleString()}`
+                      : ""}
+                    {p.last_attempt_at
+                      ? ` · last attempt ${new Date(p.last_attempt_at).toLocaleString()}`
                       : ""}
                     {p.error_message ? " · Needs attention" : ""}
                   </p>
@@ -314,11 +442,27 @@ export function PlaylistManager() {
                 <div className="flex shrink-0 flex-wrap gap-2">
                   <button
                     type="button"
-                    disabled={busy || !p.source_url}
+                    disabled={busy || !entitled}
                     onClick={() => refreshPlaylist(p)}
                     className="rounded border border-white/20 px-3 py-1.5 text-sm text-gls-body transition hover:border-white hover:text-white disabled:opacity-40"
                   >
                     Re-sync
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void renamePlaylist(p)}
+                    className="rounded border border-white/20 px-3 py-1.5 text-sm text-gls-body"
+                  >
+                    Rename
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy || !entitled}
+                    onClick={() => void replaceSource(p)}
+                    className="rounded border border-white/20 px-3 py-1.5 text-sm text-gls-body"
+                  >
+                    Replace source
                   </button>
                   <button
                     type="button"
@@ -332,6 +476,16 @@ export function PlaylistManager() {
               </li>
             ))}
           </ul>
+          {hasMoreChannels && (
+            <button
+              type="button"
+              disabled={listLoading}
+              onClick={() => void loadMore()}
+              className="rounded border border-white/20 px-4 py-2 text-sm text-white disabled:opacity-50"
+            >
+              {listLoading ? "Loading…" : "Load more channels"}
+            </button>
+          )}
         </section>
       )}
 
@@ -353,7 +507,10 @@ export function PlaylistManager() {
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                 {items.slice(0, 24).map((item) => (
                   <div key={item.id} className="w-full [&_a]:w-full">
-                    <TitleCard item={item} href={mineWatchHref(item.slug)} />
+                    <TitleCard
+                      item={item}
+                      href={mineWatchHref(item.id.replace(/^user-/, ""))}
+                    />
                   </div>
                 ))}
               </div>

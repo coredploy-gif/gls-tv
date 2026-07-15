@@ -4,67 +4,149 @@ export type IptvChannel = CatalogItem & {
   tvgId?: string | null;
 };
 
-export function parseM3u(
+export type M3uParseStats = {
+  parsed: number;
+  skipped: number;
+  invalid: number;
+  duplicates: number;
+  truncated: number;
+  kind: "channel-list" | "hls-master" | "hls-media" | "unknown";
+};
+
+export type M3uParseResult = {
+  channels: IptvChannel[];
+  stats: M3uParseStats;
+};
+
+function httpUrl(raw: string, baseUrl?: string) {
+  try {
+    const url = baseUrl ? new URL(raw, baseUrl) : new URL(raw);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    if (url.username || url.password) return null;
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+function attributes(line: string) {
+  const result = new Map<string, string>();
+  const meta = line.slice(0, line.lastIndexOf(",") >= 0 ? line.lastIndexOf(",") : undefined);
+  const re = /([a-z][a-z0-9-]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s,]+))/gi;
+  for (const match of meta.matchAll(re)) {
+    result.set(match[1].toLowerCase(), match[2] ?? match[3] ?? match[4] ?? "");
+  }
+  return result;
+}
+
+function manifestKind(lines: string[]): M3uParseStats["kind"] {
+  const upper = lines.map((line) => line.toUpperCase());
+  if (upper.some((line) => line.startsWith("#EXT-X-STREAM-INF"))) return "hls-master";
+  if (
+    upper.some((line) =>
+      /#EXT-X-(TARGETDURATION|MEDIA-SEQUENCE|PLAYLIST-TYPE|ENDLIST)/.test(line),
+    )
+  ) {
+    return "hls-media";
+  }
+  return upper.some((line) => line.startsWith("#EXTINF")) ? "channel-list" : "unknown";
+}
+
+export function parseM3uDetailed(
   text: string,
-  options: { defaultCountry?: string; forceCategory?: string } = {},
-): IptvChannel[] {
-  const { defaultCountry = "world", forceCategory } = options;
-  const lines = text.split(/\r?\n/);
+  options: {
+    defaultCountry?: string;
+    forceCategory?: string;
+    baseUrl?: string;
+    maxChannels?: number;
+  } = {},
+): M3uParseResult {
+  const {
+    defaultCountry = "world",
+    forceCategory,
+    baseUrl,
+    maxChannels = Number.POSITIVE_INFINITY,
+  } = options;
+  const lines = text.replace(/^\uFEFF/, "").split(/\r\n?|\n|\u2028|\u2029/);
+  const kind = manifestKind(lines);
+  const stats: M3uParseStats = {
+    parsed: 0,
+    skipped: 0,
+    invalid: 0,
+    duplicates: 0,
+    truncated: 0,
+    kind,
+  };
+  if (kind === "hls-master" || kind === "hls-media") {
+    stats.invalid = 1;
+    return { channels: [], stats };
+  }
+
   const items: IptvChannel[] = [];
   const seen = new Set<string>();
+  let pending: { line: string; lineNumber: number } | null = null;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]?.trim() ?? "";
-    if (!line.startsWith("#EXTINF")) continue;
-    const url = (lines[i + 1] || "").trim();
-    if (!url || url.startsWith("#")) continue;
+    if (/^#EXTINF\s*:/i.test(line)) {
+      if (pending) stats.skipped += 1;
+      pending = { line, lineNumber: i + 1 };
+      continue;
+    }
+    if (!pending || !line || line.startsWith("#")) continue;
 
-    const comma = line.lastIndexOf(",");
-    const title = (comma >= 0 ? line.slice(comma + 1) : "Unknown").trim();
-    const meta = line.slice(0, comma >= 0 ? comma : undefined);
-    const attr = (key: string) => {
-      const m = meta.match(new RegExp(`${key}="([^"]*)"`));
-      return m?.[1] ?? "";
-    };
+    const info = pending;
+    pending = null;
+    const streamUrl = httpUrl(line, baseUrl);
+    if (!streamUrl) {
+      stats.invalid += 1;
+      continue;
+    }
 
-    const tvgId = attr("tvg-id");
-    const logo = attr("tvg-logo");
-    const group = attr("group-title") || forceCategory || "General";
-    const dedupeKey = tvgId || url;
-    if (seen.has(dedupeKey)) continue;
+    const comma = info.line.lastIndexOf(",");
+    const title = (comma >= 0 ? info.line.slice(comma + 1) : "Unknown").trim();
+    const attr = attributes(info.line);
+    const tvgId = attr.get("tvg-id") || "";
+    const rawLogo = attr.get("tvg-logo") || "";
+    const logo = rawLogo ? httpUrl(rawLogo, baseUrl) : null;
+    const group = attr.get("group-title") || forceCategory || "General";
+    const dedupeKey = `${tvgId.toLowerCase() || title.toLowerCase()}\u0000${streamUrl}`;
+    if (seen.has(dedupeKey)) {
+      stats.duplicates += 1;
+      continue;
+    }
     seen.add(dedupeKey);
+    if (items.length >= maxChannels) {
+      stats.truncated += 1;
+      continue;
+    }
 
     let country = defaultCountry;
     const cm = tvgId.match(/\.([a-z]{2})(?:@|$)/i);
     if (cm?.[1]) country = cm[1].toLowerCase();
-
     const qm = title.match(/\((\d{3,4}p|SD|HD|FHD|4K|UHD)\)/i);
     const quality = qm?.[1]?.toUpperCase() ?? "Auto";
-
     const categories = [
       ...new Set(
         group
           .split(/[;,]/)
-          .map((s) => s.trim())
+          .map((value) => value.trim())
           .filter(Boolean),
       ),
     ];
     if (
       forceCategory &&
-      !categories.map((c) => c.toLowerCase()).includes(forceCategory.toLowerCase())
+      !categories.some((category) => category.toLowerCase() === forceCategory.toLowerCase())
     ) {
       categories.unshift(forceCategory);
     }
-
     const idBase = (tvgId || title).toLowerCase().replace(/[^a-z0-9@.]+/g, "-");
     const slug =
       idBase.replace(/[@.]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") ||
-      `ch-${items.length}`;
-
+      `ch-${info.lineNumber}`;
     const cleanTitle =
       title.replace(/\s*\((\d{3,4}p|SD|HD|FHD|4K|UHD)\)\s*$/i, "").trim() ||
       title;
-
     const fallbackArt =
       "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=1200&q=80";
 
@@ -83,16 +165,24 @@ export function parseM3u(
       isLive: true,
       sources: [
         {
-          url,
+          url: streamUrl,
           quality,
-          format: url.includes(".m3u8") ? "hls" : "mp4",
+          format: /\.m3u8(?:$|\?)/i.test(streamUrl) ? "hls" : "mp4",
         },
       ],
       tvgId: tvgId || null,
     });
   }
+  if (pending) stats.skipped += 1;
+  stats.parsed = items.length;
+  return { channels: items, stats };
+}
 
-  return items;
+export function parseM3u(
+  text: string,
+  options: { defaultCountry?: string; forceCategory?: string; baseUrl?: string } = {},
+): IptvChannel[] {
+  return parseM3uDetailed(text, options).channels;
 }
 
 const MATCH_DAY_RE =

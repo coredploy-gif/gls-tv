@@ -9,6 +9,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { isEadminEmail } from "@/lib/eadmin";
 import { BROWSE_NAV } from "@/lib/nav-theme";
+import { ManagedSystemLinks } from "@/components/ManagedSystemLinks";
 
 function NavLink({
   href,
@@ -92,6 +93,7 @@ export function BrowseNav() {
             );
           })}
         </nav>
+        <ManagedSystemLinks placement="nav" />
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
           {isAdmin && (
             <Link

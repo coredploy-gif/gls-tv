@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { parseM3u } from "@/lib/iptv";
+import { parseM3uDetailed } from "@/lib/iptv";
 import { PLAYLIST_LIMITS } from "@/lib/playlists";
+import { getAccountEntitlement } from "@/lib/membership/account";
+import { secureFetchBuffered } from "@/lib/secure-url";
+import { isFeatureEnabled } from "@/lib/operations/feature-flags";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -15,44 +18,66 @@ function isHttpUrl(value: string) {
   }
 }
 
+function responseError(
+  code: string,
+  message: string,
+  status: number,
+  importId: string,
+) {
+  return NextResponse.json({ error: { code, message, importId } }, { status });
+}
+
 async function fetchM3u(url: string) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 45_000);
-  try {
-    const res = await fetch(url, {
-      signal: controller.signal,
-      redirect: "follow",
-      headers: {
+  const res = await secureFetchBuffered(url, {
+    timeoutMs: 20_000,
+    maxRedirects: 4,
+    maxBytes: PLAYLIST_LIMITS.maxBytes,
+    headers: {
         "User-Agent": "GLS-TV/1.0 (playlist-importer)",
         Accept: "application/vnd.apple.mpegurl,audio/x-mpegurl,text/plain,*/*",
-      },
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      throw new Error(`Could not download playlist (HTTP ${res.status})`);
-    }
-    const buf = await res.arrayBuffer();
-    if (buf.byteLength > PLAYLIST_LIMITS.maxBytes) {
-      throw new Error(
-        `Playlist is too large (max ${Math.round(PLAYLIST_LIMITS.maxBytes / 1024 / 1024)}MB)`,
-      );
-    }
-    return new TextDecoder("utf-8", { fatal: false }).decode(buf);
-  } finally {
-    clearTimeout(timer);
+    },
+  });
+  if (res.status < 200 || res.status >= 300) {
+    throw new Error(`Could not download playlist (HTTP ${res.status})`);
   }
+  const contentType = String(res.headers["content-type"] || "");
+  if (contentType.includes("text/html")) throw new Error("URL returned HTML");
+  return {
+    text: new TextDecoder("utf-8", { fatal: false }).decode(res.body),
+    finalUrl: res.finalUrl,
+  };
 }
 
 export async function POST(req: Request) {
+  const importId = crypto.randomUUID();
+  if (!(await isFeatureEnabled("playlist_imports"))) {
+    return responseError(
+      "M3U_IMPORTS_DISABLED",
+      "Playlist imports are temporarily unavailable.",
+      503,
+      importId,
+    );
+  }
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json(
-      { error: "Sign in to save a playlist to your account." },
-      { status: 401 },
+    return responseError(
+      "M3U_UNAUTHORIZED",
+      "Sign in to save a playlist to your account.",
+      401,
+      importId,
+    );
+  }
+  const entitlement = await getAccountEntitlement(user.id, user.email);
+  if (!entitlement.allowed) {
+    return responseError(
+      "M3U_ENTITLEMENT_REQUIRED",
+      "An active trial or membership is required.",
+      403,
+      importId,
     );
   }
 
@@ -60,109 +85,111 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return responseError("M3U_BAD_REQUEST", "Invalid JSON body.", 400, importId);
   }
 
-  const url = (body.url || "").trim();
   const name = (body.name || "My playlist").trim().slice(0, 80) || "My playlist";
   const playlistId = body.playlistId?.trim() || null;
+  let url = (body.url || "").trim();
 
-  if (!url || !isHttpUrl(url)) {
-    return NextResponse.json(
-      { error: "Paste a valid http(s) M3U / M3U8 playlist link." },
-      { status: 400 },
-    );
-  }
-
-  let text: string;
-  try {
-    text = await fetchM3u(url);
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Download failed";
-    return NextResponse.json({ error: msg }, { status: 400 });
-  }
-
-  if (!/#EXTM3U|#EXTINF/i.test(text)) {
-    return NextResponse.json(
-      {
-        error:
-          "That URL did not look like an M3U playlist. Use a direct .m3u / .m3u8 link.",
-      },
-      { status: 400 },
-    );
-  }
-
-  const parsed = parseM3u(text);
-  if (!parsed.length) {
-    return NextResponse.json(
-      { error: "No channels found in that playlist." },
-      { status: 400 },
-    );
-  }
-
-  const channels = parsed.slice(0, PLAYLIST_LIMITS.maxChannels);
-  const rawStore =
-    text.length <= PLAYLIST_LIMITS.maxRawStore ? text : null;
-
-  let targetId = playlistId;
-
-  if (targetId) {
-    const { data: existing, error: exErr } = await supabase
+  if (playlistId) {
+    const { data: existing, error } = await supabase
       .from("user_playlists")
-      .select("id")
-      .eq("id", targetId)
+      .select("id, source_url, last_attempt_at")
+      .eq("id", playlistId)
       .eq("user_id", user.id)
       .maybeSingle();
-    if (exErr || !existing) {
-      return NextResponse.json(
-        { error: "Playlist not found on your account." },
-        { status: 404 },
+    if (error || !existing) {
+      return responseError(
+        "M3U_PLAYLIST_NOT_FOUND",
+        "Playlist not found on your account.",
+        404,
+        importId,
       );
     }
-    const { error: upErr } = await supabase
-      .from("user_playlists")
-      .update({
-        name,
-        source_url: url,
-        raw_m3u: rawStore,
-        status: "syncing",
-        error_message: null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", targetId)
-      .eq("user_id", user.id);
-    if (upErr) {
-      return NextResponse.json({ error: upErr.message }, { status: 500 });
+    if (
+      existing.last_attempt_at &&
+      Date.now() - new Date(existing.last_attempt_at).getTime() <
+        PLAYLIST_LIMITS.refreshCooldownMs
+    ) {
+      return responseError(
+        "M3U_REFRESH_COOLDOWN",
+        "Please wait briefly before refreshing this playlist again.",
+        429,
+        importId,
+      );
     }
-    await supabase
-      .from("user_playlist_channels")
-      .delete()
-      .eq("playlist_id", targetId)
-      .eq("user_id", user.id);
+    url ||= existing.source_url || "";
   } else {
-    const { data: created, error: createErr } = await supabase
+    const { count } = await supabase
       .from("user_playlists")
-      .insert({
-        user_id: user.id,
-        name,
-        source_url: url,
-        raw_m3u: rawStore,
-        status: "syncing",
-        channel_count: 0,
-      })
-      .select("id")
-      .single();
-    if (createErr || !created) {
-      return NextResponse.json(
-        { error: createErr?.message || "Could not create playlist" },
-        { status: 500 },
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+    if ((count || 0) >= PLAYLIST_LIMITS.maxPlaylists) {
+      return responseError(
+        "M3U_PLAYLIST_LIMIT",
+        `Your account can save up to ${PLAYLIST_LIMITS.maxPlaylists} playlists.`,
+        409,
+        importId,
       );
     }
-    targetId = created.id;
   }
 
+  if (!url || !isHttpUrl(url)) {
+    return responseError(
+      "M3U_URL_INVALID",
+      "Paste a valid HTTP(S) M3U playlist link.",
+      400,
+      importId,
+    );
+  }
+
+  let fetched: { text: string; finalUrl: string };
+  try {
+    fetched = await fetchM3u(url);
+  } catch {
+    if (playlistId) {
+      await supabase
+        .from("user_playlists")
+        .update({
+          status: "error",
+          error_message: "The playlist could not be downloaded. Your existing channels were kept.",
+          last_attempt_at: new Date().toISOString(),
+          last_import_id: importId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", playlistId)
+        .eq("user_id", user.id);
+    }
+    return responseError(
+      "M3U_FETCH_FAILED",
+      "The playlist could not be downloaded. Existing channels were kept.",
+      400,
+      importId,
+    );
+  }
+
+  const parsed = parseM3uDetailed(fetched.text, {
+    baseUrl: fetched.finalUrl,
+    maxChannels: PLAYLIST_LIMITS.maxChannels,
+  });
+  if (!parsed.channels.length) {
+    const manifest = parsed.stats.kind.startsWith("hls-");
+    return responseError(
+      manifest ? "M3U_SINGLE_STREAM" : "M3U_NO_CHANNELS",
+      manifest
+        ? "That URL is a single HLS stream, not an importable channel list."
+        : "No valid HTTP(S) channels were found in that playlist.",
+      400,
+      importId,
+    );
+  }
+
+  const rawStore =
+    fetched.text.length <= PLAYLIST_LIMITS.maxRawStore ? fetched.text : null;
+
   const slugSeen = new Set<string>();
-  const rows = channels.map((ch, i) => {
+  const rows = parsed.channels.map((ch, i) => {
     let slug = ch.slug.replace(/^iptv-/, "") || `ch-${i}`;
     slug = slug.slice(0, 100);
     let unique = slug;
@@ -174,8 +201,6 @@ export async function POST(req: Request) {
 
     const src = ch.sources[0];
     return {
-      playlist_id: targetId!,
-      user_id: user.id,
       slug: unique,
       title: ch.title.slice(0, 200),
       description: ch.description.slice(0, 500),
@@ -191,52 +216,49 @@ export async function POST(req: Request) {
     };
   });
 
-  const batchSize = 250;
-  for (let i = 0; i < rows.length; i += batchSize) {
-    const chunk = rows.slice(i, i + batchSize);
-    const { error: insErr } = await supabase
-      .from("user_playlist_channels")
-      .insert(chunk);
-    if (insErr) {
+  const stats = { ...parsed.stats, importId };
+  const { data: playlist, error } = await supabase.rpc(
+    "apply_user_playlist_import",
+    {
+      p_playlist_id: playlistId,
+      p_name: name,
+      p_source_url: url,
+      p_raw_m3u: rawStore,
+      p_import_id: importId,
+      p_channels: rows,
+      p_stats: stats,
+    },
+  );
+  if (error) {
+    if (playlistId) {
       await supabase
         .from("user_playlists")
         .update({
           status: "error",
-          error_message: insErr.message,
+          error_message: "The new import could not be applied. Your existing channels were kept.",
+          last_attempt_at: new Date().toISOString(),
+          last_import_id: importId,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", targetId)
+        .eq("id", playlistId)
         .eq("user_id", user.id);
-      return NextResponse.json({ error: insErr.message }, { status: 500 });
     }
-  }
-
-  const truncated = parsed.length > channels.length;
-  const { data: playlist, error: finErr } = await supabase
-    .from("user_playlists")
-    .update({
-      channel_count: rows.length,
-      status: "ready",
-      error_message: truncated
-        ? `Imported first ${rows.length} of ${parsed.length} channels`
-        : null,
-      last_synced_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", targetId)
-    .eq("user_id", user.id)
-    .select("*")
-    .single();
-
-  if (finErr) {
-    return NextResponse.json({ error: finErr.message }, { status: 500 });
+    const known = error.message.match(/M3U_[A-Z_]+/)?.[0];
+    return responseError(
+      known || "M3U_APPLY_FAILED",
+      known === "M3U_REFRESH_COOLDOWN"
+        ? "Another refresh just completed. Wait briefly and try again."
+        : "The new import could not be applied. Existing channels were kept.",
+      known === "M3U_REFRESH_COOLDOWN" ? 429 : 500,
+      importId,
+    );
   }
 
   return NextResponse.json({
     ok: true,
     playlist,
     channelCount: rows.length,
-    truncated,
-    totalFound: parsed.length,
+    stats,
+    importId,
   });
 }

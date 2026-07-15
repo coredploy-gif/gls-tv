@@ -12,6 +12,7 @@ import {
   yocoConfigured,
   type ManualPaymentMethod,
 } from "@/lib/manual-billing";
+import { isFeatureEnabled } from "@/lib/operations/feature-flags";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -79,6 +80,12 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!(await isFeatureEnabled("payments"))) {
+    return NextResponse.json(
+      { error: "Payments are temporarily unavailable" },
+      { status: 503 },
+    );
+  }
   const user = await session();
   if (!user)
     return NextResponse.json({ error: "Sign in required" }, { status: 401 });

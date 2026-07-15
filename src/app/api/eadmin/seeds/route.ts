@@ -7,6 +7,9 @@ import {
   normalizeSlug,
   type StreamSeedRow,
 } from "@/lib/eadmin";
+import { writeAuditLog } from "@/lib/admin/audit";
+import { validatePublicUrl } from "@/lib/secure-url";
+import { isAllowedMediaHost } from "@/lib/media-hosts";
 
 async function requireEadmin() {
   const supabase = await createClient();
@@ -88,6 +91,16 @@ export async function PUT(req: Request) {
         { status: 400 },
       );
     }
+    if (url) {
+      try {
+        await validatePublicUrl(url, isAllowedMediaHost);
+      } catch {
+        return NextResponse.json(
+          { error: `Stream host is not approved for ${slug}` },
+          { status: 400 },
+        );
+      }
+    }
     payload.push({
       slug,
       title,
@@ -112,6 +125,14 @@ export async function PUT(req: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  await writeAuditLog(gate.service!, {
+    actorEmail: gate.user!.email,
+    actorUserId: gate.user!.id,
+    action: "stream_seed.upsert",
+    entityType: "stream_seed",
+    summary: `Updated ${payload.length} approved stream seed(s)`,
+    meta: { slugs: payload.map((row) => row.slug) },
+  });
 
   return NextResponse.json({ seeds: data ?? [] });
 }
@@ -133,6 +154,14 @@ export async function DELETE(req: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  await writeAuditLog(gate.service!, {
+    actorEmail: gate.user!.email,
+    actorUserId: gate.user!.id,
+    action: "stream_seed.delete",
+    entityType: "stream_seed",
+    entityId: normalizeSlug(slug),
+    summary: "Deleted approved stream seed",
+  });
 
   return NextResponse.json({ ok: true });
 }

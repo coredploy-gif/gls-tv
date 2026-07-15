@@ -108,10 +108,13 @@ export const ADMIN_NAV_COLORS: Record<string, string> = {
   "/admin/ops": "#f5c542",
   "/admin/finance": "#34d399",
   "/admin/helpdesk": "#7ec8ff",
+  "/admin/inbox": "#9ae6b4",
   "/admin/audit": "#a8c4ff",
   "/admin/knowledge": "#f5c542",
   "/admin/chat": "#ff8ec8",
   "/admin/links": "#ff8ec8",
   "/admin/users": "#a8c4ff",
+  "/admin/access": "#c4b5fd",
+  "/admin/rights": "#fca5a5",
   "/admin/system": "#ffb074",
 };

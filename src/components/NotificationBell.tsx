@@ -16,25 +16,38 @@ export function NotificationBell() {
   const lib = useLibrary();
   const [open, setOpen] = useState(false);
   const [serverItems, setServerItems] = useState<AppNotification[]>([]);
-  const [readIds, setReadIds] = useState<Set<string>>(new Set());
+  const [readIds, setReadIds] = useState<Set<string>>(() => loadReadIds("anon"));
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
   const ref = useRef<HTMLDivElement>(null);
   const viewerKey = viewer?.id || lib.viewerKey || "anon";
 
   const refresh = useCallback(async () => {
     try {
-      const res = await fetch("/api/membership/notifications", {
+      const res = await fetch("/api/membership/notifications?filter=all&limit=40", {
         cache: "no-store",
       });
-      const json = (await res.json()) as { items?: AppNotification[] };
+      const json = (await res.json()) as {
+        items?: AppNotification[];
+        readIds?: string[];
+        dismissedIds?: string[];
+      };
       setServerItems(json.items || []);
+      const serverRead = new Set(json.readIds || []);
+      const local = loadReadIds(viewerKey);
+      const merged = new Set([...local, ...serverRead]);
+      setReadIds(merged);
+      saveReadIds(viewerKey, merged);
+      setDismissedIds(new Set(json.dismissedIds || []));
     } catch {
       setServerItems([]);
     }
-  }, []);
+  }, [viewerKey]);
 
   useEffect(() => {
-    setReadIds(loadReadIds(viewerKey));
-    void refresh();
+    queueMicrotask(() => {
+      setReadIds(loadReadIds(viewerKey));
+      void refresh();
+    });
   }, [viewerKey, refresh]);
 
   useEffect(() => {
@@ -42,8 +55,15 @@ export function NotificationBell() {
     const onDoc = (e: MouseEvent) => {
       if (!ref.current?.contains(e.target as Node)) setOpen(false);
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
     document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   const activityFromLibrary: AppNotification[] = useMemo(() => {
@@ -57,32 +77,48 @@ export function NotificationBell() {
     }));
   }, [lib.continueWatching]);
 
-  const items = useMemo(() => {
+  const allItems = useMemo(() => {
     const merged = [...serverItems, ...activityFromLibrary];
     const seen = new Set<string>();
     const out: AppNotification[] = [];
     for (const n of merged.sort((a, b) => b.createdAt - a.createdAt)) {
-      if (seen.has(n.id)) continue;
+      if (seen.has(n.id) || dismissedIds.has(n.id)) continue;
       seen.add(n.id);
       out.push(n);
     }
     return out.slice(0, 24);
-  }, [serverItems, activityFromLibrary]);
+  }, [serverItems, activityFromLibrary, dismissedIds]);
 
-  const unread = items.filter((n) => !readIds.has(n.id)).length;
+  // Bell shows unread only — read items leave the dropdown
+  const items = useMemo(
+    () => allItems.filter((n) => !readIds.has(n.id)),
+    [allItems, readIds],
+  );
 
-  const markAllRead = () => {
+  const unread = items.length;
+
+  const persistRead = async (ids: string[]) => {
     const next = new Set(readIds);
-    for (const n of items) next.add(n.id);
+    for (const id of ids) next.add(id);
     setReadIds(next);
     saveReadIds(viewerKey, next);
+    try {
+      await fetch("/api/membership/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "read", ids }),
+      });
+    } catch {
+      /* local state already updated */
+    }
+  };
+
+  const markAllRead = () => {
+    void persistRead(items.map((item) => item.id));
   };
 
   const markOne = (id: string) => {
-    const next = new Set(readIds);
-    next.add(id);
-    setReadIds(next);
-    saveReadIds(viewerKey, next);
+    void persistRead([id]);
   };
 
   return (
@@ -97,6 +133,8 @@ export function NotificationBell() {
         aria-label={
           unread ? `Notifications, ${unread} unread` : "Notifications"
         }
+        aria-expanded={open}
+        aria-haspopup="dialog"
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
           <path
@@ -120,52 +158,67 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="gls-glass absolute right-0 top-full z-50 mt-2 w-[min(92vw,360px)] overflow-hidden rounded-xl shadow-2xl">
-          <div className="flex items-center justify-between border-b border-white/10 px-3 py-2.5">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-gls-pink-soft">
+        <div
+          role="dialog"
+          aria-label="Notifications"
+          className="fixed inset-x-3 top-[4.5rem] z-50 max-h-[min(70vh,420px)] overflow-hidden rounded-xl border border-white/15 bg-[#12121a] shadow-2xl sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[min(92vw,360px)] sm:max-w-[calc(100vw-1.5rem)]"
+        >
+          <div className="flex items-center justify-between border-b border-white/10 bg-[#1a1a24] px-3 py-2.5">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#f5d0e0]">
               Notifications
             </p>
-            {unread > 0 && (
-              <button
-                type="button"
-                onClick={markAllRead}
-                className="text-[11px] text-gls-muted hover:text-white"
+            <div className="flex items-center gap-3">
+              {unread > 0 && (
+                <button
+                  type="button"
+                  onClick={markAllRead}
+                  className="text-[11px] font-medium text-[#c8c8d8] hover:text-white"
+                >
+                  Mark all read
+                </button>
+              )}
+              <Link
+                href="/notifications"
+                onClick={() => setOpen(false)}
+                className="text-[11px] font-semibold text-gls-pink-soft hover:text-white"
               >
-                Mark all read
-              </button>
-            )}
+                View all
+              </Link>
+            </div>
           </div>
 
-          <div className="max-h-[70vh] overflow-y-auto">
+          <div className="max-h-[min(60vh,360px)] overflow-y-auto bg-[#12121a]">
             {items.length === 0 ? (
-              <p className="px-4 py-8 text-center text-sm text-gls-muted">
-                No activity yet. Play something to see updates here.
-              </p>
+              <div className="px-4 py-8 text-center">
+                <p className="text-sm font-medium text-white">You&apos;re all caught up</p>
+                <p className="mt-1 text-xs text-[#a8a8b8]">
+                  Read notices live in the Notifications portal.
+                </p>
+                <Link
+                  href="/notifications"
+                  onClick={() => setOpen(false)}
+                  className="mt-3 inline-block text-xs font-semibold text-gls-pink-soft hover:text-white"
+                >
+                  Open portal
+                </Link>
+              </div>
             ) : (
               items.map((n) => {
-                const unreadItem = !readIds.has(n.id);
                 const inner = (
                   <>
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-semibold text-white">
-                        {n.title}
-                      </p>
-                      {unreadItem && (
-                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-gls-red" />
-                      )}
+                      <p className="text-sm font-semibold text-white">{n.title}</p>
+                      <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-gls-red" />
                     </div>
-                    <p className="mt-0.5 line-clamp-2 text-xs text-gls-body">
-                      {n.body}
-                    </p>
-                    <p className="mt-1 text-[10px] uppercase tracking-wide text-gls-muted">
+                    <p className="mt-0.5 line-clamp-2 text-xs text-[#c4c4d4]">{n.body}</p>
+                    <p className="mt-1 text-[10px] uppercase tracking-wide text-[#8e8ea0]">
                       {n.kind} · {formatNotifTime(n.createdAt)}
                     </p>
                   </>
                 );
 
-                const className = `block w-full border-b border-white/5 px-3 py-3 text-left transition hover:bg-white/5 ${
-                  unreadItem ? "bg-white/[0.03]" : ""
-                }`;
+                const className =
+                  "block w-full border-b border-white/8 bg-[#16161f] px-3 py-3 text-left transition hover:bg-[#1e1e2a]";
 
                 if (n.href) {
                   return (

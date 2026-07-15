@@ -32,7 +32,7 @@ export default function AdminUsersPage() {
   }, [q]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
 
   const grant = async () => {

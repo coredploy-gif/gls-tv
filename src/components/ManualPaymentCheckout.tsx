@@ -197,6 +197,21 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                   <p className="mt-1 text-sm text-gls-muted">
                     No automatic debit · renew when you choose
                   </p>
+                  <p className="mt-2 text-xs text-gls-muted">
+                    By paying, you accept the{" "}
+                    <Link href="/legal#terms" className="text-white underline">
+                      Terms
+                    </Link>
+                    ,{" "}
+                    <Link href="/legal#privacy" className="text-white underline">
+                      Privacy notice
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/legal#payments" className="text-white underline">
+                      refund/cancellation policy
+                    </Link>
+                    .
+                  </p>
                 </div>
                 <p className="gls-display text-5xl text-gls-pink-soft">
                   R{(payment.amount_zar_cents / 100).toFixed(0)}

@@ -17,36 +17,79 @@ export default function AdminSystemLinksPage() {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [placement, setPlacement] = useState("nav");
+  const [isActive, setIsActive] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const res = await fetch("/api/admin/system-links");
-    const json = await res.json();
-    setLinks(json.links || []);
+    try {
+      const res = await fetch("/api/admin/system-links", { cache: "no-store" });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || "Links could not be loaded");
+      setLinks(json.links || []);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Links could not be loaded");
+    }
   }, []);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
 
   const add = async () => {
     if (!title.trim() || !url.trim()) return;
-    await fetch("/api/admin/system-links", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, url, placement }),
-    });
-    setTitle("");
-    setUrl("");
-    void load();
+    setBusy(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/admin/system-links", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingId,
+          title,
+          url,
+          placement,
+          is_active: isActive,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || "Link could not be saved");
+      setTitle("");
+      setUrl("");
+      setPlacement("nav");
+      setIsActive(true);
+      setEditingId(null);
+      setMessage(editingId ? "Link updated." : "Link created.");
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Link could not be saved");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const remove = async (id: string) => {
-    await fetch("/api/admin/system-links", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "delete", id }),
-    });
-    void load();
+    if (!confirm("Delete this managed link?")) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/system-links", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete", id }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || "Link could not be deleted");
+      setMessage("Link deleted.");
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Link could not be deleted");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -60,7 +103,7 @@ export default function AdminSystemLinksPage() {
       <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,380px)_1fr]">
         <div className="gls-admin-card h-fit space-y-3 rounded-lg p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gls-red">
-            Add link
+            {editingId ? "Edit link" : "Add link"}
           </p>
           <input
             value={title}
@@ -79,7 +122,7 @@ export default function AdminSystemLinksPage() {
             onChange={(e) => setPlacement(e.target.value)}
             className="gls-admin-input"
           >
-            {["nav", "footer", "browse", "sports", "landing", "custom"].map(
+            {["nav", "footer"].map(
               (p) => (
                 <option key={p} value={p}>
                   Placement: {p}
@@ -87,13 +130,42 @@ export default function AdminSystemLinksPage() {
               ),
             )}
           </select>
+          <label className="flex items-center gap-2 text-sm text-gls-body">
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={(event) => setIsActive(event.target.checked)}
+            />
+            Published
+          </label>
           <button
             type="button"
             onClick={add}
+            disabled={busy}
             className="gls-cta w-full rounded-md px-3 py-2.5 text-sm"
           >
-            Add link
+            {busy ? "Saving…" : editingId ? "Save changes" : "Add link"}
           </button>
+          {editingId && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                setEditingId(null);
+                setTitle("");
+                setUrl("");
+                setPlacement("nav");
+                setIsActive(true);
+              }}
+              className="w-full rounded border border-white/20 px-3 py-2 text-sm text-white"
+            >
+              Cancel edit
+            </button>
+          )}
+          <div aria-live="polite">
+            {error && <p className="text-sm text-red-200">{error}</p>}
+            {message && <p className="text-sm text-emerald-200">{message}</p>}
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -108,16 +180,38 @@ export default function AdminSystemLinksPage() {
                   <span className="gls-admin-pill bg-white/10 text-gls-body">
                     {l.placement}
                   </span>
+                  <span className="gls-admin-pill bg-white/10 text-gls-body">
+                    {l.is_active ? "published" : "draft"}
+                  </span>
                 </div>
                 <p className="mt-1 truncate text-xs text-gls-muted">{l.url}</p>
               </div>
-              <button
-                type="button"
-                onClick={() => remove(l.id)}
-                className="shrink-0 text-xs font-medium text-gls-muted transition hover:text-gls-red"
-              >
-                Remove
-              </button>
+              <div className="flex shrink-0 gap-3">
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => {
+                    setEditingId(l.id);
+                    setTitle(l.title);
+                    setUrl(l.url);
+                    setPlacement(l.placement);
+                    setIsActive(l.is_active);
+                    setError(null);
+                    setMessage(null);
+                  }}
+                  className="text-xs font-medium text-gls-muted transition hover:text-white"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => remove(l.id)}
+                  className="text-xs font-medium text-gls-muted transition hover:text-gls-red"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
           ))}
           {!links.length && (

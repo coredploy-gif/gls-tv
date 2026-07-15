@@ -358,11 +358,30 @@ export function ManualBillingAdmin({
           setQ={setQ}
           busy={busy}
           refund={(receipt) => {
-            const note = prompt(
-              `Refund note for ${receipt.receipt_number} (this records the refund; make the actual bank/Yoco refund separately):`,
+            const refundMethod = prompt(
+              `Only continue after money was returned outside GLS TV. Enter refund method for ${receipt.receipt_number}: yoco or eft`,
             );
-            if (note === null) return;
-            void action({ action: "refund", receiptId: receipt.id, note });
+            if (!refundMethod || !["yoco", "eft"].includes(refundMethod.toLowerCase()))
+              return;
+            const refundReference = prompt(
+              "Enter the completed Yoco/EFT refund transaction reference:",
+            );
+            if (!refundReference) return;
+            const note = prompt("Optional internal refund note:") || "";
+            if (
+              !confirm(
+                "Confirm that the money has already been returned through Yoco or EFT. GLS TV only records the completed external refund.",
+              )
+            )
+              return;
+            void action({
+              action: "refund",
+              receiptId: receipt.id,
+              note,
+              refundMethod: refundMethod.toLowerCase(),
+              refundReference,
+              confirmExternalRefund: true,
+            });
           }}
         />
       )}
@@ -895,7 +914,11 @@ function ReportsView({ reports }: { reports: Reports | null }) {
           ["Revenue 30d", money(s.revenue30dZarCents), "Paid receipts"],
           ["Total revenue", money(s.totalRevenueZarCents), "All recorded"],
           ["Paying members", s.uniquePayingMembers, `${s.activeMembers} active`],
-          ["Renewal rate", `${s.renewalRate}%`, `${s.renewals} renewals`],
+          [
+            "Returning-payer rate",
+            `${s.renewalRate}%`,
+            `${s.renewals} repeat receipts; share of payers with 2+ receipts`,
+          ],
           ["Receipts", s.receiptCount, "Non-refunded"],
           ["Pending", s.pending, "Needs workflow"],
           ["Rejected", s.rejected, "Unmatched"],

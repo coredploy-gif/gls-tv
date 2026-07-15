@@ -39,7 +39,7 @@ export function FinanceSubscriptions() {
   }, [q]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
 
   const cancel = async (subscriptionId: string) => {
@@ -63,7 +63,7 @@ export function FinanceSubscriptions() {
       <AdminPageHeader
         eyebrow="Finance"
         title="Subscriptions"
-        description="Local subscription mirror synced from Stripe webhooks and admin grants."
+        description="Legacy subscription mirror. Stripe controls are dormant; launch memberships renew manually through Yoco/EFT."
       />
       <input
         className="gls-admin-input mt-8 max-w-md"

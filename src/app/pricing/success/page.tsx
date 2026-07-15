@@ -13,8 +13,10 @@ function SuccessBody() {
 
   useEffect(() => {
     if (!sessionId) {
-      setStatus("ok");
-      setDetail("Payment received. Your plan will activate shortly.");
+      queueMicrotask(() => {
+        setStatus("ok");
+        setDetail("Payment received. Your plan will activate shortly.");
+      });
       return;
     }
     let cancelled = false;

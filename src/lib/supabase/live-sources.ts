@@ -17,17 +17,26 @@ function browserClient() {
 }
 
 function applyHeal(item: CatalogItem, sources: MediaSource[]): CatalogItem {
-  const { sources: healed, tags } = healChannelSources({
+  const { sources: healed, tags, cleared } = healChannelSources({
     ...item,
     sources,
   });
-  if (!healed.length) return { ...item, sources };
+  if (!healed.length && !cleared) return { ...item, sources };
+  const linearPay =
+    cleared ||
+    tags.includes("LinearPay") ||
+    tags.includes("Rights");
   return {
     ...item,
     sources: healed,
+    description: linearPay
+      ? `${item.title} is a linear pay-TV sports channel. GLS lists it for discovery and onboarding — use the official licensed provider in your territory (no open pirate HLS).`
+      : item.description,
     categories: [
       ...new Set([
-        ...item.categories.filter((c) => c !== "NeedsUrl"),
+        ...item.categories.filter(
+          (c) => c !== "NeedsUrl" && c !== "Playable" && c !== "Unavailable",
+        ),
         ...tags,
       ]),
     ],
@@ -132,7 +141,7 @@ export async function withLiveSources(
     }
 
     const family = sportsFamily(item);
-    let mirrors = [...primary, ...secondary];
+    const mirrors = [...primary, ...secondary];
     if (!mirrors.length) {
       return applyHeal(item, item.sources);
     }
@@ -186,7 +195,11 @@ export async function withLiveSources(
               family ? "LinearSports" : null,
               isLinearSportsPack(item) ? "LinearSports" : null,
               channel?.health_status === "healthy" ? "Playable" : null,
-              channel?.health_status && channel.health_status !== "healthy"
+              channel?.health_status &&
+              channel.health_status !== "healthy" &&
+              !healedItem.categories.includes("Rights") &&
+              !healedItem.categories.includes("LinearPay") &&
+              !healedItem.categories.includes("Unavailable")
                 ? "ProxyOk"
                 : null,
             ] as (string | null)[]

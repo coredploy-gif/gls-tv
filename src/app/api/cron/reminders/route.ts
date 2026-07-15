@@ -110,7 +110,7 @@ async function run(req: NextRequest) {
           days <= 1
             ? "Trial ends tomorrow"
             : `${days} days left on your trial`,
-        body: "Add a card on Plans to keep watching after your free trial.",
+        body: "Renew for 30 days with a Yoco payment link or verified EFT to keep watching.",
         href: "/pricing",
         severity: days <= 1 ? "urgent" : "warn",
         dedupe_key: `trial-ending-${t.trial_ends_at.slice(0, 10)}`,

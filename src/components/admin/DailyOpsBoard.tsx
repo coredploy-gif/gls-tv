@@ -98,7 +98,7 @@ export function DailyOpsBoard() {
   }, []);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
     const t = setInterval(() => void load(), 60_000);
     return () => clearInterval(t);
   }, [load]);

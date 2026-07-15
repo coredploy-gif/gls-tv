@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
     "iptv:fetch": "node scripts/fetch-iptv.mjs",
     "iptv:parse": "node scripts/parse-m3u.mjs",
     "iptv:sync": "node scripts/fetch-iptv.mjs && node scripts/parse-m3u.mjs",
@@ -43,6 +44,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

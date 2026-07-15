@@ -40,7 +40,7 @@ export function FinanceCustomers() {
   }, [q]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
 
   const grant = async () => {
@@ -103,7 +103,7 @@ export function FinanceCustomers() {
       <AdminPageHeader
         eyebrow="Finance"
         title="Customers"
-        description="Search accounts, grant paid plans, open Stripe Customer Portal, or sync from Stripe."
+        description="Legacy account tools. Stripe portal/sync actions are dormant; use Manual Billing for launch payments."
       />
 
       <div className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,340px)_1fr]">

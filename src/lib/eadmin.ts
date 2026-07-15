@@ -1,19 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 
-/** Built-in owner admins — never subject to trial / device lock. */
-const BUILTIN_EADMIN_EMAILS = ["t.cassim3@gmail.com"];
-
-/** Comma-separated admin emails that can use /eadmin and /admin */
+/** Server-only emergency bootstrap owners. Normal access is database-backed. */
 export function eadminEmails(): string[] {
-  const fromEnv = [
-    process.env.EADMIN_EMAILS || "",
-    process.env.NEXT_PUBLIC_EADMIN_EMAILS || "",
-  ]
-    .join(",")
+  const fromEnv = (process.env.EADMIN_EMAILS || "")
     .split(",")
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
-  return [...new Set([...BUILTIN_EADMIN_EMAILS, ...fromEnv])];
+  return [...new Set(fromEnv)];
 }
 
 export function isEadminEmail(email: string | null | undefined): boolean {

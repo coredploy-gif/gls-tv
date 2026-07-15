@@ -5,10 +5,14 @@ export type UserPlaylistRow = {
   user_id: string;
   name: string;
   source_url: string | null;
+  source_redacted?: string | null;
   channel_count: number;
   status: string;
   error_message: string | null;
   last_synced_at: string | null;
+  last_attempt_at?: string | null;
+  last_import_id?: string | null;
+  import_stats?: Record<string, number | string>;
   created_at: string;
   updated_at: string;
 };
@@ -25,7 +29,7 @@ export type UserPlaylistChannelRow = {
   categories: string[];
   countries: string[];
   tvg_id: string | null;
-  stream_url: string;
+  stream_url?: string;
   quality: string;
   format: string;
   sort_order: number;
@@ -56,7 +60,7 @@ export function channelRowToCatalog(
     isLive: true,
     sources: [
       {
-        url: row.stream_url,
+        url: `/api/hls?channelId=${encodeURIComponent(row.id)}`,
         quality: row.quality || "Auto",
         format,
       },
@@ -64,12 +68,16 @@ export function channelRowToCatalog(
   };
 }
 
-export function mineWatchHref(slug: string) {
-  return `/watch/mine/${encodeURIComponent(slug)}`;
+export function mineWatchHref(channelId: string) {
+  return `/watch/mine/${encodeURIComponent(channelId)}`;
 }
 
 export const PLAYLIST_LIMITS = {
   maxChannels: 2000,
+  maxAccountChannels: 5000,
+  maxPlaylists: 10,
   maxBytes: 8 * 1024 * 1024,
   maxRawStore: 512 * 1024,
+  refreshCooldownMs: 30_000,
+  pageSize: 240,
 } as const;

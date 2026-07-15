@@ -62,26 +62,45 @@ export function ProfilesGate() {
   const pickViewer = (p: Viewer) => {
     if (picking) return;
     setPicking(p.id);
+    setError(null);
     startTransition(async () => {
       try {
+        const deviceId = getOrCreateDeviceId();
         const res = await fetch("/api/membership/profiles", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "select", viewerId: p.id }),
+          body: JSON.stringify({
+            action: "select",
+            viewerId: p.id,
+            deviceId,
+          }),
         });
         const json = (await res.json()) as {
           ok?: boolean;
           redirectTo?: string;
           error?: string;
+          code?: string;
+          manageUrl?: string;
         };
         if (!res.ok || !json.redirectTo) {
+          if (res.status === 409 || json.code === "DEVICE_LIMIT") {
+            setPicking(null);
+            setError(
+              json.error ||
+                "Sign out from a device already signed in, then try again.",
+            );
+            return;
+          }
           throw new Error(json.error || "Could not open profile");
         }
-        // Hard navigate so middleware sees the Set-Cookie from the API response
         window.location.assign(json.redirectTo);
       } catch (e) {
         setPicking(null);
-        setError("We couldn’t open that profile right now. Please try again.");
+        setError(
+          e instanceof Error
+            ? e.message
+            : "We couldn’t open that profile right now. Please try again.",
+        );
       }
     });
   };
@@ -154,7 +173,15 @@ export function ProfilesGate() {
         </p>
       )}
       {error && (
-        <p className="relative mt-3 text-sm text-gls-red">{error}</p>
+        <div className="relative z-10 mt-6 max-w-md rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-center">
+          <p className="text-sm text-amber-100">{error}</p>
+          <Link
+            href="/account#devices"
+            className="mt-2 inline-block text-sm font-semibold text-white underline"
+          >
+            Manage devices
+          </Link>
+        </div>
       )}
       <div className="relative z-10 mt-12 flex flex-wrap justify-center gap-8">
         {viewers.map((p) => (

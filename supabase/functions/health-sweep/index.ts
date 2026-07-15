@@ -59,12 +59,13 @@ Deno.serve(async (req) => {
 
   const cronSecret = Deno.env.get("CRON_SECRET") || "";
   const auth = req.headers.get("Authorization") || "";
-  const url = new URL(req.url);
-  const qSecret = url.searchParams.get("secret") || "";
-  const okAuth =
-    !cronSecret ||
-    auth === `Bearer ${cronSecret}` ||
-    qSecret === cronSecret;
+  if (!cronSecret) {
+    return Response.json(
+      { error: "CRON_SECRET is not configured" },
+      { status: 503 },
+    );
+  }
+  const okAuth = auth === `Bearer ${cronSecret}`;
 
   if (!okAuth) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });

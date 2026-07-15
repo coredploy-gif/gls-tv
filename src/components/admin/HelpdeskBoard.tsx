@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 type Ticket = {
@@ -45,7 +46,8 @@ const STATUS_TONE: Record<string, string> = {
   closed: "bg-white/10 text-gls-muted",
 };
 
-export function HelpdeskBoard() {
+function HelpdeskBoardInner() {
+  const search = useSearchParams();
   const [view, setView] = useState<"list" | "board">("list");
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [status, setStatus] = useState("all");
@@ -58,6 +60,7 @@ export function HelpdeskBoard() {
   const [reply, setReply] = useState("");
   const [threadBusy, setThreadBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [threadErr, setThreadErr] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setBusy(true);
@@ -74,8 +77,35 @@ export function HelpdeskBoard() {
   }, [status, priority, source, q]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
+
+  const openTicket = useCallback(async (t: Ticket | string) => {
+    const id = typeof t === "string" ? t : t.id;
+    setThreadBusy(true);
+    setThreadErr(null);
+    setReply("");
+    const res = await fetch(`/api/admin/helpdesk?ticketId=${id}`);
+    const json = await res.json();
+    setThreadBusy(false);
+    if (res.ok) {
+      setSelected(json.ticket);
+      setMessages(json.messages || []);
+      window.history.replaceState(
+        null,
+        "",
+        `/admin/helpdesk?ticket=${encodeURIComponent(id)}`,
+      );
+    } else {
+      setThreadErr(json.error || "Thread could not be loaded");
+      setMessages([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    const id = search.get("ticket");
+    if (id) queueMicrotask(() => void openTicket(id));
+  }, [search, openTicket]);
 
   const updateStatus = async (id: string, next: string) => {
     const res = await fetch("/api/admin/helpdesk", {
@@ -83,27 +113,16 @@ export function HelpdeskBoard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "update", id, status: next }),
     });
-    if (res.ok) void load();
-  };
-
-  const openTicket = async (t: Ticket) => {
-    setSelected(t);
-    setReply("");
-    setThreadBusy(true);
-    const res = await fetch(`/api/admin/helpdesk?ticketId=${t.id}`);
-    const json = await res.json();
-    setThreadBusy(false);
     if (res.ok) {
-      setSelected(json.ticket || t);
-      setMessages(json.messages || []);
-    } else {
-      setMessages([]);
+      void load();
+      if (selected?.id === id) void openTicket(id);
     }
   };
 
   const sendReply = async () => {
     if (!selected || !reply.trim()) return;
     setThreadBusy(true);
+    setThreadErr(null);
     const res = await fetch("/api/admin/helpdesk", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -113,11 +132,14 @@ export function HelpdeskBoard() {
         body: reply.trim(),
       }),
     });
+    const json = await res.json().catch(() => ({}));
     setThreadBusy(false);
     if (res.ok) {
       setReply("");
-      await openTicket(selected);
+      await openTicket(selected.id);
       void load();
+    } else {
+      setThreadErr((json as { error?: string }).error || "Reply failed — try again");
     }
   };
 
@@ -141,12 +163,17 @@ export function HelpdeskBoard() {
     return map;
   }, [tickets]);
 
+  const closeModal = () => {
+    setSelected(null);
+    window.history.replaceState(null, "", "/admin/helpdesk");
+  };
+
   return (
     <div>
       <AdminPageHeader
         eyebrow="Support desk"
         title="Helpdesk"
-        description="Jira-style queue — list by default, board for flow. Chat escalations land as GLS-0001…"
+        description="Member chat tickets and converted public contacts. Open a row for the full thread."
         actions={
           <>
             <div className="flex overflow-hidden rounded-md border border-white/15 bg-black/40 p-0.5">
@@ -210,7 +237,7 @@ export function HelpdeskBoard() {
           onChange={(e) => setSource(e.target.value)}
           className="gls-admin-input w-auto"
         >
-          {["all", "chat", "email", "manual", "system"].map((s) => (
+          {["all", "chat", "contact", "email", "manual", "system"].map((s) => (
             <option key={s} value={s}>
               Source: {s}
             </option>
@@ -237,6 +264,7 @@ export function HelpdeskBoard() {
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Priority</th>
                 <th className="px-4 py-3">Requester</th>
+                <th className="px-4 py-3">Source</th>
                 <th className="px-4 py-3">Updated</th>
               </tr>
             </thead>
@@ -275,6 +303,9 @@ export function HelpdeskBoard() {
                   <td className="px-4 py-3 text-gls-muted">
                     {t.requester_email || "—"}
                   </td>
+                  <td className="px-4 py-3 text-xs uppercase text-gls-muted">
+                    {t.source}
+                  </td>
                   <td className="px-4 py-3 text-xs text-gls-muted">
                     {new Date(t.updated_at).toLocaleString()}
                   </td>
@@ -283,12 +314,13 @@ export function HelpdeskBoard() {
               {!tickets.length && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="px-4 py-16 text-center text-gls-muted"
                   >
                     <p className="gls-display text-3xl text-white/20">Empty queue</p>
                     <p className="mt-2 text-sm">
-                      Chat escalations land here as GLS-####.
+                      Chat escalations land here as GLS-####. Look for [DEMO] to
+                      preview a sample thread.
                     </p>
                   </td>
                 </tr>
@@ -346,11 +378,14 @@ export function HelpdeskBoard() {
       {selected && (
         <div
           className="gls-admin-modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelected(null)}
+          onClick={closeModal}
         >
           <div
             className="gls-admin-modal flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-lg"
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Ticket ${selected.ticket_number}`}
           >
             <div className="border-b border-white/10 p-6 pb-4">
               <p className="font-mono text-sm font-semibold text-gls-red">
@@ -359,10 +394,18 @@ export function HelpdeskBoard() {
               <h3 className="mt-2 text-2xl font-semibold tracking-tight text-white">
                 {selected.subject}
               </h3>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <span className={`gls-admin-pill ${STATUS_TONE[selected.status]}`}>
-                  {selected.status}
-                </span>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <select
+                  value={selected.status}
+                  onChange={(e) => updateStatus(selected.id, e.target.value)}
+                  className={`gls-admin-pill border-0 ${STATUS_TONE[selected.status]}`}
+                >
+                  {BOARD_COLS.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
                 <span
                   className={`gls-admin-pill ${PRIORITY_TONE[selected.priority]}`}
                 >
@@ -378,7 +421,7 @@ export function HelpdeskBoard() {
               </p>
             </div>
 
-            <div className="flex-1 space-y-3 overflow-y-auto p-6">
+            <div className="flex-1 space-y-2.5 overflow-y-auto bg-[#0c0c12] p-5">
               {selected.description && (
                 <div className="rounded-lg border border-white/10 bg-black/40 p-3 text-sm text-gls-body">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-gls-muted">
@@ -390,25 +433,41 @@ export function HelpdeskBoard() {
               {threadBusy && !messages.length && (
                 <p className="text-sm text-gls-muted">Loading thread…</p>
               )}
-              {messages.map((m) => (
-                <div
-                  key={m.id}
-                  className={`rounded-lg border px-3 py-2.5 text-sm ${
-                    m.author_type === "agent"
-                      ? "border-gls-pink/30 bg-gls-pink/10"
-                      : "border-white/10 bg-black/40"
-                  }`}
-                >
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-gls-muted">
-                    {m.author_type} · {m.author_email || "—"} ·{" "}
-                    {new Date(m.created_at).toLocaleString()}
-                  </p>
-                  <p className="mt-1 whitespace-pre-wrap text-white">{m.body}</p>
-                </div>
-              ))}
+              {messages.map((m) => {
+                const agent = m.author_type === "agent";
+                const system = m.author_type === "system";
+                return (
+                  <div
+                    key={m.id}
+                    className={`flex ${agent ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-sm ${
+                        system
+                          ? "w-full rounded-md border border-white/10 bg-white/5 text-gls-muted"
+                          : agent
+                            ? "rounded-br-md bg-gls-pink/20 text-white"
+                            : "rounded-bl-md bg-[#1a1a24] text-[#e8e8f0]"
+                      }`}
+                    >
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-gls-muted">
+                        {m.author_type}
+                        {m.author_email ? ` · ${m.author_email}` : ""} ·{" "}
+                        {new Date(m.created_at).toLocaleString()}
+                      </p>
+                      <p className="mt-1 whitespace-pre-wrap">{m.body}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="border-t border-white/10 p-4">
+              {threadErr && (
+                <p role="alert" className="mb-2 text-sm text-red-300">
+                  {threadErr}
+                </p>
+              )}
               <textarea
                 className="gls-admin-input min-h-[80px] w-full"
                 placeholder="Agent reply…"
@@ -427,7 +486,7 @@ export function HelpdeskBoard() {
                 <button
                   type="button"
                   className="rounded-md border border-white/20 px-4 py-2.5 text-sm text-gls-body"
-                  onClick={() => setSelected(null)}
+                  onClick={closeModal}
                 >
                   Close
                 </button>
@@ -437,5 +496,13 @@ export function HelpdeskBoard() {
         </div>
       )}
     </div>
+  );
+}
+
+export function HelpdeskBoard() {
+  return (
+    <Suspense fallback={<p className="p-8 text-sm text-gls-muted">Loading helpdesk…</p>}>
+      <HelpdeskBoardInner />
+    </Suspense>
   );
 }

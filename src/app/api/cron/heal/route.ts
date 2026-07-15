@@ -71,7 +71,7 @@ async function runHeal(req: NextRequest) {
   }>((resolve) => {
     const child = spawn(process.execPath, [script], {
       cwd: process.cwd(),
-      env: { ...process.env, NODE_TLS_REJECT_UNAUTHORIZED: "0" },
+      env: process.env,
     });
     let stdout = "";
     let stderr = "";

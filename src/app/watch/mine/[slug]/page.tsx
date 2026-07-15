@@ -8,6 +8,7 @@ import {
   mineWatchHref,
   type UserPlaylistChannelRow,
 } from "@/lib/playlists";
+import { getAccountEntitlement } from "@/lib/membership/account";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 
@@ -23,12 +24,14 @@ export default async function WatchMinePage({ params }: Props) {
   if (!user) {
     redirect(`/auth?next=/watch/mine/${encodeURIComponent(slug)}`);
   }
+  const entitlement = await getAccountEntitlement(user.id, user.email);
+  if (!entitlement.allowed) redirect("/pricing?reason=membership-required");
 
   const { data: row } = await supabase
     .from("user_playlist_channels")
     .select("*")
     .eq("user_id", user.id)
-    .eq("slug", slug)
+    .eq("id", slug)
     .maybeSingle();
 
   if (!row) notFound();
@@ -40,7 +43,7 @@ export default async function WatchMinePage({ params }: Props) {
     .select("*")
     .eq("user_id", user.id)
     .eq("playlist_id", row.playlist_id)
-    .neq("slug", slug)
+    .neq("id", slug)
     .order("sort_order", { ascending: true })
     .limit(24);
 
@@ -94,7 +97,7 @@ export default async function WatchMinePage({ params }: Props) {
             items={related}
             limit={24}
             viewMoreHref="/playlists"
-            hrefForItem={(ch) => mineWatchHref(ch.slug)}
+            hrefForItem={(ch) => mineWatchHref(ch.id.replace(/^user-/, ""))}
           />
         </div>
       )}

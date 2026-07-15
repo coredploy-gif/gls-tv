@@ -104,6 +104,11 @@ function isPiratePayLinear(item) {
   if (/^supersport\b/i.test(t) || /^dstv\b/i.test(t)) return true;
   if (/bein\s*sports/i.test(t) && !/xtra/i.test(t)) return true;
   if (/^premier\s*sports\b/i.test(t)) return true;
+  // Balkan / RU Arena pay-linear (not TeleArena FTA)
+  if (/^arena\s*(sport|fight|premium)/i.test(t) || /^arena\s*sport/i.test(t))
+    return true;
+  if (/^match\s*!?\s*arena/i.test(t) || /матч.?арена/i.test(t)) return true;
+  if (/^vivacom\s*arena/i.test(t)) return true;
   // http IP or shady non-HTTPS already filtered — also drop opaque IP CDNs
   try {
     const host = new URL(item.url).hostname.toLowerCase();

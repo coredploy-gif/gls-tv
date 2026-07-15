@@ -52,8 +52,10 @@ export function EadminSeedsPanel() {
   }, []);
 
   useEffect(() => {
-    if (!loading && user) void load();
-    if (!loading && !user) setAllowed(null);
+    queueMicrotask(() => {
+      if (!loading && user) void load();
+      if (!loading && !user) setAllowed(null);
+    });
   }, [loading, user, load]);
 
   const saveAll = async () => {

@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createServiceClient, isEadminEmail } from "@/lib/eadmin";
+import { createServiceClient } from "@/lib/eadmin";
 import { writeAuditLog } from "@/lib/admin/audit";
+import { getAdminAccess, hasAdminPermission } from "@/lib/admin/access";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 async function assertAdmin() {
-  const sb = await createClient();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
-  if (!user || !isEadminEmail(user.email)) return null;
-  return user;
+  const access = await getAdminAccess();
+  if (!access || !hasAdminPermission(access, "support.write")) return null;
+  return access.user;
 }
 
 export async function GET(req: NextRequest) {
@@ -79,19 +77,34 @@ export async function POST(req: NextRequest) {
     data: { user: sessionUser },
   } = await sb.auth.getUser();
 
-  // Public: escalate from live chat → ticket GLS-#### (service role insert)
+  // Chat escalation is account-only. Durable anonymous rate limiting is not
+  // available in this deployment, so unauthenticated ticket creation is disabled.
   if (action === "create_from_chat") {
-    const subject = String(body.subject || "Live chat request").slice(0, 200);
-    const description = String(body.description || "").slice(0, 8000);
-    const email =
-      String(body.email || sessionUser?.email || "").slice(0, 200) || null;
+    if (!sessionUser) {
+      return NextResponse.json(
+        { error: "Sign in before creating a support ticket." },
+        { status: 401 },
+      );
+    }
+    if (String(body.website || body.company || "").trim()) {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
+    const subject = String(body.subject || "Live chat request").trim().slice(0, 200);
+    const description = String(body.description || "").trim().slice(0, 8000);
+    if (subject.length < 3 || description.length < 10) {
+      return NextResponse.json(
+        { error: "Add a subject and at least 10 characters of detail." },
+        { status: 400 },
+      );
+    }
+    const email = sessionUser.email?.slice(0, 200) || null;
     const { data, error } = await service
       .from("helpdesk_tickets")
       .insert({
         subject,
         description,
         requester_email: email,
-        requester_user_id: sessionUser?.id || null,
+        requester_user_id: sessionUser.id,
         source: "chat",
         status: "open",
         priority: "medium",
@@ -117,7 +130,7 @@ export async function POST(req: NextRequest) {
   }
 
   const user = await assertAdmin();
-  if (!user || !isEadminEmail(user.email))
+  if (!user)
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   if (action === "update") {
@@ -200,7 +213,7 @@ export async function POST(req: NextRequest) {
         kind: "ticket_reply",
         title: `Support replied · ${ticket.ticket_number}`,
         body: message.slice(0, 280),
-        href: "/pricing",
+        href: `/support?ticket=${encodeURIComponent(id)}`,
         severity: "info",
         dedupe_key: `ticket-reply-${msg.id}`,
         created_by: user.email,

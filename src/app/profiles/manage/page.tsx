@@ -49,7 +49,9 @@ export default function ManageProfilesPage() {
 
   useEffect(() => {
     if (!user) return;
-    load().catch((e) => setError(e.message));
+    queueMicrotask(() => {
+      void load().catch((e) => setError(e.message));
+    });
   }, [user, load]);
 
   const openCreate = () => {

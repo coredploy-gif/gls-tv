@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createServiceClient, isEadminEmail } from "@/lib/eadmin";
+import { createServiceClient } from "@/lib/eadmin";
+import { getAdminAccess, hasAdminPermission } from "@/lib/admin/access";
 import { writeAuditLog } from "@/lib/admin/audit";
 import type { ReminderInsert, ReminderKind, ReminderSeverity } from "@/lib/reminders";
 
@@ -8,12 +8,9 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 async function assertAdmin() {
-  const sb = await createClient();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
-  if (!user || !isEadminEmail(user.email)) return null;
-  return user;
+  const access = await getAdminAccess();
+  if (!access || !hasAdminPermission(access, "ops.write")) return null;
+  return access.user;
 }
 
 async function upsertReminder(
@@ -91,7 +88,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  let rows = data || [];
+  const rows = data || [];
   const userIds = [...new Set(rows.map((r) => r.user_id))];
   const { data: profiles } = userIds.length
     ? await service.from("profiles").select("id, email, display_name").in("id", userIds)
@@ -259,7 +256,7 @@ export async function POST(req: NextRequest) {
           user_id: s.user_id,
           kind: "past_due",
           title: "Payment needs attention",
-          body: "Your GLS TV subscription is past due. Update your card to restore premium.",
+          body: "Your GLS TV membership has ended. Renew for 30 days with Yoco or verified EFT to restore access.",
           href: "/pricing",
           severity: "urgent",
           dedupe_key: `past-due-${new Date().toISOString().slice(0, 10)}`,

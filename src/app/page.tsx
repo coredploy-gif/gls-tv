@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { GlsLogo } from "@/components/GlsLogo";
 import { GLS_PLANS } from "@/lib/membership/plans";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function LandingPage() {
   return (

@@ -1,6 +1,6 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import QRCode from "qrcode";
-import { maxViewerSlots, type GlsPlanId } from "@/lib/membership/plans";
+import type { GlsPlanId } from "@/lib/membership/plans";
 
 export type ManualPlanId = Extract<GlsPlanId, "gls_55" | "gls_65" | "gls_75">;
 export type ManualPaymentStatus =
@@ -208,181 +208,29 @@ export async function activateManualPayment(input: {
   paymentId: string;
   adminEmail: string;
   externalTransactionId?: string | null;
+  paymentMethod: Exclude<ManualPaymentMethod, "unselected">;
   adminNote?: string | null;
   paidAt?: string | null;
 }) {
-  const { service, paymentId, adminEmail } = input;
-  const { data: payment, error } = await service
-    .from("manual_payment_requests")
-    .select("*")
-    .eq("id", paymentId)
-    .single();
-  if (error || !payment) {
-    return { ok: false as const, error: error?.message || "Payment not found" };
+  const paidAt = new Date(input.paidAt || Date.now());
+  if (Number.isNaN(paidAt.getTime())) {
+    return { ok: false as const, error: "Invalid paid date" };
   }
-
-  const { data: existingReceipt } = await service
-    .from("payment_receipts")
-    .select("*")
-    .eq("payment_request_id", paymentId)
-    .maybeSingle();
-  if (existingReceipt) {
-    return {
-      ok: true as const,
-      alreadyPaid: true,
-      payment,
-      receipt: existingReceipt,
-    };
+  const { data, error } = await input.service.rpc("activate_manual_payment", {
+    p_payment_id: input.paymentId,
+    p_admin_email: input.adminEmail,
+    p_external_transaction_id: input.externalTransactionId?.trim() || null,
+    p_payment_method: input.paymentMethod,
+    p_admin_note: input.adminNote?.trim() || null,
+    p_paid_at: paidAt.toISOString(),
+  });
+  if (error || !data) {
+    return { ok: false as const, error: error?.message || "Activation failed" };
   }
-
-  const { data: currentSub } = await service
-    .from("subscriptions")
-    .select("current_period_end")
-    .eq("user_id", payment.user_id)
-    .maybeSingle();
-  const now = new Date(input.paidAt || Date.now());
-  const existingEnd = currentSub?.current_period_end
-    ? new Date(currentSub.current_period_end)
-    : null;
-  const startsAt =
-    existingEnd && existingEnd.getTime() > now.getTime() ? existingEnd : now;
-  const endsAt = new Date(
-    startsAt.getTime() + MEMBERSHIP_DAYS * 86_400_000,
-  );
-  const transactionId =
-    input.externalTransactionId?.trim() ||
-    payment.external_transaction_id ||
-    null;
-
-  const { error: profileError } = await service
-    .from("profiles")
-    .update({
-      plan: payment.plan,
-      is_premium: true,
-      is_admin_exception: false,
-      max_viewer_profiles: maxViewerSlots(payment.plan),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", payment.user_id);
-  if (profileError) {
-    return { ok: false as const, error: profileError.message };
-  }
-
-  const { error: subError } = await service.from("subscriptions").upsert(
-    {
-      user_id: payment.user_id,
-      plan: payment.plan,
-      status: "active",
-      provider: payment.payment_method === "yoco" ? "yoco" : "manual",
-      external_id: transactionId || payment.payment_reference,
-      current_period_end: endsAt.toISOString(),
-      amount_zar_cents: payment.amount_zar_cents,
-      currency: "zar",
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" },
-  );
-  if (subError) return { ok: false as const, error: subError.message };
-
-  const paidAt = now.toISOString();
-  const { data: paidPayment, error: paymentError } = await service
-    .from("manual_payment_requests")
-    .update({
-      status: "paid",
-      paid_at: paidAt,
-      submitted_at: payment.submitted_at || paidAt,
-      verified_at: new Date().toISOString(),
-      verified_by: adminEmail,
-      external_transaction_id: transactionId,
-      admin_note: input.adminNote || payment.admin_note || null,
-      membership_starts_at: startsAt.toISOString(),
-      membership_ends_at: endsAt.toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", paymentId)
-    .select("*")
-    .single();
-  if (paymentError) {
-    return { ok: false as const, error: paymentError.message };
-  }
-
-  const [{ data: profile }, settings] = await Promise.all([
-    service
-      .from("profiles")
-      .select("email, display_name")
-      .eq("id", payment.user_id)
-      .maybeSingle(),
-    getManualPaymentSettings(service),
-  ]);
-
-  const { data: receipt, error: receiptError } = await service
-    .from("payment_receipts")
-    .insert({
-      payment_request_id: paymentId,
-      user_id: payment.user_id,
-      member_reference: payment.member_reference,
-      payment_reference: payment.payment_reference,
-      plan: payment.plan,
-      amount_zar_cents: payment.amount_zar_cents,
-      payment_method: payment.payment_method,
-      external_transaction_id: transactionId,
-      customer_name: profile?.display_name || null,
-      customer_email: profile?.email || null,
-      trading_name: settings.trading_name,
-      membership_starts_at: startsAt.toISOString(),
-      membership_ends_at: endsAt.toISOString(),
-      paid_at: paidAt,
-      issued_by: adminEmail,
-      receipt_footer: settings.receipt_footer,
-    })
-    .select("*")
-    .single();
-  if (receiptError) {
-    return { ok: false as const, error: receiptError.message };
-  }
-
-  await Promise.all([
-    service.from("manual_payment_events").insert({
-      payment_request_id: paymentId,
-      user_id: payment.user_id,
-      event_type: "payment_approved",
-      actor_email: adminEmail,
-      note: input.adminNote || null,
-      meta: {
-        transactionId,
-        receiptNumber: receipt.receipt_number,
-        membershipEndsAt: endsAt.toISOString(),
-      },
-    }),
-    service.from("billing_events").insert({
-      event_type: "manual_payment_approved",
-      user_id: payment.user_id,
-      amount_zar_cents: payment.amount_zar_cents,
-      payload: {
-        paymentId,
-        paymentReference: payment.payment_reference,
-        receiptNumber: receipt.receipt_number,
-        method: payment.payment_method,
-        by: adminEmail,
-      },
-    }),
-    service.from("user_reminders").insert({
-      user_id: payment.user_id,
-      kind: "admin",
-      title: "Membership activated",
-      body: `Your ${MEMBERSHIP_DAYS}-day GLS TV membership is active until ${endsAt.toLocaleDateString("en-ZA")}.`,
-      href: `/receipts/${receipt.id}`,
-      severity: "info",
-      dedupe_key: `payment-approved-${paymentId}`,
-      created_by: adminEmail,
-      meta: { paymentId, receiptId: receipt.id },
-    }),
-  ]);
-
-  return {
-    ok: true as const,
-    alreadyPaid: false,
-    payment: paidPayment,
-    receipt,
+  const result = data as {
+    alreadyPaid: boolean;
+    payment: Record<string, unknown>;
+    receipt: Record<string, unknown>;
   };
+  return { ok: true as const, ...result };
 }

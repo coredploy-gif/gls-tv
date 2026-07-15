@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import type { CatalogItem, MediaSource } from "@/data/types";
 import type HlsType from "hls.js";
 import {
@@ -16,6 +17,10 @@ import {
   needsDeepBuffer,
 } from "@/lib/channel-heal";
 import { isBrokenTraceOrigin, isTraceChannel } from "@/lib/trace-mirrors";
+import {
+  DSTV_SUPERSPORT,
+  officialLinearPayDestination,
+} from "@/lib/linear-pay";
 
 type VideoPlayerProps = {
   item: CatalogItem;
@@ -219,13 +224,15 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
 
   useEffect(() => {
     const next = initialPick(item, sortedSources(item));
-    setSourceIndex(next.index);
-    setMode(isHardGeo(item) ? "direct" : next.mode);
-    setBehindLive(false);
-    behindLiveRef.current = false;
-    setAheadSec(0);
-    setError(null);
-    deepBufferRef.current = false;
+    queueMicrotask(() => {
+      setSourceIndex(next.index);
+      setMode(isHardGeo(item) ? "direct" : next.mode);
+      setBehindLive(false);
+      behindLiveRef.current = false;
+      setAheadSec(0);
+      setError(null);
+      deepBufferRef.current = false;
+    });
   }, [item.id, item.slug]);
 
   useEffect(() => {
@@ -799,14 +806,53 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
   };
 
   if (!sources.length) {
+    const linearPay =
+      item.categories.includes("LinearPay") ||
+      item.categories.includes("Rights") ||
+      item.categories.includes("Unavailable");
+    const dest = linearPay
+      ? officialLinearPayDestination(item.slug, item.title)
+      : null;
     return (
       <div className="relative flex aspect-video w-full flex-col items-center justify-center gap-3 bg-black p-6 text-center">
+        <p className="rounded-full border border-amber-400/40 bg-amber-500/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-100">
+          Linear pay channel
+        </p>
         <p className="text-lg font-semibold text-white">
-          This channel is not available right now
+          {linearPay
+            ? `${item.title} needs an official subscription`
+            : "This channel is not available right now"}
         </p>
-        <p className="max-w-md text-sm text-white/70">
-          Please choose another channel and try again later.
+        <p className="max-w-lg text-sm text-white/70">
+          {dest?.note ||
+            "Please choose another channel and try again later."}
         </p>
+        {linearPay && dest && (
+          <div className="mt-2 flex flex-wrap justify-center gap-2">
+            <a
+              href={dest.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="gls-cta rounded px-4 py-2 text-sm"
+            >
+              {dest.label}
+            </a>
+            <a
+              href={DSTV_SUPERSPORT.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded border border-white/25 px-4 py-2 text-sm text-white"
+            >
+              {DSTV_SUPERSPORT.label}
+            </a>
+            <Link
+              href="/sports"
+              className="rounded border border-white/15 px-4 py-2 text-sm text-gls-muted hover:text-white"
+            >
+              Browse Sports
+            </Link>
+          </div>
+        )}
       </div>
     );
   }
@@ -834,18 +880,18 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
           <div className="flex flex-wrap justify-center gap-2">
             {isHardGeo(item) && (
               <>
-                <a
+                <Link
                   href="/watch/sabc-news"
                   className="gls-cta rounded px-4 py-2 text-sm"
                 >
                   SABC News
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/watch/ln24-sa"
                   className="rounded border border-white/20 px-4 py-2 text-sm text-white"
                 >
                   LN24
-                </a>
+                </Link>
               </>
             )}
             {sourceIndex + 1 < sources.length && (

@@ -19,8 +19,10 @@ export function MyPlaylistHomeRow() {
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      setItems([]);
-      setEmptySignedIn(false);
+      queueMicrotask(() => {
+        setItems([]);
+        setEmptySignedIn(false);
+      });
       return;
     }
     let cancelled = false;
@@ -93,7 +95,7 @@ export function MyPlaylistHomeRow() {
       items={items}
       limit={18}
       viewMoreHref="/playlists"
-      hrefForItem={(ch) => mineWatchHref(ch.slug)}
+      hrefForItem={(ch) => mineWatchHref(ch.id.replace(/^user-/, ""))}
     />
   );
 }

@@ -33,7 +33,7 @@ export function FinanceInvoices() {
   }, [q]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
 
   const refund = async (invoiceId: string) => {
@@ -59,7 +59,7 @@ export function FinanceInvoices() {
       <AdminPageHeader
         eyebrow="Finance"
         title="Invoices"
-        description="Live Stripe invoice feed in ZAR. Open hosted invoices, PDFs, or issue refunds."
+        description="Dormant legacy Stripe invoice view. Do not use for Yoco/EFT launch payments or refunds."
       />
       <input
         className="gls-admin-input mt-8 max-w-md"

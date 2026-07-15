@@ -71,6 +71,7 @@ async function run(req: NextRequest) {
           paymentId: payment.id,
           adminEmail: "yoco-sync",
           externalTransactionId: `yoco:${link.id}`,
+          paymentMethod: "yoco",
           adminNote: "Automatically confirmed from Yoco payment-link status",
           paidAt: link.updated_at || null,
         });

@@ -2,27 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/eadmin";
 import {
-  accountHasAccess,
   ensureDefaultViewers,
+  getAccountEntitlement,
   getAccountProfile,
   listAvatarCatalog,
   listViewerProfiles,
 } from "@/lib/membership/account";
 import {
   ACTIVE_VIEWER_COOKIE,
+  VIEWER_SESSION_COOKIE,
   adultLimitForPlan,
   maxViewerSlots,
 } from "@/lib/membership/plans";
+import {
+  claimViewerDeviceSession,
+  kidsLimitForPlan,
+} from "@/lib/membership/viewer-sessions";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function cookieOptions(maxAge: number) {
+function cookieOptions(maxAge: number, httpOnly = false) {
   return {
     path: "/",
     maxAge,
     sameSite: "lax" as const,
-    httpOnly: false,
+    httpOnly,
     secure: process.env.NODE_ENV === "production",
   };
 }
@@ -40,7 +45,8 @@ export async function GET() {
   if (!viewers.length) {
     viewers = await ensureDefaultViewers(user.id, user.email);
   }
-  const account = await getAccountProfile(user.id);
+  const entitlement = await getAccountEntitlement(user.id, user.email);
+  const account = entitlement.account;
   const avatars = await listAvatarCatalog();
 
   return NextResponse.json({
@@ -49,7 +55,7 @@ export async function GET() {
     plan: account?.plan || "trial",
     adultLimit: adultLimitForPlan(account?.plan),
     maxSlots: maxViewerSlots(account?.plan),
-    access: accountHasAccess(account, user.email),
+    access: entitlement.allowed,
     trialEndsAt: account?.trial_ends_at,
   });
 }
@@ -74,9 +80,10 @@ export async function POST(req: NextRequest) {
 
   const action = body.action || "list";
 
-  // Select profile → set cookie the middleware will see, then client hard-navigates
+  // Select profile → claim a simultaneous stream slot, then client hard-navigates
   if (action === "select") {
     const viewerId = (body.viewerId || "").trim();
+    const deviceId = (body.deviceId || "").trim() || user.id;
     if (!viewerId) {
       return NextResponse.json({ error: "viewerId required" }, { status: 400 });
     }
@@ -86,11 +93,49 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    const account = await getAccountProfile(user.id);
-    if (!accountHasAccess(account, user.email)) {
-      return NextResponse.json(
+    const entitlement = await getAccountEntitlement(user.id, user.email);
+    if (!entitlement.allowed) {
+      const res = NextResponse.json(
         { error: "No active trial or subscription" },
         { status: 403 },
+      );
+      res.cookies.set(ACTIVE_VIEWER_COOKIE, "", cookieOptions(0));
+      res.cookies.set(VIEWER_SESSION_COOKIE, "", cookieOptions(0, true));
+      return res;
+    }
+
+    const service = createServiceClient();
+    if (!service) {
+      return NextResponse.json(
+        { error: "Device sessions are not configured" },
+        { status: 503 },
+      );
+    }
+
+    const claim = await claimViewerDeviceSession({
+      service,
+      userId: user.id,
+      plan: entitlement.account?.plan,
+      viewerProfileId: viewer.id,
+      isKids: Boolean(viewer.is_kids),
+      deviceId,
+      userAgent: req.headers.get("user-agent"),
+      existingToken: req.cookies.get(VIEWER_SESSION_COOKIE)?.value || null,
+    });
+
+    if (!claim.ok) {
+      const status = claim.code === "DEVICE_LIMIT" ? 409 : 500;
+      return NextResponse.json(
+        {
+          error: claim.error,
+          code: claim.code || "SESSION_ERROR",
+          adultLimit: claim.adultLimit ?? adultLimitForPlan(entitlement.account?.plan),
+          kidsLimit: claim.kidsLimit ?? kidsLimitForPlan(entitlement.account?.plan),
+          adultActive: claim.adultActive,
+          kidsActive: claim.kidsActive,
+          manageUrl: "/account#devices",
+        },
+        { status },
       );
     }
 
@@ -99,8 +144,18 @@ export async function POST(req: NextRequest) {
       ok: true,
       redirectTo,
       viewerId: viewer.id,
+      deviceLabel: claim.session.device_label,
     });
-    res.cookies.set(ACTIVE_VIEWER_COOKIE, viewer.id, cookieOptions(60 * 60 * 24 * 365));
+    res.cookies.set(
+      ACTIVE_VIEWER_COOKIE,
+      viewer.id,
+      cookieOptions(60 * 60 * 24 * 365),
+    );
+    res.cookies.set(
+      VIEWER_SESSION_COOKIE,
+      claim.session.session_token,
+      cookieOptions(60 * 60 * 24 * 30, true),
+    );
     return res;
   }
 
@@ -216,7 +271,8 @@ export async function POST(req: NextRequest) {
     ip,
   });
 
-  const account = await getAccountProfile(user.id);
+  const entitlement = await getAccountEntitlement(user.id, user.email);
+  const account = entitlement.account;
   let viewers = await listViewerProfiles(user.id);
   if (!viewers.length) {
     viewers = await ensureDefaultViewers(user.id, user.email);
@@ -234,8 +290,8 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({
-    access: accountHasAccess(account, user.email),
-    reason: accountHasAccess(account, user.email)
+    access: entitlement.allowed,
+    reason: entitlement.allowed
       ? undefined
       : "Your free trial has ended. Choose a plan to keep watching.",
     viewers,

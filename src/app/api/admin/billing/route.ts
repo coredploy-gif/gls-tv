@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createServiceClient, isEadminEmail } from "@/lib/eadmin";
+import { createServiceClient } from "@/lib/eadmin";
+import { getAdminAccess, hasAdminPermission } from "@/lib/admin/access";
 import { GLS_PLANS, maxViewerSlots, type GlsPlanId } from "@/lib/membership/plans";
 import { getStripe, isBillablePlan, siteUrl } from "@/lib/stripe";
 import { writeAuditLog } from "@/lib/admin/audit";
@@ -9,12 +9,9 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 async function assertAdmin() {
-  const sb = await createClient();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
-  if (!user || !isEadminEmail(user.email)) return null;
-  return user;
+  const access = await getAdminAccess();
+  if (!access || !hasAdminPermission(access, "finance.read")) return null;
+  return access.user;
 }
 
 function planZarCents(plan: string) {

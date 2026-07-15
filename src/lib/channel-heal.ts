@@ -43,9 +43,35 @@ function src(
 export function isFragileHost(url: string): boolean {
   return (
     isBrokenTraceOrigin(url) ||
-    /channels\.trace\.plus|blocked\.grouptag|streamvidex|qzz\.io|live20\.bozztv\.com/i.test(
+    /channels\.trace\.plus|blocked\.grouptag|streamvidex|qzz\.io|live20\.bozztv\.com|nghk\.ai/i.test(
       url,
     )
+  );
+}
+
+function isRawIpUrl(url: string): boolean {
+  try {
+    return /^\d+\.\d+\.\d+\.\d+$/.test(new URL(url).hostname);
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Balkan / RU / BG Arena pay-linear brands — shown for discovery with LinearPay warning.
+ * Do not attach unofficial restreams (nghk, raw IP, DStv multimedia scrapes).
+ */
+export function isArenaPayLinear(
+  slug: string,
+  title?: string | null,
+): boolean {
+  const hay = `${slug} ${title || ""}`.toLowerCase();
+  if (/tele.?arena/.test(hay)) return false;
+  if (/tv.?central/.test(hay)) return false;
+  return (
+    /arena\s*sport|arenasport|arena\s*fight|arenafight|arena\s*premium|match.?arena|матч.?арена|vivacom.?arena/i.test(
+      hay,
+    ) || /arenasport|arenafight|arenapremium|matcharena|vivacomarena/i.test(slug)
   );
 }
 
@@ -114,6 +140,17 @@ function healPackFor(slug: string, title?: string | null): Pack | null {
     return [src(AFROBEATS, 5, "heal-afrobeats")];
   }
 
+  // Italian TeleArena — Wowza/streamlock already used elsewhere in playable packs
+  if (/tele.?arena|telearena/.test(hay)) {
+    return [
+      src(
+        "https://5ce9406b73c33.streamlock.net/TeleArena/TeleArena.stream/playlist.m3u8",
+        5,
+        "heal-telearena-streamlock",
+      ),
+    ];
+  }
+
   return null;
 }
 
@@ -154,9 +191,18 @@ function mergeSources(
  */
 export function healChannelSources(
   item: Pick<CatalogItem, "slug" | "title" | "sources" | "categories">,
-): { sources: MediaSource[]; tags: string[] } {
+): { sources: MediaSource[]; tags: string[]; cleared?: boolean } {
   const tags: string[] = [];
   let sources = [...(item.sources || [])];
+
+  // 0) Arena Sport / Fight / Premium — show as linear pay (no pirate HLS)
+  if (isArenaPayLinear(item.slug, item.title)) {
+    return {
+      sources: [],
+      tags: ["LinearPay", "LinearSports", "Sports", "Rights"],
+      cleared: true,
+    };
+  }
 
   // 1) Trace music / sports family
   if (isTraceChannel(item.slug, item.title)) {
@@ -164,7 +210,7 @@ export function healChannelSources(
     tags.push("Healed", "Playable");
   }
 
-  // 2) ZA FTA / news / hope packs
+  // 2) ZA FTA / news / hope / TeleArena packs
   const pack = healPackFor(item.slug, item.title);
   if (pack) {
     sources = mergeSources(pack, sources);
@@ -172,11 +218,14 @@ export function healChannelSources(
     if (isGeoSensitiveChannel(item.slug, item.title, item.categories)) {
       tags.push("Geo");
     }
-  } else if (sources.some((s) => isFragileHost(s.url))) {
-    // Demote fragile hosts even without a dedicated pack
+  } else if (sources.some((s) => isFragileHost(s.url) || isRawIpUrl(s.url))) {
+    // Demote fragile / raw-IP hosts even without a dedicated pack
     sources = mergeSources([], sources);
     tags.push("ProxyOk");
   }
+
+  // Drop raw-IP and nghk restreams that survived merge
+  sources = sources.filter((s) => !isRawIpUrl(s.url) && !/nghk\.ai/i.test(s.url));
 
   // 3) Pluto / jmp2 series — keep URLs but tag for proxy + deep buffer
   if (sources.some((s) => isPlutoFamily(s.url))) {

@@ -34,7 +34,7 @@ export function AuditTrail() {
   }, [source, q]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
 
   return (

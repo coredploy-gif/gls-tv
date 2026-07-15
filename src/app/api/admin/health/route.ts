@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { isEadminEmail, serviceRoleStatus } from "@/lib/eadmin";
+import { serviceRoleStatus } from "@/lib/eadmin";
+import { getAdminAccess, hasAdminPermission } from "@/lib/admin/access";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /** Admin env health — no secrets returned. */
 export async function GET() {
-  const sb = await createClient();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
-  if (!user || !isEadminEmail(user.email)) {
+  const access = await getAdminAccess();
+  if (!access || !hasAdminPermission(access, "ops.write")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

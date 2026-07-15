@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
 type Mode = "signin" | "signup";
@@ -32,6 +33,7 @@ export function AuthPanel({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [acceptedPolicies, setAcceptedPolicies] = useState(false);
 
   const goAfterLogin = () => {
     onDone?.();
@@ -149,6 +151,28 @@ export function AuthPanel({
             className="w-full rounded-sm border border-white/15 bg-black/50 px-4 py-3 text-white outline-none ring-gls-red placeholder:text-white/30 focus:border-gls-red focus:ring-1"
           />
         </label>
+        {mode === "signup" && (
+          <label className="flex items-start gap-2 text-xs leading-relaxed text-gls-body">
+            <input
+              type="checkbox"
+              required
+              checked={acceptedPolicies}
+              onChange={(event) => setAcceptedPolicies(event.target.checked)}
+              className="mt-0.5"
+            />
+            <span>
+              I agree to the{" "}
+              <Link href="/legal#terms" className="text-white underline">
+                Terms
+              </Link>
+              ,{" "}
+              <Link href="/legal#privacy" className="text-white underline">
+                Privacy/POPIA notice
+              </Link>
+              , trial/device rules and kids-profile terms.
+            </span>
+          </label>
+        )}
         <label className="block">
           <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gls-muted">
             Password
@@ -187,6 +211,14 @@ export function AuthPanel({
               ? "Sign in"
               : "Create account"}
         </button>
+        {mode === "signin" && (
+          <Link
+            href="/auth/reset"
+            className="block text-center text-sm text-gls-pink-soft hover:text-white"
+          >
+            Forgot password?
+          </Link>
+        )}
       </form>
     </div>
   );

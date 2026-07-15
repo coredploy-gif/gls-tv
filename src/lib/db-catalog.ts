@@ -33,20 +33,36 @@ type DbChannel = {
 
 export function catalogFromDbChannel(ch: DbChannel): CatalogItem | null {
   const url = (ch.active_source_url || ch.source_url || "").trim();
-  if (!url) return null;
+  const cats = ch.categories || ["General"];
+  const linearPay =
+    cats.includes("LinearPay") ||
+    cats.includes("Rights") ||
+    cats.includes("Unavailable");
+  // Linear pay tiles stay visible for discovery even when HLS is intentionally empty
+  if (!url && !linearPay) return null;
+  const rightsBlocked = linearPay || ch.health_status === "dead";
   return {
     id: ch.id,
     slug: ch.slug,
     title: ch.title,
     type: "live",
-    description: ch.description || "iptv-org catalog stream.",
+    description:
+      ch.description ||
+      (linearPay
+        ? `${ch.title} — linear pay-TV channel. Use the official licensed provider.`
+        : "iptv-org catalog stream."),
     countries: ch.countries?.length ? ch.countries : ["world"],
     categories: [
       ...new Set([
-        ...(ch.categories || ["General"]),
+        ...cats.filter((c) => c !== "Unavailable"),
         "IptvOrg",
-        ch.health_status === "healthy" ? "Playable" : "ProxyOk",
-      ]),
+        linearPay ? "LinearPay" : null,
+        ch.health_status === "healthy"
+          ? "Playable"
+          : linearPay
+            ? null
+            : "ProxyOk",
+      ].filter(Boolean) as string[]),
     ],
     languages: ch.languages || [],
     poster: ch.poster || FALLBACK_ART,
@@ -54,15 +70,18 @@ export function catalogFromDbChannel(ch: DbChannel): CatalogItem | null {
     license: (ch.license as CatalogItem["license"]) || "open_stream",
     isLive: ch.is_live !== false,
     featured: Boolean(ch.featured),
-    sources: [
-      {
-        url,
-        quality: ch.source_quality || "Auto",
-        format: (ch.source_format as "hls" | "mp4") || "hls",
-        priority: 20,
-        label: "iptv-org-db",
-      },
-    ],
+    sources:
+      rightsBlocked || !url
+        ? []
+        : [
+            {
+              url,
+              quality: ch.source_quality || "Auto",
+              format: (ch.source_format as "hls" | "mp4") || "hls",
+              priority: 20,
+              label: "iptv-org-db",
+            },
+          ],
   };
 }
 
@@ -182,7 +201,10 @@ export async function searchDbCatalog(opts: {
         query = query.or(
           [
             "categories.cs.{Sports}",
+            "categories.cs.{LinearSports}",
+            "categories.cs.{LinearPay}",
             "title.ilike.%sport%",
+            "title.ilike.%arena%",
             "title.ilike.%fox%",
             "title.ilike.%espn%",
             "title.ilike.%tsn%",
@@ -190,6 +212,7 @@ export async function searchDbCatalog(opts: {
             "title.ilike.%golf%",
             "title.ilike.%bein%",
             "slug.ilike.%sport%",
+            "slug.ilike.%arena%",
             "slug.ilike.%fox%",
             "slug.ilike.%espn%",
             "slug.ilike.%tsn%",

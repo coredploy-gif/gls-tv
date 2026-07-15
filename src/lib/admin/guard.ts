@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { isEadminEmail } from "@/lib/eadmin";
+import { getAdminAccess } from "@/lib/admin/access";
 import { redirect } from "next/navigation";
 
 export async function requireAdmin() {
@@ -8,10 +8,12 @@ export async function requireAdmin() {
     data: { user },
   } = await sb.auth.getUser();
   if (!user) redirect("/auth?next=/admin");
-  if (!isEadminEmail(user.email)) redirect("/browse");
+  const access = await getAdminAccess(user);
+  if (!access) redirect("/browse");
   return user;
 }
 
 export async function getIsAdminClientHint(email: string | null | undefined) {
-  return isEadminEmail(email);
+  if (!email) return false;
+  return Boolean(await getAdminAccess());
 }

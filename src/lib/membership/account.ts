@@ -19,6 +19,18 @@ export type AccountProfile = {
   max_viewer_profiles: number;
 };
 
+export type AccountSubscription = {
+  status: string | null;
+  current_period_end: string | null;
+};
+
+export type AccountEntitlement = {
+  account: AccountProfile | null;
+  subscription: AccountSubscription | null;
+  allowed: boolean;
+  reason: "admin" | "exception" | "trial" | "subscription" | "expired" | "lookup_failed";
+};
+
 export type ViewerProfile = {
   id: string;
   user_id: string;
@@ -43,16 +55,95 @@ export async function getAccountProfile(
   return (data as AccountProfile | null) ?? null;
 }
 
-export function accountHasAccess(account: AccountProfile | null, email?: string | null) {
+export function accountHasAccess(
+  account: AccountProfile | null,
+  email?: string | null,
+  subscription?: AccountSubscription | null,
+) {
   if (!account) return false;
   if (isEadminEmail(email || account.email)) return true;
-  if (account.trial_bypassed || account.is_admin_exception || account.is_premium)
-    return true;
+  if (account.trial_bypassed || account.is_admin_exception) return true;
   if (account.plan === "exception" || account.plan === "admin") return true;
+  if (
+    account.is_premium &&
+    subscription?.status === "active" &&
+    subscription.current_period_end &&
+    new Date(subscription.current_period_end).getTime() > Date.now()
+  ) {
+    return true;
+  }
   if (account.trial_ends_at) {
     return new Date(account.trial_ends_at).getTime() > Date.now();
   }
   return false;
+}
+
+export async function getAccountEntitlement(
+  userId: string,
+  email?: string | null,
+): Promise<AccountEntitlement> {
+  try {
+    const sb = await createClient();
+    const [{ data: account, error: accountError }, { data: subscription, error: subError }] =
+      await Promise.all([
+        sb
+          .from("profiles")
+          .select(
+            "id, display_name, email, plan, trial_ends_at, trial_bypassed, is_admin_exception, is_premium, max_viewer_profiles",
+          )
+          .eq("id", userId)
+          .maybeSingle(),
+        sb
+          .from("subscriptions")
+          .select("status, current_period_end")
+          .eq("user_id", userId)
+          .maybeSingle(),
+      ]);
+    if (accountError || subError || !account) {
+      return {
+        account: (account as AccountProfile | null) ?? null,
+        subscription: (subscription as AccountSubscription | null) ?? null,
+        allowed: false,
+        reason: "lookup_failed",
+      };
+    }
+    const typedAccount = account as AccountProfile;
+    const typedSubscription = subscription as AccountSubscription | null;
+    const allowed = accountHasAccess(typedAccount, email, typedSubscription);
+    let reason: AccountEntitlement["reason"] = "expired";
+    if (allowed) {
+      if (isEadminEmail(email || typedAccount.email)) reason = "admin";
+      else if (
+        typedAccount.trial_bypassed ||
+        typedAccount.is_admin_exception ||
+        typedAccount.plan === "exception" ||
+        typedAccount.plan === "admin"
+      ) {
+        reason = "exception";
+      } else if (
+        typedSubscription?.status === "active" &&
+        typedSubscription.current_period_end &&
+        new Date(typedSubscription.current_period_end).getTime() > Date.now()
+      ) {
+        reason = "subscription";
+      } else {
+        reason = "trial";
+      }
+    }
+    return {
+      account: typedAccount,
+      subscription: typedSubscription,
+      allowed,
+      reason,
+    };
+  } catch {
+    return {
+      account: null,
+      subscription: null,
+      allowed: false,
+      reason: "lookup_failed",
+    };
+  }
 }
 
 export async function listViewerProfiles(userId: string): Promise<ViewerProfile[]> {

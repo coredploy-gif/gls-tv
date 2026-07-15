@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createServiceClient, isEadminEmail, normalizeSlug } from "@/lib/eadmin";
+import { createServiceClient, normalizeSlug } from "@/lib/eadmin";
+import { getAdminAccess, hasAdminPermission } from "@/lib/admin/access";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const q = (req.nextUrl.searchParams.get("q") || "").trim().toLowerCase();
-  const admin = req.nextUrl.searchParams.get("admin") === "1";
+  const requestedAdmin = req.nextUrl.searchParams.get("admin") === "1";
+  const auth = await createClient();
+  const {
+    data: { user },
+  } = await auth.auth.getUser();
+  const access = requestedAdmin && user ? await getAdminAccess(user) : null;
+  const admin = Boolean(access && hasAdminPermission(access, "support.write"));
   const service = createServiceClient();
-  const sb = service || (await createClient());
+  const sb = admin && service ? service : auth;
 
   let query = sb
     .from("kb_articles")
@@ -39,7 +46,8 @@ export async function POST(req: NextRequest) {
   const {
     data: { user },
   } = await sb.auth.getUser();
-  if (!user || !isEadminEmail(user.email))
+  const access = user ? await getAdminAccess(user) : null;
+  if (!access || !hasAdminPermission(access, "support.write"))
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const service = createServiceClient();
   if (!service)

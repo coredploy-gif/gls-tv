@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createServiceClient, isEadminEmail } from "@/lib/eadmin";
+import { createServiceClient } from "@/lib/eadmin";
 import { writeAuditLog } from "@/lib/admin/audit";
 import {
   activateManualPayment,
@@ -12,22 +11,28 @@ import {
   paymentReferenceFor,
   type ManualPaymentMethod,
 } from "@/lib/manual-billing";
+import {
+  getAdminAccess,
+  hasAdminPermission,
+  requireAal2,
+} from "@/lib/admin/access";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 async function assertAdmin() {
-  const sb = await createClient();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
-  if (!user || !isEadminEmail(user.email)) return null;
-  return user;
+  const access = await getAdminAccess();
+  if (!access || !hasAdminPermission(access, "finance.read")) return null;
+  return access.user;
 }
 
-function safeMethod(value: unknown): ManualPaymentMethod {
-  const method = String(value || "eft") as ManualPaymentMethod;
-  return ["yoco", "eft", "cash", "other"].includes(method) ? method : "eft";
+function safeMethod(
+  value: unknown,
+): Exclude<ManualPaymentMethod, "unselected"> {
+  const method = String(value || "eft");
+  return ["yoco", "eft", "cash", "other"].includes(method)
+    ? (method as Exclude<ManualPaymentMethod, "unselected">)
+    : "eft";
 }
 
 async function profilesMap(
@@ -225,8 +230,13 @@ export async function GET(req: NextRequest) {
     const byMethod: Record<string, { count: number; cents: number }> = {};
     const monthly: Record<string, { count: number; cents: number }> = {};
     const uniqueMembers = new Set<string>();
+    const receiptsByMember = new Map<string, number>();
     for (const receipt of valid) {
       uniqueMembers.add(receipt.user_id);
+      receiptsByMember.set(
+        receipt.user_id,
+        (receiptsByMember.get(receipt.user_id) || 0) + 1,
+      );
       const plan = receipt.plan || "unknown";
       const method = receipt.payment_method || "unknown";
       const month = String(receipt.issued_at).slice(0, 7);
@@ -249,8 +259,13 @@ export async function GET(req: NextRequest) {
       (profile) => profile.is_premium,
     ).length;
     const renewals = Math.max(0, valid.length - uniqueMembers.size);
+    const renewedMembers = [...receiptsByMember.values()].filter(
+      (count) => count >= 2,
+    ).length;
     const renewalRate =
-      uniqueMembers.size > 0 ? Math.round((renewals / uniqueMembers.size) * 100) : 0;
+      uniqueMembers.size > 0
+        ? Math.min(100, Math.round((renewedMembers / uniqueMembers.size) * 100))
+        : 0;
 
     return NextResponse.json({
       summary: {
@@ -297,6 +312,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No service role" }, { status: 503 });
   const body = (await req.json()) as Record<string, unknown>;
   const action = String(body.action || "");
+  if (["approve", "refund"].includes(action)) {
+    const access = await getAdminAccess(admin);
+    if (!access || !hasAdminPermission(access, "finance.write") || !requireAal2(access)) {
+      return NextResponse.json(
+        { error: "Payment activation and refunds require finance permission and verified MFA (AAL2)." },
+        { status: 403 },
+      );
+    }
+  }
 
   if (action === "approve") {
     const paymentId = String(body.paymentId || "");
@@ -311,26 +335,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { error: updateError } = await service
-      .from("manual_payment_requests")
-      .update({
-        payment_method: method,
-        external_transaction_id: transactionId,
-        status: "verifying",
-        admin_note:
-          body.adminNote != null ? String(body.adminNote).slice(0, 1000) : null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", paymentId)
-      .neq("status", "paid");
-    if (updateError) {
-      return NextResponse.json({ error: updateError.message }, { status: 409 });
-    }
     const result = await activateManualPayment({
       service,
       paymentId,
       adminEmail: admin.email || "admin",
       externalTransactionId: transactionId,
+      paymentMethod: method,
       adminNote:
         body.adminNote != null ? String(body.adminNote).slice(0, 1000) : null,
       paidAt: body.paidAt != null ? String(body.paidAt) : null,
@@ -399,6 +409,7 @@ export async function POST(req: NextRequest) {
         paymentId,
         adminEmail: admin.email || "admin",
         externalTransactionId: `yoco:${link.id}`,
+        paymentMethod: "yoco",
         adminNote: "Confirmed from Yoco payment-link status",
         paidAt: link.updated_at || null,
       });
@@ -544,6 +555,7 @@ export async function POST(req: NextRequest) {
       paymentId: payment.id,
       adminEmail: admin.email || "admin",
       externalTransactionId: transactionId,
+      paymentMethod: recordedMethod,
       adminNote: "Recorded from reconciliation",
       paidAt: body.paidAt != null ? String(body.paidAt) : null,
     });
@@ -564,6 +576,21 @@ export async function POST(req: NextRequest) {
   if (action === "refund") {
     const receiptId = String(body.receiptId || "");
     const note = String(body.note || "").trim().slice(0, 1000);
+    const refundReference = String(body.refundReference || "").trim().slice(0, 200);
+    const refundMethod = String(body.refundMethod || "").trim().toLowerCase();
+    if (
+      body.confirmExternalRefund !== true ||
+      !refundReference ||
+      !["yoco", "eft"].includes(refundMethod)
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Confirm the external Yoco/EFT refund and provide its reference before recording it.",
+        },
+        { status: 400 },
+      );
+    }
     const { data: receipt } = await service
       .from("payment_receipts")
       .select("*")
@@ -577,7 +604,16 @@ export async function POST(req: NextRequest) {
     await Promise.all([
       service
         .from("payment_receipts")
-        .update({ refunded_at: now, refund_note: note || null })
+        .update({
+          refunded_at: now,
+          refund_note: note || null,
+          meta: {
+            ...(receipt.meta || {}),
+            externalRefundCompleted: true,
+            refundMethod,
+            refundReference,
+          },
+        })
         .eq("id", receiptId),
       service
         .from("manual_payment_requests")
@@ -592,6 +628,8 @@ export async function POST(req: NextRequest) {
           receiptNumber: receipt.receipt_number,
           by: admin.email,
           note,
+          refundMethod,
+          refundReference,
         },
       }),
       service.from("user_reminders").insert({
@@ -600,7 +638,7 @@ export async function POST(req: NextRequest) {
         title: "Payment marked refunded",
         body:
           note ||
-          `Receipt ${receipt.receipt_number} has been marked as refunded.`,
+          `The externally completed ${refundMethod.toUpperCase()} refund for receipt ${receipt.receipt_number} has been recorded.`,
         href: `/receipts/${receiptId}`,
         severity: "info",
         dedupe_key: `receipt-refund-${receiptId}`,
@@ -613,7 +651,7 @@ export async function POST(req: NextRequest) {
         entityType: "receipt",
         entityId: receiptId,
         summary: `Refunded ${receipt.receipt_number}`,
-        meta: { note },
+        meta: { note, refundMethod, refundReference },
       }),
     ]);
     return NextResponse.json({ ok: true });

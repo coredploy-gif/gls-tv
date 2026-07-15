@@ -86,9 +86,11 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!viewerReady && viewerKey === "boot") return;
     const key = viewer?.id || readCookieViewerId();
-    setState(loadFor(key));
-    setLoadedKey(key);
-    setReady(true);
+    queueMicrotask(() => {
+      setState(loadFor(key));
+      setLoadedKey(key);
+      setReady(true);
+    });
   }, [viewer?.id, viewerReady, viewerKey]);
 
   useEffect(() => {

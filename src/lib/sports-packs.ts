@@ -5,7 +5,7 @@ export function isLinearSportsPack(
   item: CatalogItem | { slug: string; title: string; categories?: string[] },
 ) {
   const hay = `${item.slug} ${item.title} ${(item.categories || []).join(" ")}`;
-  return /espn|tsn|fox.?sport|foxsports|bein|sky.?sport|supersport|nba.?tv|nfl.?network|nhl.?network|mlb.?network|dazn|tnt.?sport|bt.?sport|premier.?sport/i.test(
+  return /espn|tsn|fox.?sport|foxsports|bein|sky.?sport|supersport|arena.?sport|arenasport|arena.?fight|nba.?tv|nfl.?network|nhl.?network|mlb.?network|dazn|tnt.?sport|bt.?sport|premier.?sport/i.test(
     hay,
   );
 }
