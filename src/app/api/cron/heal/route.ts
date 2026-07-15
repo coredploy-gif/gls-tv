@@ -12,8 +12,8 @@ export const maxDuration = 300;
  *   Authorization: Bearer <CRON_SECRET>
  *   or ?secret=<CRON_SECRET>
  *
- * Local / Vercel Cron / Windows Task Scheduler can hit this.
- * On serverless hosts, prefer running `npm run heal` in CI and committing JSON.
+ * Local or a long-running task runner can hit this.
+ * On Vercel, run `npm run heal` in CI and commit the generated JSON instead.
  */
 export async function GET(req: NextRequest) {
   return runHeal(req);
@@ -31,13 +31,25 @@ function authorized(req: NextRequest) {
   }
   const auth = req.headers.get("authorization") || "";
   if (auth === `Bearer ${secret}`) return true;
-  if (req.nextUrl.searchParams.get("secret") === secret) return true;
-  return false;
+  return (
+    process.env.NODE_ENV !== "production" &&
+    req.nextUrl.searchParams.get("secret") === secret
+  );
 }
 
 async function runHeal(req: NextRequest) {
   if (!authorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (process.env.VERCEL === "1") {
+    return NextResponse.json(
+      {
+        error:
+          "Heal writes generated files and cannot persist changes on Vercel. Run npm run heal in CI and commit the generated JSON.",
+      },
+      { status: 409 },
+    );
   }
 
   const script = path.join(process.cwd(), "scripts", "heal-playable.mjs");

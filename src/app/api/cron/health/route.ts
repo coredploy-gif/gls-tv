@@ -21,8 +21,10 @@ function authorized(req: NextRequest) {
   if (!secret) return process.env.NODE_ENV !== "production";
   const auth = req.headers.get("authorization") || "";
   if (auth === `Bearer ${secret}`) return true;
-  if (req.nextUrl.searchParams.get("secret") === secret) return true;
-  return false;
+  return (
+    process.env.NODE_ENV !== "production" &&
+    req.nextUrl.searchParams.get("secret") === secret
+  );
 }
 
 async function run(req: NextRequest) {

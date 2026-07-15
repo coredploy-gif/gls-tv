@@ -14,8 +14,9 @@ export const maxDuration = 60;
 function authorized(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
   if (!secret) return process.env.NODE_ENV !== "production";
+  if (req.headers.get("authorization") === `Bearer ${secret}`) return true;
   return (
-    req.headers.get("authorization") === `Bearer ${secret}` ||
+    process.env.NODE_ENV !== "production" &&
     req.nextUrl.searchParams.get("secret") === secret
   );
 }
