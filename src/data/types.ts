@@ -4,7 +4,8 @@ export type LicenseKind =
   | "public_domain"
   | "creative_commons"
   | "fta_public"
-  | "open_stream";
+  | "open_stream"
+  | "rights_managed";
 
 export interface MediaSource {
   url: string;

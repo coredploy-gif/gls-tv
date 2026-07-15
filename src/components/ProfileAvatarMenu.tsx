@@ -4,14 +4,12 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useActiveViewer } from "@/lib/membership/active-viewer";
 import { useAuth } from "@/lib/auth/AuthProvider";
-import { isEadminEmail } from "@/lib/eadmin";
 
 export function ProfileAvatarMenu() {
-  const { user, signOut } = useAuth();
+  const { isAdmin, signOut } = useAuth();
   const { viewer, viewers, switchToProfiles, refresh } = useActiveViewer();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const isAdmin = isEadminEmail(user?.email);
 
   useEffect(() => {
     if (!open) return;

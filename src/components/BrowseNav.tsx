@@ -7,7 +7,6 @@ import { GlsLogo } from "./GlsLogo";
 import { ProfileAvatarMenu } from "@/components/ProfileAvatarMenu";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/lib/auth/AuthProvider";
-import { isEadminEmail } from "@/lib/eadmin";
 import { BROWSE_NAV } from "@/lib/nav-theme";
 import { ManagedSystemLinks } from "@/components/ManagedSystemLinks";
 
@@ -58,8 +57,7 @@ function MobileLink({ href, label, active, children }: { href: string; label: st
 
 export function BrowseNav() {
   const pathname = usePathname();
-  const { user } = useAuth();
-  const isAdmin = isEadminEmail(user?.email);
+  const { isAdmin } = useAuth();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -98,14 +96,16 @@ export function BrowseNav() {
           {isAdmin && (
             <Link
               href="/admin"
-              className="gls-glass hidden items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-white transition hover:brightness-110 sm:inline-flex"
+              aria-label="Admin portal"
+              className="gls-glass inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-bold uppercase tracking-wide text-white transition hover:brightness-110 sm:px-3.5"
               style={{
                 boxShadow: "0 0 20px rgba(255,107,157,0.2)",
               }}
             >
               <span className="gls-admin-live-dot" aria-hidden />
               <span className="bg-gradient-to-r from-white to-gls-pink-soft bg-clip-text text-transparent">
-                Admin
+                <span className="sm:hidden" aria-hidden>A</span>
+                <span className="hidden sm:inline">Admin</span>
               </span>
             </Link>
           )}

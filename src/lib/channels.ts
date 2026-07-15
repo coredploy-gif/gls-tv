@@ -23,6 +23,7 @@ import {
   CURATED_PUBLIC_SPORTS,
   CURATED_SERIES_SEEDS,
 } from "@/data/curated-public-fast";
+import { LINEAR_PAY_CATALOG } from "@/data/linear-pay-catalog";
 
 const sportsChannels = sportsJson as CatalogItem[];
 const usChannels = usJson as CatalogItem[];
@@ -130,6 +131,7 @@ export function getAllChannels(): CatalogItem[] {
     playableAsia,
     playableAsiaSeries,
     playableKoreaSeries,
+    LINEAR_PAY_CATALOG,
     CATALOG,
     sportsChannels,
     usChannels,
@@ -194,6 +196,7 @@ export function getChannelBySlug(slug: string): CatalogItem | undefined {
     playableAsia.find((c) => c.slug === slug) ||
     playableAsiaSeries.find((c) => c.slug === slug) ||
     playableKoreaSeries.find((c) => c.slug === slug) ||
+    LINEAR_PAY_CATALOG.find((c) => c.slug === slug) ||
     VERIFIED_LIVE.find((c) => c.slug === slug) ||
     CATALOG.find((c) => c.slug === slug) ||
     sportsChannels.find((c) => c.slug === slug) ||
@@ -209,6 +212,9 @@ export function getSportsChannels() {
     CURATED_PUBLIC_SPORTS,
     playableWrestling,
     playableSports,
+    LINEAR_PAY_CATALOG.filter((c) =>
+      c.categories.some((x) => /sport|fight|combat/i.test(x)),
+    ),
     top10.filter((c) => c.categories.includes("Sports")),
     VERIFIED_LIVE.filter((c) => c.categories.some((x) => /sport/i.test(x))),
     sportsChannels,

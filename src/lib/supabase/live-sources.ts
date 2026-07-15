@@ -6,7 +6,7 @@ import {
   isNumberedLinearSlot,
   sportsFamily,
 } from "@/lib/sports-packs";
-import { healChannelSources } from "@/lib/channel-heal";
+import { healChannelSources, isArenaPayLinear } from "@/lib/channel-heal";
 import { isTraceChannel } from "@/lib/trace-mirrors";
 
 function browserClient() {
@@ -146,7 +146,11 @@ export async function withLiveSources(
       return applyHeal(item, item.sources);
     }
 
-    const seeded = Boolean(seed?.url?.trim());
+    const rightsManaged =
+      isArenaPayLinear(item.slug, item.title) ||
+      item.categories.includes("LinearPay") ||
+      item.categories.includes("Rights");
+    const seeded = Boolean(seed?.url?.trim()) && !rightsManaged;
     if (
       !seeded &&
       !isNumberedLinearSlot(item) &&

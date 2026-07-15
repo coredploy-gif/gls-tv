@@ -1,5 +1,6 @@
 import type { CatalogItem } from "@/data/types";
 import { createClient } from "@supabase/supabase-js";
+import { isArenaPayLinear } from "@/lib/channel-heal";
 
 function anon() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -37,7 +38,7 @@ export function catalogFromDbChannel(ch: DbChannel): CatalogItem | null {
   const linearPay =
     cats.includes("LinearPay") ||
     cats.includes("Rights") ||
-    cats.includes("Unavailable");
+    isArenaPayLinear(ch.slug, ch.title);
   // Linear pay tiles stay visible for discovery even when HLS is intentionally empty
   if (!url && !linearPay) return null;
   const rightsBlocked = linearPay || ch.health_status === "dead";

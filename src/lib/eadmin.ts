@@ -1,3 +1,4 @@
+import "server-only";
 import { createClient } from "@supabase/supabase-js";
 
 /** Server-only emergency bootstrap owners. Normal access is database-backed. */

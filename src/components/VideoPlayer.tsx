@@ -18,7 +18,7 @@ import {
 } from "@/lib/channel-heal";
 import { isBrokenTraceOrigin, isTraceChannel } from "@/lib/trace-mirrors";
 import {
-  DSTV_SUPERSPORT,
+  isLinearPayCategory,
   officialLinearPayDestination,
 } from "@/lib/linear-pay";
 
@@ -806,17 +806,16 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
   };
 
   if (!sources.length) {
-    const linearPay =
-      item.categories.includes("LinearPay") ||
-      item.categories.includes("Rights") ||
-      item.categories.includes("Unavailable");
+    const linearPay = isLinearPayCategory(item.categories);
     const dest = linearPay
-      ? officialLinearPayDestination(item.slug, item.title)
+      ? officialLinearPayDestination(item.slug, item.title, item.countries)
       : null;
     return (
       <div className="relative flex aspect-video w-full flex-col items-center justify-center gap-3 bg-black p-6 text-center">
         <p className="rounded-full border border-amber-400/40 bg-amber-500/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-100">
-          Linear pay channel
+          {linearPay
+            ? "Linear pay channel · official subscription required"
+            : "Technically offline"}
         </p>
         <p className="text-lg font-semibold text-white">
           {linearPay
@@ -836,14 +835,6 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
               className="gls-cta rounded px-4 py-2 text-sm"
             >
               {dest.label}
-            </a>
-            <a
-              href={DSTV_SUPERSPORT.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded border border-white/25 px-4 py-2 text-sm text-white"
-            >
-              {DSTV_SUPERSPORT.label}
             </a>
             <Link
               href="/sports"

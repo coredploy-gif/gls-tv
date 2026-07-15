@@ -5,47 +5,51 @@
 
 export function isLinearPayCategory(categories: string[] | null | undefined) {
   return Boolean(
-    categories?.some((c) =>
-      /^(LinearPay|Rights)$/i.test(c) || c === "Unavailable",
-    ),
+    categories?.some((c) => /^(LinearPay|Rights)$/i.test(c)),
   );
 }
 
 export function officialLinearPayDestination(
   slug: string,
   title?: string | null,
+  countries: string[] = [],
 ): { label: string; href: string; note: string } {
   const hay = `${slug} ${title || ""}`.toLowerCase();
   if (/match.?arena|матч.?арена|matcharena/.test(hay)) {
     return {
-      label: "MATCH! official",
-      href: "https://matchtv.ru/",
-      note: "Match Arena is linear pay-TV. Use the official MATCH! service in your territory.",
+      label: "Open official Match! Arena",
+      href: "https://matchtv.ru/video/channel/arena",
+      note: "Match! Arena is rights-managed linear TV. GLS does not include a MATCH! subscription; availability, login, and playback are controlled by the official service.",
     };
   }
   if (/vivacom/.test(hay)) {
     return {
-      label: "Vivacom Arena",
-      href: "https://www.vivacom.bg/",
-      note: "Vivacom Arena is a linear pay channel. Subscribe via Vivacom for licensed viewing.",
+      label: "Open official Vivacom Arena",
+      href: "https://www.vivacom.bg/eon-tv/arena",
+      note: "Vivacom Arena is rights-managed linear TV. GLS does not include a Vivacom/EON subscription; use Vivacom for licensed access.",
     };
   }
-  if (/arena\s*fight|arenafight/.test(hay)) {
+  if (/arena[\s_-]*fight|arenafight/.test(hay)) {
     return {
-      label: "Arena Sport official",
-      href: "https://www.arenasport.com/",
-      note: "Arena Fight is linear pay-TV. Open Arena Sport / your local cable-satellite package for licensed access.",
+      label: "Open official Arena Fight",
+      href: "https://www.arenafighttv.com/",
+      note: "Arena Fight is rights-managed linear TV. GLS does not include an Arena Cloud or broadcaster subscription.",
     };
   }
-  // Default Balkan Arena Sport / Premium — plus SA onboarding path to DStv SuperSport
+
+  const isCroatia = /(?:^|[-_])hr(?:$|[-_])|croatia|hrvats/i.test(hay);
+  const isBosnia = /(?:^|[-_])ba(?:$|[-_])|bosnia|bih/i.test(hay);
+  const onlyCountry = countries.length === 1 ? countries[0]?.toLowerCase() : "";
+  const href =
+    isCroatia || onlyCountry === "hr"
+      ? "https://tvarenasport.hr/"
+      : isBosnia || onlyCountry === "ba"
+        ? "https://tvarenasport.ba/"
+        : "https://www.tvarenasport.com/";
+
   return {
-    label: "Arena Sport official",
-    href: "https://www.arenasport.com/",
-    note: "This is a linear pay-TV sports channel. GLS shows it for discovery and onboarding — watch via Arena Sport or your licensed provider (for example SuperSport on DStv in South Africa).",
+    label: "Open official Arena Sport",
+    href,
+    note: "This is rights-managed linear pay TV. GLS lists the channel for discovery and onboarding but does not include an Arena Sport, Arena Cloud, cable, or satellite subscription.",
   };
 }
-
-export const DSTV_SUPERSPORT = {
-  label: "SuperSport · DStv",
-  href: "https://www.dstv.com/en-za/",
-} as const;

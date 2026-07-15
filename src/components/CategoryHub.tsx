@@ -19,6 +19,7 @@ import {
 } from "@/lib/hubs";
 import { getChannelBySlug, getWrestlingChannels, getAsiaSeries } from "@/lib/channels";
 import { catalogFromSeed } from "@/lib/stream-seeds-catalog";
+import { isLinearPayCategory } from "@/lib/linear-pay";
 import type { CatalogItem } from "@/data/types";
 
 type Props = {
@@ -128,6 +129,9 @@ export function CategoryHub({ hubKey }: Props) {
     (i) =>
       i.categories.includes("ProxyOk") && !i.categories.includes("Playable"),
   );
+  const rightsManaged = filtered.filter((i) =>
+    isLinearPayCategory(i.categories),
+  );
   const popular = filtered.filter(
     (i) =>
       i.categories.includes("Popular") || i.categories.includes("Playable"),
@@ -235,6 +239,12 @@ export function CategoryHub({ hubKey }: Props) {
 
         {hubKey === "sports" && (
           <>
+            <ContentRow
+              title="Arena linear pay TV · official subscription required"
+              items={rightsManaged}
+              limit={ROW_LIMIT}
+              viewMoreHref={`${moreBase}/all?q=arena`}
+            />
             <ContentRow
               title="Free football & sports · FIFA+ / beIN XTRA / FOX"
               items={popularFirst(

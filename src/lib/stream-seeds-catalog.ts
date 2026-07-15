@@ -1,5 +1,6 @@
 import type { CatalogItem } from "@/data/types";
 import { createClient } from "@supabase/supabase-js";
+import { isArenaPayLinear } from "@/lib/channel-heal";
 
 function anon() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -21,22 +22,29 @@ export function catalogFromSeed(row: {
   backdrop?: string | null;
 }): CatalogItem {
   const url = (row.url || "").trim();
-  const has = /^https?:\/\//i.test(url);
+  const rightsManaged = isArenaPayLinear(row.slug, row.title);
+  const has = /^https?:\/\//i.test(url) && !rightsManaged;
   return {
     id: `stream-seed-${row.slug}`,
     slug: row.slug,
     title: row.title,
     type: "live",
-    description: has
-      ? "Eadmin-seeded stream."
-      : "Eadmin slot — waiting for a stream URL.",
+    description: rightsManaged
+      ? `${row.title} is a linear pay-TV channel. GLS includes the card for discovery, but does not include a broadcaster subscription.`
+      : has
+        ? "Eadmin-seeded stream."
+        : "Eadmin slot — waiting for a stream URL.",
     countries: row.countries?.length ? row.countries : ["world"],
     categories: [
       ...new Set([
         ...(row.categories || ["Sports", "UserSeed"]),
         "Curated",
         "Popular",
-        ...(has ? ["Playable", "Verified"] : ["NeedsUrl"]),
+        ...(rightsManaged
+          ? ["LinearPay", "Rights"]
+          : has
+            ? ["Playable", "Verified"]
+            : ["NeedsUrl"]),
       ]),
     ],
     languages: ["en"],
@@ -44,7 +52,7 @@ export function catalogFromSeed(row: {
     backdrop:
       row.backdrop ||
       FALLBACK_ART.replace("w=1600&h=2400", "w=3840&h=2160"),
-    license: "open_stream",
+    license: rightsManaged ? "rights_managed" : "open_stream",
     isLive: true,
     featured: false,
     sources: has

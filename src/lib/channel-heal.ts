@@ -69,7 +69,7 @@ export function isArenaPayLinear(
   if (/tele.?arena/.test(hay)) return false;
   if (/tv.?central/.test(hay)) return false;
   return (
-    /arena\s*sport|arenasport|arena\s*fight|arenafight|arena\s*premium|match.?arena|матч.?арена|vivacom.?arena/i.test(
+    /arena[\s_-]*sport|arenasport|arena[\s_-]*fight|arenafight|arena[\s_-]*premium|match.?arena|матч.?арена|vivacom.?arena/i.test(
       hay,
     ) || /arenasport|arenafight|arenapremium|matcharena|vivacomarena/i.test(slug)
   );
