@@ -1,0 +1,193 @@
+[
+  {
+    "id": "iptv-inthekitchen-us-sd",
+    "slug": "inthekitchen-us-sd",
+    "title": "In the kitchen",
+    "type": "live",
+    "description": "Food · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Shop",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/HrRUd6r.png",
+    "backdrop": "https://i.imgur.com/HrRUd6r.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc4us/master.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-chefchampion-us-sd",
+    "slug": "chefchampion-us-sd",
+    "title": "Chef Champion (720p) [Not 24/7]",
+    "type": "live",
+    "description": "Food · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/15a9pG9.png",
+    "backdrop": "https://i.imgur.com/15a9pG9.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-chefchampion/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-chefrocshow-us-sd",
+    "slug": "chefrocshow-us-sd",
+    "title": "Chef Roc Show (720p) [Not 24/7]",
+    "type": "live",
+    "description": "Food · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/vhVnAzE.png",
+    "backdrop": "https://i.imgur.com/vhVnAzE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-chefrock/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-jordankitchen-jo-sd",
+    "slug": "jordankitchen-jo-sd",
+    "title": "Jordan Kitchen",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "jo"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/B45qcQX.png",
+    "backdrop": "https://i.imgur.com/B45qcQX.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/cooking/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-royakitchen-jo-sd",
+    "slug": "royakitchen-jo-sd",
+    "title": "Roya Kitchen",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "jo"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/lWfh8pP.png",
+    "backdrop": "https://i.imgur.com/lWfh8pP.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://playlist.fasttvcdn.com/pl/toa2uuhhygheuly7xtuqrg/roya-kitchen/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tv5mondechefs-fr-sd",
+    "slug": "tv5mondechefs-fr-sd",
+    "title": "TV5MONDE Chefs",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "fr"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Lifestyle",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://psi.tv5monde.com/media/static/default/lives/tv5monde-chef.png",
+    "backdrop": "https://psi.tv5monde.com/media/static/default/lives/tv5monde-chef.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://tvf-tv5ch.otteravision.com/tvf/tv5ch/tv5ch.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  }
+]

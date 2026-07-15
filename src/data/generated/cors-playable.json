@@ -1,0 +1,738 @@
+{
+  "sports": [
+    {
+      "title": "AKC TV",
+      "url": "https://broadcast.blivenyc.com/speed/broadcast/22/desktop-playlist.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/XRTfoSp.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Outdoor"
+      ],
+      "slug": "akctv-us-sd",
+      "id": "iptv-akctv-us-sd"
+    },
+    {
+      "title": "DraftKings Network",
+      "url": "https://na.linear.zype.com/e0bd0e23-a958-4e43-8164-4f2fef8876a8/fd3614bd-90bf-4530-a277-65ae3a1720c8-zype/live.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/SFYhgrt.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "slug": "draftkingsnetwork-us-sd",
+      "id": "iptv-draftkingsnetwork-us-sd"
+    },
+    {
+      "title": "Duck Hunting TV",
+      "url": "https://main.duckhunting.playout.vju.tv/duckhuntingtv/main.m3u8",
+      "cors": "*",
+      "segs": 6,
+      "poster": "https://image.roku.com/developer_channels/prod/b2a80f0a20fc338f22a8289f23d20d19d958470ff1b8df3845c57cbc54ec1245.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Outdoor"
+      ],
+      "slug": "duckhuntingtv-us-sd",
+      "id": "iptv-duckhuntingtv-us-sd"
+    },
+    {
+      "title": "KCMN-LD6",
+      "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg02873-kravemedia-mtrspt1-distrotv/playlist.m3u8",
+      "cors": "*",
+      "segs": 9,
+      "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/QVC_logo_2019.svg/960px-QVC_logo_2019.svg.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "slug": "kcmnld426-us-sd",
+      "id": "iptv-kcmnld426-us-sd"
+    },
+    {
+      "title": "Lacrosse TV",
+      "url": "https://a-cdn.klowdtv.com/live2/lsn_720p/playlist.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://yt3.googleusercontent.com/ytc/AIdro_m_xSJFydxZ9QBU-85OuchjmzS0Bo0_Tukmk7to8hBfyl8=s512-c-k-c0x00ffffff-no-rj",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "slug": "lacrossetv-us-sd",
+      "id": "iptv-lacrossetv-us-sd"
+    },
+    {
+      "title": "Midpen Media Center Youth Education and Sports Channel 28",
+      "url": "https://5c2974786200d.streamlock.net/live-chan28/ngrp:ch28_all/playlist.m3u8",
+      "cors": "*",
+      "segs": 3,
+      "poster": "https://i.imgur.com/RPJiolQ.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Education"
+      ],
+      "slug": "midpenmediacenterchannel28-us-sd",
+      "id": "iptv-midpenmediacenterchannel28-us-sd"
+    },
+    {
+      "title": "Outdoor America",
+      "url": "https://d1e354daam8g5r.cloudfront.net/playlist.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/UKfimFD.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Outdoor"
+      ],
+      "slug": "outdooramerica-us-sd",
+      "id": "iptv-outdooramerica-us-sd"
+    },
+    {
+      "title": "Pac 12 Insider",
+      "url": "https://pac12-firetv.amagi.tv/playlist.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/736QREy.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "slug": "pac12insider-us-sd",
+      "id": "iptv-pac12insider-us-sd"
+    },
+    {
+      "title": "Pursuit UP",
+      "url": "https://d1p1siomv3cm7b.cloudfront.net/playlist.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/5Vzwqts.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Outdoor"
+      ],
+      "slug": "pursuitup-us-sd",
+      "id": "iptv-pursuitup-us-sd"
+    },
+    {
+      "title": "Rally TV",
+      "url": "https://rally-tv-live.akamaized.net/hls/live/2117704/RallyTV-Pri/master.m3u8",
+      "cors": "*",
+      "segs": 30,
+      "poster": "https://i.postimg.cc/WtLq2C7c/logo-Rally-Tv1.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "slug": "rallytv-us-sd",
+      "id": "iptv-rallytv-us-sd"
+    },
+    {
+      "title": "Stadium",
+      "url": "https://wurl120sports.global.transmit.live/hls/679a907dce42a042c23ace37/v1/stadium_gracenote/samsung_us/latest/main/hls/playlist.m3u8",
+      "cors": "*",
+      "segs": 6,
+      "poster": "https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Stadium_%28sports_network%29_logo.svg/960px-Stadium_%28sports_network%29_logo.svg.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "slug": "stadium-us-sd",
+      "id": "iptv-stadium-us-sd"
+    },
+    {
+      "title": "Swamiji TV American (1080p) [Not 24/7]",
+      "url": "https://stream.swamiji.tv/YogaIPTV/smil:YogaStreamUS.smil/playlist.m3u8",
+      "cors": "*",
+      "segs": 3,
+      "poster": "https://i.imgur.com/nrLcuzs.png",
+      "countries": [
+        "at"
+      ],
+      "categories": [
+        "Outdoor"
+      ],
+      "slug": "swamijitvamerican-at-sd",
+      "id": "iptv-swamijitvamerican-at-sd"
+    }
+  ],
+  "news": [
+    {
+      "title": "ABC 25 News Central Texas",
+      "url": "https://content.uplynk.com/channel/9d4e02c9c3544c269d32e6b316792c8f.m3u8",
+      "cors": "*",
+      "segs": 8,
+      "poster": "https://upload.wikimedia.org/wikipedia/commons/2/27/WWAY_logo.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "General"
+      ],
+      "slug": "kxxv251-us-hd",
+      "id": "iptv-kxxv251-us-hd"
+    },
+    {
+      "title": "America's Voice",
+      "url": "https://content.uplynk.com/channel/26bd482ffe364a1282bc3df28bd3c21f.m3u8",
+      "cors": "*",
+      "segs": 16,
+      "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=1200&q=80",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "americasvoice-us-sd",
+      "id": "iptv-americasvoice-us-sd"
+    },
+    {
+      "title": "Amu TV",
+      "url": "https://jmc-live.ercdn.net/amutv/amutv.m3u8",
+      "cors": "*",
+      "segs": 1080,
+      "poster": "https://i.imgur.com/KXdvPum.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "amutv-us-sd",
+      "id": "iptv-amutv-us-sd"
+    },
+    {
+      "title": "Black News Channel",
+      "url": "https://blacknewschannel-xumo-us.amagi.tv/playlist.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/oX5oR4d.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "blacknewschannel-us-sd",
+      "id": "iptv-blacknewschannel-us-sd"
+    },
+    {
+      "title": "CBN News Channel",
+      "url": "https://fastly.live.brightcove.com/6380396819112/us-east-1/734546207001/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJob3N0IjoiczFpM3ZpLmVncmVzcy50N2M3emwiLCJhY2NvdW50X2lkIjoiNzM0NTQ2MjA3MDAxIiwiZWhuIjoiZmFzdGx5LmxpdmUuYnJpZ2h0Y292ZS5jb20iLCJpc3MiOiJibGl2ZS1wbGF5YmFjay1zb3VyY2UtYXBpIiwic3ViIjoicGF0aG1hcHRva2VuIiwiYXVkIjpbIjczNDU0NjIwNzAwMSJdLCJqdGkiOiI2MzgwMzk2ODE5MTEyIn0.GDYp4IWtzwPkupEWeeOavnioVknO-Ev3UGlHvM1rE6I/playlist-hls.m3u8",
+      "cors": "*",
+      "segs": 5,
+      "poster": "https://i.imgur.com/9f9YMsA.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Religious"
+      ],
+      "slug": "cbnnews-us-sd",
+      "id": "iptv-cbnnews-us-sd"
+    },
+    {
+      "title": "CBS News Baltimore",
+      "url": "https://lineup.cbsivideo.com/playout/8877a7d5-b094-4ac8-bc72-75a5fed68e5b/index.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/jy3UfCe.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "cbsnewsbaltimore-us-sd",
+      "id": "iptv-cbsnewsbaltimore-us-sd"
+    },
+    {
+      "title": "CBS News Miami",
+      "url": "https://cbsn-mia.cbsnstream.cbsnews.com/out/v1/ac174b7938264d24ae27e56f6584bca0/master.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/DExbVa9.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "cbsnewsmiami-us-sd",
+      "id": "iptv-cbsnewsmiami-us-sd"
+    },
+    {
+      "title": "CBS News Sacramento",
+      "url": "https://lineup.cbsivideo.com/playout/c1ed69db-6b71-4581-a937-a70ab4089f8a/index.m3u8",
+      "cors": "*",
+      "segs": 15,
+      "poster": "https://i.imgur.com/0e1kSGX.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "cbsnewssacramento-us-sd",
+      "id": "iptv-cbsnewssacramento-us-sd"
+    },
+    {
+      "title": "Channel One",
+      "url": "https://pemirateshls.persiana.live/hls/stream.m3u8",
+      "cors": "*",
+      "segs": 20,
+      "poster": "https://i.imgur.com/igskUo0.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Culture",
+        "News"
+      ],
+      "slug": "channelone-us-sd",
+      "id": "iptv-channelone-us-sd"
+    },
+    {
+      "title": "Cheddar News",
+      "url": "https://wurlcheddar.global.transmit.live/hls/689ceac9301c34d3919676f3/v1/Cheddar/samsung_us/latest/main/hls/playlist.m3u8",
+      "cors": "*",
+      "segs": 6,
+      "poster": "https://i.imgur.com/tuP9GW8.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "cheddarnews-us-sd",
+      "id": "iptv-cheddarnews-us-sd"
+    },
+    {
+      "title": "Didgah TV",
+      "url": "https://media.streambrothers.com:1936/8276/8276/playlist.m3u8",
+      "cors": "*",
+      "segs": 3,
+      "poster": "https://i.imgur.com/3SeAyBS.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "didgahtv-us-sd",
+      "id": "iptv-didgahtv-us-sd"
+    },
+    {
+      "title": "Entertainment Tonight",
+      "url": "https://enterbcef94b.airspace-cdn.cbsivideo.com/master.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Entertainment_Tonight_2021.svg/960px-Entertainment_Tonight_2021.svg.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Entertainment",
+        "News"
+      ],
+      "slug": "entertainmenttonight-us-sd",
+      "id": "iptv-entertainmenttonight-us-sd"
+    }
+  ],
+  "kids": [
+    {
+      "title": "3ABN Kids Network",
+      "url": "https://3abn.bozztv.com/3abn2/Kids_live/smil:Kids_live.smil/playlist.m3u8",
+      "cors": "*",
+      "segs": 6,
+      "poster": "https://i.imgur.com/z3npqO1.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Animation",
+        "Kids",
+        "Religious"
+      ],
+      "slug": "3abnkids-us-sd",
+      "id": "iptv-3abnkids-us-sd"
+    },
+    {
+      "title": "Aghapy Kids",
+      "url": "https://5b622f07944df.streamlock.net/aghapykids.tv/aghapykids2/playlist.m3u8",
+      "cors": "*",
+      "segs": 3,
+      "poster": "https://i.imgur.com/8ariztD.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Kids"
+      ],
+      "slug": "aghapykids-us-sd",
+      "id": "iptv-aghapykids-us-sd"
+    },
+    {
+      "title": "Alkarma TV Family (1080p) [Not 24/7]",
+      "url": "https://58cc65c534c67.streamlock.net/alkarmatv.com/alkarmaNA2.smil/playlist.m3u8",
+      "cors": "*",
+      "segs": 3,
+      "poster": "https://i.imgur.com/yUEuQA2.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Religious"
+      ],
+      "slug": "alkarmatvfamily-us-sd",
+      "id": "iptv-alkarmatvfamily-us-sd"
+    },
+    {
+      "title": "AMG TV",
+      "url": "https://2-fss-2.streamhoster.com/pl_138/201660-1270634-1/playlist.m3u8",
+      "cors": "*",
+      "segs": 4,
+      "poster": "https://i.imgur.com/m5Anun9.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Family"
+      ],
+      "slug": "amgtv-us-sd",
+      "id": "iptv-amgtv-us-sd"
+    },
+    {
+      "title": "Baby Shark TV",
+      "url": "https://newidco-babysharktv-1-us.roku.wurl.tv/playlist.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/SbBKr8L.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Kids"
+      ],
+      "slug": "babysharktv-us-sd",
+      "id": "iptv-babysharktv-us-sd"
+    },
+    {
+      "title": "Blues TV",
+      "url": "https://2-fss-2.streamhoster.com/pl_138/205510-3094608-1/playlist.m3u8",
+      "cors": "*",
+      "segs": 4,
+      "poster": "https://i.imgur.com/px0CSti.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Animation"
+      ],
+      "slug": "kmbyld275-us-sd",
+      "id": "iptv-kmbyld275-us-sd"
+    },
+    {
+      "title": "Brat TV",
+      "url": "https://streams2.sofast.tv/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/04072b68-dc6a-4d5e-98af-f356ba8d5063/playlist.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/Kkcp9Bk.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Kids"
+      ],
+      "slug": "brattv-us-sd",
+      "id": "iptv-brattv-us-sd"
+    },
+    {
+      "title": "CBN Family",
+      "url": "https://fastly.live.brightcove.com/6380399588112/us-east-1/734546207001/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJob3N0IjoiczFpM3ZpLmVncmVzcy50N2M3emwiLCJhY2NvdW50X2lkIjoiNzM0NTQ2MjA3MDAxIiwiZWhuIjoiZmFzdGx5LmxpdmUuYnJpZ2h0Y292ZS5jb20iLCJpc3MiOiJibGl2ZS1wbGF5YmFjay1zb3VyY2UtYXBpIiwic3ViIjoicGF0aG1hcHRva2VuIiwiYXVkIjpbIjczNDU0NjIwNzAwMSJdLCJqdGkiOiI2MzgwMzk5NTg4MTEyIn0.LYfIeObmX4AEStY_xCnPZwMJHXgOAPFMTKfztq-9F8U/playlist-hls.m3u8",
+      "cors": "*",
+      "segs": 5,
+      "poster": "https://i.imgur.com/wDPkKT1.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Religious"
+      ],
+      "slug": "cbnfamily-us-sd",
+      "id": "iptv-cbnfamily-us-sd"
+    },
+    {
+      "title": "Dove Channel",
+      "url": "https://linear-896.frequency.stream/dist/cineverse/896/hls/master/playlist.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=1200&q=80",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Family"
+      ],
+      "slug": "dovechannel-us-sd",
+      "id": "iptv-dovechannel-us-sd"
+    },
+    {
+      "title": "FilmRise Anime",
+      "url": "https://dvu7aia8rjlfm.cloudfront.net/master.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/3wqeGXM.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Animation"
+      ],
+      "slug": "filmriseanime-us-sd",
+      "id": "iptv-filmriseanime-us-sd"
+    },
+    {
+      "title": "HappyKids",
+      "url": "https://dil9xdvretp0f.cloudfront.net/index.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/cPrUCFw.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Kids"
+      ],
+      "slug": "happykids-us-sd",
+      "id": "iptv-happykids-us-sd"
+    },
+    {
+      "title": "Logos TV Kids (720p) [Not 24/7]",
+      "url": "https://streamer1.streamhost.org/salive/logoskidsH/playlist.m3u8",
+      "cors": "*",
+      "segs": 3,
+      "poster": "https://i.imgur.com/Kr3U3Ub.png",
+      "countries": [
+        "es"
+      ],
+      "categories": [
+        "Kids",
+        "Religious"
+      ],
+      "slug": "logostvkids-es-sd",
+      "id": "iptv-logostvkids-es-sd"
+    }
+  ],
+  "food": [
+    {
+      "title": "Better Health TV",
+      "url": "https://tgn.bozztv.com/betterlife/betterhealth/betterhealth/index.m3u8",
+      "cors": "*",
+      "segs": 4,
+      "poster": "https://i.imgur.com/qnwJiji.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Lifestyle"
+      ],
+      "slug": "betterhealthtv-us-sd",
+      "id": "iptv-betterhealthtv-us-sd"
+    },
+    {
+      "title": "Biz TV",
+      "url": "https://2-fss-1.streamhoster.com/pl_154/205722-2251224-1/playlist.m3u8",
+      "cors": "*",
+      "segs": 6,
+      "poster": "https://i.imgur.com/yaNXOnO.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Lifestyle"
+      ],
+      "slug": "biztv-us-sd",
+      "id": "iptv-biztv-us-sd"
+    },
+    {
+      "title": "bon appétit",
+      "url": "https://bonappetit-samsung.amagi.tv/playlist.m3u8",
+      "cors": "*",
+      "segs": 9,
+      "poster": "https://i.imgur.com/YhFFxlE.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Cooking"
+      ],
+      "slug": "bonappetit-us-sd",
+      "id": "iptv-bonappetit-us-sd"
+    },
+    {
+      "title": "Chef Champion (720p) [Not 24/7]",
+      "url": "https://rpn.bozztv.com/gusa/gusa-chefchampion/index.m3u8",
+      "cors": "*",
+      "segs": 4,
+      "poster": "https://i.imgur.com/15a9pG9.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Cooking"
+      ],
+      "slug": "chefchampion-us-sd",
+      "id": "iptv-chefchampion-us-sd"
+    },
+    {
+      "title": "Chef Roc Show (720p) [Not 24/7]",
+      "url": "https://rpn.bozztv.com/gusa/gusa-chefrock/index.m3u8",
+      "cors": "*",
+      "segs": 4,
+      "poster": "https://i.imgur.com/vhVnAzE.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Cooking"
+      ],
+      "slug": "chefrocshow-us-sd",
+      "id": "iptv-chefrocshow-us-sd"
+    },
+    {
+      "title": "Fashion Finds",
+      "url": "https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc5us/master.m3u8",
+      "cors": "*",
+      "segs": 3,
+      "poster": "https://i.imgur.com/GvDRZgq.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Lifestyle",
+        "Shop"
+      ],
+      "slug": "fashionfinds-us-sd",
+      "id": "iptv-fashionfinds-us-sd"
+    },
+    {
+      "title": "Global Fashion Channel",
+      "url": "https://pubgfc.teleosmedia.com/linear/globalfashionchannel/globalfashionchannel/playlist.m3u8",
+      "cors": "*",
+      "segs": 13,
+      "poster": "https://i.imgur.com/s4eGYEP.jpg",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Lifestyle"
+      ],
+      "slug": "globalfashionchannel-us-sd",
+      "id": "iptv-globalfashionchannel-us-sd"
+    },
+    {
+      "title": "In the kitchen",
+      "url": "https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc4us/master.m3u8",
+      "cors": "*",
+      "segs": 3,
+      "poster": "https://i.imgur.com/HrRUd6r.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Cooking",
+        "Shop"
+      ],
+      "slug": "inthekitchen-us-sd",
+      "id": "iptv-inthekitchen-us-sd"
+    },
+    {
+      "title": "INFAST",
+      "url": "https://amg00861-terninternation-lifestyle-samsungau-kdlyy.amagi.tv/playlist/amg00861-terninternation-lifestyle-samsungau/playlist.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/VwAMqA7.png",
+      "countries": [
+        "nl"
+      ],
+      "categories": [
+        "Lifestyle"
+      ],
+      "slug": "infast-nl-sd",
+      "id": "iptv-infast-nl-sd"
+    },
+    {
+      "title": "Kaloopy TV",
+      "url": "https://streamingserver000.viewtv.cloud/VIEWTVNETWORK-KALOOPY/index.m3u8",
+      "cors": "*",
+      "segs": 4,
+      "poster": "https://i.imgur.com/XPyOTZF.jpeg",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Lifestyle"
+      ],
+      "slug": "kaloopytv-us-sd",
+      "id": "iptv-kaloopytv-us-sd"
+    },
+    {
+      "title": "KPVM AWE Plus",
+      "url": "https://2-fss-2.streamhoster.com/pl_120/206858-4404552-1/playlist.m3u8",
+      "cors": "*",
+      "segs": 4,
+      "poster": "https://i.imgur.com/hL8i7Ar.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Lifestyle",
+        "Travel"
+      ],
+      "slug": "kpvmld257-us-sd",
+      "id": "iptv-kpvmld257-us-sd"
+    },
+    {
+      "title": "Lighting Lives Blessing Nations Smart Life Style TV (LLBN)",
+      "url": "https://brightstar-sls-pull-secure.akamaized.net/brightstarsls/stream.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/kHFlTEy.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Lifestyle"
+      ],
+      "slug": "smartlifestyletv-us-sd",
+      "id": "iptv-smartlifestyletv-us-sd"
+    }
+  ]
+}

@@ -1,0 +1,1033 @@
+{
+  "beinsportsusa-us-sd": {
+    "slug": "beinsportsusa-us-sd",
+    "title": "beIN SPORTS XTRA",
+    "url": "https://bein-xtra-bein.amagi.tv/playlist.m3u8",
+    "note": "Main beIN Sports USA restream dead — XTRA FAST.",
+    "countries": [
+      "us",
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Playable",
+      "Verified",
+      "Healed"
+    ]
+  },
+  "etvnewssport-za-sd": {
+    "slug": "etvnewssport-za-sd",
+    "title": "ZA News · SABC News",
+    "url": "https://sabconetanw.cdn.mangomolo.com/news/smil:news.stream.smil/master.m3u8",
+    "note": "Old AFxP ETVN entrepreneur URL is 404. Healed to open SABC News CDN.",
+    "countries": [
+      "za"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Healed"
+    ]
+  },
+  "ln24sa-za-sd": {
+    "slug": "ln24sa-za-sd",
+    "title": "LN24SA",
+    "url": "https://cdnstack.internetmultimediaonline.org/ln24/ln24.stream/playlist.m3u8",
+    "note": "Keep LN24 on known-good open HLS.",
+    "countries": [
+      "za"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Healed"
+    ]
+  },
+  "abpnews-in-sd": {
+    "slug": "abpnews-in-sd",
+    "title": "ABP News",
+    "url": "https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-472500/abpnews/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "etvnews-in-hd": {
+    "slug": "etvnews-in-hd",
+    "title": "ETV News",
+    "url": "https://cc-3448kp65yhc5w.akamaized.net/WWBI/Amagi/ETV_News_IN/playlist.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "indiatoday-in-sd": {
+    "slug": "indiatoday-in-sd",
+    "title": "India Today",
+    "url": "https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-293160/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "indiatv-in-sd": {
+    "slug": "indiatv-in-sd",
+    "title": "India TV",
+    "url": "https://pl-indiatvnews.akamaized.net/out/v1/db79179b608641ceaa5a4d0dd0dca8da/index.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "indiatvspeednews-in-hd": {
+    "slug": "indiatvspeednews-in-hd",
+    "title": "India TV Speed News",
+    "url": "https://cc-lyf4c0hwzg5dd.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-lyf4c0hwzg5dd/v1/vglive-sk-479089/main.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "ndtv24x7-in-sd": {
+    "slug": "ndtv24x7-in-sd",
+    "title": "NDTV 24x7",
+    "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/NDTV24x7.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "ndtvmadhyapradeshchhattisgarh-in-sd": {
+    "slug": "ndtvmadhyapradeshchhattisgarh-in-sd",
+    "title": "NDTV Madhya Pradesh Chhattisgarh",
+    "url": "https://ndtvregional.akamaized.net/hls/live/2102726-b/ndtvmpcg/master_1.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "ndtvrajasthan-in-sd": {
+    "slug": "ndtvrajasthan-in-sd",
+    "title": "NDTV Rajasthan",
+    "url": "https://ndtvregional.akamaized.net/hls/live/2102726-b/ndtvraj/master_1.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18assamnortheast-in-sd": {
+    "slug": "news18assamnortheast-in-sd",
+    "title": "News18 Assam North-East",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Assam_North_East_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18bangla-in-sd": {
+    "slug": "news18bangla-in-sd",
+    "title": "News18 Bangla",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Bangla_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18biharjharkhand-in-sd": {
+    "slug": "news18biharjharkhand-in-sd",
+    "title": "News18 Bihar Jharkhand",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Bihar_Jharkhand_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18delhincrjk-in-sd": {
+    "slug": "news18delhincrjk-in-sd",
+    "title": "News18 Delhi NCR JK",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_JKLH_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18gujarati-in-sd": {
+    "slug": "news18gujarati-in-sd",
+    "title": "News18 Gujarati",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Gujarati_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18india-in-sd": {
+    "slug": "news18india-in-sd",
+    "title": "News18 India",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_India_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18kerala-in-sd": {
+    "slug": "news18kerala-in-sd",
+    "title": "News18 Kerala",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Kerala_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18madhyapradeshchhattisgarh-in-sd": {
+    "slug": "news18madhyapradeshchhattisgarh-in-sd",
+    "title": "News18 Madhya Pradesh/Chhattisgarh",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_MP_Chhattisgarh_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18marathi-in-sd": {
+    "slug": "news18marathi-in-sd",
+    "title": "News18 Marathi",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Lokmat_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18odia-in-sd": {
+    "slug": "news18odia-in-sd",
+    "title": "News18 Odia",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Odia_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18punjabharyanahimachal-in-sd": {
+    "slug": "news18punjabharyanahimachal-in-sd",
+    "title": "News18 Punjab/Haryana/Himachal",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Punjab_Haryana_HP_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18rajasthan-in-sd": {
+    "slug": "news18rajasthan-in-sd",
+    "title": "News18 Rajasthan",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Rajasthan_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18tamilnadu-in-sd": {
+    "slug": "news18tamilnadu-in-sd",
+    "title": "News18 Tamil Nadu",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Tamil_Nadu_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18urdu-in-sd": {
+    "slug": "news18urdu-in-sd",
+    "title": "News18 Urdu",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Urdu_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "news18uttarpradeshuttarakhand-in-sd": {
+    "slug": "news18uttarpradeshuttarakhand-in-sd",
+    "title": "News18 Uttar Pradesh Uttarakhand",
+    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_UP_Uttarakhand_NW18_MOB/output01/master.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "republicbangla-in-sd": {
+    "slug": "republicbangla-in-sd",
+    "title": "Republic Bangla",
+    "url": "https://vg-republictvlive.akamaized.net/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/vglive-sk-456368/main.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "republicbharat-in-sd": {
+    "slug": "republicbharat-in-sd",
+    "title": "Republic Bharat",
+    "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/RepublicBharat.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "republickannada-in-sd": {
+    "slug": "republickannada-in-sd",
+    "title": "Republic Kannada",
+    "url": "https://vg-republictvlive.akamaized.net/ptnr-republicweb/title-Republic_TV_Kannada/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/1acd1ce1-c6a7-4ae4-afa1-133ffb111ebb/main.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "republictv-in-sd": {
+    "slug": "republictv-in-sd",
+    "title": "Republic TV",
+    "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/RepublicTV.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zee24kalak-in-sd": {
+    "slug": "zee24kalak-in-sd",
+    "title": "Zee 24 Kalak",
+    "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zee24kalak/v1/manifest/611d79b11b77e2f571934fd80ca1413453772ac7/497f7199-758d-495d-9d2f-a5489231c428/14b7c8ec-16da-47f2-8d7e-5bbaec67b3e2/3.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zee24taas-in-sd": {
+    "slug": "zee24taas-in-sd",
+    "title": "Zee 24 Taas",
+    "url": "https://dgrvlduwztkd4.cloudfront.net/index_5.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeebharat-in-sd": {
+    "slug": "zeebharat-in-sd",
+    "title": "Zee Bharat",
+    "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeehindustan/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/96bbab12-582e-4540-af70-510ab6824581/main.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeebiharjharkhand-in-sd": {
+    "slug": "zeebiharjharkhand-in-sd",
+    "title": "Zee Bihar Jharkhand",
+    "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/ZeeBiharJharkhand.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeedelhincrharyana-in-sd": {
+    "slug": "zeedelhincrharyana-in-sd",
+    "title": "Zee Delhi NCR Haryana",
+    "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeedelhincr/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/cc483a15-1b39-4642-872d-5d08d362ed01/main.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeekannadanews-in-sd": {
+    "slug": "zeekannadanews-in-sd",
+    "title": "Zee Kannada News",
+    "url": "https://d3vzwoqcbpfm8p.cloudfront.net/index_4.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeemadhyapradeshchhattisgarh-in-sd": {
+    "slug": "zeemadhyapradeshchhattisgarh-in-sd",
+    "title": "Zee Madhya Pradesh Chhattisgarh",
+    "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeemadhyachhattisgarh/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/2ab17056-6187-4f0e-a34d-f436ac479d6c/main.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeemalayalamnews-in-sd": {
+    "slug": "zeemalayalamnews-in-sd",
+    "title": "Zee Malayalam News",
+    "url": "https://d1ty2af03alkwd.cloudfront.net/index_4.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeenews-in-sd": {
+    "slug": "zeenews-in-sd",
+    "title": "Zee News",
+    "url": "https://dknttpxmr0dwf.cloudfront.net/index_57.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeepunjabharyanahimachal-in-sd": {
+    "slug": "zeepunjabharyanahimachal-in-sd",
+    "title": "Zee Punjab Haryana Himachal",
+    "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeepunjabharyanahima/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/65eed269-2f3a-4dd0-ac89-d18959af28e3/main.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeerajasthan-in-sd": {
+    "slug": "zeerajasthan-in-sd",
+    "title": "Zee Rajasthan",
+    "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeerajashthannews/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/8e864b9a-1681-41a0-99a6-387490bc5b24/main.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeetelugunews-in-sd": {
+    "slug": "zeetelugunews-in-sd",
+    "title": "Zee Telugu News",
+    "url": "https://d116gfrn8orazi.cloudfront.net/index.m3u8?akes=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NjcxOTc5NzJ9.O4qmdMPbHwKrCg6hFXvD70vjSPWKQd0a7NrjmFdeMB8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeeuttarpradeshuttarakhand-in-sd": {
+    "slug": "zeeuttarpradeshuttarakhand-in-sd",
+    "title": "Zee Uttar Pradesh/Uttarakhand",
+    "url": "https://duw35ict5q7th.cloudfront.net/index_3.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "etvcomedy-in-hd": {
+    "slug": "etvcomedy-in-hd",
+    "title": "ETV Comedy",
+    "url": "https://cc-wie8j8y69d2uy.akamaized.net/WWBI/Amagi/ETV_Comedy_IN/playlist.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Comedy",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "etvjosh-in-hd": {
+    "slug": "etvjosh-in-hd",
+    "title": "ETV Josh",
+    "url": "https://cc-uyh1ow5zouoio.akamaized.net/WWBI/Amagi/ETV_Josh_IN/playlist.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "etvmusic-in-hd": {
+    "slug": "etvmusic-in-hd",
+    "title": "ETV Music",
+    "url": "https://cc-szivnms4rlah6.akamaized.net/WWBI/Amagi/ETV_Music_IN/playlist.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "ndtvindia-in-sd": {
+    "slug": "ndtvindia-in-sd",
+    "title": "NDTV India",
+    "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/NDTVIndia.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "ndtvprofit-in-sd": {
+    "slug": "ndtvprofit-in-sd",
+    "title": "NDTV Profit",
+    "url": "https://ndtvprofit.akamaized.net/hls/live/2107404/ndtvprofit/chunklist_5.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Business",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "ndtvprofit-in-hd": {
+    "slug": "ndtvprofit-in-hd",
+    "title": "NDTV Profit",
+    "url": "https://ndtvprofit.akamaized.net/hls/live/2107404/ndtvprofit/master_1.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zee24ghanta-in-sd": {
+    "slug": "zee24ghanta-in-sd",
+    "title": "Zee 24 Ghanta",
+    "url": "https://d2dsoyvkr33m05.cloudfront.net/index_4.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeebanglasonar-in-sd": {
+    "slug": "zeebanglasonar-in-sd",
+    "title": "Zee Bangla Sonar",
+    "url": "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/ColorsHD/default/ColorsHD.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "zeebusiness-in-sd": {
+    "slug": "zeebusiness-in-sd",
+    "title": "Zee Business",
+    "url": "https://dwby15d04agvq.cloudfront.net/index_5.m3u8",
+    "note": "India heal · verified open HLS",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Business",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ]
+  },
+  "fox-weather": {
+    "slug": "fox-weather",
+    "title": "FOX Weather",
+    "url": "https://247wlive.foxweather.com/stream/index.m3u8",
+    "note": "Official Fox Weather open stream.",
+    "countries": [
+      "us",
+      "world"
+    ],
+    "categories": [
+      "Weather",
+      "Fox",
+      "Playable",
+      "Verified",
+      "Healed"
+    ]
+  },
+  "espn8theocho-us-espn8theochohd": {
+    "slug": "espn8theocho-us-espn8theochohd",
+    "title": "ESPN8 The Ocho (free FAST)",
+    "url": "https://d3b6q2ou5kp8ke.cloudfront.net/ESPNTheOcho.m3u8",
+    "note": "Pay ESPN linear not open — mapped to official ESPN8 The Ocho FAST.",
+    "countries": [
+      "us",
+      "ca",
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "ESPN",
+      "Playable",
+      "Verified",
+      "Healed",
+      "Popular"
+    ]
+  },
+  "foxdeportes-us-sd": {
+    "slug": "foxdeportes-us-sd",
+    "title": "LiveNOW from FOX (free)",
+    "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00488-foxdigital-livenowbyfox-lgus/playlist.m3u8",
+    "note": "FS1/FS2/Fox Sports pay linear not open — Fox LiveNOW FAST.",
+    "countries": [
+      "us",
+      "ca",
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Fox",
+      "News",
+      "Playable",
+      "Verified",
+      "Healed",
+      "Popular"
+    ]
+  },
+  "foxsoccerplus-us-sd": {
+    "slug": "foxsoccerplus-us-sd",
+    "title": "LiveNOW from FOX (free)",
+    "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00488-foxdigital-livenowbyfox-lgus/playlist.m3u8",
+    "note": "FS1/FS2/Fox Sports pay linear not open — Fox LiveNOW FAST.",
+    "countries": [
+      "us",
+      "ca",
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Fox",
+      "News",
+      "Playable",
+      "Verified",
+      "Healed",
+      "Popular"
+    ]
+  },
+  "tsntheocho-ca-sd": {
+    "slug": "tsntheocho-ca-sd",
+    "title": "TSN The Ocho",
+    "url": "https://d3pnbvng3bx2nj.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-rds8g35qfqrnv/TSN_The_Ocho.m3u8",
+    "note": "Canadian free sports FAST.",
+    "countries": [
+      "us",
+      "ca",
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Playable",
+      "Verified",
+      "Healed",
+      "Popular"
+    ]
+  },
+  "traceivoire-fr-sd": {
+    "slug": "traceivoire-fr-sd",
+    "title": "TRACE Urban",
+    "url": "https://lightning-traceurban-samsungau.amagi.tv/playlist.m3u8",
+    "note": "Trace+ CDN dead — Amagi Urban FAST heal.",
+    "countries": ["za", "fr", "world"],
+    "categories": [
+      "Music",
+      "Africa",
+      "Entertainment",
+      "Playable",
+      "Verified",
+      "Healed",
+      "Popular"
+    ]
+  },
+  "tracesportstars-fr-sd": {
+    "slug": "tracesportstars-fr-sd",
+    "title": "TRACE Sport Stars",
+    "url": "https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8",
+    "note": "Trace+ Sport Stars dead — Amagi Sport FAST heal.",
+    "countries": ["za", "fr", "world"],
+    "categories": [
+      "Sports",
+      "Music",
+      "Playable",
+      "Verified",
+      "Healed",
+      "Popular"
+    ]
+  },
+  "tracesportstars-fr-hd": {
+    "slug": "tracesportstars-fr-hd",
+    "title": "TRACE Sport Stars",
+    "url": "https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8",
+    "note": "Trace+ Sport Stars dead — Amagi Sport FAST heal.",
+    "countries": ["za", "fr", "world"],
+    "categories": [
+      "Sports",
+      "Music",
+      "Playable",
+      "Verified",
+      "Healed"
+    ]
+  },
+  "tracesportstars-fr-russia": {
+    "slug": "tracesportstars-fr-russia",
+    "title": "TRACE Sport Stars",
+    "url": "https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8",
+    "note": "Trace+ Sport Stars dead — Amagi Sport FAST heal.",
+    "countries": ["za", "fr", "world"],
+    "categories": [
+      "Sports",
+      "Music",
+      "Playable",
+      "Verified",
+      "Healed"
+    ]
+  }
+}

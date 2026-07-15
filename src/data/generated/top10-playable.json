@@ -1,0 +1,732 @@
+{
+  "sports": [
+    {
+      "cat": "sports",
+      "title": "Red Bull TV",
+      "slug": "red-bull-tv",
+      "url": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master_1660.m3u8",
+      "countries": [
+        "world",
+        "at"
+      ],
+      "categories": [
+        "Sports",
+        "Extreme"
+      ],
+      "poster": "https://images.unsplash.com/photo-1551524559-8af4e6624178?auto=format&fit=crop&w=1600&h=2400&q=92",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "curated-red-bull-tv"
+    },
+    {
+      "cat": "sports",
+      "title": "ATG Live",
+      "slug": "atglive-se-sd",
+      "url": "https://kanal75xto-llhls.akamaized.net/live/Data/atg-kanal-15-02a-rr/HLS-Legacy-HL/atg-kanal-15-02a-rr.m3u8",
+      "countries": [
+        "se"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "poster": "https://i.imgur.com/bPWFXkL.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-atglive-se-sd"
+    },
+    {
+      "cat": "sports",
+      "title": "DraftKings Network",
+      "slug": "draftkingsnetwork-us-sd",
+      "url": "https://na.linear.zype.com/e0bd0e23-a958-4e43-8164-4f2fef8876a8/fd3614bd-90bf-4530-a277-65ae3a1720c8-zype/live.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "poster": "https://i.imgur.com/SFYhgrt.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-draftkingsnetwork-us-sd"
+    },
+    {
+      "cat": "sports",
+      "title": "Fuel TV",
+      "slug": "fueltv-pt-au",
+      "url": "https://amg01074-fueltv-fueltvau-samsungau-g09kq.amagi.tv/playlist/amg01074-fueltv-fueltvau-samsungau/playlist.m3u8",
+      "countries": [
+        "pt"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "poster": "https://i.imgur.com/I8mviBy.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-fueltv-pt-au"
+    },
+    {
+      "cat": "sports",
+      "title": "FUEL TV",
+      "slug": "fueltv-pt-emea",
+      "url": "https://amg01074-fueltv-fueltvemeaen-rakuten-b6j62.amagi.tv/hls/amagi_hls_data_rakutenAA-fueltvemeaen/CDN/master.m3u8",
+      "countries": [
+        "pt"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "poster": "https://i.imgur.com/I8mviBy.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-fueltv-pt-emea"
+    },
+    {
+      "cat": "sports",
+      "title": "KCMN-LD6",
+      "slug": "kcmnld426-us-sd",
+      "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg02873-kravemedia-mtrspt1-distrotv/playlist.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/QVC_logo_2019.svg/960px-QVC_logo_2019.svg.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-kcmnld426-us-sd"
+    },
+    {
+      "cat": "sports",
+      "title": "MTRSPT1",
+      "slug": "mtrspt1-us-hd",
+      "url": "https://amg02873-kravemedia-mtrspt1-distrotv-mnsrl.amagi.tv/playlist/amg02873-kravemedia-mtrspt1-distrotv/playlist.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "poster": "https://i.imgur.com/Rb1H5cV.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-mtrspt1-us-hd"
+    },
+    {
+      "cat": "sports",
+      "title": "Pac 12 Insider",
+      "slug": "pac12insider-us-sd",
+      "url": "https://pac12-firetv.amagi.tv/playlist.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "poster": "https://i.imgur.com/736QREy.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-pac12insider-us-sd"
+    },
+    {
+      "cat": "sports",
+      "title": "RACER International",
+      "slug": "racerinternational-pl-fast",
+      "url": "https://amg00378-mavtv-amg00378c2-rakuten-us-1048.playouts.now.amagi.tv/playlist/amg00378-mavtvfast-motorsportsnetwork-rakutenus/playlist.m3u8",
+      "countries": [
+        "pl"
+      ],
+      "categories": [
+        "Sports"
+      ],
+      "poster": "https://provider-static.plex.tv/epg/cms/production/dd4e5871-4347-49e3-9ea1-a8770ea9c518/RACER_Intl_logo_1500x1000.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-racerinternational-pl-fast"
+    },
+    {
+      "cat": "sports",
+      "title": "Red Bull TV",
+      "slug": "redbulltv-at-sd",
+      "url": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8",
+      "countries": [
+        "at"
+      ],
+      "categories": [
+        "Sports",
+        "Outdoor"
+      ],
+      "poster": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-redbulltv-at-sd"
+    }
+  ],
+  "news": [
+    {
+      "cat": "news",
+      "title": "Al Jazeera English",
+      "slug": "al-jazeera-english",
+      "url": "https://cdn-7.pishow.tv/live/429/master.m3u8",
+      "countries": [
+        "qa",
+        "world"
+      ],
+      "categories": [
+        "News"
+      ],
+      "cors": "*",
+      "direct": true,
+      "segs": 10,
+      "score": 100,
+      "id": "playable-al-jazeera-english"
+    },
+    {
+      "cat": "news",
+      "title": "DW English",
+      "slug": "dw-english",
+      "url": "https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/master.m3u8",
+      "countries": [
+        "de",
+        "world"
+      ],
+      "categories": [
+        "News"
+      ],
+      "cors": "*",
+      "direct": true,
+      "segs": 10,
+      "score": 90,
+      "id": "playable-dw-english"
+    },
+    {
+      "cat": "news",
+      "title": "France 24 English",
+      "slug": "france-24-english",
+      "url": "https://static.france24.com/live/F24_EN_HI_HLS/live_web.m3u8",
+      "countries": [
+        "fr",
+        "world"
+      ],
+      "categories": [
+        "News"
+      ],
+      "cors": "*",
+      "direct": true,
+      "segs": 10,
+      "score": 90,
+      "id": "playable-france-24-english"
+    },
+    {
+      "cat": "news",
+      "title": "Reuters",
+      "slug": "reuters",
+      "url": "https://amg00453-reuters-amg00453c1-rakuten-uk-2110.playouts.now.amagi.tv/playlist/amg00453-reuters-reuters-rakutenuk/playlist.m3u8",
+      "countries": [
+        "gb",
+        "world"
+      ],
+      "categories": [
+        "News",
+        "UK"
+      ],
+      "poster": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80",
+      "cors": "*",
+      "segs": 10,
+      "id": "playable-reuters"
+    },
+    {
+      "cat": "news",
+      "title": "ABC News Live",
+      "slug": "abc-news-live",
+      "url": "https://abcnews-streams.akamaized.net/hls/live/2023560/abcnewshudson1/master.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "poster": "https://images.unsplash.com/photo-1504711332673-fb914d329d74?auto=format&fit=crop&w=600&q=80",
+      "cors": "*",
+      "segs": 10,
+      "id": "playable-abc-news-live"
+    },
+    {
+      "title": "America's Voice",
+      "url": "https://content.uplynk.com/channel/26bd482ffe364a1282bc3df28bd3c21f.m3u8",
+      "cors": "*",
+      "segs": 16,
+      "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=1200&q=80",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "americasvoice-us-sd",
+      "id": "iptv-americasvoice-us-sd"
+    },
+    {
+      "title": "Black News Channel",
+      "url": "https://blacknewschannel-xumo-us.amagi.tv/playlist.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/oX5oR4d.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "blacknewschannel-us-sd",
+      "id": "iptv-blacknewschannel-us-sd"
+    },
+    {
+      "title": "CBS News Baltimore",
+      "url": "https://lineup.cbsivideo.com/playout/8877a7d5-b094-4ac8-bc72-75a5fed68e5b/index.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/jy3UfCe.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "cbsnewsbaltimore-us-sd",
+      "id": "iptv-cbsnewsbaltimore-us-sd"
+    },
+    {
+      "title": "CBS News Miami",
+      "url": "https://cbsn-mia.cbsnstream.cbsnews.com/out/v1/ac174b7938264d24ae27e56f6584bca0/master.m3u8",
+      "cors": "*",
+      "segs": 10,
+      "poster": "https://i.imgur.com/DExbVa9.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "cbsnewsmiami-us-sd",
+      "id": "iptv-cbsnewsmiami-us-sd"
+    },
+    {
+      "title": "CBS News Sacramento",
+      "url": "https://lineup.cbsivideo.com/playout/c1ed69db-6b71-4581-a937-a70ab4089f8a/index.m3u8",
+      "cors": "*",
+      "segs": 15,
+      "poster": "https://i.imgur.com/0e1kSGX.png",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "News"
+      ],
+      "slug": "cbsnewssacramento-us-sd",
+      "id": "iptv-cbsnewssacramento-us-sd"
+    }
+  ],
+  "kids": [
+    {
+      "cat": "kids",
+      "title": "Banijay Mr Bean Animé",
+      "slug": "mrbeananimated-uk-fr",
+      "url": "https://amg00627-amg00627c31-rakuten-fr-3991.playouts.now.amagi.tv/playlist/amg00627-banijayfast-mrbeanfrcc-rakutenfr/playlist.m3u8",
+      "countries": [
+        "uk"
+      ],
+      "categories": [
+        "Kids",
+        "Animation"
+      ],
+      "poster": "https://static.wikia.nocookie.net/logopedia/images/2/25/Mr._Bean_Animated_Series_stacked_logo.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-mrbeananimated-uk-fr"
+    },
+    {
+      "cat": "kids",
+      "title": "Chithiram",
+      "slug": "chithiram-in-sd",
+      "url": "https://cdn-6.pishow.tv/live/1243/master.m3u8",
+      "countries": [
+        "in"
+      ],
+      "categories": [
+        "Kids"
+      ],
+      "poster": "https://i.imgur.com/xv9cWSh.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-chithiram-in-sd"
+    },
+    {
+      "cat": "kids",
+      "title": "HappyKids",
+      "slug": "happykids-us-sd",
+      "url": "https://dil9xdvretp0f.cloudfront.net/index.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Kids"
+      ],
+      "poster": "https://i.imgur.com/cPrUCFw.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-happykids-us-sd"
+    },
+    {
+      "cat": "kids",
+      "title": "KiKA (1080p) [Not 24/7]",
+      "slug": "kika-de-sd",
+      "url": "https://kikahls.akamaized.net/hls/live/2022690/livetvkika_ww/master.m3u8",
+      "countries": [
+        "de"
+      ],
+      "categories": [
+        "Kids"
+      ],
+      "poster": "https://i.imgur.com/vZdNp5S.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-kika-de-sd"
+    },
+    {
+      "cat": "kids",
+      "title": "Mr Bean Live Action",
+      "slug": "mrbeanliveaction-uk-english",
+      "url": "https://amg00627-amg00627c40-rakuten-uk-5725.playouts.now.amagi.tv/playlist/amg00627-banijayfast-mrbeanpopupcc-rakutenuk/playlist.m3u8",
+      "countries": [
+        "uk"
+      ],
+      "categories": [
+        "Kids",
+        "Comedy"
+      ],
+      "poster": "https://d2yv6y0n3qsl5c.cloudfront.net/MBEANP/MrBeanLiveAction-LG_LOGO_800x200.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-mrbeanliveaction-uk-english"
+    },
+    {
+      "cat": "kids",
+      "title": "Mr. Bean Anime Italy",
+      "slug": "mrbeananimated-uk-it",
+      "url": "https://amg00627-amg00627c29-rakuten-it-3989.playouts.now.amagi.tv/playlist/amg00627-banijayfast-mrbeanitcc-rakutenit/playlist.m3u8",
+      "countries": [
+        "uk"
+      ],
+      "categories": [
+        "Kids",
+        "Animation"
+      ],
+      "poster": "https://static.wikia.nocookie.net/logopedia/images/2/25/Mr._Bean_Animated_Series_stacked_logo.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-mrbeananimated-uk-it"
+    },
+    {
+      "cat": "kids",
+      "title": "Mr. Bean Anime Spain",
+      "slug": "mrbeananimated-uk-es",
+      "url": "https://amg00627-amg00627c30-rakuten-es-3990.playouts.now.amagi.tv/playlist/amg00627-banijayfast-mrbeanescc-rakutenes/playlist.m3u8",
+      "countries": [
+        "uk"
+      ],
+      "categories": [
+        "Kids",
+        "Animation"
+      ],
+      "poster": "https://static.wikia.nocookie.net/logopedia/images/2/25/Mr._Bean_Animated_Series_stacked_logo.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-mrbeananimated-uk-es"
+    },
+    {
+      "cat": "kids",
+      "title": "Ninja Kidz",
+      "slug": "ninjakidztv-us-sd",
+      "url": "https://d3868b4ny0rgdf.cloudfront.net/playlist.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Kids"
+      ],
+      "poster": "https://i.imgur.com/7EngqUi.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-ninjakidztv-us-sd"
+    },
+    {
+      "cat": "kids",
+      "title": "The LEGO Channel",
+      "slug": "legochannel-us-sd",
+      "url": "https://dltiqboxjw21d.cloudfront.net/index.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Kids"
+      ],
+      "poster": "https://i.imgur.com/xePwW13.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-legochannel-us-sd"
+    },
+    {
+      "cat": "kids",
+      "title": "ToonGoggles",
+      "slug": "toongoggles-us-sd",
+      "url": "https://amg01329-otterainc-toongoggles-samsungau-ad-4c.amagi.tv/playlist/amg01329-otterainc-toongoggles-samsungau/playlist.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Kids"
+      ],
+      "poster": "https://i.imgur.com/JMnxswq.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-toongoggles-us-sd"
+    }
+  ],
+  "food": [
+    {
+      "cat": "food",
+      "title": "In the kitchen",
+      "slug": "inthekitchen-us-sd",
+      "url": "https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc4us/master.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Food",
+        "Cooking",
+        "Shop"
+      ],
+      "poster": "https://i.imgur.com/HrRUd6r.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-inthekitchen-us-sd"
+    },
+    {
+      "cat": "food",
+      "title": "Chef Champion (720p) [Not 24/7]",
+      "slug": "chefchampion-us-sd",
+      "url": "https://rpn.bozztv.com/gusa/gusa-chefchampion/index.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://i.imgur.com/15a9pG9.png",
+      "cors": "*, *",
+      "direct": false,
+      "segs": 1,
+      "score": 25,
+      "id": "iptv-chefchampion-us-sd"
+    },
+    {
+      "cat": "food",
+      "title": "Chef Roc Show (720p) [Not 24/7]",
+      "slug": "chefrocshow-us-sd",
+      "url": "https://rpn.bozztv.com/gusa/gusa-chefrock/index.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://i.imgur.com/vhVnAzE.png",
+      "cors": "*, *",
+      "direct": false,
+      "segs": 1,
+      "score": 25,
+      "id": "iptv-chefrocshow-us-sd"
+    },
+    {
+      "cat": "food",
+      "title": "Jordan Kitchen",
+      "slug": "jordankitchen-jo-sd",
+      "url": "https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/cooking/playlist.m3u8",
+      "countries": [
+        "jo"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://i.imgur.com/B45qcQX.png",
+      "cors": "",
+      "direct": false,
+      "segs": 1,
+      "score": 25,
+      "id": "iptv-jordankitchen-jo-sd"
+    },
+    {
+      "cat": "food",
+      "title": "bon appétit",
+      "slug": "bonappetit-us-sd",
+      "url": "https://bonappetit-samsung.amagi.tv/playlist.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://i.imgur.com/YhFFxlE.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-bonappetit-us-sd"
+    },
+    {
+      "cat": "food",
+      "title": "Tastemade",
+      "slug": "tastemade-us-us",
+      "url": "https://rakutenaa-tm-intl-aus-rakuten-eu-n1gtg.amagi.tv/playlist/rakutenAA-tm-intl-aus-rakuten-eu/playlist.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://i.imgur.com/xP7Ehn8.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-tastemade-us-us"
+    },
+    {
+      "cat": "food",
+      "title": "BBC Food",
+      "slug": "bbcfood-us-sd",
+      "url": "https://d1e9r0b71zfwk7.cloudfront.net/playlist.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://i.imgur.com/kcmHcSx.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 0,
+      "score": 75,
+      "id": "iptv-bbcfood-us-sd"
+    },
+    {
+      "cat": "food",
+      "title": "Food Food",
+      "slug": "foodfood-in-sd",
+      "url": "https://mumt03.tangotv.in/Dsly5z3HFOODFOOD/index.m3u8",
+      "countries": [
+        "in"
+      ],
+      "categories": [
+        "Food",
+        "Cooking",
+        "Lifestyle"
+      ],
+      "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Food_Food.png",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 55,
+      "id": "iptv-foodfood-in-sd"
+    },
+    {
+      "cat": "food",
+      "title": "Kulinar TV",
+      "slug": "kulinartv-ru-sd",
+      "url": "https://api.alpaca.t62a.com/hls/9110/stream0.m3u8",
+      "countries": [
+        "ru"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://smotret.tv/images/kulinar-tv.webp",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 55,
+      "id": "iptv-kulinartv-ru-sd"
+    },
+    {
+      "cat": "food",
+      "title": "Gusto TV",
+      "slug": "gustotv-ca-poland",
+      "url": "https://563f72af.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X0d1c3RvVFZfSExT/playlist.m3u8",
+      "countries": [
+        "ca"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Gusto_TV.png",
+      "cors": "",
+      "direct": false,
+      "segs": 1,
+      "score": 25,
+      "id": "iptv-gustotv-ca-poland"
+    }
+  ]
+}

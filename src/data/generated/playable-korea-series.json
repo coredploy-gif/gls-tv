@@ -1,0 +1,233 @@
+[
+  {
+    "id": "iptv-ebskids-kr-sd",
+    "slug": "ebskids-kr-sd",
+    "title": "EBS kids (400p) [Not 24/7]",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "Kids",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama",
+      "Korea"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/62oo8Bx.png",
+    "backdrop": "https://i.imgur.com/62oo8Bx.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://ebsonair.ebs.co.kr/ebsufamilypc/familypc1m/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-abn-kr-sd",
+    "slug": "abn-kr-sd",
+    "title": "ABN TV",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama",
+      "Korea"
+    ],
+    "languages": [],
+    "poster": "https://www.abn.co.kr/resources/images/logo.png",
+    "backdrop": "https://www.abn.co.kr/resources/images/logo.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vod2.abn.co.kr/IPHONE/abn.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-hlandtv-kr-sd",
+    "slug": "hlandtv-kr-sd",
+    "title": "MBC Chuncheon (춘천 MBC) (480p) [Not 24/7]",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama",
+      "Korea"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/lthyx2P.png",
+    "backdrop": "https://i.imgur.com/lthyx2P.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.chmbc.co.kr/TV/myStream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-hlcqdtv-kr-sd",
+    "slug": "hlcqdtv-kr-sd",
+    "title": "MBC Daejeon (대전 MBC) (720p) [Not 24/7]",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama",
+      "Korea"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/HCbvAiM.png",
+    "backdrop": "https://i.imgur.com/HCbvAiM.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://ns1.tjmbc.co.kr/live/myStream.sdp/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-hlajdtv-kr-sd",
+    "slug": "hlajdtv-kr-sd",
+    "title": "MBC Jeju (제주 MBC) (352p) [Not 24/7]",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama",
+      "Korea"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/JM4rxGU.png",
+    "backdrop": "https://i.imgur.com/JM4rxGU.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://wowza.jejumbc.com/live/tv_jejumbc/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-hlatdtv-kr-sd",
+    "slug": "hlatdtv-kr-sd",
+    "title": "MBC Yeosu (여수 MBC) (1080p) [Not 24/7]",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama",
+      "Korea"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/3VSuYsn.png",
+    "backdrop": "https://i.imgur.com/3VSuYsn.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://5c3639aa99149.streamlock.net/live_TV/tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-gugaktv-kr-sd",
+    "slug": "gugaktv-kr-sd",
+    "title": "GugakTV 국악방송",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama",
+      "Korea"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/Ey7Htm8.png",
+    "backdrop": "https://i.imgur.com/Ey7Htm8.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mgugaklive.nowcdn.co.kr/gugakvideo/gugakvideo.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  }
+]

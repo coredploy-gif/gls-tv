@@ -1,0 +1,24 @@
+{
+
+  "_comment": "Local tile slots. Live URLs preferably live in Supabase stream_seeds (/eadmin). Fill url here only as offline fallback.",
+
+  "channels": [
+
+    { "slug": "tsn1-ca-sd", "title": "TSN 1", "url": "" },
+
+    { "slug": "tsn2-ca-sd", "title": "TSN 2", "url": "" },
+
+    { "slug": "tsn3-ca-sd", "title": "TSN 3", "url": "" },
+
+    { "slug": "tsn4-ca-sd", "title": "TSN 4", "url": "" },
+
+    { "slug": "tsn5-ca-sd", "title": "TSN 5", "url": "" },
+
+    { "slug": "fox-sports-1", "title": "Fox Sports 1", "url": "" },
+
+    { "slug": "fox-sports-2", "title": "Fox Sports 2", "url": "" }
+
+  ]
+
+}
+

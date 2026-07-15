@@ -1,0 +1,21 @@
+{
+  "at": "2026-07-12T19:33:02.376Z",
+  "ms": 65131,
+  "sports": {
+    "alive": 47,
+    "kept": 47
+  },
+  "kids": {
+    "alive": 22,
+    "kept": 22
+  },
+  "food": {
+    "alive": 19,
+    "kept": 19,
+    "competitions": 6
+  },
+  "overrides": [
+    "beinsportsusa-us-sd"
+  ],
+  "note": "beIN Sports USA open feed dead → XTRA mapping"
+}

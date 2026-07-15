@@ -1,0 +1,622 @@
+[
+  {
+    "id": "iptv-mrbeananimated-uk-fr",
+    "slug": "mrbeananimated-uk-fr",
+    "title": "Banijay Mr Bean Animé",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "uk"
+    ],
+    "categories": [
+      "Kids",
+      "Animation",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://static.wikia.nocookie.net/logopedia/images/2/25/Mr._Bean_Animated_Series_stacked_logo.png",
+    "backdrop": "https://static.wikia.nocookie.net/logopedia/images/2/25/Mr._Bean_Animated_Series_stacked_logo.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg00627-amg00627c31-rakuten-fr-3991.playouts.now.amagi.tv/playlist/amg00627-banijayfast-mrbeanfrcc-rakutenfr/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-chithiram-in-sd",
+    "slug": "chithiram-in-sd",
+    "title": "Chithiram",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Kids",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/xv9cWSh.png",
+    "backdrop": "https://i.imgur.com/xv9cWSh.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-6.pishow.tv/live/1243/master.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-happykids-us-sd",
+    "slug": "happykids-us-sd",
+    "title": "HappyKids",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Kids",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/cPrUCFw.png",
+    "backdrop": "https://i.imgur.com/cPrUCFw.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dil9xdvretp0f.cloudfront.net/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-kika-de-sd",
+    "slug": "kika-de-sd",
+    "title": "KiKA (1080p) [Not 24/7]",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "de"
+    ],
+    "categories": [
+      "Kids",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/vZdNp5S.png",
+    "backdrop": "https://i.imgur.com/vZdNp5S.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://kikahls.akamaized.net/hls/live/2022690/livetvkika_ww/master.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-mrbeanliveaction-uk-english",
+    "slug": "mrbeanliveaction-uk-english",
+    "title": "Mr Bean Live Action",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "uk"
+    ],
+    "categories": [
+      "Kids",
+      "Comedy",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://d2yv6y0n3qsl5c.cloudfront.net/MBEANP/MrBeanLiveAction-LG_LOGO_800x200.png",
+    "backdrop": "https://d2yv6y0n3qsl5c.cloudfront.net/MBEANP/MrBeanLiveAction-LG_LOGO_800x200.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg00627-amg00627c40-rakuten-uk-5725.playouts.now.amagi.tv/playlist/amg00627-banijayfast-mrbeanpopupcc-rakutenuk/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-mrbeananimated-uk-it",
+    "slug": "mrbeananimated-uk-it",
+    "title": "Mr. Bean Anime Italy",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "uk"
+    ],
+    "categories": [
+      "Kids",
+      "Animation",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://static.wikia.nocookie.net/logopedia/images/2/25/Mr._Bean_Animated_Series_stacked_logo.png",
+    "backdrop": "https://static.wikia.nocookie.net/logopedia/images/2/25/Mr._Bean_Animated_Series_stacked_logo.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg00627-amg00627c29-rakuten-it-3989.playouts.now.amagi.tv/playlist/amg00627-banijayfast-mrbeanitcc-rakutenit/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-mrbeananimated-uk-es",
+    "slug": "mrbeananimated-uk-es",
+    "title": "Mr. Bean Anime Spain",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "uk"
+    ],
+    "categories": [
+      "Kids",
+      "Animation",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://static.wikia.nocookie.net/logopedia/images/2/25/Mr._Bean_Animated_Series_stacked_logo.png",
+    "backdrop": "https://static.wikia.nocookie.net/logopedia/images/2/25/Mr._Bean_Animated_Series_stacked_logo.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg00627-amg00627c30-rakuten-es-3990.playouts.now.amagi.tv/playlist/amg00627-banijayfast-mrbeanescc-rakutenes/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-ninjakidztv-us-sd",
+    "slug": "ninjakidztv-us-sd",
+    "title": "Ninja Kidz",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Kids",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/7EngqUi.png",
+    "backdrop": "https://i.imgur.com/7EngqUi.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d3868b4ny0rgdf.cloudfront.net/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-legochannel-us-sd",
+    "slug": "legochannel-us-sd",
+    "title": "The LEGO Channel",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Kids",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/xePwW13.png",
+    "backdrop": "https://i.imgur.com/xePwW13.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dltiqboxjw21d.cloudfront.net/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-toongoggles-us-sd",
+    "slug": "toongoggles-us-sd",
+    "title": "ToonGoggles",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Kids",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/JMnxswq.png",
+    "backdrop": "https://i.imgur.com/JMnxswq.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg01329-otterainc-toongoggles-samsungau-ad-4c.amagi.tv/playlist/amg01329-otterainc-toongoggles-samsungau/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-zoomoo-sg-sd",
+    "slug": "zoomoo-sg-sd",
+    "title": "Zoo Moo (Australia)",
+    "type": "live",
+    "description": "Kids · plays via proxy",
+    "countries": [
+      "sg"
+    ],
+    "categories": [
+      "Kids",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/ciTJrnl.png",
+    "backdrop": "https://i.imgur.com/ciTJrnl.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://zoomoo-samsungau.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-adntvplus-fr-sd",
+    "slug": "adntvplus-fr-sd",
+    "title": "ADN TV+",
+    "type": "live",
+    "description": "Kids · plays via proxy",
+    "countries": [
+      "fr"
+    ],
+    "categories": [
+      "Kids",
+      "Animation",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/HQZQyWt.png",
+    "backdrop": "https://i.imgur.com/HQZQyWt.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d3b73b34o7cvkq.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-gz2sgqzp076kf/adn.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-teletubbies-uk-sd",
+    "slug": "teletubbies-uk-sd",
+    "title": "Teletubbies",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "uk"
+    ],
+    "categories": [
+      "Kids",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/J9iWjWL.png",
+    "backdrop": "https://i.imgur.com/J9iWjWL.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dv8lsrd8fecw9.cloudfront.net/master.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-filmriseanime-us-sd",
+    "slug": "filmriseanime-us-sd",
+    "title": "FilmRise Anime",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Kids",
+      "Animation",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/3wqeGXM.png",
+    "backdrop": "https://i.imgur.com/3wqeGXM.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dvu7aia8rjlfm.cloudfront.net/master.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-yugioh-us-sd",
+    "slug": "yugioh-us-sd",
+    "title": "Yu-Gi-Oh!",
+    "type": "live",
+    "description": "Kids · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Kids",
+      "Animation",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/Tl6aW2u.png",
+    "backdrop": "https://i.imgur.com/Tl6aW2u.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg01796-amg01796c19-rakuten-gb-7486.playouts.now.amagi.tv/playlist/amg01796-fastmediafast-yugioh2en-rakutengb/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-kartoonchannel-us-sd",
+    "slug": "kartoonchannel-us-sd",
+    "title": "Kartoon Channel",
+    "type": "live",
+    "description": "Kids · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Kids",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/1luzP3T.png",
+    "backdrop": "https://i.imgur.com/1luzP3T.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://lightning-fnf-samsungaus.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-ketchuptv-us-sd",
+    "slug": "ketchuptv-us-sd",
+    "title": "Ketchup TV",
+    "type": "live",
+    "description": "Kids · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Kids",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/XRGioQX.png",
+    "backdrop": "https://i.imgur.com/XRGioQX.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d24p9tv2w5yorn.cloudfront.net/vod.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-moonbugkids-uk-sd",
+    "slug": "moonbugkids-uk-sd",
+    "title": "Moonbug Kids",
+    "type": "live",
+    "description": "Kids · plays via proxy",
+    "countries": [
+      "uk"
+    ],
+    "categories": [
+      "Kids",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/vZHtxQb.png",
+    "backdrop": "https://i.imgur.com/vZHtxQb.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://moonbug-rokuus.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-ryanandfriends-us-sd",
+    "slug": "ryanandfriends-us-sd",
+    "title": "Ryan and Friends",
+    "type": "live",
+    "description": "Kids · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Kids",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/jcIprmt.png",
+    "backdrop": "https://i.imgur.com/jcIprmt.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://ryanandfriends-samsungau.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tgjunior-us-sd",
+    "slug": "tgjunior-us-sd",
+    "title": "Toon Goggles Junior",
+    "type": "live",
+    "description": "Kids · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Kids",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/aqane40.png",
+    "backdrop": "https://i.imgur.com/aqane40.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d3i6upqaqzosi1.cloudfront.net/tg/jr_us/tg_jr_us.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  }
+]

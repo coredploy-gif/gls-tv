@@ -1,0 +1,478 @@
+[
+  {
+    "id": "iptv-bonappetit-us-sd",
+    "slug": "bonappetit-us-sd",
+    "title": "bon appétit",
+    "type": "live",
+    "description": "Food · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/YhFFxlE.png",
+    "backdrop": "https://i.imgur.com/YhFFxlE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://bonappetit-samsung.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-inthekitchen-us-sd",
+    "slug": "inthekitchen-us-sd",
+    "title": "In the kitchen",
+    "type": "live",
+    "description": "Food · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Shop",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/HrRUd6r.png",
+    "backdrop": "https://i.imgur.com/HrRUd6r.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc4us/master.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tastemade-us-us",
+    "slug": "tastemade-us-us",
+    "title": "Tastemade",
+    "type": "live",
+    "description": "Food · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/xP7Ehn8.png",
+    "backdrop": "https://i.imgur.com/xP7Ehn8.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rakutenaa-tm-intl-aus-rakuten-eu-n1gtg.amagi.tv/playlist/rakutenAA-tm-intl-aus-rakuten-eu/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-foodfood-in-sd",
+    "slug": "foodfood-in-sd",
+    "title": "Food Food",
+    "type": "live",
+    "description": "Food · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Lifestyle",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Food_Food.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Food_Food.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mumt03.tangotv.in/Dsly5z3HFOODFOOD/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-kulinartv-ru-sd",
+    "slug": "kulinartv-ru-sd",
+    "title": "Kulinar TV",
+    "type": "live",
+    "description": "Food · direct Playable (CORS*)",
+    "countries": [
+      "ru"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://smotret.tv/images/kulinar-tv.webp",
+    "backdrop": "https://smotret.tv/images/kulinar-tv.webp",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://api.alpaca.t62a.com/hls/9110/stream0.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-gustotv-ca-poland",
+    "slug": "gustotv-ca-poland",
+    "title": "Gusto TV",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "ca"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Gusto_TV.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Gusto_TV.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://563f72af.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X0d1c3RvVFZfSExT/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-gustotv-ca-sd",
+    "slug": "gustotv-ca-sd",
+    "title": "Gusto TV",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "ca"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Gusto_TV.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Gusto_TV.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://e75fc053c0d2406fb74cdd71d77e1a7f.mediatailor.us-east-1.amazonaws.com/v1/master/f4e8c53a8367a5b58e20ce054ea3ce25a3e904d3/RakutenTV-eu_GustoTV/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-jordankitchen-jo-sd",
+    "slug": "jordankitchen-jo-sd",
+    "title": "Jordan Kitchen",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "jo"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/B45qcQX.png",
+    "backdrop": "https://i.imgur.com/B45qcQX.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/cooking/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-royakitchen-jo-sd",
+    "slug": "royakitchen-jo-sd",
+    "title": "Roya Kitchen",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "jo"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/lWfh8pP.png",
+    "backdrop": "https://i.imgur.com/lWfh8pP.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://playlist.fasttvcdn.com/pl/toa2uuhhygheuly7xtuqrg/roya-kitchen/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tv5mondechefs-fr-sd",
+    "slug": "tv5mondechefs-fr-sd",
+    "title": "TV5MONDE Chefs",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "fr"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Lifestyle",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://psi.tv5monde.com/media/static/default/lives/tv5monde-chef.png",
+    "backdrop": "https://psi.tv5monde.com/media/static/default/lives/tv5monde-chef.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://tvf-tv5ch.otteravision.com/tvf/tv5ch/tv5ch.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-maddogandmerrill-us-sd",
+    "slug": "maddogandmerrill-us-sd",
+    "title": "Mad Dog and Merrill (540p) [Not 24/7]",
+    "type": "live",
+    "description": "Food · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/5QQy3aW.png",
+    "backdrop": "https://i.imgur.com/5QQy3aW.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-mwg/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-gordonramsayshellskitchen-us-sd",
+    "slug": "gordonramsayshellskitchen-us-sd",
+    "title": "Gordon Ramsay",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/WgN4T18.png",
+    "backdrop": "https://i.imgur.com/WgN4T18.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://aegis-cloudfront-1.tubi.video/c8364f36-c60b-4a39-8d86-0b92db4611c0/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tastemade-us-uk",
+    "slug": "tastemade-us-uk",
+    "title": "Tastemade",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/xP7Ehn8.png",
+    "backdrop": "https://i.imgur.com/xP7Ehn8.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://tastemade-tdint-rakuten.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-chefchampion-us-sd",
+    "slug": "chefchampion-us-sd",
+    "title": "Chef Champion (720p) [Not 24/7]",
+    "type": "live",
+    "description": "Food · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/15a9pG9.png",
+    "backdrop": "https://i.imgur.com/15a9pG9.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-chefchampion/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-chefrocshow-us-sd",
+    "slug": "chefrocshow-us-sd",
+    "title": "Chef Roc Show (720p) [Not 24/7]",
+    "type": "live",
+    "description": "Food · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/vhVnAzE.png",
+    "backdrop": "https://i.imgur.com/vhVnAzE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-chefrock/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  }
+]

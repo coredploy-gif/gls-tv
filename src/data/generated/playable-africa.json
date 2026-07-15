@@ -1,0 +1,1904 @@
+[
+  {
+    "id": "iptv-aptv-gh-sd",
+    "slug": "aptv-gh-sd",
+    "title": "AP TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "gh"
+    ],
+    "categories": [
+      "Entertainment",
+      "Africa",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/Oky18bX.png",
+    "backdrop": "https://i.imgur.com/Oky18bX.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://59nyqg8elwap-hls-live.5centscdn.com/APTV/85c20905211659d143febd7c32592ee0.sdp/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-btv-ug-sd",
+    "slug": "btv-ug-sd",
+    "title": "BTV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ug"
+    ],
+    "categories": [
+      "Entertainment",
+      "Africa",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/rcHZ1al.png",
+    "backdrop": "https://i.imgur.com/rcHZ1al.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://streamfi-alphadgtl1.zettawiseroutes.com:8181/hls/stream.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-sowetotv-za-sd",
+    "slug": "sowetotv-za-sd",
+    "title": "Soweto TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "za"
+    ],
+    "categories": [
+      "Entertainment",
+      "Family",
+      "Africa",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://admango.cdn.mangomolo.com/analytics/uploads/188/654228e5b5.jpg",
+    "backdrop": "https://admango.cdn.mangomolo.com/analytics/uploads/188/654228e5b5.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn.freevisiontv.co.za/sttv/smil:soweto.stream.smil/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tshwanetv-za-sd",
+    "slug": "tshwanetv-za-sd",
+    "title": "Tshwane TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "za"
+    ],
+    "categories": [
+      "Entertainment",
+      "Family",
+      "General",
+      "Africa",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://admango.cdn.mangomolo.com/analytics/uploads/188/654a3ec660.png",
+    "backdrop": "https://admango.cdn.mangomolo.com/analytics/uploads/188/654a3ec660.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn.freevisiontv.co.za/sttv/smil:tshwane.stream.smil/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tvvitoria-mz-sd",
+    "slug": "tvvitoria-mz-sd",
+    "title": "TV Vitória",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "mz"
+    ],
+    "categories": [
+      "Entertainment",
+      "Africa",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/HlWzzfj.png",
+    "backdrop": "https://i.imgur.com/HlWzzfj.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stmv1.srvif.com/tvvitoriamz/tvvitoriamz/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-libyaalwataniya-ly-sd",
+    "slug": "libyaalwataniya-ly-sd",
+    "title": "Libya Al Wataniya",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ly"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/KSUny9D.jpeg",
+    "backdrop": "https://i.imgur.com/KSUny9D.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-globecast.akamaized.net/live/eds/libya_al_watanya/hls_roku/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-akilikids-ke-sd",
+    "slug": "akilikids-ke-sd",
+    "title": "Akili Kids!",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ke"
+    ],
+    "categories": [
+      "Kids",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/xFm2co6.png",
+    "backdrop": "https://i.imgur.com/xFm2co6.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://m6.livecdn.io/akilikids.co.ke/akilikids.smil/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-koogitv-eg-sd",
+    "slug": "koogitv-eg-sd",
+    "title": "Koogi TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "eg"
+    ],
+    "categories": [
+      "Kids",
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/zojMTP9.png",
+    "backdrop": "https://i.imgur.com/zojMTP9.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://5d658d7e9f562.streamlock.net/koogi.tv/koogi.smil/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-reinoinfantil-mz-sd",
+    "slug": "reinoinfantil-mz-sd",
+    "title": "Reino Infantil",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "mz"
+    ],
+    "categories": [
+      "Kids",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/oAygpDw.png",
+    "backdrop": "https://i.imgur.com/oAygpDw.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://www.khuwemultimedia.com/hls/reinoinfantiltv/reinoinfantiltv.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-7info-ci-sd",
+    "slug": "7info-ci-sd",
+    "title": "7 Info",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ci"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/jcl1nNR.png",
+    "backdrop": "https://i.imgur.com/jcl1nNR.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://video1.getstreamhosting.com:1936/8042/8042/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-advocatebroadcastingnetwork-ng-sd",
+    "slug": "advocatebroadcastingnetwork-ng-sd",
+    "title": "Advocate Broadcasting Network",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ng"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/ZkBEAp7.png",
+    "backdrop": "https://i.imgur.com/ZkBEAp7.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://viewmedia7219.bozztv.com/wmedia/viewmedia100/web_045/Stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-almasartv-ly-sd",
+    "slug": "almasartv-ly-sd",
+    "title": "Al Masar TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ly"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://play-lh.googleusercontent.com/FHPrsr391mPFqKfTq6ZdvWPZNVfsZeTAVQ8rjQF-NosnRdNipUy5xa43RWkiF4tGcQU",
+    "backdrop": "https://play-lh.googleusercontent.com/FHPrsr391mPFqKfTq6ZdvWPZNVfsZeTAVQ8rjQF-NosnRdNipUy5xa43RWkiF4tGcQU",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://starmenajo.com/hls/almasar/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-al24news-dz-sd",
+    "slug": "al24news-dz-sd",
+    "title": "AL24 News",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "dz"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/vyVEXYL.png",
+    "backdrop": "https://i.imgur.com/vyVEXYL.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn.live.easybroadcast.io/abr_corp/66_al24_u4yga6h/corp/66_al24_u4yga6h_240p/chunks.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-crtvnews-cm-sd",
+    "slug": "crtvnews-cm-sd",
+    "title": "CRTV News",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "cm"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/5CshVf9.png",
+    "backdrop": "https://i.imgur.com/5CshVf9.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live1.acangroup.org:1929/publiclive/crtv_news/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-dabangatv-sd-sd",
+    "slug": "dabangatv-sd-sd",
+    "title": "Dabanga TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "sd"
+    ],
+    "categories": [
+      "Education",
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/BH1N6TA.png",
+    "backdrop": "https://i.imgur.com/BH1N6TA.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://hls.dabangasudan.org/hls/stream.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-ln24sa-za-sd",
+    "slug": "ln24sa-za-sd",
+    "title": "LN24SA",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "za"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/Hg5YTwu.png",
+    "backdrop": "https://i.imgur.com/Hg5YTwu.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdnstack.internetmultimediaonline.org/ln24/ln24.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-medi1tvarabic-ma-sd",
+    "slug": "medi1tvarabic-ma-sd",
+    "title": "Medi 1 TV Arabic",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ma"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/3YsZPY6.jpeg",
+    "backdrop": "https://i.imgur.com/3YsZPY6.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn.live.easybroadcast.io/abr_corp/83_medi1tv-arabic_g90v4ec/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-medi1tvmaghreb-ma-sd",
+    "slug": "medi1tvmaghreb-ma-sd",
+    "title": "Medi 1 TV Maghreb",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ma"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/F5OFQsp.jpeg",
+    "backdrop": "https://i.imgur.com/F5OFQsp.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn.live.easybroadcast.io/abr_corp/83_medi1tv-maghreb_jnbspmg/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-medi1tvafrique-ma-sd",
+    "slug": "medi1tvafrique-ma-sd",
+    "title": "Medi1TV Afrique",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ma"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/a20DHnj.png",
+    "backdrop": "https://i.imgur.com/a20DHnj.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn.live.easybroadcast.io/abr_corp/83_medi1tv-afrique_tm7tu45/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-mekameleentv-tr-sd",
+    "slug": "mekameleentv-tr-sd",
+    "title": "Mekameleen TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "tr"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/q7iVchl.png",
+    "backdrop": "https://i.imgur.com/q7iVchl.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mn-nl.mncdn.com/mekameleen/smil:mekameleentv.smil/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-newscentral-ng-sd",
+    "slug": "newscentral-ng-sd",
+    "title": "News Central",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ng"
+    ],
+    "categories": [
+      "News",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/qvCgI8N.png",
+    "backdrop": "https://i.imgur.com/qvCgI8N.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://wf.newscentral.ng:8443/hls/stream.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-a12tv-ci-sd",
+    "slug": "a12tv-ci-sd",
+    "title": "A12 TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ci"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/JgnjgvF.png",
+    "backdrop": "https://i.imgur.com/JgnjgvF.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://video1.getstreamhosting.com:1936/8250/8250/manifest.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-acerfitv-cm-sd",
+    "slug": "acerfitv-cm-sd",
+    "title": "Acerfi TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "cm"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/exX5djJ.png",
+    "backdrop": "https://i.imgur.com/exX5djJ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://streamtv.acerfi.net/hls/acerfitv/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-afromagicchannel-ci-sd",
+    "slug": "afromagicchannel-ci-sd",
+    "title": "Afro Magic Channel",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ci"
+    ],
+    "categories": [
+      "Culture",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/yQzXErU.png",
+    "backdrop": "https://i.imgur.com/yQzXErU.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://video1.getstreamhosting.com:1936/8306/8306/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-afroculturetv-ci-sd",
+    "slug": "afroculturetv-ci-sd",
+    "title": "Afroculture TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ci"
+    ],
+    "categories": [
+      "Culture",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/bjaZ3kO.png",
+    "backdrop": "https://i.imgur.com/bjaZ3kO.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://streamtv.cmediahosthosting.net:3836/live/myafroculturelive.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-bcsstarcrosstv-ng-sd",
+    "slug": "bcsstarcrosstv-ng-sd",
+    "title": "BCS StarCross TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ng"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/VKv1Y6p.png",
+    "backdrop": "https://i.imgur.com/VKv1Y6p.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://viewmedia7219.bozztv.com/wmedia/viewmedia100/web_001/Stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-bukeddetv1-ug-sd",
+    "slug": "bukeddetv1-ug-sd",
+    "title": "Bukedde TV 1",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ug"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/HFq5QlJ.png",
+    "backdrop": "https://i.imgur.com/HFq5QlJ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.hydeinnovations.com/bukedde1flussonic/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-bukeddetv2-ug-sd",
+    "slug": "bukeddetv2-ug-sd",
+    "title": "Bukedde TV 2 (576p) [Not 24/7]",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ug"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/ukwPZeY.png",
+    "backdrop": "https://i.imgur.com/ukwPZeY.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.hydeinnovations.com/bukedde2flussonic/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-capetowntv-za-sd",
+    "slug": "capetowntv-za-sd",
+    "title": "Cape Town TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "za"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/Y8FK1Kk.png",
+    "backdrop": "https://i.imgur.com/Y8FK1Kk.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn.freevisiontv.co.za/sttv/smil:ctv.stream.smil/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-dodomatv-tz-sd",
+    "slug": "dodomatv-tz-sd",
+    "title": "Dodoma TV (360p) [Not 24/7]",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "tz"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/bLq9eFa.png",
+    "backdrop": "https://i.imgur.com/bLq9eFa.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://goliveafrica.media:9998/live/625965017ed69/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-ebs-us-hd",
+    "slug": "ebs-us-hd",
+    "title": "EBS HD",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Culture",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/zqbK2IB.png",
+    "backdrop": "https://i.imgur.com/zqbK2IB.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/ebstv/ebstv/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-elwatania1-tn-sd",
+    "slug": "elwatania1-tn-sd",
+    "title": "El Watania 1 (1080i)",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "tn"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/gNr2V14.png",
+    "backdrop": "https://i.imgur.com/gNr2V14.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://sw1.tanitweb.net/TunisiaTV/_definst_/watania1/chunklist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-elwatania2-tn-sd",
+    "slug": "elwatania2-tn-sd",
+    "title": "El Watania 2",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "tn"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/kgkrD3V.png",
+    "backdrop": "https://i.imgur.com/kgkrD3V.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://sw1.tanitweb.net/TunisiaTV/_definst_/watania2/playlist.m3u8?DVR",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-gmstv-sn-sd",
+    "slug": "gmstv-sn-sd",
+    "title": "GMS TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "sn"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/Ue02CIH.png",
+    "backdrop": "https://i.imgur.com/Ue02CIH.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://acasmedia6.acangroup.org/gmstv/gmstv_output/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-greatcommissiontv-ke-sd",
+    "slug": "greatcommissiontv-ke-sd",
+    "title": "Great Commission TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ke"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://raw.githubusercontent.com/songwenhui239/Songwenhui239/refs/heads/main/Great%20Commission%20TV.jpeg",
+    "backdrop": "https://raw.githubusercontent.com/songwenhui239/Songwenhui239/refs/heads/main/Great%20Commission%20TV.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream-server9-jupiter.muxlive.com/hls/gctvghana/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-isibotv-rw-sd",
+    "slug": "isibotv-rw-sd",
+    "title": "Isibo TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "rw"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/bXhEeTC.png",
+    "backdrop": "https://i.imgur.com/bXhEeTC.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://5c46fa289c89f.streamlock.net/pub2live/myStream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-k24-ke-sd",
+    "slug": "k24-ke-sd",
+    "title": "K24",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ke"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/SUjo6Bm.png",
+    "backdrop": "https://i.imgur.com/SUjo6Bm.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://livecdn.premiumfree.tv/afxpstr/K24Backup/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-lauradavemediatv-cm-sd",
+    "slug": "lauradavemediatv-cm-sd",
+    "title": "Laura Dave Media TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "cm"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/zzG1S2n.png",
+    "backdrop": "https://i.imgur.com/zzG1S2n.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://streaming.lauradavemedia.com/ldm/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-mbc1egypt-eg-hd",
+    "slug": "mbc1egypt-eg-hd",
+    "title": "MBC 1 Egypt",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "eg"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/CiA3plN.png",
+    "backdrop": "https://i.imgur.com/CiA3plN.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-1-na/eec141533c90dd34722c503a296dd0d8/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-mbc5-ae-sd",
+    "slug": "mbc5-ae-sd",
+    "title": "MBC 5",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ae"
+    ],
+    "categories": [
+      "Family",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/fRWaDyF.png",
+    "backdrop": "https://i.imgur.com/fRWaDyF.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-5/ee6b000cee0629411b666ab26cb13e9b/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-mbcmasr-eg-sd",
+    "slug": "mbcmasr-eg-sd",
+    "title": "MBC Masr",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "eg"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/o2elx0u.png",
+    "backdrop": "https://i.imgur.com/o2elx0u.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr/956eac069c78a35d47245db6cdbb1575/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-mbcmasr2-eg-sd",
+    "slug": "mbcmasr2-eg-sd",
+    "title": "MBC Masr 2",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "eg"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/KHo7Gtn.png",
+    "backdrop": "https://i.imgur.com/KHo7Gtn.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-merutv-ke-sd",
+    "slug": "merutv-ke-sd",
+    "title": "MERU TV (720p) [Not 24/7]",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ke"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/EPmWNfz.jpg",
+    "backdrop": "https://i.imgur.com/EPmWNfz.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://goliveafrica.media:9998/live/628e5c1991061/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-qausaintv-ng-sd",
+    "slug": "qausaintv-ng-sd",
+    "title": "Qausain TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ng"
+    ],
+    "categories": [
+      "Culture",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.ibb.co/N70QyQ7/Qausain-TV-logo.png",
+    "backdrop": "https://i.ibb.co/N70QyQ7/Qausain-TV-logo.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://acasmedia3.acangroup.org/qausaintv/qausaintv_output/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-reflettv-ci-sd",
+    "slug": "reflettv-ci-sd",
+    "title": "REFLET TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ci"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/EauXR22.png",
+    "backdrop": "https://i.imgur.com/EauXR22.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://edge-a3.evrideo.tv/8f37c9f0-fe22-44f4-b64a-76ad11730daf_1000026630_HLS/manifest.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-storychanneltv-ma-sd",
+    "slug": "storychanneltv-ma-sd",
+    "title": "StoryChannel TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ma"
+    ],
+    "categories": [
+      "Culture",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/ZBV6xph.png",
+    "backdrop": "https://i.imgur.com/ZBV6xph.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://136044159.r.cdnsun.net/storychannel.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-superscreentv-ng-sd",
+    "slug": "superscreentv-ng-sd",
+    "title": "Superscreen TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ng"
+    ],
+    "categories": [
+      "Culture",
+      "Family",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/uTNmSWE.png",
+    "backdrop": "https://i.imgur.com/uTNmSWE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://video1.getstreamhosting.com:1936/8398/8398/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tanasuhtv-ly-hd",
+    "slug": "tanasuhtv-ly-hd",
+    "title": "Tanasuh TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ly"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/iBAhM2v.png",
+    "backdrop": "https://i.imgur.com/iBAhM2v.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://kilolink.pulsarstarsolutions.com/live/smil:tanasuhtv.smil/manifest.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tayariwesttv-ug-sd",
+    "slug": "tayariwesttv-ug-sd",
+    "title": "Tayari West TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ug"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/tbnOtUZ.jpeg",
+    "backdrop": "https://i.imgur.com/tbnOtUZ.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.hydeinnovations.com/tarari-west/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tvwest-ug-sd",
+    "slug": "tvwest-ug-sd",
+    "title": "TV West",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ug"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/EiJzkIz.png",
+    "backdrop": "https://i.imgur.com/EiJzkIz.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.hydeinnovations.com/tvwest-flussonic/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tv10-rw-sd",
+    "slug": "tv10-rw-sd",
+    "title": "TV10",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "rw"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/DeaWC1N.png",
+    "backdrop": "https://i.imgur.com/DeaWC1N.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://5c46fa289c89f.streamlock.net/pub1live/mystream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-wanluotv-ug-sd",
+    "slug": "wanluotv-ug-sd",
+    "title": "Wan Luo TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ug"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/4PUUp3E.png",
+    "backdrop": "https://i.imgur.com/4PUUp3E.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.hydeinnovations.com/luotv-flussonic/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-watantv-eg-sd",
+    "slug": "watantv-eg-sd",
+    "title": "Watan TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "eg"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/pZyKaUH.png",
+    "backdrop": "https://i.imgur.com/pZyKaUH.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rp.tactivemedia.com/watantv_source/live/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-sudantv-sd-sd",
+    "slug": "sudantv-sd-sd",
+    "title": "Sudan TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "sd"
+    ],
+    "categories": [
+      "Undefined",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/XUPAYAA.png",
+    "backdrop": "https://i.imgur.com/XUPAYAA.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-globecast.akamaized.net/live/eds/sudan_tv/hls_roku/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-2mmonde-ma-plus1",
+    "slug": "2mmonde-ma-plus1",
+    "title": "2M Monde +1",
+    "type": "live",
+    "description": "Africa · plays via proxy",
+    "countries": [
+      "ma"
+    ],
+    "categories": [
+      "General",
+      "Africa",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/MvpntzA.png",
+    "backdrop": "https://i.imgur.com/MvpntzA.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d2qh3gh0k5vp3v.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-n6pess5lwbghr/2M_ES.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-aghapytv-eg-sd",
+    "slug": "aghapytv-eg-sd",
+    "title": "Aghapy TV (1080p) [Not 24/7]",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "eg"
+    ],
+    "categories": [
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://upload.wikimedia.org/wikipedia/en/e/eb/AghapyTV.jpg",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/en/e/eb/AghapyTV.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://5b622f07944df.streamlock.net/aghapy.tv/aghapy.smil/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-atvsat-us-sd",
+    "slug": "atvsat-us-sd",
+    "title": "ATVSat (1080p) [Not 24/7]",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/pwM5txv.png",
+    "backdrop": "https://i.imgur.com/pwM5txv.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.atvsat.com/atvsatlive/smil:atvsatlive.smil/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-benietv-ci-sd",
+    "slug": "benietv-ci-sd",
+    "title": "Benie TV",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ci"
+    ],
+    "categories": [
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/7FXi05e.jpeg",
+    "backdrop": "https://i.imgur.com/7FXi05e.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://tv.voozmedia.fun/benietv/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-chosentvenglish-ng-sd",
+    "slug": "chosentvenglish-ng-sd",
+    "title": "Chosen TV English",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "ng"
+    ],
+    "categories": [
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://viewmedia7219.bozztv.com/wmedia/viewmedia100/web_024/Stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-cna-dz-sd",
+    "slug": "cna-dz-sd",
+    "title": "CNA (360p) [Not 24/7]",
+    "type": "live",
+    "description": "Africa · direct Playable (CORS*)",
+    "countries": [
+      "dz"
+    ],
+    "categories": [
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/Ki3ySUE.png",
+    "backdrop": "https://i.imgur.com/Ki3ySUE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.creacast.com/cna/stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-arryadia-ma-hd",
+    "slug": "arryadia-ma-hd",
+    "title": "Arryadia",
+    "type": "live",
+    "description": "Africa · plays via proxy",
+    "countries": [
+      "ma"
+    ],
+    "categories": [
+      "Sports",
+      "Africa",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/XjzK3gZ.png",
+    "backdrop": "https://i.imgur.com/XjzK3gZ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream-lb.livemediama.com/arryadia/hls/master.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-arryadiahd1-ma-hd",
+    "slug": "arryadiahd1-ma-hd",
+    "title": "Arryadia HD 1",
+    "type": "live",
+    "description": "Africa · plays via proxy",
+    "countries": [
+      "ma"
+    ],
+    "categories": [
+      "Sports",
+      "Africa",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://i.ibb.co/fYNx6Fk1/image-removebg-preview-1.png",
+    "backdrop": "https://i.ibb.co/fYNx6Fk1/image-removebg-preview-1.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream-lb.livemediama.com/arryadia-hd-01/hls/master.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-arryadiahd2-ma-hd",
+    "slug": "arryadiahd2-ma-hd",
+    "title": "Arryadia HD 2",
+    "type": "live",
+    "description": "Africa · plays via proxy",
+    "countries": [
+      "ma"
+    ],
+    "categories": [
+      "Sports",
+      "Africa",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://i.ibb.co/jPFCVFNS/image-removebg-preview-3.png",
+    "backdrop": "https://i.ibb.co/jPFCVFNS/image-removebg-preview-3.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream-lb.livemediama.com/arryadia-hd-02/hls/master.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  }
+]

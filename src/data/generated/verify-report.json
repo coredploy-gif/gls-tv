@@ -1,0 +1,85 @@
+{
+  "at": "2026-07-13T22:08:24.107Z",
+  "report": [
+    {
+      "name": "playable-africa.json",
+      "kept": 63,
+      "direct": 59,
+      "proxy": 4,
+      "total": 65,
+      "reasons": {
+        "The operation was aborted due to timeout": 2
+      }
+    },
+    {
+      "name": "playable-asia.json",
+      "kept": 204,
+      "direct": 196,
+      "proxy": 8,
+      "total": 209,
+      "reasons": {
+        "variant": 1,
+        "seg_404": 4
+      }
+    },
+    {
+      "name": "playable-asia-series.json",
+      "kept": 23,
+      "direct": 22,
+      "proxy": 1,
+      "total": 23,
+      "reasons": {}
+    },
+    {
+      "name": "playable-korea-series.json",
+      "kept": 7,
+      "direct": 7,
+      "proxy": 0,
+      "total": 7,
+      "reasons": {}
+    },
+    {
+      "name": "playable-sports.json",
+      "kept": 121,
+      "direct": 60,
+      "proxy": 61,
+      "total": 125,
+      "reasons": {
+        "The operation was aborted due to timeout": 3,
+        "seg_404": 1
+      }
+    },
+    {
+      "name": "playable-kids.json",
+      "kept": 20,
+      "direct": 13,
+      "proxy": 7,
+      "total": 20,
+      "reasons": {}
+    },
+    {
+      "name": "playable-food.json",
+      "kept": 15,
+      "direct": 8,
+      "proxy": 7,
+      "total": 15,
+      "reasons": {}
+    },
+    {
+      "name": "playable-food-competitions.json",
+      "kept": 6,
+      "direct": 3,
+      "proxy": 3,
+      "total": 6,
+      "reasons": {}
+    },
+    {
+      "name": "playable-wrestling.json",
+      "kept": 3,
+      "direct": 3,
+      "proxy": 0,
+      "total": 3,
+      "reasons": {}
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "name": "gls-tv",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "iptv:fetch": "node scripts/fetch-iptv.mjs",
+    "iptv:parse": "node scripts/parse-m3u.mjs",
+    "iptv:sync": "node scripts/fetch-iptv.mjs && node scripts/parse-m3u.mjs",
+    "heal": "node scripts/heal-playable.mjs",
+    "heal:india": "node scripts/heal-india.mjs",
+    "heal:sports": "node scripts/heal-us-sports.mjs",
+    "heal:soccer": "node scripts/heal-soccer.mjs",
+    "seed:regions": "node scripts/seed-regions.mjs",
+    "verify:playable": "node scripts/verify-playable.mjs",
+    "sync:supabase": "node scripts/sync-supabase.mjs",
+    "sync:rpc": "node scripts/sync-via-rpc.mjs",
+    "seed:iptv-org": "node --env-file=.env.local scripts/seed-iptv-org-targets.mjs",
+    "seed:iptv-org:index": "node --env-file=.env.local scripts/seed-iptv-org-targets.mjs --index",
+    "seed:iptv-org:all": "node scripts/seed-iptv-org-index.mjs",
+    "catalog:refresh": "npm run iptv:sync && npm run heal && npm run seed:regions && npm run verify:playable && npm run sync:supabase"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.2",
+    "hls.js": "^1.6.16",
+    "next": "16.2.10",
+    "qrcode": "^1.5.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "stripe": "^22.3.1",
+    "undici": "^8.7.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

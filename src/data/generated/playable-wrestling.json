@@ -1,0 +1,101 @@
+[
+  {
+    "id": "playable-impact-network",
+    "slug": "impactnetwork-us-sd",
+    "title": "Impact Wrestling",
+    "type": "live",
+    "description": "TNA / Impact Wrestling free linear — closest open wrestling hub (WWE Raw/SmackDown live on Netflix, not free HLS). · direct Playable (CORS*)",
+    "countries": [
+      "us",
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Wrestling",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://edge1.lifestreamcdn.com/live/impactroku1/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "playable-mma-tv",
+    "slug": "mmatv-com-sk-sd",
+    "title": "MMA TV",
+    "type": "live",
+    "description": "Combat sports & MMA free linear. · direct Playable (CORS*)",
+    "countries": [
+      "world",
+      "sk"
+    ],
+    "categories": [
+      "Sports",
+      "Wrestling",
+      "MMA",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://images.unsplash.com/photo-1555597673-b21d5c935865?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1555597673-b21d5c935865?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://streams2.sofast.tv/vglive-sk-462904/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "playable-persiana-fight",
+    "slug": "persianafight-ir-sd",
+    "title": "Persiana Fight",
+    "type": "live",
+    "description": "Fight / combat free stream. · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Wrestling",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://images.unsplash.com/photo-1599058945522-28d584b6f14f?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1599058945522-28d584b6f14f?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "sources": [
+      {
+        "url": "https://fighthls.persiana.live/hls/stream.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ],
+    "featured": true
+  }
+]

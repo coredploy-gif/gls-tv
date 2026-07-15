@@ -1,0 +1,16 @@
+{
+  "at": "2026-07-13T18:29:13.915Z",
+  "ms": 185173,
+  "africa": {
+    "raw": 261,
+    "playable": 80
+  },
+  "asia": {
+    "raw": 1025,
+    "playable": 136,
+    "series": 32,
+    "koreaSeries": 0,
+    "indiaPlayable": 60,
+    "krCnJpPlayable": 29
+  }
+}

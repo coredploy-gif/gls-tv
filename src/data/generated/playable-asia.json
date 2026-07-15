@@ -1,0 +1,6467 @@
+[
+  {
+    "id": "iptv-abpnews-in-sd",
+    "slug": "abpnews-in-sd",
+    "title": "ABP News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s158138_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s158138_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-472500/abpnews/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-bigtv24x7-in-sd",
+    "slug": "bigtv24x7-in-sd",
+    "title": "Big TV 24x7 (576i)",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.postimg.cc/rpHrRxR5/big_tv_malayalam.png",
+    "backdrop": "https://i.postimg.cc/rpHrRxR5/big_tv_malayalam.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d2gvyg6lvauoko.cloudfront.net/230226/bigtvmalyalam/chunks.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-etvnews-in-hd",
+    "slug": "etvnews-in-hd",
+    "title": "ETV News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900001AQ_20250811T033458SQUARE.png",
+    "backdrop": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900001AQ_20250811T033458SQUARE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-3448kp65yhc5w.akamaized.net/WWBI/Amagi/ETV_News_IN/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-gtcnews-in-sd",
+    "slug": "gtcnews-in-sd",
+    "title": "GTC News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://www.thegtcnetwork.com/gtc-news.png",
+    "backdrop": "https://www.thegtcnetwork.com/gtc-news.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vglivessai.akamaized.net/sg/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/921cca59-daee-4f89-8c38-7ffe8de44f4c/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-indiatoday-in-sd",
+    "slug": "indiatoday-in-sd",
+    "title": "India Today",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_INDIA_TODAY/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_INDIA_TODAY/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-293160/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-indiatv-in-sd",
+    "slug": "indiatv-in-sd",
+    "title": "India TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_INDIA_TV/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_INDIA_TV/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://pl-indiatvnews.akamaized.net/out/v1/db79179b608641ceaa5a4d0dd0dca8da/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-indiatvspeednews-in-hd",
+    "slug": "indiatvspeednews-in-hd",
+    "title": "India TV Speed News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_INDIA_TV_SPEED_NEWS/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_INDIA_TV_SPEED_NEWS/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-lyf4c0hwzg5dd.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-lyf4c0hwzg5dd/v1/vglive-sk-479089/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-janamtv-in-sd",
+    "slug": "janamtv-in-sd",
+    "title": "Janam TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s143221_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s143221_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/janamtv_nim_https/140622/janamtv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-madhimugamtv-in-sd",
+    "slug": "madhimugamtv-in-sd",
+    "title": "Madhimugam TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Madhimugam_TV.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Madhimugam_TV.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://yuppparoriglin.akamaized.net/181224/smil:mathimugam.smil/playlist.m3u8?hdnts=st=1735898689~exp=1835898688~acl=*~hmac=f5fe24724fe05481e3841f9eb5ab8efdee0a3dd83645ae9dcf45703f525bab7b",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ndtv24x7-in-sd",
+    "slug": "ndtv24x7-in-sd",
+    "title": "NDTV 24x7",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NDTV_24X7/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NDTV_24X7/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/NDTV24x7.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ndtvrajasthan-in-sd",
+    "slug": "ndtvrajasthan-in-sd",
+    "title": "NDTV Rajasthan",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NDTV_RAJASTHAN/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NDTV_RAJASTHAN/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://ndtvregional.akamaized.net/hls/live/2102726-b/ndtvraj/master_1.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news7tamil-in-sd",
+    "slug": "news7tamil-in-sd",
+    "title": "News 7 Tamil",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS7_TAMIL/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS7_TAMIL/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://segment.yuppcdn.net/240122/news7/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18assamnortheast-in-sd",
+    "slug": "news18assamnortheast-in-sd",
+    "title": "News18 Assam North-East",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_ASSAM_NORTHSYMHYPEAST/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_ASSAM_NORTHSYMHYPEAST/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Assam_North_East_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18bangla-in-sd",
+    "slug": "news18bangla-in-sd",
+    "title": "News18 Bangla",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_BANGLA/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_BANGLA/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Bangla_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18biharjharkhand-in-sd",
+    "slug": "news18biharjharkhand-in-sd",
+    "title": "News18 Bihar Jharkhand",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/FQ3zDZE.png",
+    "backdrop": "https://i.imgur.com/FQ3zDZE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Bihar_Jharkhand_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18delhincrjk-in-sd",
+    "slug": "news18delhincrjk-in-sd",
+    "title": "News18 Delhi NCR JK",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/News18JKLH.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/News18JKLH.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_JKLH_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18gujarati-in-sd",
+    "slug": "news18gujarati-in-sd",
+    "title": "News18 Gujarati",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_GUJARATI/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_GUJARATI/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Gujarati_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18india-in-sd",
+    "slug": "news18india-in-sd",
+    "title": "News18 India",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_INDIA/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_INDIA/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_India_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18kerala-in-sd",
+    "slug": "news18kerala-in-sd",
+    "title": "News18 Kerala",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_KERALA/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_KERALA/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Kerala_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18madhyapradeshchhattisgarh-in-sd",
+    "slug": "news18madhyapradeshchhattisgarh-in-sd",
+    "title": "News18 Madhya Pradesh/Chhattisgarh",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_MADHYA_PRADESH_CHHATTISGARH/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_MADHYA_PRADESH_CHHATTISGARH/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_MP_Chhattisgarh_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18marathi-in-sd",
+    "slug": "news18marathi-in-sd",
+    "title": "News18 Marathi",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_LOKMAT/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_LOKMAT/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Lokmat_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18odia-in-sd",
+    "slug": "news18odia-in-sd",
+    "title": "News18 Odia",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_ODIA/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_ODIA/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Odia_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18punjabharyanahimachal-in-sd",
+    "slug": "news18punjabharyanahimachal-in-sd",
+    "title": "News18 Punjab/Haryana/Himachal",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_PUNJAB_HARYANA/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_PUNJAB_HARYANA/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Punjab_Haryana_HP_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18rajasthan-in-sd",
+    "slug": "news18rajasthan-in-sd",
+    "title": "News18 Rajasthan",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_RAJASTHAN/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_RAJASTHAN/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Rajasthan_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18tamilnadu-in-sd",
+    "slug": "news18tamilnadu-in-sd",
+    "title": "News18 Tamil Nadu",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_TAMIL_NADU/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_TAMIL_NADU/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Tamil_Nadu_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18urdu-in-sd",
+    "slug": "news18urdu-in-sd",
+    "title": "News18 Urdu",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/8xnwMRR.png",
+    "backdrop": "https://i.imgur.com/8xnwMRR.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Urdu_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news18uttarpradeshuttarakhand-in-sd",
+    "slug": "news18uttarpradeshuttarakhand-in-sd",
+    "title": "News18 Uttar Pradesh Uttarakhand",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_UTTAR_PRADESH_UTTARAKHAND/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_UTTAR_PRADESH_UTTARAKHAND/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://n18syndication.akamaized.net/bpk-tv/News18_UP_Uttarakhand_NW18_MOB/output01/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-news9live-in-sd",
+    "slug": "news9live-in-sd",
+    "title": "News9Live",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS9/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS9/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg01106-amg01106c3-amgplt0844.playout.now3.amagi.tv/ts-ap-s1-n1/playlist/amg01106-amg01106c3-amgplt0844/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-reportertv-in-sd",
+    "slug": "reportertv-in-sd",
+    "title": "Reporter TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s85096_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s85096_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://segment.yuppcdn.net/050522/reporter/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-republicbangla-in-sd",
+    "slug": "republicbangla-in-sd",
+    "title": "Republic Bangla",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_RSYMDOT_BANGLA/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_RSYMDOT_BANGLA/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-republictvlive.akamaized.net/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/vglive-sk-456368/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-republicbharat-in-sd",
+    "slug": "republicbharat-in-sd",
+    "title": "Republic Bharat",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s143724_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s143724_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/RepublicBharat.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-republickannada-in-sd",
+    "slug": "republickannada-in-sd",
+    "title": "Republic Kannada",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_RSYMDOTKANNADA/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_RSYMDOTKANNADA/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-republictvlive.akamaized.net/ptnr-republicweb/title-Republic_TV_Kannada/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/1acd1ce1-c6a7-4ae4-afa1-133ffb111ebb/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-republictv-in-sd",
+    "slug": "republictv-in-sd",
+    "title": "Republic TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s143723_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s143723_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/RepublicTV.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-salaamtv-in-sd",
+    "slug": "salaamtv-in-sd",
+    "title": "Salaam TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s144466_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s144466_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d2o3r1shda7xvv.cloudfront.net/index_5.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-timesnownavbharat-in-sd",
+    "slug": "timesnownavbharat-in-sd",
+    "title": "Times Now Navbharat",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TIMES_NOW_NAVBHARAT_HD/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TIMES_NOW_NAVBHARAT_HD/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/TimesNowNavbharat.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tv5news-in-sd",
+    "slug": "tv5news-in-sd",
+    "title": "TV5 News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV5_TELUGU/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV5_TELUGU/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/tv5_nim_https/110322/tv5/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tv9bangla-in-sd",
+    "slug": "tv9bangla-in-sd",
+    "title": "TV9 Bangla",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_BANGLA/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_BANGLA/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dyjmyiv3bp2ez.cloudfront.net/pub-iotv9banaen8yq/liveabr/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tv9bharatvarsh-in-sd",
+    "slug": "tv9bharatvarsh-in-sd",
+    "title": "TV9 Bharatvarsh",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_BHARATVARSH/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_BHARATVARSH/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dyjmyiv3bp2ez.cloudfront.net/pub-iotv9hinjzgtpe/liveabr/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tv9gujarati-in-sd",
+    "slug": "tv9gujarati-in-sd",
+    "title": "TV9 Gujarati",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_GUJARATI/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_GUJARATI/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dyjmyiv3bp2ez.cloudfront.net/pub-iotv9guj3ki8lu/liveabr/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tv9marathi-in-sd",
+    "slug": "tv9marathi-in-sd",
+    "title": "TV9 Marathi",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_MARATHI/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_MARATHI/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dyjmyiv3bp2ez.cloudfront.net/pub-iotv9marlygv8h/liveabr/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tv9telugu-in-sd",
+    "slug": "tv9telugu-in-sd",
+    "title": "TV9 Telugu",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_TELUGU_NEWS/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_TELUGU_NEWS/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dyjmyiv3bp2ez.cloudfront.net/pub-iotv9telcmjhcs/liveabr/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-v6news-in-sd",
+    "slug": "v6news-in-sd",
+    "title": "V6 News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s144047_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s144047_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/v6news_nim_https/140622/v6news/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zee24kalak-in-sd",
+    "slug": "zee24kalak-in-sd",
+    "title": "Zee 24 Kalak",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00230P1R.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00230P1R.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zee24kalak/v1/manifest/611d79b11b77e2f571934fd80ca1413453772ac7/497f7199-758d-495d-9d2f-a5489231c428/14b7c8ec-16da-47f2-8d7e-5bbaec67b3e2/3.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zee24taas-in-sd",
+    "slug": "zee24taas-in-sd",
+    "title": "Zee 24 Taas",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00230LKE.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00230LKE.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dgrvlduwztkd4.cloudfront.net/index_5.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeebharat-in-sd",
+    "slug": "zeebharat-in-sd",
+    "title": "Zee Bharat",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00230QBL.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00230QBL.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeehindustan/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/96bbab12-582e-4540-af70-510ab6824581/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeebiharjharkhand-in-sd",
+    "slug": "zeebiharjharkhand-in-sd",
+    "title": "Zee Bihar Jharkhand",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00230Y44.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00230Y44.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/ZeeBiharJharkhand.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeedelhincrharyana-in-sd",
+    "slug": "zeedelhincrharyana-in-sd",
+    "title": "Zee Delhi NCR Haryana",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG0023166M.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG0023166M.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeedelhincr/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/cc483a15-1b39-4642-872d-5d08d362ed01/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeekannadanews-in-sd",
+    "slug": "zeekannadanews-in-sd",
+    "title": "Zee Kannada News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Zee_Kannada_News.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Zee_Kannada_News.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d3vzwoqcbpfm8p.cloudfront.net/index_4.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeemadhyapradeshchhattisgarh-in-sd",
+    "slug": "zeemadhyapradeshchhattisgarh-in-sd",
+    "title": "Zee Madhya Pradesh Chhattisgarh",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG002316X5.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG002316X5.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeemadhyachhattisgarh/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/2ab17056-6187-4f0e-a34d-f436ac479d6c/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeemalayalamnews-in-sd",
+    "slug": "zeemalayalamnews-in-sd",
+    "title": "Zee Malayalam News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://english.cdn.zeenews.com/images/logo/zee-malayalam-17.svg",
+    "backdrop": "https://english.cdn.zeenews.com/images/logo/zee-malayalam-17.svg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d1ty2af03alkwd.cloudfront.net/index_4.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeenews-in-sd",
+    "slug": "zeenews-in-sd",
+    "title": "Zee News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG0023VWYC.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG0023VWYC.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dknttpxmr0dwf.cloudfront.net/index_57.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeepunjabharyanahimachal-in-sd",
+    "slug": "zeepunjabharyanahimachal-in-sd",
+    "title": "Zee Punjab Haryana Himachal",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG0022KHKS.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG0022KHKS.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeepunjabharyanahima/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/65eed269-2f3a-4dd0-ac89-d18959af28e3/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeerajasthan-in-sd",
+    "slug": "zeerajasthan-in-sd",
+    "title": "Zee Rajasthan",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00231732.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00231732.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeerajashthannews/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/8e864b9a-1681-41a0-99a6-387490bc5b24/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeetelugunews-in-sd",
+    "slug": "zeetelugunews-in-sd",
+    "title": "Zee Telugu News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG0023178R.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG0023178R.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d116gfrn8orazi.cloudfront.net/index.m3u8?akes=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NjcxOTc5NzJ9.O4qmdMPbHwKrCg6hFXvD70vjSPWKQd0a7NrjmFdeMB8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeeuttarpradeshuttarakhand-in-sd",
+    "slug": "zeeuttarpradeshuttarakhand-in-sd",
+    "title": "Zee Uttar Pradesh/Uttarakhand",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG002317GQ.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG002317GQ.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://duw35ict5q7th.cloudfront.net/index_3.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-aajtak-in-sd",
+    "slug": "aajtak-in-sd",
+    "title": "Aaj Tak",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-791258/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-amritatv-in-sd",
+    "slug": "amritatv-in-sd",
+    "title": "Amrita TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/WdSjlPl.png",
+    "backdrop": "https://i.imgur.com/WdSjlPl.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://ddash74r36xqp.cloudfront.net/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-bhojpuricinema-in-sd",
+    "slug": "bhojpuricinema-in-sd",
+    "title": "Bhojpuri Cinema",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live-bhojpuri.akamaized.net/liveabr/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-epictv-in-digital",
+    "slug": "epictv-in-digital",
+    "title": "Epic TV Digital",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_EPIC/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_EPIC/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-czbq30x55knit.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-czbq30x55knit/DIYC/PMSL/IN10/Epic_TV_IN_B/Epic_TV_IN_B.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-etvcomedy-in-hd",
+    "slug": "etvcomedy-in-hd",
+    "title": "ETV Comedy",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Comedy",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900003U3_20251106T195117SQUARE.png",
+    "backdrop": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900003U3_20251106T195117SQUARE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-wie8j8y69d2uy.akamaized.net/WWBI/Amagi/ETV_Comedy_IN/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-etvjosh-in-hd",
+    "slug": "etvjosh-in-hd",
+    "title": "ETV Josh",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900004LP_20250811T033452SQUARE.png",
+    "backdrop": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900004LP_20250811T033452SQUARE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-uyh1ow5zouoio.akamaized.net/WWBI/Amagi/ETV_Josh_IN/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-etvmusic-in-hd",
+    "slug": "etvmusic-in-hd",
+    "title": "ETV Music",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900002RV_20250811T033455SQUARE.png",
+    "backdrop": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900002RV_20250811T033455SQUARE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-szivnms4rlah6.akamaized.net/WWBI/Amagi/ETV_Music_IN/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-gtcpunjabi-in-sd",
+    "slug": "gtcpunjabi-in-sd",
+    "title": "GTC Punjabi",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://media.thegtcnetwork.com/uploads/gtc-pujabin-s.jpg",
+    "backdrop": "https://media.thegtcnetwork.com/uploads/gtc-pujabin-s.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://gtc-yupp.vgcdn.net/vglive-sk-254807/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-kalaignarmurasu-in-sd",
+    "slug": "kalaignarmurasu-in-sd",
+    "title": "Kalaignar Murasu",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s143561_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s143561_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/murasu_nim_https/050522/murasu/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-epicbharat-in-sd",
+    "slug": "epicbharat-in-sd",
+    "title": "Nazara",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG0032BW6T.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG0032BW6T.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-p1izg43bk7sj5.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-p1izg43bk7sj5/DIYC/PMSL/IN10/Nazara_IN_B/Nazara_IN_B.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ndtvindia-in-sd",
+    "slug": "ndtvindia-in-sd",
+    "title": "NDTV India",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/NDTVIndia.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ndtvprofit-in-sd",
+    "slug": "ndtvprofit-in-sd",
+    "title": "NDTV Profit",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Business",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NDTV_PROFIT_PRIME/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NDTV_PROFIT_PRIME/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://ndtvprofit.akamaized.net/hls/live/2107404/ndtvprofit/chunklist_5.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ndtvprofit-in-hd",
+    "slug": "ndtvprofit-in-hd",
+    "title": "NDTV Profit",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://ndtvprofit.akamaized.net/hls/live/2107404/ndtvprofit/master_1.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-nepal1-in-sd",
+    "slug": "nepal1-in-sd",
+    "title": "Nepal 1",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/Xr4FjC8.png",
+    "backdrop": "https://i.imgur.com/Xr4FjC8.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d1msejlow1t3l4.cloudfront.net/fta/nepal1/chunks.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-pasandtv-in-sd",
+    "slug": "pasandtv-in-sd",
+    "title": "Pasand TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG002NFYY1.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG002NFYY1.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d1msejlow1t3l4.cloudfront.net/fta/pasand/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-pitaara-in-sd",
+    "slug": "pitaara-in-sd",
+    "title": "Pitaara",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Movies",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PITAARA/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PITAARA/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-pitaaratvlive.akamaized.net/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/vglive-sk-583798/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-sanatv-in-sd",
+    "slug": "sanatv-in-sd",
+    "title": "Sana TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/CR7DGBv.png",
+    "backdrop": "https://i.imgur.com/CR7DGBv.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vglivessai.akamaized.net/us/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/b6d9e864-ec16-410a-804d-ccf8f720bfaa/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-shubhcinematv-in-sd",
+    "slug": "shubhcinematv-in-sd",
+    "title": "Shubh Cinema TV",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Movies",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/RQhorAG.png",
+    "backdrop": "https://i.imgur.com/RQhorAG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d393sxaxig6bax.cloudfront.net/out/v1/589cf2cf44bf42bb941e817a2240d62e/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-southstation-in-hd",
+    "slug": "southstation-in-hd",
+    "title": "South Station",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Movies",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN3800008CX_20260325T012316SQUARE.png",
+    "backdrop": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN3800008CX_20260325T012316SQUARE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-yw7ztecy8do3q.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-yw7ztecy8do3q/SS_IN.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-totalbhakti-in-sd",
+    "slug": "totalbhakti-in-sd",
+    "title": "Total Bhakti",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Religious",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/LPwRdmF.png",
+    "backdrop": "https://i.imgur.com/LPwRdmF.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d34z4embz0hjf6.cloudfront.net/out/v1/d55b3323a9f142638f897378f0b526fe/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-yrfmusic-in-sd",
+    "slug": "yrfmusic-in-sd",
+    "title": "YRF Music",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/YRF_Music.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/YRF_Music.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01412-xiaomiasia-yrfmusic-xiaomi/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zee24ghanta-in-sd",
+    "slug": "zee24ghanta-in-sd",
+    "title": "Zee 24 Ghanta",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d2dsoyvkr33m05.cloudfront.net/index_4.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeebanglasonar-in-sd",
+    "slug": "zeebanglasonar-in-sd",
+    "title": "Zee Bangla Sonar",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00287G7K.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00287G7K.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/ColorsHD/default/ColorsHD.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeebusiness-in-sd",
+    "slug": "zeebusiness-in-sd",
+    "title": "Zee Business",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Business",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00230YYJ.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00230YYJ.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dwby15d04agvq.cloudfront.net/index_5.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-10tv-in-sd",
+    "slug": "10tv-in-sd",
+    "title": "10 TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_10TV/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_10TV/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mumbai-edge.smartplaytv.in/10TV/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-24news-in-sd",
+    "slug": "24news-in-sd",
+    "title": "24 News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://sund-images.sunnxt.com/202222/300x300_24News_202222_d63feca0-79ae-47ea-b75a-66c17d456f4c.png",
+    "backdrop": "https://sund-images.sunnxt.com/202222/300x300_24News_202222_d63feca0-79ae-47ea-b75a-66c17d456f4c.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mumt07.tangotv.in/zHjX9OFlTWENTYFOURNEWS/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-4tvnews-in-sd",
+    "slug": "4tvnews-in-sd",
+    "title": "4TV News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/4_TV.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/4_TV.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-4.pishow.tv/live/1007/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-6tvtelugu-in-sd",
+    "slug": "6tvtelugu-in-sd",
+    "title": "6 TV Telugu",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/l3EcRnZ.png",
+    "backdrop": "https://i.imgur.com/l3EcRnZ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-1.pishow.tv/live/232/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-99tv-in-sd",
+    "slug": "99tv-in-sd",
+    "title": "99TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/dZA4gel.png",
+    "backdrop": "https://i.imgur.com/dZA4gel.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-1.pishow.tv/live/1211/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-aajtak-in-hd",
+    "slug": "aajtak-in-hd",
+    "title": "Aaj Tak HD",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_AAJ_TAK/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_AAJ_TAK/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-akdcalcuttanews-in-sd",
+    "slug": "akdcalcuttanews-in-sd",
+    "title": "AKD Calcutta News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/transparentImages/Calcutta%20News.png",
+    "backdrop": "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/transparentImages/Calcutta%20News.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.legitpro.co.in/cnnnews/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-amarujala-in-sd",
+    "slug": "amarujala-in-sd",
+    "title": "AmarUjala",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/ndQ8LZp.png",
+    "backdrop": "https://i.imgur.com/ndQ8LZp.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amarujala.ottlive.co.in/amarujala/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-anandabarta-in-sd",
+    "slug": "anandabarta-in-sd",
+    "title": "Ananda Barta",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Anand_Barta.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Anand_Barta.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://account19.livebox.co.in/Anandabarta2hls/live.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-anbnews-in-sd",
+    "slug": "anbnews-in-sd",
+    "title": "ANB News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ANB_NEWS/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ANB_NEWS/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://server.livelegitpro.in:9899/anbnews/anbnews/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-bansalnews-in-sd",
+    "slug": "bansalnews-in-sd",
+    "title": "Bansal News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_BANSAL_NEWS/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_BANSAL_NEWS/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://8yzmq2gbdvax-hls-live.wmncdn.net/bansalnewstv1/live1.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-brknews-in-sd",
+    "slug": "brknews-in-sd",
+    "title": "BRK News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://d229kpbsb5jevy.cloudfront.net/yuppfast/content/common/channel/logos/brk-news.png",
+    "backdrop": "https://d229kpbsb5jevy.cloudfront.net/yuppfast/content/common/channel/logos/brk-news.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-1.pishow.tv/live/1037/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-bttv-in-sd",
+    "slug": "bttv-in-sd",
+    "title": "BT TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Business",
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://akm-img-a-in.tosshub.com/businesstoday/resource/img/best-bank-new.png",
+    "backdrop": "https://akm-img-a-in.tosshub.com/businesstoday/resource/img/best-bank-new.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://feeds.intoday.in/bttv/itgd.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-chardiklagurbaanitv-in-sd",
+    "slug": "chardiklagurbaanitv-in-sd",
+    "title": "Chardikla Gurbaani TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/NXD8CPq.png",
+    "backdrop": "https://i.imgur.com/NXD8CPq.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://chardikalatimestv.gigabitcdn.net/in-chardikala/chardikala-gurbani-tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-chardiklatimetv-in-sd",
+    "slug": "chardiklatimetv-in-sd",
+    "title": "Chardikla Time TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_CHARDIKLA_TIME_TV/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_CHARDIKLA_TIME_TV/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://chardikalagurbanitv.gigabitcdn.net/in-chardikala/chardikala-timetv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-chardiklatimetvnorthamerica-in-sd",
+    "slug": "chardiklatimetvnorthamerica-in-sd",
+    "title": "Chardikla Time TV North America",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/IUeMFey.jpg",
+    "backdrop": "https://i.imgur.com/IUeMFey.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://chardikalanorthamerica.gigabitcdn.net/in-chardikala/chardikala-north-usa/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ctvnakdplus-in-sd",
+    "slug": "ctvnakdplus-in-sd",
+    "title": "CTVN AKD Plus",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s142754_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s142754_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.legitpro.co.in/ctvnakdplus/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-cvrenglish-in-sd",
+    "slug": "cvrenglish-in-sd",
+    "title": "CVR English",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/k0WTQKi.png",
+    "backdrop": "https://i.imgur.com/k0WTQKi.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-2.pishow.tv/live/425/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-globalpunjab-in-sd",
+    "slug": "globalpunjab-in-sd",
+    "title": "Global Punjab",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/WDLqcWW.png",
+    "backdrop": "https://i.imgur.com/WDLqcWW.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://server.livelegitpro.in/globalpunjab/globalpunjab/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-goodnewstoday-in-sd",
+    "slug": "goodnewstoday-in-sd",
+    "title": "Good News Today",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GOOD_NEWS_TODAY/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GOOD_NEWS_TODAY/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://aajtaklive.vgcdn.net/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/3196cced-ce29-4219-9809-f07ccdaa02b9/vglive-sk-848805/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-goodnewstv-in-sd",
+    "slug": "goodnewstv-in-sd",
+    "title": "GoodNews TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Religious",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GOODNEWS_TV/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GOODNEWS_TV/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://bpgdlwwar3ze-hls-live.wmncdn.net/goodnews/live.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-guaranteenews-in-sd",
+    "slug": "guaranteenews-in-sd",
+    "title": "Guarantee News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://media.licdn.com/dms/image/v2/D560BAQHYZzbGJ7ViZA/company-logo_200_200/company-logo_200_200/0/1728031377890?e=2147483647&v=beta&t=bIsZgNUCcg0M_-Zqeu5wKYgBt_1-pI798X9lP5CxhTM",
+    "backdrop": "https://media.licdn.com/dms/image/v2/D560BAQHYZzbGJ7ViZA/company-logo_200_200/company-logo_200_200/0/1728031377890?e=2147483647&v=beta&t=bIsZgNUCcg0M_-Zqeu5wKYgBt_1-pI798X9lP5CxhTM",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://guaranteenews.in:8443/live/gnews/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-highnews-in-sd",
+    "slug": "highnews-in-sd",
+    "title": "High News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://pbs.twimg.com/profile_images/1104268476858937351/USUT4ykS_400x400.png",
+    "backdrop": "https://pbs.twimg.com/profile_images/1104268476858937351/USUT4ykS_400x400.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://highmedia.livebox.co.in/HIGHNEWShls/LIVE.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-hmtv-in-sd",
+    "slug": "hmtv-in-sd",
+    "title": "HMTV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s143136_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s143136_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-1.pishow.tv/live/280/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-hornbilltv-in-sd",
+    "slug": "hornbilltv-in-sd",
+    "title": "Hornbill TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_HORNBILL/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_HORNBILL/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-2.pishow.tv/live/1463/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ibc24-in-sd",
+    "slug": "ibc24-in-sd",
+    "title": "IBC 24",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_IBC24/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_IBC24/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-3.pishow.tv/live/220/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-indiaahead-in-sd",
+    "slug": "indiaahead-in-sd",
+    "title": "India Ahead",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/hBkTmf9.png",
+    "backdrop": "https://i.imgur.com/hBkTmf9.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mumt05.tangotv.in/87NeALx2INDIAAHEAD/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-indiadailylive-in-sd",
+    "slug": "indiadailylive-in-sd",
+    "title": "India Daily Live",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/India_Daily_24x7.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/India_Daily_24x7.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://indiadaily.ottlive.co.in/indiadailylive/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-indywoodtv-in-sd",
+    "slug": "indywoodtv-in-sd",
+    "title": "Indywood TV",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Movies",
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.ibb.co/jT3NCPp/logo-tv.png",
+    "backdrop": "https://i.ibb.co/jT3NCPp/logo-tv.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://43wrzjnpqoxe-hls-live.wmncdn.net/indywood/indywoodtv/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-inews-in-sd",
+    "slug": "inews-in-sd",
+    "title": "INews",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/I_News.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/I_News.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-1.pishow.tv/live/411/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-jantatv-in-sd",
+    "slug": "jantatv-in-sd",
+    "title": "Janta TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_JANTA_TV/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_JANTA_TV/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.jswk.online/IK_RTPM/live/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-kairalinews-in-sd",
+    "slug": "kairalinews-in-sd",
+    "title": "Kairali News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s143246_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s143246_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-3.pishow.tv/live/1469/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-kannurvision-in-sd",
+    "slug": "kannurvision-in-sd",
+    "title": "Kannur Vision",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/FCXqPer.png",
+    "backdrop": "https://i.imgur.com/FCXqPer.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.logichost.in/kannurvision/live/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-kashishnews-in-sd",
+    "slug": "kashishnews-in-sd",
+    "title": "Kashish News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/qfINs2r.png",
+    "backdrop": "https://i.imgur.com/qfINs2r.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://server.thelegitpro.in/kashishnews/kashishnews/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-kolkatatv-in-sd",
+    "slug": "kolkatatv-in-sd",
+    "title": "Kolkata TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s143271_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s143271_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn.ottlive.co.in/kolkatatv/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-livingindianews-in-sd",
+    "slug": "livingindianews-in-sd",
+    "title": "Living India News",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/YikaJvd.png",
+    "backdrop": "https://i.imgur.com/YikaJvd.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.ottlive.co.in/livingindia/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-mediaone-in-sd",
+    "slug": "mediaone-in-sd",
+    "title": "Media One",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_MEDIA_ONE/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_MEDIA_ONE/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-3.pishow.tv/live/1481/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-medibiztv-in-sd",
+    "slug": "medibiztv-in-sd",
+    "title": "MediBizTV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Education",
+      "News",
+      "Science",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://www.medibiztv.com/assets/logo-E76jcvP9.png",
+    "backdrop": "https://www.medibiztv.com/assets/logo-E76jcvP9.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://43wrzjnpqoxe-hls-live.wmncdn.net/marinebiztvlive/marinebiztvlive/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-nagalandtv-in-sd",
+    "slug": "nagalandtv-in-sd",
+    "title": "Nagaland TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/EBEIpPo.png",
+    "backdrop": "https://i.imgur.com/EBEIpPo.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-6.pishow.tv/live/10014/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-weathernews-jp-sd",
+    "slug": "weathernews-jp-sd",
+    "title": "Weathernews",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "jp"
+    ],
+    "categories": [
+      "Weather",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/A8uRSTS.png",
+    "backdrop": "https://i.imgur.com/A8uRSTS.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rch01e-alive-hls.akamaized.net/38fb45b25cdb05a1/out/v1/4e907bfabc684a1dae10df8431a84d21/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-harbinmoviechannel-cn-sd",
+    "slug": "harbinmoviechannel-cn-sd",
+    "title": "Harbin Movie Channel",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "cn"
+    ],
+    "categories": [
+      "Movies",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://www.tvchinese.net/uploads/tv/haerbin.jpg",
+    "backdrop": "https://www.tvchinese.net/uploads/tv/haerbin.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.hrbtv.net/yspd/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-taiwanindigenoustv-tw-sd",
+    "slug": "taiwanindigenoustv-tw-sd",
+    "title": "Taiwan Indigenous TV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "tw"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/QqIdVqz.png",
+    "backdrop": "https://i.imgur.com/QqIdVqz.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://streamipcfapp.akamaized.net/live/_definst_/live_720/key_b1500.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-ebskids-kr-sd",
+    "slug": "ebskids-kr-sd",
+    "title": "EBS kids (400p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "Kids",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/62oo8Bx.png",
+    "backdrop": "https://i.imgur.com/62oo8Bx.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://ebsonair.ebs.co.kr/ebsufamilypc/familypc1m/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-cctvplus1-cn-sd",
+    "slug": "cctvplus1-cn-sd",
+    "title": "CCTV+ 1 (600p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "cn"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/U8d4Is6.png",
+    "backdrop": "https://i.imgur.com/U8d4Is6.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cd-live-stream.news.cctvplus.com/live/smil:CHANNEL1.smil/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-cctvplus2-cn-sd",
+    "slug": "cctvplus2-cn-sd",
+    "title": "CCTV+ 2 (600p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "cn"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/qSg862A.png",
+    "backdrop": "https://i.imgur.com/qSg862A.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cd-live-stream.news.cctvplus.com/live/smil:CHANNEL2.smil/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-harbincomprehensivenewschannel-cn-sd",
+    "slug": "harbincomprehensivenewschannel-cn-sd",
+    "title": "Harbin Comprehensive News Channel",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "cn"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://www.tvchinese.net/uploads/tv/haerbin.jpg",
+    "backdrop": "https://www.tvchinese.net/uploads/tv/haerbin.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.hrbtv.net/xwzh/playlist.m3u8?_upt=ef41dd531755913594",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-abn-kr-sd",
+    "slug": "abn-kr-sd",
+    "title": "ABN TV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://www.abn.co.kr/resources/images/logo.png",
+    "backdrop": "https://www.abn.co.kr/resources/images/logo.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vod2.abn.co.kr/IPHONE/abn.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-cctv9-cn-sd",
+    "slug": "cctv9-cn-sd",
+    "title": "CCTV-9 (576i)",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "cn"
+    ],
+    "categories": [
+      "Documentary",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/3tivvMm.png",
+    "backdrop": "https://i.imgur.com/3tivvMm.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://xykt-fix.github.io/Y77.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-hakkatv-tw-sd",
+    "slug": "hakkatv-tw-sd",
+    "title": "Hakka TV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "tw"
+    ],
+    "categories": [
+      "Culture",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/1CdGSbU.png",
+    "backdrop": "https://i.imgur.com/1CdGSbU.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://hc9lby9bzw8zcar.wcetv.com/hls/hakkatv.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-hlandtv-kr-sd",
+    "slug": "hlandtv-kr-sd",
+    "title": "MBC Chuncheon (춘천 MBC) (480p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/lthyx2P.png",
+    "backdrop": "https://i.imgur.com/lthyx2P.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.chmbc.co.kr/TV/myStream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-hlcqdtv-kr-sd",
+    "slug": "hlcqdtv-kr-sd",
+    "title": "MBC Daejeon (대전 MBC) (720p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/HCbvAiM.png",
+    "backdrop": "https://i.imgur.com/HCbvAiM.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://ns1.tjmbc.co.kr/live/myStream.sdp/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-hlajdtv-kr-sd",
+    "slug": "hlajdtv-kr-sd",
+    "title": "MBC Jeju (제주 MBC) (352p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/JM4rxGU.png",
+    "backdrop": "https://i.imgur.com/JM4rxGU.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://wowza.jejumbc.com/live/tv_jejumbc/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-hlatdtv-kr-sd",
+    "slug": "hlatdtv-kr-sd",
+    "title": "MBC Yeosu (여수 MBC) (1080p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/3VSuYsn.png",
+    "backdrop": "https://i.imgur.com/3VSuYsn.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://5c3639aa99149.streamlock.net/live_TV/tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-petclubtv-hk-sd",
+    "slug": "petclubtv-hk-sd",
+    "title": "Pet Club TV",
+    "type": "live",
+    "description": "Asia · plays via proxy",
+    "countries": [
+      "hk"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/ykPNNwQ.png",
+    "backdrop": "https://i.imgur.com/ykPNNwQ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://petclub-samsungaus.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-gongyounghomeshopping-kr-sd",
+    "slug": "gongyounghomeshopping-kr-sd",
+    "title": "Gongyoung Shopping",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "Shop",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/YL3rpd7.png",
+    "backdrop": "https://i.imgur.com/YL3rpd7.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://etv.publichs.com/live5.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-goodtv-tw-sd",
+    "slug": "goodtv-tw-sd",
+    "title": "GOOD TV CH1 綜合台 (720p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "tw"
+    ],
+    "categories": [
+      "Religious",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/k28Kc3o.png",
+    "backdrop": "https://i.imgur.com/k28Kc3o.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.streamingfast.net/osmflivech1.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-good2-tw-sd",
+    "slug": "good2-tw-sd",
+    "title": "GOOD TV CH2 真理台",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "tw"
+    ],
+    "categories": [
+      "Religious",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/YxFRoft.png",
+    "backdrop": "https://i.imgur.com/YxFRoft.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.streamingfast.net/osmflivech2.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-gstv-jp-sd",
+    "slug": "gstv-jp-sd",
+    "title": "GSTV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "jp"
+    ],
+    "categories": [
+      "Shop",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/ECnVG5I.png",
+    "backdrop": "https://i.imgur.com/ECnVG5I.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://japaneast.av.mk.io/mediakindcdn-mediakind/ca01a143-f823-4432-b670-c22ff9643ce4/index.qfm/manifest(format=m3u8-cmaf)",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-suprememastertv-tw-sd",
+    "slug": "suprememastertv-tw-sd",
+    "title": "Supreme Master TV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "tw"
+    ],
+    "categories": [
+      "Undefined",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/kFMHayP.png",
+    "backdrop": "https://i.imgur.com/kFMHayP.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://lbs-us1.suprememastertv.com/720p.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-shopchannel-jp-sd",
+    "slug": "shopchannel-jp-sd",
+    "title": "Shop Channel (1080p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · plays via proxy",
+    "countries": [
+      "jp"
+    ],
+    "categories": [
+      "Shop",
+      "Asia",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://www.shopch.jp/com/images/common/logo_2021.png",
+    "backdrop": "https://www.shopch.jp/com/images/common/logo_2021.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream3.shopch.jp/HLS/master.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-gugaktv-kr-sd",
+    "slug": "gugaktv-kr-sd",
+    "title": "GugakTV 국악방송",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/Ey7Htm8.png",
+    "backdrop": "https://i.imgur.com/Ey7Htm8.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mgugaklive.nowcdn.co.kr/gugakvideo/gugakvideo.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-lottehomeshopping-kr-sd",
+    "slug": "lottehomeshopping-kr-sd",
+    "title": "Lotte Home Shopping",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "Shop",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/dJeNehc.png",
+    "backdrop": "https://i.imgur.com/dJeNehc.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://pchlslivesw.lotteimall.com/live/livestream/lotteimalllive_mp4.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-lotteonetv-kr-sd",
+    "slug": "lotteonetv-kr-sd",
+    "title": "Lotte OneTV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kr"
+    ],
+    "categories": [
+      "Shop",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/bXe7tYE.png",
+    "backdrop": "https://i.imgur.com/bXe7tYE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://onetvhlslive.lotteimall.com/lotteonetvlive/lotteonetvlive.mp4.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-abantetv-ph-hd",
+    "slug": "abantetv-ph-hd",
+    "title": "Abante TV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "ph"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Abante_masthead.svg",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Abante_masthead.svg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg19223-amg19223c12-amgplt0352.playout.now3.amagi.tv/playlist/amg19223-amg19223c12-amgplt0352/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-hirutv-lk-sd",
+    "slug": "hirutv-lk-sd",
+    "title": "Hiru TV (360p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "lk"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/M66UqPB.png",
+    "backdrop": "https://i.imgur.com/M66UqPB.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://tv.hiruhost.com:1936/8012/8012/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-homeplus-ir-sd",
+    "slug": "homeplus-ir-sd",
+    "title": "Home Plus",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "ir"
+    ],
+    "categories": [
+      "Movies",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://homeplushls.wns.live/hls/stream.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-ndtvlanka-lk-sd",
+    "slug": "ndtvlanka-lk-sd",
+    "title": "NDTV LANKA",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "lk"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/5cyTVRJ.png",
+    "backdrop": "https://i.imgur.com/5cyTVRJ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://g4wlkqqwl23a-hls-live.5centscdn.com/NDTVLANKA/1ff5fa54d14c3ff6c6bd3918bbb7db5d.sdp/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-ningtv-la-sd",
+    "slug": "ningtv-la-sd",
+    "title": "Ning TV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "la"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/ANnEPnK.png",
+    "backdrop": "https://i.imgur.com/ANnEPnK.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://livefta.malimarcdn.com/ftaedge00/ningtv.sdp/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-rupashibanglatv-bd-sd",
+    "slug": "rupashibanglatv-bd-sd",
+    "title": "Rupashi Bangla TV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "bd"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Rupashi_Bangla.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Rupashi_Bangla.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://app24.jagobd.com.bd/c3VydmVyX8RpbEU9Mi8xNy8yMFDEEHGcfRgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcEdsEfeDeKiNkVN3PTOmdFseWRtaW51aiPhnPTI2/ruposhibangla.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-vatilao-la-sd",
+    "slug": "vatilao-la-sd",
+    "title": "Vati Lao TV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "la"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/NwxXABV.png",
+    "backdrop": "https://i.imgur.com/NwxXABV.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://livefta.malimarcdn.com/ftaedge00/vatilaotv.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-imaitv-lk-sd",
+    "slug": "imaitv-lk-sd",
+    "title": "Imai TV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "lk"
+    ],
+    "categories": [
+      "Culture",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/9tODclu.png",
+    "backdrop": "https://i.imgur.com/9tODclu.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live20.bozztv.com/akamaissh101/ssh101/imaitv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-inwild-nl-sd",
+    "slug": "inwild-nl-sd",
+    "title": "INWILD",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "nl"
+    ],
+    "categories": [
+      "Documentary",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://cdn.uc.assets.prezly.com/92770c71-9d6f-400f-8311-38e9cfec52c2/InWild_landscape-green.png",
+    "backdrop": "https://cdn.uc.assets.prezly.com/92770c71-9d6f-400f-8311-38e9cfec52c2/InWild_landscape-green.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg00861-terninternation-inwild-samsunguk-w5wic.amagi.tv/playlist/amg00861-terninternation-inwild-samsunguk/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tvbvietnam-vn-sd",
+    "slug": "tvbvietnam-vn-sd",
+    "title": "TVB Vietnam",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "vn"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://raw.githubusercontent.com/songwenhui239/Songwenhui239/refs/heads/main/TVB%20Vietnam.jpeg",
+    "backdrop": "https://raw.githubusercontent.com/songwenhui239/Songwenhui239/refs/heads/main/TVB%20Vietnam.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg01868-amg01868c3-tvbanywhere-us-4491.playouts.now.amagi.tv/playlist/amg01868-tvbusa-tvbvietnam-tvbanywhereus/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-minimax-pk-sd",
+    "slug": "minimax-pk-sd",
+    "title": "Minimax",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "pk"
+    ],
+    "categories": [
+      "Kids",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/TJvf8vd.png",
+    "backdrop": "https://i.imgur.com/TJvf8vd.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vodzong.mjunoon.tv:8087/streamtest/disckids-157-1/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-mnbsport-mn-sd",
+    "slug": "mnbsport-mn-sd",
+    "title": "MNB Sport",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "mn"
+    ],
+    "categories": [
+      "Sports",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/z854PC3.png",
+    "backdrop": "https://i.imgur.com/z854PC3.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.mnb.mn/hls/mnb_sport.stream.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-pksports-pk-sd",
+    "slug": "pksports-pk-sd",
+    "title": "PK Sports",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "pk"
+    ],
+    "categories": [
+      "Sports",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://raw.githubusercontent.com/songwenhui239/Songwenhui239/refs/heads/main/PK%20Sports.jpeg",
+    "backdrop": "https://raw.githubusercontent.com/songwenhui239/Songwenhui239/refs/heads/main/PK%20Sports.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://lbgo.bozztv.com/ssh101/ssh101/pksportshd/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-tsports7-th-sd",
+    "slug": "tsports7-th-sd",
+    "title": "T Sports 7",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "th"
+    ],
+    "categories": [
+      "Sports",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/KyI0s5n.png",
+    "backdrop": "https://i.imgur.com/KyI0s5n.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live-us1.thaimomo.com/live-as/chtsport-1/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-briantv-la-sd",
+    "slug": "briantv-la-sd",
+    "title": "Brian TV (720p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "la"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/zG1WNgU.jpg",
+    "backdrop": "https://i.imgur.com/zG1WNgU.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://livefta.malimarcdn.com/ftaedge00/briantv.sdp/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-gtv-ph-sd",
+    "slug": "gtv-ph-sd",
+    "title": "GTV (480p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "ph"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/rWhamwh.png",
+    "backdrop": "https://i.imgur.com/rWhamwh.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://streams.comclark.com/pknsd/gtv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-ktnnews-pk-sd",
+    "slug": "ktnnews-pk-sd",
+    "title": "KTN News",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "pk"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/RtEzpPQ.png",
+    "backdrop": "https://i.imgur.com/RtEzpPQ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vodzong.mjunoon.tv:8087/streamtest/KTNNews-151/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-lahorenews-pk-sd",
+    "slug": "lahorenews-pk-sd",
+    "title": "Lahore News (720p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "pk"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/bQfQeEA.jpeg",
+    "backdrop": "https://i.imgur.com/bQfQeEA.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vcdn.dunyanews.tv/lahorelive/ngrp:lnews_1_all/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-lingkartv-id-sd",
+    "slug": "lingkartv-id-sd",
+    "title": "Lingkar TV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "id"
+    ],
+    "categories": [
+      "Music",
+      "News",
+      "Religious",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://lingkartv.com/assets/img/logo-square.png",
+    "backdrop": "https://lingkartv.com/assets/img/logo-square.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://lingkartv.my.id/hls/lingkartv.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-topnews-th-sd",
+    "slug": "topnews-th-sd",
+    "title": "Top News",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "th"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/tRFnV9M.png",
+    "backdrop": "https://i.imgur.com/tRFnV9M.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.topnews.co.th/hls/topnews_a_720.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-3hd-th-sd",
+    "slug": "3hd-th-sd",
+    "title": "3HD",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "th"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/YRiulCU.png",
+    "backdrop": "https://i.imgur.com/YRiulCU.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live-us1.thaimomo.com/live-as/ch3hd-3/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-a2z-ph-sd",
+    "slug": "a2z-ph-sd",
+    "title": "A2Z (480p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "ph"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/1zsdloF.png",
+    "backdrop": "https://i.imgur.com/1zsdloF.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://streams.comclark.com/pknsd/a2z/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-apsaratv11-kh-sd",
+    "slug": "apsaratv11-kh-sd",
+    "title": "Apsara TV11",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "kh"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/9wJe71I.png",
+    "backdrop": "https://i.imgur.com/9wJe71I.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.ams.com.kh/app/stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-bungotv-id-sd",
+    "slug": "bungotv-id-sd",
+    "title": "Bungo TV (480p) [Not 24/7]",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "id"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/OrCrtDA.png",
+    "backdrop": "https://i.imgur.com/OrCrtDA.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://5bf7b725107e5.streamlock.net/bungotv/bungotv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-canthotv-vn-sd",
+    "slug": "canthotv-vn-sd",
+    "title": "Cần Thơ TV1",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "vn"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.ibb.co/MDhNH26J/cantho1-2025.png",
+    "backdrop": "https://i.ibb.co/MDhNH26J/cantho1-2025.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.canthotv.vn/live/tv/chunklist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-caobangtv-vn-sd",
+    "slug": "caobangtv-vn-sd",
+    "title": "Cao Bằng TV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "vn"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/dGonewm.png",
+    "backdrop": "https://i.imgur.com/dGonewm.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.thingnet.vn/live/smil:CRTV.smil/chunklist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-channel5-th-sd",
+    "slug": "channel5-th-sd",
+    "title": "Channel 5",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "th"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/wOIaqg7.png",
+    "backdrop": "https://i.imgur.com/wOIaqg7.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://639bc5877c5fe.streamlock.net/tv5hdlive/tv5hdlive/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-cnaoriginals-sg-sd",
+    "slug": "cnaoriginals-sg-sd",
+    "title": "CNA Originals",
+    "type": "live",
+    "description": "Asia · plays via proxy",
+    "countries": [
+      "sg"
+    ],
+    "categories": [
+      "Documentary",
+      "Asia",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/CNA_new_logo.svg/500px-CNA_new_logo.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/CNA_new_logo.svg/500px-CNA_new_logo.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://amg01082-cna-amg01082c1-rlaxx-us-11304.playouts.now.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-newsone-pk-sd",
+    "slug": "newsone-pk-sd",
+    "title": "News One",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "pk"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/ivrRYMk.png",
+    "backdrop": "https://i.imgur.com/ivrRYMk.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vodzong.mjunoon.tv:8087/streamtest/NEWS1-128/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-bstv-pk-sd",
+    "slug": "bstv-pk-sd",
+    "title": "BSTV",
+    "type": "live",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "pk"
+    ],
+    "categories": [
+      "General",
+      "Asia",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://www.vivalivetv.com/public/files/shows/0/1/3952-640x360-FFFFFF.jpg",
+    "backdrop": "https://www.vivalivetv.com/public/files/shows/0/1/3952-640x360-FFFFFF.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://lbgo.bozztv.com/ssh101/ssh101/bstv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-godstandskidsclubtv-pk-arabic",
+    "slug": "godstandskidsclubtv-pk-arabic",
+    "title": "God Stands Kids Club TV Arabic",
+    "type": "live",
+    "description": "Asia · plays via proxy",
+    "countries": [
+      "pk"
+    ],
+    "categories": [
+      "Kids",
+      "Religious",
+      "Asia",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/FxDBbpz.jpeg",
+    "backdrop": "https://i.imgur.com/FxDBbpz.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://online.godstands.tv:5443/WebRTCApp/streams/KidsArabic.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-godstandskidsclubtv-pk-english",
+    "slug": "godstandskidsclubtv-pk-english",
+    "title": "God Stands Kids Club TV English",
+    "type": "live",
+    "description": "Asia · plays via proxy",
+    "countries": [
+      "pk"
+    ],
+    "categories": [
+      "Kids",
+      "Religious",
+      "Asia",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/FxDBbpz.jpeg",
+    "backdrop": "https://i.imgur.com/FxDBbpz.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://online.godstands.tv:5443/WebRTCApp/streams/kidsenglish.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-godstandskidsclubtv-pk-urdu",
+    "slug": "godstandskidsclubtv-pk-urdu",
+    "title": "God Stands Kids Club TV Urdu",
+    "type": "live",
+    "description": "Asia · plays via proxy",
+    "countries": [
+      "pk"
+    ],
+    "categories": [
+      "Kids",
+      "Religious",
+      "Asia",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/FxDBbpz.jpeg",
+    "backdrop": "https://i.imgur.com/FxDBbpz.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://online.godstands.tv:5443/WebRTCApp/streams/KidsUrdu.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-7smusic-in-sd",
+    "slug": "7smusic-in-sd",
+    "title": "7S Music",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/zDiIhdN.png",
+    "backdrop": "https://i.imgur.com/zDiIhdN.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mumt03.tangotv.in/Dsly5z3H7SMUSIC/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-9xm-in-sd",
+    "slug": "9xm-in-sd",
+    "title": "9XM",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_9XM/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_9XM/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://9xjio.wiseplayout.com/9XM/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-aasthabhajan-in-sd",
+    "slug": "aasthabhajan-in-sd",
+    "title": "Aastha Bhajan",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Religious",
+      "Asia",
+      "India",
+      "Healed",
+      "Music",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s142514_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s142514_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mumt05.tangotv.in/87NeALx2AASTHABHAJAN/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-andyharyana-in-sd",
+    "slug": "andyharyana-in-sd",
+    "title": "Andy Haryana",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Culture",
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/rmCBD3e.png",
+    "backdrop": "https://i.imgur.com/rmCBD3e.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mumt03.tangotv.in/Dsly5z3HANDYHARYANA/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-b4umusic-in-india",
+    "slug": "b4umusic-in-india",
+    "title": "B4U Music",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s158141_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s158141_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-2.pishow.tv/live/415/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-chithiram-in-sd",
+    "slug": "chithiram-in-sd",
+    "title": "Chithiram",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Kids",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/xv9cWSh.png",
+    "backdrop": "https://i.imgur.com/xv9cWSh.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-6.pishow.tv/live/1243/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ddsports-in-sd",
+    "slug": "ddsports-in-sd",
+    "title": "DD Sports SD",
+    "type": "live",
+    "description": "India · plays via proxy",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Sports",
+      "Asia",
+      "India",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s158255_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s158255_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/b17adfe543354fdd8d189b110617cddd/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-foodfood-in-sd",
+    "slug": "foodfood-in-sd",
+    "title": "Food Food",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Cooking",
+      "Lifestyle",
+      "Asia",
+      "India",
+      "Healed",
+      "Food",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Food_Food.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Food_Food.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mumt03.tangotv.in/Dsly5z3HFOODFOOD/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ishwarbhaktitv-in-sd",
+    "slug": "ishwarbhaktitv-in-sd",
+    "title": "Ishwar Bhakti TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Religious",
+      "Asia",
+      "India",
+      "Healed",
+      "Music",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ISHWAR_TV/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ISHWAR_TV/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://6n3yow8pl9ok-hls-live.5centscdn.com/ishwartvlive/tv.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-mahaabhakti-in-sd",
+    "slug": "mahaabhakti-in-sd",
+    "title": "Mahaa Bhakti",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Religious",
+      "Asia",
+      "India",
+      "Healed",
+      "Music",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://yt3.googleusercontent.com/OWECRvCVJh-dXU2MTRZhMRIDvFvcWan0YMoWWfXsM5_WEHobQy2QoHQbGr7AZUXzMOByTMAXbg=s900-c-k-c0x00ffffff-no-rj",
+    "backdrop": "https://yt3.googleusercontent.com/OWECRvCVJh-dXU2MTRZhMRIDvFvcWan0YMoWWfXsM5_WEHobQy2QoHQbGr7AZUXzMOByTMAXbg=s900-c-k-c0x00ffffff-no-rj",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mumbai-edge.smartplaytv.in/MahaBhakthi/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-musicindia-in-sd",
+    "slug": "musicindia-in-sd",
+    "title": "Music India (720p) [Not 24/7]",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s143563_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s143563_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-2.pishow.tv/live/226/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-orangebanglatv-in-sd",
+    "slug": "orangebanglatv-in-sd",
+    "title": "Orange Bangla TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/wjSaHj5.png",
+    "backdrop": "https://i.imgur.com/wjSaHj5.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-4.pishow.tv/live/1499/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-pepperstv-in-sd",
+    "slug": "pepperstv-in-sd",
+    "title": "Peppers TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Peppers_TV.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Peppers_TV.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-2.pishow.tv/live/1383/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ptcchakde-in-sd",
+    "slug": "ptcchakde-in-sd",
+    "title": "PTC Chakde",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PTC_CHAKDE/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PTC_CHAKDE/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-1.pishow.tv/live/449/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ptcmusic-in-sd",
+    "slug": "ptcmusic-in-sd",
+    "title": "PTC Music",
+    "type": "live",
+    "description": "India · plays via proxy",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PTC_MUSIC/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PTC_MUSIC/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d2lk5u59tns74c.cloudfront.net/out/v1/f913cf893c594f73b114216e74a2efbc/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-publicmusic-in-sd",
+    "slug": "publicmusic-in-sd",
+    "title": "Public Music (720p) [Not 24/7]",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PUBLIC_MUSIC/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PUBLIC_MUSIC/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-3.pishow.tv/live/441/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-punjabihits-in-sd",
+    "slug": "punjabihits-in-sd",
+    "title": "Punjabi Hits",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PUNJABI_HITS/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PUNJABI_HITS/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.ottlive.co.in/punjabihits/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-rajmusixtamil-in-sd",
+    "slug": "rajmusixtamil-in-sd",
+    "title": "Raj Musix Tamil",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_RAJ_MUSIX_TAMIL/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_RAJ_MUSIX_TAMIL/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://livestream.rajtv.tv/hlslive/Admin/px08241087/live/Raj_Musix/master_1.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-rajmusixtelugu-in-sd",
+    "slug": "rajmusixtelugu-in-sd",
+    "title": "Raj Musix Telugu",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_RAJ_MUSIX_TELUGU/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_RAJ_MUSIX_TELUGU/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-1.pishow.tv/live/1213/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-sangeetbangla-in-sd",
+    "slug": "sangeetbangla-in-sd",
+    "title": "Sangeet Bangla",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/transparentImages/Sangeet%20Bangla.png",
+    "backdrop": "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/transparentImages/Sangeet%20Bangla.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-4.pishow.tv/live/1143/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-sangeetmarathi-in-sd",
+    "slug": "sangeetmarathi-in-sd",
+    "title": "Sangeet Marathi",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_SANGEET_MARATHI/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_SANGEET_MARATHI/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-3.pishow.tv/live/1229/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-steelbirdmusic-in-sd",
+    "slug": "steelbirdmusic-in-sd",
+    "title": "Steelbird Music (720p) [Not 24/7]",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Steelbird_Music.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Steelbird_Music.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn2.in/SteelbirdMusicTVhls/live.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-svbc-in-sd",
+    "slug": "svbc-in-sd",
+    "title": "SVBC Sri Venkateswara Bhakti Channel",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Religious",
+      "Asia",
+      "India",
+      "Healed",
+      "Music",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s143889_ld_h9_ab.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s143889_ld_h9_ab.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://player.mslivestream.net/telugu/5d076e5c3d34cb8bb08e54a4bb7e223e.sdp/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tarangmusic-in-sd",
+    "slug": "tarangmusic-in-sd",
+    "title": "Tarang Music",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/oSm8zFD.png",
+    "backdrop": "https://i.imgur.com/oSm8zFD.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://livetv.tarangplus.in/tarangmusic-origin/live/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tunes6-in-sd",
+    "slug": "tunes6-in-sd",
+    "title": "Tunes 6",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Tunes_6.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Tunes_6.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.d6-pro.com/tunes6music/live/video.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ultimatetv-in-sd",
+    "slug": "ultimatetv-in-sd",
+    "title": "Ultimate TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/utvtamil.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/utvtamil.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.ottlive.co.in/utvtamil/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-uniquetv-in-sd",
+    "slug": "uniquetv-in-sd",
+    "title": "Unique TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Kids",
+      "Asia",
+      "Series",
+      "Drama",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Unique_Tv.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Unique_Tv.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mumt05.tangotv.in/87NeALx2UNIQUETV/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-vaanaviltv-in-sd",
+    "slug": "vaanaviltv-in-sd",
+    "title": "Vaanavil TV",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Vaanavil_TV.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Vaanavil_TV.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://6n3yope4d9ok-hls-live.5centscdn.com/vaanavil/TV.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zoom-in-sd",
+    "slug": "zoom-in-sd",
+    "title": "Zoom",
+    "type": "live",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Music",
+      "Asia",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ZOOM/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ZOOM/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dai.google.com/linear/hls/event/JCAm25qkRXiKcK1AJMlvKQ/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  }
+]

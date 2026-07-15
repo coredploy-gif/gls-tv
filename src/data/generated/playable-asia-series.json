@@ -1,0 +1,1312 @@
+[
+  {
+    "id": "iptv-zee24kalak-in-sd",
+    "slug": "zee24kalak-in-sd",
+    "title": "Zee 24 Kalak",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00230P1R.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00230P1R.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zee24kalak/v1/manifest/611d79b11b77e2f571934fd80ca1413453772ac7/497f7199-758d-495d-9d2f-a5489231c428/14b7c8ec-16da-47f2-8d7e-5bbaec67b3e2/3.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zee24taas-in-sd",
+    "slug": "zee24taas-in-sd",
+    "title": "Zee 24 Taas",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00230LKE.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00230LKE.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dgrvlduwztkd4.cloudfront.net/index_5.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeebharat-in-sd",
+    "slug": "zeebharat-in-sd",
+    "title": "Zee Bharat",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00230QBL.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00230QBL.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeehindustan/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/96bbab12-582e-4540-af70-510ab6824581/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeebiharjharkhand-in-sd",
+    "slug": "zeebiharjharkhand-in-sd",
+    "title": "Zee Bihar Jharkhand",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00230Y44.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00230Y44.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/ZeeBiharJharkhand.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeedelhincrharyana-in-sd",
+    "slug": "zeedelhincrharyana-in-sd",
+    "title": "Zee Delhi NCR Haryana",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG0023166M.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG0023166M.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeedelhincr/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/cc483a15-1b39-4642-872d-5d08d362ed01/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeekannadanews-in-sd",
+    "slug": "zeekannadanews-in-sd",
+    "title": "Zee Kannada News",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Zee_Kannada_News.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Zee_Kannada_News.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d3vzwoqcbpfm8p.cloudfront.net/index_4.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeemadhyapradeshchhattisgarh-in-sd",
+    "slug": "zeemadhyapradeshchhattisgarh-in-sd",
+    "title": "Zee Madhya Pradesh Chhattisgarh",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG002316X5.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG002316X5.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeemadhyachhattisgarh/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/2ab17056-6187-4f0e-a34d-f436ac479d6c/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeemalayalamnews-in-sd",
+    "slug": "zeemalayalamnews-in-sd",
+    "title": "Zee Malayalam News",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://english.cdn.zeenews.com/images/logo/zee-malayalam-17.svg",
+    "backdrop": "https://english.cdn.zeenews.com/images/logo/zee-malayalam-17.svg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d1ty2af03alkwd.cloudfront.net/index_4.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeenews-in-sd",
+    "slug": "zeenews-in-sd",
+    "title": "Zee News",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG0023VWYC.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG0023VWYC.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dknttpxmr0dwf.cloudfront.net/index_57.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeepunjabharyanahimachal-in-sd",
+    "slug": "zeepunjabharyanahimachal-in-sd",
+    "title": "Zee Punjab Haryana Himachal",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG0022KHKS.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG0022KHKS.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeepunjabharyanahima/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/65eed269-2f3a-4dd0-ac89-d18959af28e3/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeerajasthan-in-sd",
+    "slug": "zeerajasthan-in-sd",
+    "title": "Zee Rajasthan",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00231732.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00231732.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-zeerajashthannews/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/8e864b9a-1681-41a0-99a6-387490bc5b24/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeetelugunews-in-sd",
+    "slug": "zeetelugunews-in-sd",
+    "title": "Zee Telugu News",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG0023178R.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG0023178R.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d116gfrn8orazi.cloudfront.net/index.m3u8?akes=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NjcxOTc5NzJ9.O4qmdMPbHwKrCg6hFXvD70vjSPWKQd0a7NrjmFdeMB8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeeuttarpradeshuttarakhand-in-sd",
+    "slug": "zeeuttarpradeshuttarakhand-in-sd",
+    "title": "Zee Uttar Pradesh/Uttarakhand",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG002317GQ.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG002317GQ.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://duw35ict5q7th.cloudfront.net/index_3.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-amritatv-in-sd",
+    "slug": "amritatv-in-sd",
+    "title": "Amrita TV",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/WdSjlPl.png",
+    "backdrop": "https://i.imgur.com/WdSjlPl.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://ddash74r36xqp.cloudfront.net/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-bhojpuricinema-in-sd",
+    "slug": "bhojpuricinema-in-sd",
+    "title": "Bhojpuri Cinema",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live-bhojpuri.akamaized.net/liveabr/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-epictv-in-digital",
+    "slug": "epictv-in-digital",
+    "title": "Epic TV Digital",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_EPIC/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_EPIC/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-czbq30x55knit.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-czbq30x55knit/DIYC/PMSL/IN10/Epic_TV_IN_B/Epic_TV_IN_B.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-etvjosh-in-hd",
+    "slug": "etvjosh-in-hd",
+    "title": "ETV Josh",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900004LP_20250811T033452SQUARE.png",
+    "backdrop": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900004LP_20250811T033452SQUARE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-uyh1ow5zouoio.akamaized.net/WWBI/Amagi/ETV_Josh_IN/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-gtcpunjabi-in-sd",
+    "slug": "gtcpunjabi-in-sd",
+    "title": "GTC Punjabi",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://media.thegtcnetwork.com/uploads/gtc-pujabin-s.jpg",
+    "backdrop": "https://media.thegtcnetwork.com/uploads/gtc-pujabin-s.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://gtc-yupp.vgcdn.net/vglive-sk-254807/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-kalaignarmurasu-in-sd",
+    "slug": "kalaignarmurasu-in-sd",
+    "title": "Kalaignar Murasu",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/s143561_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s143561_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/murasu_nim_https/050522/murasu/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-epicbharat-in-sd",
+    "slug": "epicbharat-in-sd",
+    "title": "Nazara",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG0032BW6T.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG0032BW6T.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-p1izg43bk7sj5.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-p1izg43bk7sj5/DIYC/PMSL/IN10/Nazara_IN_B/Nazara_IN_B.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-nepal1-in-sd",
+    "slug": "nepal1-in-sd",
+    "title": "Nepal 1",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/Xr4FjC8.png",
+    "backdrop": "https://i.imgur.com/Xr4FjC8.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d1msejlow1t3l4.cloudfront.net/fta/nepal1/chunks.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-pasandtv-in-sd",
+    "slug": "pasandtv-in-sd",
+    "title": "Pasand TV",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG002NFYY1.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG002NFYY1.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d1msejlow1t3l4.cloudfront.net/fta/pasand/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-pitaara-in-sd",
+    "slug": "pitaara-in-sd",
+    "title": "Pitaara",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Movies",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PITAARA/images/LOGO_HD/image.png",
+    "backdrop": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_PITAARA/images/LOGO_HD/image.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vg-pitaaratvlive.akamaized.net/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/vglive-sk-583798/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-sanatv-in-sd",
+    "slug": "sanatv-in-sd",
+    "title": "Sana TV",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/CR7DGBv.png",
+    "backdrop": "https://i.imgur.com/CR7DGBv.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://vglivessai.akamaized.net/us/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/b6d9e864-ec16-410a-804d-ccf8f720bfaa/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-shubhcinematv-in-sd",
+    "slug": "shubhcinematv-in-sd",
+    "title": "Shubh Cinema TV",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Movies",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/RQhorAG.png",
+    "backdrop": "https://i.imgur.com/RQhorAG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d393sxaxig6bax.cloudfront.net/out/v1/589cf2cf44bf42bb941e817a2240d62e/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-southstation-in-hd",
+    "slug": "southstation-in-hd",
+    "title": "South Station",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Movies",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN3800008CX_20260325T012316SQUARE.png",
+    "backdrop": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN3800008CX_20260325T012316SQUARE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cc-yw7ztecy8do3q.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-yw7ztecy8do3q/SS_IN.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zee24ghanta-in-sd",
+    "slug": "zee24ghanta-in-sd",
+    "title": "Zee 24 Ghanta",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d2dsoyvkr33m05.cloudfront.net/index_4.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeebanglasonar-in-sd",
+    "slug": "zeebanglasonar-in-sd",
+    "title": "Zee Bangla Sonar",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00287G7K.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00287G7K.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/ColorsHD/default/ColorsHD.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-zeebusiness-in-sd",
+    "slug": "zeebusiness-in-sd",
+    "title": "Zee Business",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Business",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://dtil.tmsimg.com/assets/GNLZZGG00230YYJ.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/GNLZZGG00230YYJ.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dwby15d04agvq.cloudfront.net/index_5.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-indywoodtv-in-sd",
+    "slug": "indywoodtv-in-sd",
+    "title": "Indywood TV",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Movies",
+      "News",
+      "Asia",
+      "India",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Series",
+      "Drama"
+    ],
+    "languages": [],
+    "poster": "https://i.ibb.co/jT3NCPp/logo-tv.png",
+    "backdrop": "https://i.ibb.co/jT3NCPp/logo-tv.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://43wrzjnpqoxe-hls-live.wmncdn.net/indywood/indywoodtv/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-harbinmoviechannel-cn-sd",
+    "slug": "harbinmoviechannel-cn-sd",
+    "title": "Harbin Movie Channel",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "cn"
+    ],
+    "categories": [
+      "Movies",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://www.tvchinese.net/uploads/tv/haerbin.jpg",
+    "backdrop": "https://www.tvchinese.net/uploads/tv/haerbin.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://stream.hrbtv.net/yspd/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-petclubtv-hk-sd",
+    "slug": "petclubtv-hk-sd",
+    "title": "Pet Club TV",
+    "type": "series",
+    "description": "Asia · plays via proxy",
+    "countries": [
+      "hk"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/ykPNNwQ.png",
+    "backdrop": "https://i.imgur.com/ykPNNwQ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://petclub-samsungaus.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-hirutv-lk-sd",
+    "slug": "hirutv-lk-sd",
+    "title": "Hiru TV (360p) [Not 24/7]",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "lk"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/M66UqPB.png",
+    "backdrop": "https://i.imgur.com/M66UqPB.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://tv.hiruhost.com:1936/8012/8012/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-homeplus-ir-sd",
+    "slug": "homeplus-ir-sd",
+    "title": "Home Plus",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "ir"
+    ],
+    "categories": [
+      "Movies",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://homeplushls.wns.live/hls/stream.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-ndtvlanka-lk-sd",
+    "slug": "ndtvlanka-lk-sd",
+    "title": "NDTV LANKA",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "lk"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/5cyTVRJ.png",
+    "backdrop": "https://i.imgur.com/5cyTVRJ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://g4wlkqqwl23a-hls-live.5centscdn.com/NDTVLANKA/1ff5fa54d14c3ff6c6bd3918bbb7db5d.sdp/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-ningtv-la-sd",
+    "slug": "ningtv-la-sd",
+    "title": "Ning TV",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "la"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/ANnEPnK.png",
+    "backdrop": "https://i.imgur.com/ANnEPnK.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://livefta.malimarcdn.com/ftaedge00/ningtv.sdp/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-rupashibanglatv-bd-sd",
+    "slug": "rupashibanglatv-bd-sd",
+    "title": "Rupashi Bangla TV",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "bd"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Rupashi_Bangla.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Rupashi_Bangla.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://app24.jagobd.com.bd/c3VydmVyX8RpbEU9Mi8xNy8yMFDEEHGcfRgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcEdsEfeDeKiNkVN3PTOmdFseWRtaW51aiPhnPTI2/ruposhibangla.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-vatilao-la-sd",
+    "slug": "vatilao-la-sd",
+    "title": "Vati Lao TV",
+    "type": "series",
+    "description": "Asia · direct Playable (CORS*)",
+    "countries": [
+      "la"
+    ],
+    "categories": [
+      "Entertainment",
+      "Asia",
+      "Series",
+      "Drama",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://i.imgur.com/NwxXABV.png",
+    "backdrop": "https://i.imgur.com/NwxXABV.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://livefta.malimarcdn.com/ftaedge00/vatilaotv.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-uniquetv-in-sd",
+    "slug": "uniquetv-in-sd",
+    "title": "Unique TV",
+    "type": "series",
+    "description": "India · direct Playable (CORS*)",
+    "countries": [
+      "in"
+    ],
+    "categories": [
+      "Entertainment",
+      "Kids",
+      "Asia",
+      "Series",
+      "Drama",
+      "India",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [],
+    "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Unique_Tv.png",
+    "backdrop": "https://jiotvimages.cdn.jio.com/dare_images/images/Unique_Tv.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mumt05.tangotv.in/87NeALx2UNIQUETV/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  }
+]

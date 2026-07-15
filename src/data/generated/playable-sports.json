@@ -1,0 +1,4015 @@
+[
+  {
+    "id": "curated-livenow-from-fox",
+    "slug": "livenow-from-fox",
+    "title": "LiveNOW from FOX",
+    "type": "live",
+    "description": "Free Fox digital FAST — not FS1/FS2 pay linear. · direct Playable (CORS*)",
+    "countries": [
+      "us",
+      "world"
+    ],
+    "categories": [
+      "News",
+      "Sports",
+      "Fox",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00488-foxdigital-livenowbyfox-lgus/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      },
+      {
+        "url": "https://fox-foxnewsnow-vizio.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 20,
+        "label": "mirror"
+      }
+    ]
+  },
+  {
+    "id": "curated-red-bull-tv",
+    "slug": "red-bull-tv",
+    "title": "Red Bull TV",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us",
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Extreme",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master_1660.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-redbulltv-at-sd",
+    "slug": "redbulltv-at-sd",
+    "title": "Red Bull TV",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Outdoor",
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "backdrop": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tennischannel-us-sd",
+    "slug": "tennischannel-us-sd",
+    "title": "Tennis Channel",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/tsljAnY.png",
+    "backdrop": "https://i.imgur.com/tsljAnY.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-ue1-prod.tsv2.amagi.tv/linear/amg01444-tennischannelth-tennischannelnl-samsungnl/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-draftkingsnetwork-us-sd",
+    "slug": "draftkingsnetwork-us-sd",
+    "title": "DraftKings Network",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/SFYhgrt.png",
+    "backdrop": "https://i.imgur.com/SFYhgrt.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://na.linear.zype.com/e0bd0e23-a958-4e43-8164-4f2fef8876a8/fd3614bd-90bf-4530-a277-65ae3a1720c8-zype/live.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-stadium-us-sd",
+    "slug": "stadium-us-sd",
+    "title": "Stadium",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Stadium_%28sports_network%29_logo.svg/960px-Stadium_%28sports_network%29_logo.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Stadium_%28sports_network%29_logo.svg/960px-Stadium_%28sports_network%29_logo.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://wurl120sports.global.transmit.live/hls/679a907dce42a042c23ace37/v1/stadium_gracenote/samsung_us/latest/main/hls/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-supertennis-it-sd",
+    "slug": "supertennis-it-sd",
+    "title": "SuperTennis",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/it/thumb/6/6a/SuperTennis_-_Logo_2016.svg/960px-SuperTennis_-_Logo_2016.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/it/thumb/6/6a/SuperTennis_-_Logo_2016.svg/960px-SuperTennis_-_Logo_2016.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live-embed.supertennix.hiway.media/restreamer/supertennix_client/gpu-a-c0-16/restreamer/outgest/aa3673f1-e178-44a9-a947-ef41db73211a/manifest.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "curated-beinsportsxtra-us-sd",
+    "slug": "beinsportsxtra-us-sd",
+    "title": "beIN SPORTS XTRA",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "us",
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Soccer",
+      "Healed",
+      "US",
+      "Football",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://bein-xtra-bein.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-beinsportsxtraenespanol-us-sd",
+    "slug": "beinsportsxtraenespanol-us-sd",
+    "title": "beIN Sports XTRA en Espanol",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Soccer",
+      "Football",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/V562tpO.png",
+    "backdrop": "https://i.imgur.com/V562tpO.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://dc1644a9jazgj.cloudfront.net/beIN_Sports_Xtra_Espanol.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "curated-espn8-the-ocho",
+    "slug": "espn8-the-ocho",
+    "title": "ESPN8 The Ocho",
+    "type": "live",
+    "description": "Official free ESPN FAST (not ESPN 1/2 linear). · plays via proxy",
+    "countries": [
+      "us",
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "ESPN",
+      "Healed",
+      "US",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d3b6q2ou5kp8ke.cloudfront.net/ESPNTheOcho.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-espn8theocho-us-espn8theochohd",
+    "slug": "espn8theocho-us-espn8theochohd",
+    "title": "ESPN8 The Ocho",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.fubo.tv/channel-config-ui/station-logos/on-dark/espn_8_the_ocho_bw.png",
+    "backdrop": "https://images.fubo.tv/channel-config-ui/station-logos/on-dark/espn_8_the_ocho_bw.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d3b6q2ou5kp8ke.cloudfront.net/ESPNTheOcho.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-fifaplus-uk-unitedstates",
+    "slug": "fifaplus-uk-unitedstates",
+    "title": "FIFA+ United States",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d2w9q46ikgrcwx.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-of5cbk3sav3w5/v1/sysdata_s_p_a_fifa_7/samsungheadend_us/latest/main/hls/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tsntheocho-ca-sd",
+    "slug": "tsntheocho-ca-sd",
+    "title": "TSN The Ocho",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/CA1400003R3_20240709T002034SQUARE.png",
+    "backdrop": "https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/CA1400003R3_20240709T002034SQUARE.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d3pnbvng3bx2nj.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-rds8g35qfqrnv/TSN_The_Ocho.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-wluktv141-us-hd",
+    "slug": "wluktv141-us-hd",
+    "title": "FOX 11 Green Bay WI (WLUK)",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Undefined",
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Fox_Networks_Group_US_logo.svg/960px-Fox_Networks_Group_US_logo.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Fox_Networks_Group_US_logo.svg/960px-Fox_Networks_Group_US_logo.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://linear-702.frequency.stream/dist/stirr/702/hls/master/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-kokhtv251-us-hd",
+    "slug": "kokhtv251-us-hd",
+    "title": "FOX 25 Oklahoma City OK (KOKH)",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "General",
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Fox_Networks_Group_US_logo.svg/960px-Fox_Networks_Group_US_logo.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Fox_Networks_Group_US_logo.svg/960px-Fox_Networks_Group_US_logo.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://linear-705.frequency.stream/dist/stirr/705/hls/master/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-kmphtv261-us-hd",
+    "slug": "kmphtv261-us-hd",
+    "title": "FOX 26 Visalia CA (KMPH)",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "General",
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Fox_Networks_Group_US_logo.svg/960px-Fox_Networks_Group_US_logo.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Fox_Networks_Group_US_logo.svg/960px-Fox_Networks_Group_US_logo.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://linear-711.frequency.stream/dist/stirr/711/hls/master/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-wbff451-us-hd",
+    "slug": "wbff451-us-hd",
+    "title": "FOX 45 Baltimore MD (WBFF)",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Undefined",
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Fox_Networks_Group_US_logo.svg/960px-Fox_Networks_Group_US_logo.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Fox_Networks_Group_US_logo.svg/960px-Fox_Networks_Group_US_logo.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://linear-688.frequency.stream/dist/stirr/688/hls/master/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-foxnewsradio-us-sd",
+    "slug": "foxnewsradio-us-sd",
+    "title": "Fox News Radio",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "News",
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://radio.foxnews.com/wp-content/uploads/2017/10/default_logo-150x150.png",
+    "backdrop": "https://radio.foxnews.com/wp-content/uploads/2017/10/default_logo-150x150.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://radiovid.foxnews.com/hls/live/661547/RADIOVID/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "curated-fox-weather",
+    "slug": "fox-weather",
+    "title": "FOX Weather",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us",
+      "world"
+    ],
+    "categories": [
+      "Weather",
+      "Fox",
+      "News",
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://247wlive.foxweather.com/stream/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "curated-accuweather-now",
+    "slug": "accuweather-now",
+    "title": "AccuWeather Now",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us",
+      "world"
+    ],
+    "categories": [
+      "Weather",
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-ue1-prod.tsv2.amagi.tv/linear/amg00684-accuweather-accuweather-plex/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-atglive-se-sd",
+    "slug": "atglive-se-sd",
+    "title": "ATG Live",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/bPWFXkL.png",
+    "backdrop": "https://i.imgur.com/bPWFXkL.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://kanal75xto-llhls.akamaized.net/live/Data/atg-kanal-15-02a-rr/HLS-Legacy-HL/atg-kanal-15-02a-rr.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-fueltv-pt-au",
+    "slug": "fueltv-pt-au",
+    "title": "Fuel TV",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/I8mviBy.png",
+    "backdrop": "https://i.imgur.com/I8mviBy.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg01074-fueltv-fueltvau-samsungau-g09kq.amagi.tv/playlist/amg01074-fueltv-fueltvau-samsungau/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-fueltv-pt-emea",
+    "slug": "fueltv-pt-emea",
+    "title": "FUEL TV",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/I8mviBy.png",
+    "backdrop": "https://i.imgur.com/I8mviBy.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg01074-fueltv-fueltvemeaen-rakuten-b6j62.amagi.tv/hls/amagi_hls_data_rakutenAA-fueltvemeaen/CDN/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-kcmnld426-us-sd",
+    "slug": "kcmnld426-us-sd",
+    "title": "KCMN-LD6",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/QVC_logo_2019.svg/960px-QVC_logo_2019.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/QVC_logo_2019.svg/960px-QVC_logo_2019.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg02873-kravemedia-mtrspt1-distrotv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-mtrspt1-us-hd",
+    "slug": "mtrspt1-us-hd",
+    "title": "MTRSPT1",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/Rb1H5cV.png",
+    "backdrop": "https://i.imgur.com/Rb1H5cV.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg02873-kravemedia-mtrspt1-distrotv-mnsrl.amagi.tv/playlist/amg02873-kravemedia-mtrspt1-distrotv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-racerinternational-pl-fast",
+    "slug": "racerinternational-pl-fast",
+    "title": "RACER International",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://provider-static.plex.tv/epg/cms/production/dd4e5871-4347-49e3-9ea1-a8770ea9c518/RACER_Intl_logo_1500x1000.png",
+    "backdrop": "https://provider-static.plex.tv/epg/cms/production/dd4e5871-4347-49e3-9ea1-a8770ea9c518/RACER_Intl_logo_1500x1000.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg00378-mavtv-amg00378c2-rakuten-us-1048.playouts.now.amagi.tv/playlist/amg00378-mavtvfast-motorsportsnetwork-rakutenus/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-rallytv-us-sd",
+    "slug": "rallytv-us-sd",
+    "title": "Rally TV",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.postimg.cc/WtLq2C7c/logo-Rally-Tv1.png",
+    "backdrop": "https://i.postimg.cc/WtLq2C7c/logo-Rally-Tv1.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rally-tv-live.akamaized.net/hls/live/2117704/RallyTV-Pri/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tycsports-ar-sd",
+    "slug": "tycsports-ar-sd",
+    "title": "TyC Sports",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/TyC_Sports_logo.svg/960px-TyC_Sports_logo.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/TyC_Sports_logo.svg/960px-TyC_Sports_logo.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg26268-amg26268c14-freelivesports-emea-10267.playouts.now.amagi.tv/ts-us-e2-n2/playlist/amg26268-sportsstudio-tycsports-freelivesportsemea/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-worldoffreesports-de-poland",
+    "slug": "worldoffreesports-de-poland",
+    "title": "World of Freesports",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/lta5Mog.png",
+    "backdrop": "https://i.imgur.com/lta5Mog.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/hls/amagi_hls_data_rakutenAA-mainstreammediafreesportsintl-rakuten/CDN/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-worldpokertour-us-uk",
+    "slug": "worldpokertour-us-uk",
+    "title": "World Poker Tour",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/98kLMjj.png",
+    "backdrop": "https://i.imgur.com/98kLMjj.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://amg00477-samsungelectron-worldpokertour-samsunguk-81igb.amagi.tv/playlist/amg00477-samsungelectron-worldpokertour-samsunguk/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-kbsi231-us-hd",
+    "slug": "kbsi231-us-hd",
+    "title": "FOX 23 Cape Girardeau MO (KBSI-DT1) (720p) [Not 24/7]",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "General",
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://static.wikia.nocookie.net/tvstations/images/8/8e/KBSIO6.png",
+    "backdrop": "https://static.wikia.nocookie.net/tvstations/images/8/8e/KBSIO6.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.field59.com/kbsi/kbsi1/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-kcpq131-us-hd",
+    "slug": "kcpq131-us-hd",
+    "title": "FOX 13 Seattle WA (KCPQ)",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "General",
+      "Sports",
+      "Healed",
+      "US",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/FOX_wordmark-red.svg/960px-FOX_wordmark-red.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/FOX_wordmark-red.svg/960px-FOX_wordmark-red.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://aegis-cloudfront-1.tubi.video/cc394198-7bde-43e8-b186-875bc0eb3037/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ktvu41-us-hd",
+    "slug": "ktvu41-us-hd",
+    "title": "FOX 2 San Francisco CA (KTVU)",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "General",
+      "Sports",
+      "Healed",
+      "US",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Fox_Networks_Group_US_logo.svg/960px-Fox_Networks_Group_US_logo.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Fox_Networks_Group_US_logo.svg/960px-Fox_Networks_Group_US_logo.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://aegis-cloudfront-1.tubi.video/8d9284ec-c451-4e51-a1d4-d16e5c8972af/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-fifaplus-uk-french",
+    "slug": "fifaplus-uk-french",
+    "title": "FIFA+ French",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-fifaplus-uk-german",
+    "slug": "fifaplus-uk-german",
+    "title": "FIFA+ German",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://4397879b.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWRlX0ZJRkFQbHVzR2VybWFuX0hMUw/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-fifaplus-uk-hispanicamerica",
+    "slug": "fifaplus-uk-hispanicamerica",
+    "title": "FIFA+ Hispanic America",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://6c849fb3.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/TEctbXhfRklGQVBsdXNTcGFuaXNoLTFfSExT/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-fifaplus-uk-italy",
+    "slug": "fifaplus-uk-italy",
+    "title": "FIFA+ Italy",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://5d95f7d7.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWl0X0ZJRkFQbHVzSXRhbGlhbl9ITFM/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-fifaplus-uk-portuguese",
+    "slug": "fifaplus-uk-portuguese",
+    "title": "FIFA+ Portuguese",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://e3be9ac5.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/TEctYnJfRklGQVBsdXNQb3J0dWd1ZXNlX0hMUw/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-fifaplus-uk-spain",
+    "slug": "fifaplus-uk-spain",
+    "title": "FIFA+ Spain",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d63fabad.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWVzX0ZJRkFQbHVzU3BhbmlzaF9ITFM/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-fifapluswomen-uk-english",
+    "slug": "fifapluswomen-uk-english",
+    "title": "FIFA+ Women",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/xy9ZxVO.png",
+    "backdrop": "https://i.imgur.com/xy9ZxVO.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://cffda8ff.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/U2Ftc3VuZy1nYl9GSUZBUGx1c3dvbWVuX0hMUw/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-redbulltv-at-eumena",
+    "slug": "redbulltv-at-eumena",
+    "title": "Red Bull TV",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Outdoor",
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "backdrop": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://3ea22335.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWdiX1JlZEJ1bGxUVl9ITFM/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-redbulltv-at-de",
+    "slug": "redbulltv-at-de",
+    "title": "Red Bull TV DE",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Outdoor",
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "backdrop": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://46cfeb23c7f74853bba7a256655a3119.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-582-WORBDACHDEFAST-WHALETVPLUS/582/whaletvplus/hls/master/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-redbulltv-at-es",
+    "slug": "redbulltv-at-es",
+    "title": "Red Bull TV ES",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Outdoor",
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "backdrop": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://886bd3fbc782459f8de7555d32d7e9ce.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-957-WORBLATAMESFAST-WHALETVPLUS/957/whaletvplus/hls/master/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-redbulltv-at-uk",
+    "slug": "redbulltv-at-uk",
+    "title": "Red Bull TV UK",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Outdoor",
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "backdrop": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://1a3566cb46914c5499fbc86fbc4ac87e.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-932-WORBUKENFAST-WHALETVPLUS/932/whaletvplus/hls/master/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-redbulltv-at-us",
+    "slug": "redbulltv-at-us",
+    "title": "Red Bull TV US",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Outdoor",
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "backdrop": "https://images.pluto.tv/channels/5e7cb84a172a0f0007da69e4/colorLogoPNG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://0b73ace69ebb45eaa249bb87837cb958.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-644-WORBUSENFAST-LG_US/644/lgtv/hls/master/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-accuweathernow-us-sd",
+    "slug": "accuweathernow-us-sd",
+    "title": "AccuWeather Now",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Weather",
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/M8wbVYK.png",
+    "backdrop": "https://i.imgur.com/M8wbVYK.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://cdn-ue1-prod.tsv2.amagi.tv/linear/amg00684-accuweather-accuweather-plex/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-africa24sport-fr-sd",
+    "slug": "africa24sport-fr-sd",
+    "title": "Africa 24 Sport",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "News",
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i0.wp.com/africa24tv.com/wp-content/uploads/2023/12/LOGO-AFRICASPORT-4-HD-sans-fond.png?fit=512%2C107&ssl=1",
+    "backdrop": "https://i0.wp.com/africa24tv.com/wp-content/uploads/2023/12/LOGO-AFRICASPORT-4-HD-sans-fond.png?fit=512%2C107&ssl=1",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://africa24.vedge.infomaniak.com/livecast/ik:africa24sport/manifest.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-as3sporttv-ve-sd",
+    "slug": "as3sporttv-ve-sd",
+    "title": "AS3 Sport TV",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.ibb.co/bRmGbsyV/A3-SPORTTV.jpg",
+    "backdrop": "https://i.ibb.co/bRmGbsyV/A3-SPORTTV.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://streamtv.as3sport.online:3394/hybrid/play.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-cricketgold-au-sd",
+    "slug": "cricketgold-au-sd",
+    "title": "Cricket Gold",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://resources.cricket-australia.pulselive.com/cricket-australia/photo/2025/07/25/836eddae-4329-4542-ad17-dcd37e9d951a/Cricket-Gold-1920x1080_noBG.png",
+    "backdrop": "https://resources.cricket-australia.pulselive.com/cricket-australia/photo/2025/07/25/836eddae-4329-4542-ad17-dcd37e9d951a/Cricket-Gold-1920x1080_noBG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://streams2.sofast.tv/ptnr-yupptv/title-cricketgold/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/b2048bb8-1686-4432-aa50-647245383e0c/manifest.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-equidia-fr-sd",
+    "slug": "equidia-fr-sd",
+    "title": "Equidia",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/QPpbRcZ.png",
+    "backdrop": "https://i.imgur.com/QPpbRcZ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/equidia/live2.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-fastfunbox-nl-sd",
+    "slug": "fastfunbox-nl-sd",
+    "title": "Fast&FunBox",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/a9ZtP17.png",
+    "backdrop": "https://i.imgur.com/a9ZtP17.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dash3.antik.sk/live/test_fast_and_funbox_medium_atk/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ftfsports-us-sd",
+    "slug": "ftfsports-us-sd",
+    "title": "FTF Sports",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/yvUjOI3.png",
+    "backdrop": "https://i.imgur.com/yvUjOI3.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://1657061170.rsc.cdn77.org/HLS/FTF-LINEAR.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-futbol-tj-sd",
+    "slug": "futbol-tj-sd",
+    "title": "Futbol",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/RngmCDn.png",
+    "backdrop": "https://i.imgur.com/RngmCDn.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.teleradiocom.tj/8/3m.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-gameplus-ca-sd",
+    "slug": "gameplus-ca-sd",
+    "title": "Game+",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/Lj69WbR.png",
+    "backdrop": "https://i.imgur.com/Lj69WbR.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://a-cdn.klowdtv.com/live2/fntsy_720p/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-golfchannel-cz-sd",
+    "slug": "golfchannel-cz-sd",
+    "title": "Golf Channel",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://www.sms.cz/kategorie/televize/bmp/loga/velka/golfchannel.png",
+    "backdrop": "https://www.sms.cz/kategorie/televize/bmp/loga/velka/golfchannel.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://dash4.antik.sk/live/test_golf_channel/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-horsetv-it-sd",
+    "slug": "horsetv-it-sd",
+    "title": "Horse TV",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/nK4UUX4.png",
+    "backdrop": "https://i.imgur.com/nK4UUX4.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://a-cdn.klowdtv.com/live2/horsetv_720p/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ktvsport-kw-sd",
+    "slug": "ktvsport-kw-sd",
+    "title": "KTV Sport",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/R1hGX1d.png",
+    "backdrop": "https://i.imgur.com/R1hGX1d.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://kwtspta.cdn.mangomolo.com/sp/smil:sp.stream.smil/chunklist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-lacrossetv-us-sd",
+    "slug": "lacrossetv-us-sd",
+    "title": "Lacrosse TV",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://yt3.googleusercontent.com/ytc/AIdro_m_xSJFydxZ9QBU-85OuchjmzS0Bo0_Tukmk7to8hBfyl8=s512-c-k-c0x00ffffff-no-rj",
+    "backdrop": "https://yt3.googleusercontent.com/ytc/AIdro_m_xSJFydxZ9QBU-85OuchjmzS0Bo0_Tukmk7to8hBfyl8=s512-c-k-c0x00ffffff-no-rj",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://a-cdn.klowdtv.com/live2/lsn_720p/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-madeinbotv-it-sd",
+    "slug": "madeinbotv-it-sd",
+    "title": "MadeinBO TV",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/47X44DD.png",
+    "backdrop": "https://i.imgur.com/47X44DD.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://srvx1.selftv.video/dmchannel/live/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-midpenmediacenterchannel28-us-sd",
+    "slug": "midpenmediacenterchannel28-us-sd",
+    "title": "Midpen Media Center Youth Education and Sports Channel 28",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Education",
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/RPJiolQ.png",
+    "backdrop": "https://i.imgur.com/RPJiolQ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://5c2974786200d.streamlock.net/live-chan28/ngrp:ch28_all/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-mnbsport-mn-sd",
+    "slug": "mnbsport-mn-sd",
+    "title": "MNB Sport",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/z854PC3.png",
+    "backdrop": "https://i.imgur.com/z854PC3.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live.mnb.mn/hls/mnb_sport.stream.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-monterricotv-pe-sd",
+    "slug": "monterricotv-pe-sd",
+    "title": "Monterrico TV",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/SuVO9T7.png",
+    "backdrop": "https://i.imgur.com/SuVO9T7.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://h.jcp.live.opencaster.com/play_src/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-morethansportstv-de-sd",
+    "slug": "morethansportstv-de-sd",
+    "title": "More Than Sports TV",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/SLrjImc.png",
+    "backdrop": "https://i.imgur.com/SLrjImc.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://mts1.iptv-playoutcenter.de/mts/mts-web/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-nauticalchannel-it-sd",
+    "slug": "nauticalchannel-it-sd",
+    "title": "Nautical Channel",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/2ByDyzL.png",
+    "backdrop": "https://i.imgur.com/2ByDyzL.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://a-cdn.klowdtv.com/live2/nautical_720p/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-persianafight-fr-hd",
+    "slug": "persianafight-fr-hd",
+    "title": "Persiana Fight",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://fighthls.persiana.live/hls/stream.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-pksports-pk-sd",
+    "slug": "pksports-pk-sd",
+    "title": "PK Sports",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://raw.githubusercontent.com/songwenhui239/Songwenhui239/refs/heads/main/PK%20Sports.jpeg",
+    "backdrop": "https://raw.githubusercontent.com/songwenhui239/Songwenhui239/refs/heads/main/PK%20Sports.jpeg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://lbgo.bozztv.com/ssh101/ssh101/pksportshd/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-skyracing1-au-sd",
+    "slug": "skyracing1-au-sd",
+    "title": "Sky Racing 1",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/Hf0EiaW.png",
+    "backdrop": "https://i.imgur.com/Hf0EiaW.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://636ffd31f0e12.streamlock.net/RacingStream1/RacingStream1/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-skyracing2-au-sd",
+    "slug": "skyracing2-au-sd",
+    "title": "Sky Racing 2",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/TxQvFnQ.png",
+    "backdrop": "https://i.imgur.com/TxQvFnQ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://636ffd31f0e12.streamlock.net/RacingStream2/RacingStream2/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-soskanalplus-rs-sd",
+    "slug": "soskanalplus-rs-sd",
+    "title": "SOS Kanal Plus",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/9SD40uH.png",
+    "backdrop": "https://i.imgur.com/9SD40uH.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://53be5ef2d13aa.streamlock.net/soskanalplus/soskanalplus.stream/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-sportitalia-it-sd",
+    "slug": "sportitalia-it-sd",
+    "title": "Sportitalia",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/0CJGGgd.png",
+    "backdrop": "https://i.imgur.com/0CJGGgd.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://edge-001.streamup.eu/sportitalia/sihd_abr/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-sportivnyy-ru-sd",
+    "slug": "sportivnyy-ru-sd",
+    "title": "Sportivnyy",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/ujS6mMo.png",
+    "backdrop": "https://i.imgur.com/ujS6mMo.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://live-3.otcnet.ru/sportivny/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-accdigitalnetwork-us-sd",
+    "slug": "accdigitalnetwork-us-sd",
+    "title": "ACCDN",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/V6Kaqha.png",
+    "backdrop": "https://i.imgur.com/V6Kaqha.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://raycom-accdn-firetv.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-cazetv-br-sd",
+    "slug": "cazetv-br-sd",
+    "title": "CazeTV (1080i)",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/en/thumb/6/64/Caz%C3%A9TV_logo.svg/1280px-Caz%C3%A9TV_logo.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/en/thumb/6/64/Caz%C3%A9TV_logo.svg/1280px-Caz%C3%A9TV_logo.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://dfr80qz435crc.cloudfront.net/MNOP/Amagi/Caze/Caze_TV_BR/Caze_TV.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ddsports-in-sd",
+    "slug": "ddsports-in-sd",
+    "title": "DD Sports SD",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://dtil.tmsimg.com/assets/s158255_ld_h15_aa.png?lock=720x540",
+    "backdrop": "https://dtil.tmsimg.com/assets/s158255_ld_h15_aa.png?lock=720x540",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/b17adfe543354fdd8d189b110617cddd/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-flohockey-us-hd",
+    "slug": "flohockey-us-hd",
+    "title": "FloHockey 24/7",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.fubo.tv/channel-config-ui/station-logos/on-dark/flohockey-white.png",
+    "backdrop": "https://images.fubo.tv/channel-config-ui/station-logos/on-dark/flohockey-white.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://amg02278-amg02278c2-flosports-worldwide-9916.playouts.now.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-floracing-us-hd",
+    "slug": "floracing-us-hd",
+    "title": "FloRacing 24/7",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.fubo.tv/channel-config-ui/station-logos/on-dark/floracing-white.png",
+    "backdrop": "https://images.fubo.tv/channel-config-ui/station-logos/on-dark/floracing-white.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://amg02278-amg02278c1-flosports-worldwide-7592.playouts.now.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-introuble-nl-sd",
+    "slug": "introuble-nl-sd",
+    "title": "INTROUBLE",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Auto",
+      "Outdoor",
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/a40chFI.png",
+    "backdrop": "https://i.imgur.com/a40chFI.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://amg00861-amg00861c6-stirr-us-8229.playouts.now.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-nbcsportsnow-us-sd",
+    "slug": "nbcsportsnow-us-sd",
+    "title": "NBC Sports NOW",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/EzNf2Yx.png",
+    "backdrop": "https://i.imgur.com/EzNf2Yx.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d4whmvwm0rdvi.cloudfront.net/10007/99993008/hls/master.m3u8?ads.xumo_channelId=99993008",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-nhlnetwork-us-sd",
+    "slug": "nhlnetwork-us-sd",
+    "title": "NHL Network",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/UNZ8bef.png",
+    "backdrop": "https://i.imgur.com/UNZ8bef.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://nhl-firetv.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-pac12insider-us-sd",
+    "slug": "pac12insider-us-sd",
+    "title": "Pac 12 Insider",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/736QREy.png",
+    "backdrop": "https://i.imgur.com/736QREy.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://pac12-firetv.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-pgatour-us-sd",
+    "slug": "pgatour-us-sd",
+    "title": "PGA Tour",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/J0TY9dG.png",
+    "backdrop": "https://i.imgur.com/J0TY9dG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d11k1mnrgfposz.cloudfront.net/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-racerselect-us-sd",
+    "slug": "racerselect-us-sd",
+    "title": "Racer Select",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/CurtYvn.png",
+    "backdrop": "https://i.imgur.com/CurtYvn.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://amg00378-amg00378c4-freelivesports-emea-5637.playouts.now.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tracesportstars-fr-hd",
+    "slug": "tracesportstars-fr-hd",
+    "title": "Trace Sport Stars (Australia)",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/FabFP5A.png",
+    "backdrop": "https://i.imgur.com/FabFP5A.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-womenssportsnetwork-us-sd",
+    "slug": "womenssportsnetwork-us-sd",
+    "title": "Women's Sports Network",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Undefined",
+      "Sports",
+      "Healed",
+      "US",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/rhIwUcQ.png",
+    "backdrop": "https://i.imgur.com/rhIwUcQ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d39accvx65hq9o.cloudfront.net/Womens_Sports_Network.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-worldoffreesports-de-sd",
+    "slug": "worldoffreesports-de-sd",
+    "title": "World of Freesports",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/lta5Mog.png",
+    "backdrop": "https://i.imgur.com/lta5Mog.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-worldpokertour-us-poland",
+    "slug": "worldpokertour-us-poland",
+    "title": "World Poker Tour",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/98kLMjj.png",
+    "backdrop": "https://i.imgur.com/98kLMjj.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d39g1vxj2ef6in.cloudfront.net/v1/master/3fec3e5cac39a52b2132f9c66c83dae043dc17d4/prod-rakuten-stitched/playlist.m3u8?ads.xumo_channelId=88883102",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-wmurtv91-us-hd",
+    "slug": "wmurtv91-us-hd",
+    "title": "ABC 9 Manchester NH (WMUR-TV)",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "News",
+      "Weather",
+      "Sports",
+      "Healed",
+      "US",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/en/7/72/WMURCurrentLogo.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/en/7/72/WMURCurrentLogo.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://aegis-cloudfront-1.tubi.video/b77ffe96-c5d1-43a7-8687-306ff244d725/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-weathernation-us-sd",
+    "slug": "weathernation-us-sd",
+    "title": "WeatherNation",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Weather",
+      "Sports",
+      "Healed",
+      "US",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/WeatherNation_Logo.svg/960px-WeatherNation_Logo.svg.png",
+    "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/WeatherNation_Logo.svg/960px-WeatherNation_Logo.svg.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d2ferbiwcx1539.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-8zd06wicndthf-ssai-prd/WNNationalSamsung/WNNationalSamsung.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-weatherspy-us-sd",
+    "slug": "weatherspy-us-sd",
+    "title": "WeatherSpy",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Weather",
+      "Sports",
+      "Healed",
+      "US",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/yHUUIIz.png",
+    "backdrop": "https://i.imgur.com/yHUUIIz.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://d12gab6t5iutxf.cloudfront.net/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-aspor-tr-sd",
+    "slug": "aspor-tr-sd",
+    "title": "A Spor",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/ZhkZzLf.png",
+    "backdrop": "https://i.imgur.com/ZhkZzLf.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://rnttwmjcin.turknet.ercdn.net/lcpmvefbyo/aspor/aspor.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-adotv-bj-sd",
+    "slug": "adotv-bj-sd",
+    "title": "ADO TV",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Kids",
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/pxFamLr.png",
+    "backdrop": "https://i.imgur.com/pxFamLr.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://strhls.streamakaci.tv/ortb/ortb2-multi/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-alkassfour-qa-sd",
+    "slug": "alkassfour-qa-sd",
+    "title": "Alkass Four",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/iDL65Wu.png",
+    "backdrop": "https://i.imgur.com/iDL65Wu.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-alkassone-qa-sd",
+    "slug": "alkassone-qa-sd",
+    "title": "Alkass One",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/10mmlha.png",
+    "backdrop": "https://i.imgur.com/10mmlha.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-alkassshoof-qa-sd",
+    "slug": "alkassshoof-qa-sd",
+    "title": "Alkass SHOOF",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://shoof.alkass.net/assets/images/shoof.png",
+    "backdrop": "https://shoof.alkass.net/assets/images/shoof.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://liveeu-gcp.alkassdigital.net/shooflive/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-alkassshoof2-qa-sd",
+    "slug": "alkassshoof2-qa-sd",
+    "title": "Alkass SHOOF 2",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://shoof.alkass.net/assets/images/shoof2.png",
+    "backdrop": "https://shoof.alkass.net/assets/images/shoof2.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://liveeu-gcp.alkassdigital.net/shooflive2/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-alkasssix-qa-sd",
+    "slug": "alkasssix-qa-sd",
+    "title": "Alkass Six",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/CrPSPSC.png",
+    "backdrop": "https://i.imgur.com/CrPSPSC.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://liveeu-gcp.alkassdigital.net/alkass6-p/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-alkassthree-qa-sd",
+    "slug": "alkassthree-qa-sd",
+    "title": "Alkass Three",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/d57BdFh.png",
+    "backdrop": "https://i.imgur.com/d57BdFh.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-alkasstwo-qa-sd",
+    "slug": "alkasstwo-qa-sd",
+    "title": "Alkass Two",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/8w61kFX.png",
+    "backdrop": "https://i.imgur.com/8w61kFX.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-arryadia-ma-hd",
+    "slug": "arryadia-ma-hd",
+    "title": "Arryadia",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/XjzK3gZ.png",
+    "backdrop": "https://i.imgur.com/XjzK3gZ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream-lb.livemediama.com/arryadia/hls/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-arryadiahd1-ma-hd",
+    "slug": "arryadiahd1-ma-hd",
+    "title": "Arryadia HD 1",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.ibb.co/fYNx6Fk1/image-removebg-preview-1.png",
+    "backdrop": "https://i.ibb.co/fYNx6Fk1/image-removebg-preview-1.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream-lb.livemediama.com/arryadia-hd-01/hls/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-arryadiahd2-ma-hd",
+    "slug": "arryadiahd2-ma-hd",
+    "title": "Arryadia HD 2",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.ibb.co/jPFCVFNS/image-removebg-preview-3.png",
+    "backdrop": "https://i.ibb.co/jPFCVFNS/image-removebg-preview-3.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream-lb.livemediama.com/arryadia-hd-02/hls/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-arryadiahd3-ma-hd",
+    "slug": "arryadiahd3-ma-hd",
+    "title": "Arryadia HD 3",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.ibb.co/mCnJzvvB/image-removebg-preview-4.png",
+    "backdrop": "https://i.ibb.co/mCnJzvvB/image-removebg-preview-4.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream-lb.livemediama.com/arryadia-hd-03/hls/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-arryadia-ma-hdtnt",
+    "slug": "arryadia-ma-hdtnt",
+    "title": "Arryadia HD TNT",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/XjzK3gZ.png",
+    "backdrop": "https://i.imgur.com/XjzK3gZ.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream-lb.livemediama.com/arryadia-tnt/hls/master.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-beksports-us-west",
+    "slug": "beksports-us-west",
+    "title": "BEK TV Sports West",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/1l3t5jd.png",
+    "backdrop": "https://i.imgur.com/1l3t5jd.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://cdn3.wowza.com/5/ZWQ1K2NYTmpFbGsr/BEK-WOWZA-1/smil:BEKPRIMEW.smil/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-crtv-cl-sd",
+    "slug": "crtv-cl-sd",
+    "title": "CRTV",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i2.paste.pics/bf68b159547597c39574aec9dd7c626a.png",
+    "backdrop": "https://i2.paste.pics/bf68b159547597c39574aec9dd7c626a.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stmv2.voxtvhd.com.br/crtvchile/crtvchile/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-glorykickboxing-us-poland",
+    "slug": "glorykickboxing-us-poland",
+    "title": "GLORY Kickboxing",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/tS7Ub7i.png",
+    "backdrop": "https://i.imgur.com/tS7Ub7i.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://6f972d29.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X0dsb3J5S2lja2JveGluZ19ITFM/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-htsportv-tr-sd",
+    "slug": "htsportv-tr-sd",
+    "title": "HTSpor TV",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://www.htspor.com/images/manifest/social-share-logo.png",
+    "backdrop": "https://www.htspor.com/images/manifest/social-share-logo.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://ciner.daioncdn.net/ht-spor/ht-spor.m3u8?app=web",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-itvdeportes-mx-sd",
+    "slug": "itvdeportes-mx-sd",
+    "title": "ITV Deportes",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Entertainment",
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://iili.io/J1kV1Bn.png",
+    "backdrop": "https://iili.io/J1kV1Bn.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://thm-it-roku.otteravision.com/thm/it/it.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-realitateasportiva-ro-sd",
+    "slug": "realitateasportiva-ro-sd",
+    "title": "Realitatea Sportiva",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/BaEyZto.png",
+    "backdrop": "https://i.imgur.com/BaEyZto.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream.realitatea.net/realitatea/sportiva_md/ts:playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-slopestv-us-sd",
+    "slug": "slopestv-us-sd",
+    "title": "Slopes TV",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/8bzAfgK.png",
+    "backdrop": "https://i.imgur.com/8bzAfgK.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream-us-east-1.getpublica.com/playlist.m3u8?network_id=2241",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-ktvsportplus-kw-sd",
+    "slug": "ktvsportplus-kw-sd",
+    "title": "KTV Sport Plus",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/l4oX0gf.png",
+    "backdrop": "https://i.imgur.com/l4oX0gf.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://kwtsplta.cdn.mangomolo.com/spl/smil:spl.stream.smil/chunklist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tvsbowlingnetwork-us-sd",
+    "slug": "tvsbowlingnetwork-us-sd",
+    "title": "TVS Bowling Network",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://www.watchyour.tv/channels/logo/tvs-bowling-network.jpg",
+    "backdrop": "https://www.watchyour.tv/channels/logo/tvs-bowling-network.jpg",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-tvsbowling/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tvsboxing-us-sd",
+    "slug": "tvsboxing-us-sd",
+    "title": "TVS Boxing",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "world"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/30ZoF75.png",
+    "backdrop": "https://i.imgur.com/30ZoF75.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-tvsboxing/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tvsclassicsports-us-sd",
+    "slug": "tvsclassicsports-us-sd",
+    "title": "TVS Classic Sports",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/auR0Mi6.png",
+    "backdrop": "https://i.imgur.com/auR0Mi6.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-tvs/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tvssportsbureau-us-sd",
+    "slug": "tvssportsbureau-us-sd",
+    "title": "TVS Sports Bureau",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=600&q=80",
+    "backdrop": "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=2400&q=80",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-tvssportsbureau/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tvsturbo-us-sd",
+    "slug": "tvsturbo-us-sd",
+    "title": "TVS Turbo",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/7zYIbU1.png",
+    "backdrop": "https://i.imgur.com/7zYIbU1.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-tvsturbo/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tvswomensports-us-sd",
+    "slug": "tvswomensports-us-sd",
+    "title": "TVS Women Sports",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/8hC4PfF.png",
+    "backdrop": "https://i.imgur.com/8hC4PfF.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-tvswsn/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-tvssports-us-sd",
+    "slug": "tvssports-us-sd",
+    "title": "TVS Sports (720p) [Not 24/7]",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/Lwwq62E.png",
+    "backdrop": "https://i.imgur.com/Lwwq62E.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://rpn.bozztv.com/gusa/gusa-tvssports/index.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-alabamaweathernetwork-us-sd",
+    "slug": "alabamaweathernetwork-us-sd",
+    "title": "Alabama Weather Network",
+    "type": "live",
+    "description": "Sports · direct Playable (CORS*)",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Weather",
+      "Sports",
+      "Healed",
+      "US",
+      "Playable",
+      "Verified",
+      "Popular"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://alabamaweathernetwork.com/wp-content/uploads/2025/07/bpt2ej6u.png",
+    "backdrop": "https://alabamaweathernetwork.com/wp-content/uploads/2025/07/bpt2ej6u.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://alwxnet-ott-proxy.cloud9streaming.com/alwxnet/live/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-swervesports-us-sd",
+    "slug": "swervesports-us-sd",
+    "title": "Swerve Combat",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "US",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/GT0Yi2T.png",
+    "backdrop": "https://i.imgur.com/GT0Yi2T.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "id": "iptv-xfctv-us-sd",
+    "slug": "xfctv-us-sd",
+    "title": "XFC TV",
+    "type": "live",
+    "description": "Sports · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Sports",
+      "Healed",
+      "US",
+      "ProxyOk",
+      "Verified"
+    ],
+    "languages": [
+      "en"
+    ],
+    "poster": "https://i.imgur.com/LcfzmG0.png",
+    "backdrop": "https://i.imgur.com/LcfzmG0.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": false,
+    "sources": [
+      {
+        "url": "https://stream-us-east-1.getpublica.com/playlist.m3u8?network_id=2247",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 10
+      }
+    ]
+  }
+]
