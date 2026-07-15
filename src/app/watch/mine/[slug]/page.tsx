@@ -5,7 +5,6 @@ import { WatchBackButton } from "@/components/WatchBackButton";
 import { createClient } from "@/lib/supabase/server";
 import {
   channelRowToCatalog,
-  mineWatchHref,
   type UserPlaylistChannelRow,
 } from "@/lib/playlists";
 import { getAccountEntitlement } from "@/lib/membership/account";
@@ -36,16 +35,43 @@ export default async function WatchMinePage({ params }: Props) {
 
   if (!row) notFound();
 
-  const item = channelRowToCatalog(row as UserPlaylistChannelRow);
+  const [{ data: mirrorRows }, { data: relatedRows }] = await Promise.all([
+    supabase
+      .from("user_playlist_channels")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("playlist_id", row.playlist_id)
+      .eq("title", row.title)
+      .neq("id", slug)
+      .order("sort_order", { ascending: true })
+      .limit(12),
+    supabase
+      .from("user_playlist_channels")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("playlist_id", row.playlist_id)
+      .neq("id", slug)
+      .order("sort_order", { ascending: true })
+      .limit(24),
+  ]);
 
-  const { data: relatedRows } = await supabase
-    .from("user_playlist_channels")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq("playlist_id", row.playlist_id)
-    .neq("id", slug)
-    .order("sort_order", { ascending: true })
-    .limit(24);
+  const primaryItem = channelRowToCatalog(row as UserPlaylistChannelRow);
+  const seenSources = new Set<string>();
+  const item = {
+    ...primaryItem,
+    sources: [
+      primaryItem,
+      ...(mirrorRows || []).map((mirror) =>
+        channelRowToCatalog(mirror as UserPlaylistChannelRow),
+      ),
+    ]
+      .flatMap((candidate) => candidate.sources)
+      .filter((source) => {
+        if (seenSources.has(source.url)) return false;
+        seenSources.add(source.url);
+        return true;
+      }),
+  };
 
   const related = (relatedRows || []).map((r) =>
     channelRowToCatalog(r as UserPlaylistChannelRow),
@@ -97,7 +123,7 @@ export default async function WatchMinePage({ params }: Props) {
             items={related}
             limit={24}
             viewMoreHref="/playlists"
-            hrefForItem={(ch) => mineWatchHref(ch.id.replace(/^user-/, ""))}
+            hrefPrefix="/watch/mine/"
           />
         </div>
       )}

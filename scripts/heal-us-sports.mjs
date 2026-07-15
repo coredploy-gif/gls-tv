@@ -479,7 +479,7 @@ async function main() {
   fs.writeFileSync(prevPath, JSON.stringify(merged, null, 2));
   console.log(`Wrote playable-sports.json: ${merged.length}`);
 
-  // Overrides: search Fox Sports / ESPN / TSN → open FAST destinations
+  // Overrides: map only distinct open FAST destinations.
   const overridesPath = path.join(outDir, "channel-overrides.json");
   const overrides = fs.existsSync(overridesPath)
     ? JSON.parse(fs.readFileSync(overridesPath, "utf8"))
@@ -497,7 +497,6 @@ async function main() {
   };
 
   const ocho = healed.find((h) => /ocho/i.test(h.slug) || /ocho/i.test(h.title));
-  const liveFox = healed.find((h) => /livenow|live.?now/i.test(h.slug + h.title));
   const foxWx = healed.find((h) => /fox-weather|fox weather/i.test(h.slug + h.title));
   const xtra = healed.find((h) => /bein/i.test(h.slug));
 
@@ -517,29 +516,6 @@ async function main() {
       ["Sports", "ESPN", "Playable", "Verified", "Healed"],
     );
   }
-  if (liveFox) {
-    mapAlias(
-      "fox-sports",
-      "LiveNOW from FOX (free)",
-      liveFox.sources[0].url,
-      "FS1/FS2 pay linear not listed — Fox free LiveNOW FAST.",
-      ["Sports", "Fox", "News", "Playable", "Verified", "Healed"],
-    );
-    mapAlias(
-      "foxsports-us-sd",
-      "LiveNOW from FOX (free)",
-      liveFox.sources[0].url,
-      "Pirate Fox Sports IP streams removed — LiveNOW FAST.",
-      ["Sports", "Fox", "Playable", "Verified", "Healed"],
-    );
-    mapAlias(
-      "foxsports1-us-sd",
-      "LiveNOW from FOX (free)",
-      liveFox.sources[0].url,
-      "FS1 pay not open — LiveNOW FAST.",
-      ["Sports", "Fox", "Playable", "Verified", "Healed"],
-    );
-  }
   if (foxWx) {
     mapAlias(
       "fox-weather",
@@ -549,10 +525,21 @@ async function main() {
       ["Weather", "Fox", "Playable", "Verified", "Healed"],
     );
   }
-  // TSN 1–5 slots are owned by src/data/user-stream-seeds.json — do not remap.
   for (const n of [1, 2, 3, 4, 5]) {
     delete overrides[`tsn${n}`];
     delete overrides[`tsn${n}-ca-sd`];
+  }
+  for (const slug of [
+    "fox-sports",
+    "fox-sports-1",
+    "fox-sports-2",
+    "foxsports-us-sd",
+    "foxsports1-us-sd",
+    "foxsports1-us-hd",
+    "foxsports2-ar-sd",
+    "foxsports3-ar-sd",
+  ]) {
+    delete overrides[slug];
   }
   if (xtra) {
     mapAlias(

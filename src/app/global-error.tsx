@@ -13,7 +13,7 @@ export default function GlobalError({
           <div>
             <title>GLS TV unavailable</title>
             <h1>GLS TV could not load</h1>
-            <p>Please retry. If a payment was in progress, check Billing before repeating it.</p>
+            <p>Please try again in a moment.</p>
             <button onClick={unstable_retry} style={{ padding: "10px 18px", cursor: "pointer" }}>Try again</button>
           </div>
         </main>

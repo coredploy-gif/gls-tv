@@ -10,6 +10,7 @@ import {
 import { writeAuditLog } from "@/lib/admin/audit";
 import { validatePublicUrl } from "@/lib/secure-url";
 import { isAllowedMediaHost } from "@/lib/media-hosts";
+import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
 
 async function requireEadmin() {
   const supabase = await createClient();
@@ -47,7 +48,11 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ seeds: (data ?? []) as StreamSeedRow[] });
+  return NextResponse.json({
+    seeds: ((data ?? []) as StreamSeedRow[]).filter(
+      (row) => !isExcludedBuiltinChannel(row.slug, row.title),
+    ),
+  });
 }
 
 type UpsertBody = {
@@ -82,6 +87,12 @@ export async function PUT(req: Request) {
     if (!slug || !title) {
       return NextResponse.json(
         { error: "Each seed needs slug + title" },
+        { status: 400 },
+      );
+    }
+    if (isExcludedBuiltinChannel(slug, title)) {
+      return NextResponse.json(
+        { error: `Built-in seed is not permitted for ${slug}` },
         { status: 400 },
       );
     }

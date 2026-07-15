@@ -15,41 +15,6 @@ const country = (c) => `https://iptv-org.github.io/iptv/countries/${c}.m3u`;
 
 const TARGETS = [
   {
-    slug: "tsn1-ca-sd",
-    title: "TSN 1",
-    match: [/^tsn\s*1\b/i, /^tsn1\b/i],
-    categories: ["Sports", "TSN", "Canada", "Popular", "UserSeed"],
-    countries: ["ca", "world"],
-  },
-  {
-    slug: "tsn2-ca-sd",
-    title: "TSN 2",
-    match: [/^tsn\s*2\b/i, /^tsn2\b/i],
-    categories: ["Sports", "TSN", "Canada", "Popular", "UserSeed"],
-    countries: ["ca", "world"],
-  },
-  {
-    slug: "tsn3-ca-sd",
-    title: "TSN 3",
-    match: [/^tsn\s*3\b/i, /^tsn3\b/i],
-    categories: ["Sports", "TSN", "Canada", "Popular", "UserSeed"],
-    countries: ["ca", "world"],
-  },
-  {
-    slug: "tsn4-ca-sd",
-    title: "TSN 4",
-    match: [/^tsn\s*4\b/i, /^tsn4\b/i],
-    categories: ["Sports", "TSN", "Canada", "Popular", "UserSeed"],
-    countries: ["ca", "world"],
-  },
-  {
-    slug: "tsn5-ca-sd",
-    title: "TSN 5",
-    match: [/^tsn\s*5\b/i, /^tsn5\b/i],
-    categories: ["Sports", "TSN", "Canada", "Popular", "UserSeed"],
-    countries: ["ca", "world"],
-  },
-  {
     slug: "sabc-1",
     title: "SABC 1",
     match: [/^sabc\s*1\b/i],
@@ -76,20 +41,6 @@ const TARGETS = [
     match: [/^sabc\s*news/i],
     categories: ["News", "Africa", "Popular", "UserSeed"],
     countries: ["za", "world"],
-  },
-  {
-    slug: "fox-sports-1",
-    title: "Fox Sports 1",
-    match: [/^fox\s*sports\s*1\b/i, /^fs1\b/i],
-    categories: ["Sports", "Fox", "Popular", "UserSeed"],
-    countries: ["us", "world"],
-  },
-  {
-    slug: "fox-sports-2",
-    title: "Fox Sports 2",
-    match: [/^fox\s*sports\s*2\b/i, /^fs2\b/i],
-    categories: ["Sports", "Fox", "Popular", "UserSeed"],
-    countries: ["us", "world"],
   },
   {
     slug: "zbc-tv",
@@ -200,11 +151,8 @@ if (useIndex) {
   matches = extract(text);
 } else {
   const feeds = [
-    country("ca"),
     country("za"),
-    country("us"),
     country("zw"),
-    "https://iptv-org.github.io/iptv/categories/sports.m3u",
   ];
   const texts = await Promise.all(feeds.map(fetchText));
   const map = new Map();

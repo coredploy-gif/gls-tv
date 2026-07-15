@@ -1,6 +1,7 @@
 import type { CatalogItem } from "@/data/types";
 import { createClient } from "@supabase/supabase-js";
 import { isArenaPayLinear } from "@/lib/channel-heal";
+import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
 
 function anon() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -33,6 +34,7 @@ type DbChannel = {
 };
 
 export function catalogFromDbChannel(ch: DbChannel): CatalogItem | null {
+  if (isExcludedBuiltinChannel(ch.slug, ch.title)) return null;
   const url = (ch.active_source_url || ch.source_url || "").trim();
   const cats = ch.categories || ["General"];
   const linearPay =

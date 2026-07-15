@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { AuthPanel } from "@/components/AuthPanel";
 import { TitleCard } from "@/components/TitleCard";
 import { useAuth } from "@/lib/auth/AuthProvider";
@@ -67,6 +74,10 @@ export function PlaylistManager() {
   const [listLoading, setListLoading] = useState(false);
   const [entitled, setEntitled] = useState(false);
   const [hasMoreChannels, setHasMoreChannels] = useState(false);
+  const [channelSearch, setChannelSearch] = useState("");
+  const [visibleByGroup, setVisibleByGroup] = useState<Record<string, number>>(
+    {},
+  );
   const [operationStatus, setOperationStatus] = useState<
     "idle" | "queued" | "fetching" | "parsing" | "applying" | "ready" | "error"
   >("idle");
@@ -82,12 +93,28 @@ export function PlaylistManager() {
     }
     setListLoading(true);
     try {
-      const res = await fetch("/api/playlists", { cache: "no-store" });
+      const batchSize = 1000;
+      const res = await fetch(`/api/playlists?limit=${batchSize}`, {
+        cache: "no-store",
+      });
       const data = await readResponse(res);
+      const allChannels = [...(data.channels || [])];
+      let hasMore = data.page?.hasMore === true;
+      while (hasMore && allChannels.length < 5000) {
+        const nextRes = await fetch(
+          `/api/playlists?offset=${allChannels.length}&limit=${batchSize}`,
+          { cache: "no-store" },
+        );
+        const nextData = await readResponse(nextRes);
+        const nextChannels = nextData.channels || [];
+        allChannels.push(...nextChannels);
+        hasMore =
+          nextData.page?.hasMore === true && nextChannels.length > 0;
+      }
       setPlaylists(data.playlists || []);
-      setChannels(data.channels || []);
+      setChannels(allChannels);
       setEntitled(data.entitled === true);
-      setHasMoreChannels(data.page?.hasMore === true);
+      setHasMoreChannels(hasMore);
     } catch {
       setError("We couldn’t load your playlists right now. Please refresh and try again.");
     } finally {
@@ -116,10 +143,26 @@ export function PlaylistManager() {
     queueMicrotask(() => void load());
   }, [load]);
 
+  const deferredChannelSearch = useDeferredValue(channelSearch);
+
   const visibleChannels = useMemo(() => {
-    if (activePlaylistId === "all") return channels;
-    return channels.filter((c) => c.playlist_id === activePlaylistId);
-  }, [channels, activePlaylistId]);
+    const query = deferredChannelSearch.trim().toLocaleLowerCase();
+    return channels.filter((channel) => {
+      if (
+        activePlaylistId !== "all" &&
+        channel.playlist_id !== activePlaylistId
+      ) {
+        return false;
+      }
+      if (!query) return true;
+      return [
+        channel.title,
+        channel.tvg_id || "",
+        ...(channel.categories || []),
+        ...(channel.countries || []),
+      ].some((value) => value.toLocaleLowerCase().includes(query));
+    });
+  }, [channels, activePlaylistId, deferredChannelSearch]);
 
   const catalogItems = useMemo(
     () => visibleChannels.map(channelRowToCatalog),
@@ -388,32 +431,44 @@ export function PlaylistManager() {
           )}
 
           {playlists.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setActivePlaylistId("all")}
-                className={`rounded px-3 py-1.5 text-sm font-medium transition ${
-                  activePlaylistId === "all"
-                    ? "bg-white text-black"
-                    : "bg-white/10 text-gls-body hover:bg-white/15"
-                }`}
-              >
-                All channels
-              </button>
-              {playlists.map((p) => (
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
                 <button
-                  key={p.id}
                   type="button"
-                  onClick={() => setActivePlaylistId(p.id)}
+                  onClick={() => setActivePlaylistId("all")}
                   className={`rounded px-3 py-1.5 text-sm font-medium transition ${
-                    activePlaylistId === p.id
+                    activePlaylistId === "all"
                       ? "bg-white text-black"
                       : "bg-white/10 text-gls-body hover:bg-white/15"
                   }`}
                 >
-                  {p.name} ({p.channel_count})
+                  All channels
                 </button>
-              ))}
+                {playlists.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setActivePlaylistId(p.id)}
+                    className={`rounded px-3 py-1.5 text-sm font-medium transition ${
+                      activePlaylistId === p.id
+                        ? "bg-white text-black"
+                        : "bg-white/10 text-gls-body hover:bg-white/15"
+                    }`}
+                  >
+                    {p.name} ({p.channel_count})
+                  </button>
+                ))}
+              </div>
+              <label className="block max-w-xl">
+                <span className="sr-only">Search My Playlist channels</span>
+                <input
+                  type="search"
+                  value={channelSearch}
+                  onChange={(event) => setChannelSearch(event.target.value)}
+                  placeholder="Search My Playlist channels…"
+                  className="gls-admin-input w-full"
+                />
+              </label>
             </div>
           )}
 
@@ -501,11 +556,11 @@ export function PlaylistManager() {
             </p>
           </div>
 
-          {byGroup.slice(0, 8).map(([group, items]) => (
+          {byGroup.map(([group, items]) => (
             <div key={group}>
               <h3 className="mb-3 text-lg font-semibold text-white">{group}</h3>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                {items.slice(0, 24).map((item) => (
+                {items.slice(0, visibleByGroup[group] || 24).map((item) => (
                   <div key={item.id} className="w-full [&_a]:w-full">
                     <TitleCard
                       item={item}
@@ -514,10 +569,22 @@ export function PlaylistManager() {
                   </div>
                 ))}
               </div>
-              {items.length > 24 && (
-                <p className="mt-2 text-xs text-gls-muted">
-                  Showing 24 of {items.length} in {group}
-                </p>
+              {items.length > (visibleByGroup[group] || 24) && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setVisibleByGroup((current) => ({
+                      ...current,
+                      [group]: Math.min(
+                        (current[group] || 24) + 24,
+                        items.length,
+                      ),
+                    }))
+                  }
+                  className="mt-4 rounded border border-white/20 px-4 py-2 text-sm text-white"
+                >
+                  Show more · {items.length - (visibleByGroup[group] || 24)} remaining
+                </button>
               )}
             </div>
           ))}

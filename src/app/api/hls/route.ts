@@ -11,14 +11,16 @@ import { operationalLog } from "@/lib/operations/logger";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function proxyUrl(absolute: string, req: NextRequest, channelId?: string | null) {
+function proxyUrl(absolute: string, channelId?: string | null) {
   const channel = channelId ? `channelId=${encodeURIComponent(channelId)}&` : "";
-  return `${req.nextUrl.origin}/api/hls?${channel}url=${encodeURIComponent(absolute)}`;
+  // Keep rewritten HLS resources relative to the browser's current origin.
+  // Next.js can normalize req.nextUrl.origin to localhost even when the user
+  // opened 127.0.0.1, which would drop host-scoped authentication cookies.
+  return `/api/hls?${channel}url=${encodeURIComponent(absolute)}`;
 }
 function rewritePlaylist(
   body: string,
   baseUrl: string,
-  req: NextRequest,
   channelId?: string | null,
 ) {
   return body
@@ -29,14 +31,14 @@ function rewritePlaylist(
       if (trimmed.startsWith("#")) {
         return line.replace(/URI="([^"]+)"/gi, (_match, uri: string) => {
           try {
-            return `URI="${proxyUrl(new URL(uri, baseUrl).href, req, channelId)}"`;
+            return `URI="${proxyUrl(new URL(uri, baseUrl).href, channelId)}"`;
           } catch {
             return _match;
           }
         });
       }
       try {
-        return proxyUrl(new URL(trimmed, baseUrl).href, req, channelId);
+        return proxyUrl(new URL(trimmed, baseUrl).href, channelId);
       } catch {
         return line;
       }
@@ -146,11 +148,11 @@ export async function GET(req: NextRequest) {
   try {
     target = raw ? decodeURIComponent(raw) : persistedUrl!;
     if (channelId && persistedUrl) {
-      const persistedHost = new URL(persistedUrl).hostname.toLowerCase();
-      const targetHost = new URL(target).hostname.toLowerCase();
-      if (targetHost !== persistedHost && !isAllowedMediaHost(targetHost)) {
-        return NextResponse.json({ error: "Derived media host not allowed" }, { status: 403 });
-      }
+      // HLS manifests commonly hand segment, key, and variant requests to a
+      // different CDN hostname. A channelId is owner-scoped and authenticated
+      // above, so accept those derived public URLs instead of requiring every
+      // customer playlist CDN to be pre-listed in our built-in catalogue.
+      // validatePublicUrl still blocks private/reserved network targets.
       await validatePublicUrl(target);
     } else {
       await validatePublicUrl(target, isAllowedMediaHost);
@@ -191,7 +193,6 @@ export async function GET(req: NextRequest) {
         rewritePlaylist(
           upstream.body.toString("utf8"),
           upstream.finalUrl,
-          req,
           channelId,
         ),
         {
@@ -223,9 +224,19 @@ export async function GET(req: NextRequest) {
       headers,
     });
   } catch (error) {
+    let targetHost = "invalid";
+    try {
+      targetHost = new URL(target).hostname;
+    } catch {
+      /* keep invalid */
+    }
     operationalLog("warn", "hls.proxy_failed", {
       requestId: req.headers.get("x-request-id"),
       errorType: error instanceof Error ? error.name : "unknown",
+      errorMessage:
+        error instanceof Error ? error.message.slice(0, 160) : "unknown",
+      targetHost,
+      requestKind: /\.m3u8(?:$|\?)/i.test(target) ? "playlist" : "segment",
       userId: user.id,
     });
     return NextResponse.json(

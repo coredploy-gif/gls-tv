@@ -41,8 +41,9 @@ const FALLBACK_ART =
 export function channelRowToCatalog(
   row: UserPlaylistChannelRow,
 ): CatalogItem {
-  const format =
+  const format: "hls" | "mp4" | "dash" =
     row.format === "mp4" || row.format === "dash" ? row.format : "hls";
+  const streamUrl = row.stream_url?.trim();
   return {
     id: `user-${row.id}`,
     slug: row.slug,
@@ -59,10 +60,24 @@ export function channelRowToCatalog(
     license: "open_stream",
     isLive: true,
     sources: [
+      // Prefer the original device path, which is fastest for streams whose
+      // upstream permits browser access.
+      ...(streamUrl
+        ? [
+            {
+              url: streamUrl,
+              quality: row.quality || "Auto",
+              format,
+              label: "browser-direct",
+            },
+          ]
+        : []),
+      // Keep the authenticated same-origin relay as the browser/CORS fallback.
       {
         url: `/api/hls?channelId=${encodeURIComponent(row.id)}`,
         quality: row.quality || "Auto",
         format,
+        label: "secure-relay",
       },
     ],
   };

@@ -8,6 +8,7 @@ import {
 } from "@/lib/sports-packs";
 import { healChannelSources, isArenaPayLinear } from "@/lib/channel-heal";
 import { isTraceChannel } from "@/lib/trace-mirrors";
+import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
 
 function browserClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -227,7 +228,9 @@ export async function listActiveStreamSeeds() {
       )
       .eq("is_active", true)
       .order("slug", { ascending: true });
-    return data ?? [];
+    return (data ?? []).filter(
+      (row) => !isExcludedBuiltinChannel(row.slug, row.title),
+    );
   } catch {
     return [];
   }

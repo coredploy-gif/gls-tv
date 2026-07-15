@@ -13,9 +13,9 @@ export default function EadminPage() {
       <div className="mx-auto max-w-5xl px-4 sm:px-8">
         <h1 className="gls-display text-5xl text-white">Eadmin</h1>
         <p className="mt-3 max-w-2xl text-sm text-gls-body">
-          Seed stream URLs yourself. TSN 1–5 slots are pre-created — paste your
-          HLS links and save. New slugs appear after you also add a catalog
-          tile, or use an existing Sports slug.
+          Manage approved built-in stream seeds. New slugs appear only after an
+          approved catalog tile is added; personal M3U channels belong in My
+          Playlists.
         </p>
         <div className="mt-8">
           <EadminSeedsPanel />

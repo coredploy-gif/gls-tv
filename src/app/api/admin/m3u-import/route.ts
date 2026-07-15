@@ -11,6 +11,7 @@ import {
   requireAal2,
 } from "@/lib/admin/access";
 import { isFeatureEnabled } from "@/lib/operations/feature-flags";
+import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -198,6 +199,9 @@ export async function POST(req: Request) {
       const channel = parsed.channels[mapping.index];
       const slug = normalizeSlug(mapping.targetSlug);
       if (!channel || !approved.has(slug)) throw new Error("Invalid mapping");
+      if (isExcludedBuiltinChannel(slug, approved.get(slug)!.title)) {
+        throw new Error("Excluded built-in mapping");
+      }
       return {
         slug,
         title: approved.get(slug)!.title,

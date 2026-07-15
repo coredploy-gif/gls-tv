@@ -17,13 +17,12 @@ import africaJson from "@/data/generated/africa.json";
 import asiaJson from "@/data/generated/asia.json";
 import overridesJson from "@/data/generated/channel-overrides.json";
 import { CURATED_AFRICA } from "@/data/curated-africa";
-import { CURATED_TSN, USER_SEED_SLUGS } from "@/data/curated-tsn";
 import {
   CURATED_PUBLIC_MOVIES,
   CURATED_PUBLIC_SPORTS,
   CURATED_SERIES_SEEDS,
 } from "@/data/curated-public-fast";
-import { LINEAR_PAY_CATALOG } from "@/data/linear-pay-catalog";
+import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
 
 const sportsChannels = sportsJson as CatalogItem[];
 const usChannels = usJson as CatalogItem[];
@@ -45,8 +44,6 @@ const overrides = overridesJson as Record<
 const top10 = getAllTop10();
 
 function applyOverride(item: CatalogItem): CatalogItem {
-  // User seed slots win — never remap TSN 1–5 (etc.) to FAST substitutes.
-  if (USER_SEED_SLUGS.has(item.slug)) return item;
   const o = overrides[item.slug];
   if (!o?.url) return item;
   return {
@@ -70,6 +67,7 @@ function mergeUnique(...lists: CatalogItem[][]) {
   const map = new Map<string, CatalogItem>();
   for (const list of lists) {
     for (const raw of list) {
+      if (isExcludedBuiltinChannel(raw.slug, raw.title)) continue;
       const item = applyOverride(raw);
       const bySlug = [...map.values()].find((x) => x.slug === item.slug);
       if (bySlug && map.has(bySlug.id)) {
@@ -98,7 +96,6 @@ export function getVerifiedChannels() {
   return mergeUnique(
     top10,
     CURATED_AFRICA,
-    CURATED_TSN,
     CURATED_PUBLIC_SPORTS,
     CURATED_PUBLIC_MOVIES,
     CURATED_SERIES_SEEDS,
@@ -117,7 +114,6 @@ export function getAllChannels(): CatalogItem[] {
   return mergeUnique(
     top10,
     CURATED_AFRICA,
-    CURATED_TSN,
     CURATED_PUBLIC_SPORTS,
     CURATED_PUBLIC_MOVIES,
     CURATED_SERIES_SEEDS,
@@ -131,7 +127,6 @@ export function getAllChannels(): CatalogItem[] {
     playableAsia,
     playableAsiaSeries,
     playableKoreaSeries,
-    LINEAR_PAY_CATALOG,
     CATALOG,
     sportsChannels,
     usChannels,
@@ -183,7 +178,6 @@ export function getChannelBySlug(slug: string): CatalogItem | undefined {
   const found =
     top10.find((c) => c.slug === slug) ||
     CURATED_AFRICA.find((c) => c.slug === slug) ||
-    CURATED_TSN.find((c) => c.slug === slug) ||
     CURATED_PUBLIC_SPORTS.find((c) => c.slug === slug) ||
     CURATED_PUBLIC_MOVIES.find((c) => c.slug === slug) ||
     CURATED_SERIES_SEEDS.find((c) => c.slug === slug) ||
@@ -196,25 +190,22 @@ export function getChannelBySlug(slug: string): CatalogItem | undefined {
     playableAsia.find((c) => c.slug === slug) ||
     playableAsiaSeries.find((c) => c.slug === slug) ||
     playableKoreaSeries.find((c) => c.slug === slug) ||
-    LINEAR_PAY_CATALOG.find((c) => c.slug === slug) ||
     VERIFIED_LIVE.find((c) => c.slug === slug) ||
     CATALOG.find((c) => c.slug === slug) ||
     sportsChannels.find((c) => c.slug === slug) ||
     usChannels.find((c) => c.slug === slug) ||
     africaChannels.find((c) => c.slug === slug) ||
     asiaChannels.find((c) => c.slug === slug);
-  return found ? applyOverride(found) : undefined;
+  return found && !isExcludedBuiltinChannel(found.slug, found.title)
+    ? applyOverride(found)
+    : undefined;
 }
 
 export function getSportsChannels() {
   return mergeUnique(
-    CURATED_TSN,
     CURATED_PUBLIC_SPORTS,
     playableWrestling,
     playableSports,
-    LINEAR_PAY_CATALOG.filter((c) =>
-      c.categories.some((x) => /sport|fight|combat/i.test(x)),
-    ),
     top10.filter((c) => c.categories.includes("Sports")),
     VERIFIED_LIVE.filter((c) => c.categories.some((x) => /sport/i.test(x))),
     sportsChannels,

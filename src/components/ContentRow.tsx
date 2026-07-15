@@ -15,6 +15,8 @@ type ContentRowProps = {
   viewMoreHref?: string;
   /** Continue watching remove */
   onRemove?: (slug: string) => void;
+  /** Serializable base URL for rows rendered by a Server Component. */
+  hrefPrefix?: string;
   hrefForItem?: (item: CatalogItem) => string;
 };
 
@@ -25,6 +27,7 @@ export function ContentRow({
   limit = ROW_LIMIT,
   viewMoreHref,
   onRemove,
+  hrefPrefix,
   hrefForItem,
 }: ContentRowProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -99,14 +102,21 @@ export function ContentRow({
           ref={scrollerRef}
           className="gls-row-scroll px-4 sm:px-8 lg:px-12"
         >
-          {visible.map((item, i) => (
-            <div key={item.id} className="relative shrink-0">
-              <TitleCard
-                item={item}
-                rank={ranked ? i + 1 : undefined}
-                href={hrefForItem?.(item)}
-                priority={i < 4}
-              />
+          {visible.map((item, i) => {
+            const href =
+              hrefForItem?.(item) ??
+              (hrefPrefix
+                ? `${hrefPrefix}${encodeURIComponent(item.id.replace(/^user-/, ""))}`
+                : undefined);
+
+            return (
+              <div key={item.id} className="relative shrink-0">
+                <TitleCard
+                  item={item}
+                  rank={ranked ? i + 1 : undefined}
+                  href={href}
+                  priority={i < 4}
+                />
               {onRemove && (
                 <button
                   type="button"
@@ -121,8 +131,9 @@ export function ContentRow({
                   Remove
                 </button>
               )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
           {hasMore && (
             <Link
               href={viewMoreHref!}

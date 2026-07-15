@@ -26,6 +26,10 @@ export async function GET(req: Request) {
   const params = new URL(req.url).searchParams;
   const playlistId = params.get("playlistId");
   const offset = Math.max(0, Math.min(Number(params.get("offset")) || 0, 5000));
+  const limit = Math.max(
+    1,
+    Math.min(Number(params.get("limit")) || PLAYLIST_LIMITS.pageSize, 1000),
+  );
 
   const { data: playlists, error: pErr } = await supabase
     .from("user_playlists")
@@ -47,7 +51,7 @@ export async function GET(req: Request) {
     .eq("user_id", user.id)
     .order("playlist_id", { ascending: true })
     .order("sort_order", { ascending: true })
-    .range(offset, offset + PLAYLIST_LIMITS.pageSize - 1);
+    .range(offset, offset + limit - 1);
   if (playlistId) channelQuery = channelQuery.eq("playlist_id", playlistId);
   const { data: channels, error: cErr } = entitlement.allowed
     ? await channelQuery
@@ -67,8 +71,8 @@ export async function GET(req: Request) {
     entitled: entitlement.allowed,
     page: {
       offset,
-      limit: PLAYLIST_LIMITS.pageSize,
-      hasMore: (channels?.length || 0) === PLAYLIST_LIMITS.pageSize,
+      limit,
+      hasMore: (channels?.length || 0) === limit,
     },
   });
 }

@@ -63,11 +63,8 @@ export async function downloadAndExtract(
 
   // Fast path: only regions that usually hold our allowlist (not the full 13k UI dump)
   const feeds = [
-    IPTV_ORG_COUNTRY("ca"),
     IPTV_ORG_COUNTRY("za"),
-    IPTV_ORG_COUNTRY("us"),
     IPTV_ORG_COUNTRY("zw"),
-    "https://iptv-org.github.io/iptv/categories/sports.m3u",
   ];
   sources.push(...feeds);
 

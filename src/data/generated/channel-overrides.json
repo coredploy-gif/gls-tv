@@ -913,46 +913,6 @@
       "Popular"
     ]
   },
-  "foxdeportes-us-sd": {
-    "slug": "foxdeportes-us-sd",
-    "title": "LiveNOW from FOX (free)",
-    "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00488-foxdigital-livenowbyfox-lgus/playlist.m3u8",
-    "note": "FS1/FS2/Fox Sports pay linear not open — Fox LiveNOW FAST.",
-    "countries": [
-      "us",
-      "ca",
-      "world"
-    ],
-    "categories": [
-      "Sports",
-      "Fox",
-      "News",
-      "Playable",
-      "Verified",
-      "Healed",
-      "Popular"
-    ]
-  },
-  "foxsoccerplus-us-sd": {
-    "slug": "foxsoccerplus-us-sd",
-    "title": "LiveNOW from FOX (free)",
-    "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00488-foxdigital-livenowbyfox-lgus/playlist.m3u8",
-    "note": "FS1/FS2/Fox Sports pay linear not open — Fox LiveNOW FAST.",
-    "countries": [
-      "us",
-      "ca",
-      "world"
-    ],
-    "categories": [
-      "Sports",
-      "Fox",
-      "News",
-      "Playable",
-      "Verified",
-      "Healed",
-      "Popular"
-    ]
-  },
   "tsntheocho-ca-sd": {
     "slug": "tsntheocho-ca-sd",
     "title": "TSN The Ocho",
@@ -976,7 +936,11 @@
     "title": "TRACE Urban",
     "url": "https://lightning-traceurban-samsungau.amagi.tv/playlist.m3u8",
     "note": "Trace+ CDN dead — Amagi Urban FAST heal.",
-    "countries": ["za", "fr", "world"],
+    "countries": [
+      "za",
+      "fr",
+      "world"
+    ],
     "categories": [
       "Music",
       "Africa",
@@ -992,7 +956,11 @@
     "title": "TRACE Sport Stars",
     "url": "https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8",
     "note": "Trace+ Sport Stars dead — Amagi Sport FAST heal.",
-    "countries": ["za", "fr", "world"],
+    "countries": [
+      "za",
+      "fr",
+      "world"
+    ],
     "categories": [
       "Sports",
       "Music",
@@ -1007,7 +975,11 @@
     "title": "TRACE Sport Stars",
     "url": "https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8",
     "note": "Trace+ Sport Stars dead — Amagi Sport FAST heal.",
-    "countries": ["za", "fr", "world"],
+    "countries": [
+      "za",
+      "fr",
+      "world"
+    ],
     "categories": [
       "Sports",
       "Music",
@@ -1021,7 +993,11 @@
     "title": "TRACE Sport Stars",
     "url": "https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8",
     "note": "Trace+ Sport Stars dead — Amagi Sport FAST heal.",
-    "countries": ["za", "fr", "world"],
+    "countries": [
+      "za",
+      "fr",
+      "world"
+    ],
     "categories": [
       "Sports",
       "Music",

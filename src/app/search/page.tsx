@@ -17,8 +17,6 @@ const ALL = getSearchIndex();
 
 const HINT_CHIPS = [
   "ESPN",
-  "Fox Sports",
-  "TSN",
   "Vivo TV",
   "Survivor",
   "ducktv",
@@ -197,11 +195,10 @@ function SearchInner() {
       <h1 className="gls-display text-5xl text-white">Find a channel</h1>
       <p className="mt-2 max-w-2xl text-sm text-gls-body">
         Full iptv-org list (~13k) is here — filter by category/country or type
-        the VLC name (e.g. <span className="text-white">Fox Sports 1</span>,{" "}
-        <span className="text-white">TSN1</span>). Sports hub only shows curated
-        FAST tiles; everything else is Find. If a channel was under
-        “Undefined” in the playlist, use All categories or Uncategorized /
-        type its name.
+        the VLC name (e.g. <span className="text-white">SABC News</span>).
+        Sports hub only shows curated FAST tiles; everything else is Find. If a
+        channel was under “Undefined” in the playlist, use All categories or
+        Uncategorized / type its name.
       </p>
 
       <div className="relative mt-6 max-w-2xl">

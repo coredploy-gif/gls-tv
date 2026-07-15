@@ -1,6 +1,7 @@
 import type { CatalogItem } from "@/data/types";
 import { createClient } from "@supabase/supabase-js";
 import { isArenaPayLinear } from "@/lib/channel-heal";
+import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
 
 function anon() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -75,7 +76,7 @@ export async function getSeedCatalogItem(
       .eq("slug", slug)
       .eq("is_active", true)
       .maybeSingle();
-    if (!data) return null;
+    if (!data || isExcludedBuiltinChannel(data.slug, data.title)) return null;
     return catalogFromSeed(data);
   } catch {
     return null;
@@ -93,7 +94,9 @@ export async function listSeedCatalogItems(): Promise<CatalogItem[]> {
       )
       .eq("is_active", true)
       .order("slug", { ascending: true });
-    return (data || []).map(catalogFromSeed);
+    return (data || [])
+      .filter((row) => !isExcludedBuiltinChannel(row.slug, row.title))
+      .map(catalogFromSeed);
   } catch {
     return [];
   }

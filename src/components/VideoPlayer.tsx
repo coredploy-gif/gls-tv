@@ -17,10 +17,7 @@ import {
   needsDeepBuffer,
 } from "@/lib/channel-heal";
 import { isBrokenTraceOrigin, isTraceChannel } from "@/lib/trace-mirrors";
-import {
-  isLinearPayCategory,
-  officialLinearPayDestination,
-} from "@/lib/linear-pay";
+import { isLinearPayCategory } from "@/lib/linear-pay";
 
 type VideoPlayerProps = {
   item: CatalogItem;
@@ -114,6 +111,16 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
     item.categories.includes("LinearSports") ||
     isLinearSportsPack(item);
 
+  // A previous relay fallback must not permanently pin an owner-scoped
+  // playlist channel to the server path. Start each later visit like VLC:
+  // original source from the viewer device first.
+  if (
+    first?.label === "browser-direct" &&
+    (mem?.url !== first.url || mem.mode !== "direct")
+  ) {
+    clearStreamMemory(item.slug);
+  }
+
   // Drop poisoned proxy memory that left SABC 3 flashing "Mirror 1 · proxy…"
   if (hardGeo && mem?.mode === "proxy") {
     clearStreamMemory(item.slug);
@@ -142,6 +149,11 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
   const memNow = getStreamMemory(item.slug);
 
   if (!memNow?.url || (hardGeo && memNow.mode === "proxy")) {
+    // Imported playlists try the original source first, followed by the
+    // authenticated relay and any same-title mirrors.
+    if (first?.label === "browser-direct") {
+      return { index: 0, mode: "direct" as const };
+    }
     if (first && prefersProxy(first.url) && !hardGeo) {
       return { index: 0, mode: "proxy" as const };
     }
@@ -373,12 +385,22 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
         const linear = isLinearSportsPack(item);
         const sports = isSportsHeavy(item);
         const trace = isTraceChannel(item.slug, item.title);
+        const privatePlaylist = item.categories.includes("My Playlist");
         // Keep a substantial reserve for long-form live / Trace music.
-        instance.config.maxBufferLength = linear || trace ? 420 : sports ? 320 : 140;
+        instance.config.maxBufferLength =
+          privatePlaylist ? 60 : linear || trace ? 420 : sports ? 320 : 140;
         instance.config.maxMaxBufferLength =
-          linear || trace ? 720 : sports ? 540 : 280;
+          privatePlaylist ? 180 : linear || trace ? 720 : sports ? 540 : 280;
         instance.config.maxBufferSize =
-          (linear || trace ? 380 : sports ? 280 : 120) * 1000 * 1000;
+          (privatePlaylist
+            ? 90
+            : linear || trace
+              ? 380
+              : sports
+                ? 280
+                : 120) *
+          1000 *
+          1000;
         instance.startLoad(-1);
       } catch {
         /* ignore */
@@ -403,6 +425,18 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
       el.load();
 
       if (source.format !== "hls") {
+        const onNativeError = () => {
+          if (cancelled) return;
+          if (sourceIndex + 1 < sources.length) {
+            setStatus("Trying another source…");
+            setMode("direct");
+            setSourceIndex((index) => index + 1);
+            return;
+          }
+          setError("This channel is not available to play right now.");
+        };
+        el.addEventListener("error", onNativeError);
+        detachMedia = () => el.removeEventListener("error", onNativeError);
         el.src = source.url;
         setStatus("Playing");
         try {
@@ -439,8 +473,10 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
         const linear = isLinearSportsPack(item);
         const sports = isSportsHeavy(item);
         const trace = isTraceChannel(item.slug, item.title);
+        const privatePlaylist = item.categories.includes("My Playlist");
         const unstable = isUnstableCdn(url) || requiresProxy(url) || trace;
-        const deepLive = linear || sports || unstable || trace;
+        const deepLive =
+          linear || sports || unstable || trace || privatePlaylist;
         const instance = new Hls({
           enableWorker: true,
           lowLatencyMode: false,
@@ -456,11 +492,38 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
           liveMaxLatencyDurationCount:
             linear || trace ? 260 : unstable ? 180 : sports ? 160 : 50,
           liveDurationInfinity: true,
-          maxBufferLength: linear || trace ? 200 : unstable ? 140 : sports ? 120 : 30,
+          // Private playlists may preload up to at least 60 seconds when the
+          // upstream live window and available bandwidth permit it.
+          maxBufferLength:
+            privatePlaylist
+              ? 60
+              : linear || trace
+                ? 200
+                : unstable
+                  ? 140
+                  : sports
+                    ? 120
+                    : 30,
           maxMaxBufferLength:
-            linear || trace ? 480 : unstable ? 320 : sports ? 280 : 90,
+            privatePlaylist
+              ? 180
+              : linear || trace
+                ? 480
+                : unstable
+                  ? 320
+                  : sports
+                    ? 280
+                    : 90,
           maxBufferSize:
-            (linear || trace ? 220 : unstable ? 160 : sports ? 130 : 40) *
+            (privatePlaylist
+              ? 90
+              : linear || trace
+                ? 220
+                : unstable
+                  ? 160
+                  : sports
+                    ? 130
+                    : 40) *
             1000 *
             1000,
           maxBufferHole: deepLive ? 1.8 : 0.5,
@@ -471,7 +534,10 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
           levelLoadingTimeOut: deepLive ? 45000 : 18000,
           fragLoadingTimeOut: deepLive ? 60000 : 22000,
           xhrSetup: (xhr) => {
-            xhr.withCredentials = false;
+            // Imported playlists run through our same-origin relay. It needs
+            // the signed-in viewer session cookie; direct public HLS sources
+            // deliberately remain credential-free.
+            xhr.withCredentials = url.startsWith("/api/");
           },
         });
 
@@ -500,6 +566,18 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
           jumpToLive;
 
         const silentProxy = () => {
+          // The direct source in an imported playlist has a dedicated relay
+          // source immediately after it. Skip straight to that source rather
+          // than wrapping the arbitrary URL in the catalogue-only proxy path.
+          if (source.label === "browser-direct") return silentMirror();
+          // This source is already the authenticated relay. Changing only the
+          // mode recreates the same URL and causes an endless HLS restart.
+          if (
+            source.label === "secure-relay" ||
+            source.url.startsWith("/api/hls")
+          ) {
+            return false;
+          }
           // Regional restrictions are never retried through the server proxy.
           // That path only exists for browser/CORS compatibility.
           if (hardGeo) return false;
@@ -512,6 +590,12 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
 
         const silentDirect = () => {
           if (cancelled || mode === "direct" || switchedToDirect) return false;
+          if (
+            source.label === "secure-relay" ||
+            source.url.startsWith("/api/hls")
+          ) {
+            return false;
+          }
           // Never flip cleartext HTTP / Pluto-jmp2 off proxy
           if (source && prefersProxy(source.url)) return false;
           switchedToDirect = true;
@@ -583,7 +667,8 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
                 () => deepenBuffer(instance),
                 isLinearSportsPack(item) ||
                   isSportsHeavy(item) ||
-                  isTraceChannel(item.slug, item.title)
+                  isTraceChannel(item.slug, item.title) ||
+                  item.categories.includes("My Playlist")
                   ? 500
                   : 2500,
               );
@@ -625,6 +710,16 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
                 jumpToLive();
               }
             }
+            return;
+          }
+
+          const responseCode = data.response?.code;
+          if (responseCode === 401 || responseCode === 409) {
+            setError("Choose your viewer profile to start watching.");
+            return;
+          }
+          if (responseCode === 403) {
+            setError("This channel is not available to play right now.");
             return;
           }
 
@@ -753,6 +848,21 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
         };
       } catch (err) {
         console.error(err);
+        if (
+          source.label === "browser-direct" &&
+          sourceIndex + 1 < sources.length
+        ) {
+          setSourceIndex((i) => i + 1);
+          setMode("direct");
+          return;
+        }
+        if (
+          source.label === "secure-relay" ||
+          source.url.startsWith("/api/hls")
+        ) {
+          setError("This stream could not start in the browser.");
+          return;
+        }
         if (mode === "proxy") {
           setMode("direct");
           return;
@@ -807,9 +917,6 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
 
   if (!sources.length) {
     const linearPay = isLinearPayCategory(item.categories);
-    const dest = linearPay
-      ? officialLinearPayDestination(item.slug, item.title, item.countries)
-      : null;
     return (
       <div className="relative flex aspect-video w-full flex-col items-center justify-center gap-3 bg-black p-6 text-center">
         <p className="rounded-full border border-amber-400/40 bg-amber-500/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-100">
@@ -823,19 +930,12 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
             : "This channel is not available right now"}
         </p>
         <p className="max-w-lg text-sm text-white/70">
-          {dest?.note ||
-            "Please choose another channel and try again later."}
+          {linearPay
+            ? "Use the official licensed provider available in your territory."
+            : "Please choose another channel and try again later."}
         </p>
-        {linearPay && dest && (
+        {linearPay && (
           <div className="mt-2 flex flex-wrap justify-center gap-2">
-            <a
-              href={dest.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="gls-cta rounded px-4 py-2 text-sm"
-            >
-              {dest.label}
-            </a>
             <Link
               href="/sports"
               className="rounded border border-white/15 px-4 py-2 text-sm text-gls-muted hover:text-white"
@@ -869,6 +969,14 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
             </p>
           )}
           <div className="flex flex-wrap justify-center gap-2">
+            {/choose your viewer profile/i.test(error) && (
+              <Link
+                href="/profiles"
+                className="gls-cta rounded px-4 py-2 text-sm"
+              >
+                Choose profile
+              </Link>
+            )}
             {isHardGeo(item) && (
               <>
                 <Link

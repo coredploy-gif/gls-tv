@@ -202,10 +202,10 @@ export function EadminSeedsPanel() {
           Sync from iptv-org
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-gls-body">
-          Downloads the public playlist on the server, keeps only TSN 1–5,
-          SABC, Fox Sports 1–2, ZBC TV when those names exist, and writes URLs
-          into <code className="text-white/80">stream_seeds</code>. Channels
-          not found are left alone.
+          Downloads the public playlist on the server, keeps only the approved
+          SABC and ZBC TV targets when those names exist, and writes URLs into{" "}
+          <code className="text-white/80">stream_seeds</code>. Channels not
+          found are left alone.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gls-body">
           <label className="inline-flex items-center gap-2">
