@@ -160,8 +160,13 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
     return { index: 0, mode: "direct" as const };
   }
 
-  // Seeded linear: always start on source 0 (eadmin), ignore stale memory index
-  if (seededLinear && first) {
+  // Seeded linear / Trace heals: always start on source 0 (Amagi / eadmin),
+  // ignore stale memory that could pin a dead Trace+ CDN.
+  const preferFirst =
+    seededLinear ||
+    item.categories.includes("Healed") ||
+    isTraceChannel(item.slug, item.title);
+  if (preferFirst && first) {
     return {
       index: 0,
       mode: prefersProxy(first.url) && !hardGeo ? ("proxy" as const) : ("direct" as const),

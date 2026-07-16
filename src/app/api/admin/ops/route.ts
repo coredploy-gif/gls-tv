@@ -204,7 +204,7 @@ export async function GET() {
     if (!isBillablePlan(String(p.plan))) continue;
     paid += 1;
     const cents =
-      p.plan === "gls_65" ? 6500 : p.plan === "gls_75" ? 7500 : 5500;
+      p.plan === "gls_65" ? 5500 : p.plan === "gls_75" ? 6500 : 4500;
     mrrZar += cents / 100;
   }
 

@@ -42,7 +42,7 @@ export const MEMBER_FLOW_COPY = {
   trialFirst:
     "Register with email → verify → 14-day free trial → Who’s watching → watch.",
   renewLater:
-    "Before trial ends (or anytime), choose a 30-day R55 / R65 / R75 membership and pay through a Yoco payment link or verified EFT. There is no automatic debit.",
+    "Before trial ends (or anytime), choose a 30-day R45 / R55 / R65 membership and pay through a Yoco payment link or verified EFT. There is no automatic debit.",
   adminExempt:
     "Owner admin accounts bypass trial clocks and device locks.",
 } as const;

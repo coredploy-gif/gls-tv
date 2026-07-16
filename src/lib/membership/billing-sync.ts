@@ -38,9 +38,9 @@ export function periodEndIso(subscription: Stripe.Subscription): string | null {
 }
 
 export function amountCentsForPlan(plan: GlsPlanId): number {
-  if (plan === "gls_55") return 5500;
-  if (plan === "gls_65") return 6500;
-  if (plan === "gls_75") return 7500;
+  if (plan === "gls_55") return 4500;
+  if (plan === "gls_65") return 5500;
+  if (plan === "gls_75") return 6500;
   return 0;
 }
 

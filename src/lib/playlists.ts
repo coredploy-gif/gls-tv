@@ -1,4 +1,5 @@
-import type { CatalogItem } from "@/data/types";
+import type { CatalogItem, MediaSource } from "@/data/types";
+import { healPrivatePlaylistSources } from "@/lib/channel-heal";
 
 export type UserPlaylistRow = {
   id: string;
@@ -51,6 +52,33 @@ export function channelRowToCatalog(
   const format: "hls" | "mp4" | "dash" =
     row.format === "mp4" || row.format === "dash" ? row.format : "hls";
   const streamUrl = row.stream_url?.trim();
+  const baseSources: MediaSource[] = [
+    // Prefer the original device path, which is fastest for streams whose
+    // upstream permits browser access.
+    ...(streamUrl
+      ? [
+          {
+            url: streamUrl,
+            quality: row.quality || "Auto",
+            format,
+            label: "browser-direct",
+          } satisfies MediaSource,
+        ]
+      : []),
+    // Keep the authenticated same-origin relay as the browser/CORS fallback.
+    {
+      url: `/api/hls?channelId=${encodeURIComponent(row.id)}`,
+      quality: row.quality || "Auto",
+      format,
+      label: "secure-relay",
+    },
+  ];
+  const { sources, tags: healTags } = healPrivatePlaylistSources(
+    row.slug,
+    row.title,
+    baseSources,
+  );
+
   return {
     id: `user-${row.id}`,
     slug: row.slug,
@@ -63,6 +91,7 @@ export function channelRowToCatalog(
         ...(row.categories || []),
         "My Playlist",
         "Imported",
+        ...healTags,
         ...(row.health_status === "unavailable" ? ["Unavailable"] : []),
       ]),
     ],
@@ -71,27 +100,7 @@ export function channelRowToCatalog(
     backdrop: row.backdrop || row.poster || FALLBACK_ART,
     license: "open_stream",
     isLive: true,
-    sources: [
-      // Prefer the original device path, which is fastest for streams whose
-      // upstream permits browser access.
-      ...(streamUrl
-        ? [
-            {
-              url: streamUrl,
-              quality: row.quality || "Auto",
-              format,
-              label: "browser-direct",
-            },
-          ]
-        : []),
-      // Keep the authenticated same-origin relay as the browser/CORS fallback.
-      {
-        url: `/api/hls?channelId=${encodeURIComponent(row.id)}`,
-        quality: row.quality || "Auto",
-        format,
-        label: "secure-relay",
-      },
-    ],
+    sources,
   };
 }
 

@@ -1,5 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <rect width="512" height="512" rx="96" fill="#0A0A0A"/>
-  <text x="256" y="250" text-anchor="middle" font-family="Arial Black, Helvetica, sans-serif" font-size="140" font-weight="900" fill="#FFFFFF" letter-spacing="8">GLS</text>
-  <text x="256" y="340" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="700" fill="#E50914" letter-spacing="18">TV</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" role="img" aria-label="GLS TV">
+  <defs>
+    <linearGradient id="bg" x1="80" y1="40" x2="460" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1a1218"/>
+      <stop offset="0.55" stop-color="#0b0b0f"/>
+      <stop offset="1" stop-color="#12080c"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="96" y1="88" x2="416" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" stop-opacity="0.14"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#ff6b9d" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="120" y1="100" x2="400" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="gls" x1="256" y1="170" x2="256" y2="280" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#fff5f8"/>
+      <stop offset="1" stop-color="#ffd0e0"/>
+    </linearGradient>
+    <linearGradient id="tv" x1="180" y1="300" x2="340" y2="340" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E50914"/>
+      <stop offset="0.5" stop-color="#ff4d6d"/>
+      <stop offset="1" stop-color="#ff8ec8"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <!-- App tile -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="112" fill="url(#glass)"/>
+  <rect x="18" y="18" width="476" height="476" rx="98" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <rect x="34" y="34" width="444" height="444" rx="88" fill="url(#glass)" filter="url(#softShadow)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <path d="M70 96h372c8 0 14 8 10 15L390 190H122L60 111c-4-7 2-15 10-15z" fill="url(#sheen)" opacity="0.7"/>
+
+  <!-- Brand -->
+  <g filter="url(#glow)">
+    <text x="256" y="255" text-anchor="middle" font-family="Arial Black, Helvetica Black, Impact, sans-serif" font-size="132" font-weight="900" letter-spacing="10" fill="url(#gls)">GLS</text>
+    <text x="256" y="330" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" letter-spacing="22" fill="url(#tv)">TV</text>
+  </g>
 </svg>

@@ -12,7 +12,7 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Create Stripe Checkout Session (subscription, ZAR) for R55/R65/R75. */
+/** Create Stripe Checkout Session (subscription, ZAR) for R45/R55/R65. */
 export async function POST(req: NextRequest) {
   const stripe = getStripe();
   if (!stripe) {

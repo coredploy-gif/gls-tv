@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { GlsLogo } from "@/components/GlsLogo";
 import { ADMIN_NAV_COLORS } from "@/lib/nav-theme";
 
@@ -161,14 +166,27 @@ const NAV: NavItem[] = [
     href: "/admin/access",
     label: "Roles & controls",
     icon: (
-      <path d="M12 3 5 6v5c0 4.6 2.9 8.2 7 10 4.1-1.8 7-5.4 7-10V6l-7-3Zm0 5v5m0 3h.01" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M12 3 5 6v5c0 4.6 2.9 8.2 7 10 4.1-1.8 7-5.4 7-10V6l-7-3Zm0 5v5m0 3h.01"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     ),
   },
   {
     href: "/admin/rights",
     label: "Source rights",
     icon: (
-      <path d="M7 4h10v16H7V4Zm3 4h4m-4 4h4m-4 4h3" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path
+        d="M7 4h10v16H7V4Zm3 4h4m-4 4h4m-4 4h3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
     ),
   },
   {
@@ -176,7 +194,14 @@ const NAV: NavItem[] = [
     label: "System links",
     icon: (
       <>
-        <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.6" />
+        <circle
+          cx="12"
+          cy="12"
+          r="3"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+        />
         <path
           d="M12 5v2m0 10v2m7-7h-2M7 12H5m12.02-5.02-1.4 1.4M8.38 15.62l-1.4 1.4m0-10.04 1.4 1.4m7.24 7.24 1.4 1.4"
           fill="none"
@@ -212,6 +237,50 @@ function NavIcon({
   );
 }
 
+function NavLinks({
+  pathname,
+  collapsed,
+  onNavigate,
+}: {
+  pathname: string;
+  collapsed: boolean;
+  onNavigate?: () => void;
+}) {
+  return (
+    <>
+      {NAV.map((item) => {
+        const active =
+          pathname === item.href ||
+          (item.href !== "/admin" && pathname.startsWith(item.href));
+        const color = ADMIN_NAV_COLORS[item.href] || "#ff6b9d";
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            title={item.label}
+            onClick={onNavigate}
+            className={`group/nav flex items-center gap-3 rounded-xl px-2 py-2.5 text-sm transition duration-200 ${
+              active
+                ? "gls-admin-nav-active"
+                : "text-gls-muted hover:bg-white/[0.04] hover:text-white"
+            }`}
+            style={
+              {
+                ["--nav-icon"]: color,
+              } as CSSProperties
+            }
+          >
+            <NavIcon color={color}>{item.icon}</NavIcon>
+            {!collapsed && (
+              <span className="truncate font-medium">{item.label}</span>
+            )}
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+
 export function AdminShell({
   children,
   email,
@@ -222,6 +291,7 @@ export function AdminShell({
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [ready, setReady] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -233,7 +303,24 @@ export function AdminShell({
     queueMicrotask(() => setReady(true));
   }, []);
 
-  const toggle = () => {
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [mobileOpen]);
+
+  const toggleDesktop = () => {
     setCollapsed((c) => {
       const next = !c;
       try {
@@ -255,65 +342,56 @@ export function AdminShell({
       ) || NAV[0];
   const pageColor = ADMIN_NAV_COLORS[activeItem.href] || "#ff6b9d";
 
-  return (
-    <div className="gls-admin-shell flex min-h-screen text-white">
-      <aside
-        className={`gls-admin-sidebar sticky top-0 z-30 flex h-screen shrink-0 flex-col transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          ready ? "" : "opacity-0"
-        } ${collapsed ? "w-[84px]" : "w-64"}`}
-      >
-        <div className="relative overflow-hidden border-b border-white/[0.07] px-3 py-5">
-          <div className="pointer-events-none absolute -right-6 -top-8 h-28 w-28 rounded-full bg-gls-pink/25 blur-3xl" />
-          <div className="pointer-events-none absolute -left-4 bottom-0 h-16 w-16 rounded-full bg-gls-sky/15 blur-2xl" />
-          <div className="relative flex items-center gap-3">
+  const sidebarBody = (opts: {
+    collapsed: boolean;
+    showCollapse: boolean;
+    onNavigate?: () => void;
+  }) => (
+    <>
+      <div className="relative overflow-hidden border-b border-white/[0.07] px-3 py-4 sm:py-5">
+        <div className="pointer-events-none absolute -right-6 -top-8 h-28 w-28 rounded-full bg-gls-pink/25 blur-3xl" />
+        <div className="pointer-events-none absolute -left-4 bottom-0 h-16 w-16 rounded-full bg-gls-sky/15 blur-2xl" />
+        <div className="relative flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <GlsLogo size="sm" href="/admin" glass />
-            {!collapsed && (
+            {!opts.collapsed && (
               <div className="min-w-0 animate-[gls-admin-in_0.35s_ease_both]">
                 <p className="truncate text-[10px] font-bold uppercase tracking-[0.28em] text-gls-pink">
                   Control
                 </p>
-                <p className="truncate text-sm font-medium text-white">Admin Portal</p>
+                <p className="truncate text-sm font-medium text-white">
+                  Admin Portal
+                </p>
               </div>
             )}
           </div>
+          {opts.onNavigate && (
+            <button
+              type="button"
+              onClick={opts.onNavigate}
+              className="rounded-lg border border-white/15 px-2.5 py-1.5 text-xs text-white/70 lg:hidden"
+              aria-label="Close menu"
+            >
+              Close
+            </button>
+          )}
         </div>
+      </div>
 
-        <nav className="flex-1 space-y-1.5 overflow-y-auto px-2 py-4">
-          {NAV.map((item) => {
-            const active =
-              pathname === item.href ||
-              (item.href !== "/admin" && pathname.startsWith(item.href));
-            const color = ADMIN_NAV_COLORS[item.href] || "#ff6b9d";
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                title={item.label}
-                className={`group/nav flex items-center gap-3 rounded-xl px-2 py-2 text-sm transition duration-200 ${
-                  active
-                    ? "gls-admin-nav-active"
-                    : "text-gls-muted hover:bg-white/[0.04] hover:text-white"
-                }`}
-                style={
-                  {
-                    ["--nav-icon"]: color,
-                  } as CSSProperties
-                }
-              >
-                <NavIcon color={color}>{item.icon}</NavIcon>
-                {!collapsed && (
-                  <span className="truncate font-medium">{item.label}</span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+      <nav className="flex-1 space-y-1 overflow-y-auto overscroll-contain px-2 py-3">
+        <NavLinks
+          pathname={pathname}
+          collapsed={opts.collapsed}
+          onNavigate={opts.onNavigate}
+        />
+      </nav>
 
-        <div className="space-y-1 border-t border-white/[0.07] p-2 pb-4">
+      <div className="space-y-1 border-t border-white/[0.07] p-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        {opts.showCollapse && (
           <button
             type="button"
-            onClick={toggle}
-            className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-sm text-gls-muted transition hover:bg-white/[0.04] hover:text-white"
+            onClick={toggleDesktop}
+            className="hidden w-full items-center gap-3 rounded-xl px-2 py-2 text-sm text-gls-muted transition hover:bg-white/[0.04] hover:text-white lg:flex"
           >
             <NavIcon color="#8a8494">
               <path
@@ -324,62 +402,156 @@ export function AdminShell({
                 strokeLinecap="round"
               />
             </NavIcon>
-            {!collapsed && <span>Collapse</span>}
+            {!opts.collapsed && <span>Collapse</span>}
           </button>
-          <Link
-            href="/browse"
-            className="flex items-center gap-3 rounded-xl px-2 py-2 text-sm text-gls-muted transition hover:bg-white/[0.04] hover:text-white"
-          >
-            <NavIcon color="#7ec8ff">
-              <path
-                d="M15 18l-6-6 6-6M9 12h10"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </NavIcon>
-            {!collapsed && <span>Back to GLS TV</span>}
-          </Link>
-          {!collapsed && email && (
-            <p className="truncate px-2.5 pt-1 text-[10px] leading-relaxed text-gls-muted/80">
-              Signed in as
-              <br />
-              <span className="text-gls-body">{email}</span>
-            </p>
-          )}
-        </div>
+        )}
+        <Link
+          href="/browse"
+          onClick={opts.onNavigate}
+          className="flex items-center gap-3 rounded-xl px-2 py-2 text-sm text-gls-muted transition hover:bg-white/[0.04] hover:text-white"
+        >
+          <NavIcon color="#7ec8ff">
+            <path
+              d="M15 18l-6-6 6-6M9 12h10"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </NavIcon>
+          {!opts.collapsed && <span>Back to GLS TV</span>}
+        </Link>
+        {!opts.collapsed && email && (
+          <p className="truncate px-2.5 pt-1 text-[10px] leading-relaxed text-gls-muted/80">
+            Signed in as
+            <br />
+            <span className="text-gls-body">{email}</span>
+          </p>
+        )}
+      </div>
+    </>
+  );
+
+  return (
+    <div className="gls-admin-shell flex min-h-screen text-white">
+      {/* Desktop sidebar — full width available for content on phones */}
+      <aside
+        className={`gls-admin-sidebar sticky top-0 z-30 hidden h-screen shrink-0 flex-col transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:flex ${
+          ready ? "" : "opacity-0"
+        } ${collapsed ? "w-[84px]" : "w-64"}`}
+      >
+        {sidebarBody({ collapsed, showCollapse: true })}
       </aside>
 
-      <div className="relative min-w-0 flex-1">
-        <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-white/[0.07] bg-[#07070b]/55 px-5 backdrop-blur-xl sm:px-8">
-          <div className="flex items-center gap-3">
-            <span
-              className="h-2 w-2 rounded-full"
-              style={{
-                background: pageColor,
-                boxShadow: `0 0 12px ${pageColor}`,
-              }}
-              aria-hidden
-            />
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-gls-muted">
-                GLS Admin
-              </p>
-              <h1 className="text-sm font-semibold tracking-wide text-white">
-                {activeItem.label}
-              </h1>
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal>
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/65 backdrop-blur-sm"
+            aria-label="Close menu"
+            onClick={() => setMobileOpen(false)}
+          />
+          <aside className="gls-admin-sidebar absolute inset-y-0 left-0 flex w-[min(20rem,88vw)] flex-col shadow-2xl">
+            {sidebarBody({
+              collapsed: false,
+              showCollapse: false,
+              onNavigate: () => setMobileOpen(false),
+            })}
+          </aside>
+        </div>
+      )}
+
+      <div className="relative flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-20 border-b border-white/[0.07] bg-[#07070b]/80 backdrop-blur-xl">
+          <div className="flex h-12 items-center justify-between gap-3 px-3 sm:h-14 sm:px-6 lg:px-8">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setMobileOpen(true)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/[0.04] text-white lg:hidden"
+                aria-label="Open admin menu"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
+                  <path
+                    d="M4 7h16M4 12h16M4 17h16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+              <span
+                className="hidden h-2 w-2 shrink-0 rounded-full sm:block"
+                style={{
+                  background: pageColor,
+                  boxShadow: `0 0 12px ${pageColor}`,
+                }}
+                aria-hidden
+              />
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-gls-muted">
+                  GLS Admin
+                </p>
+                <h1 className="truncate text-sm font-semibold tracking-wide text-white">
+                  {activeItem.label}
+                </h1>
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <Link
+                href="/browse"
+                className="rounded-full border border-white/15 px-2.5 py-1 text-[11px] text-gls-muted transition hover:text-white lg:hidden"
+              >
+                App
+              </Link>
+              <Link
+                href="/eadmin"
+                className="hidden text-xs text-gls-muted transition hover:text-gls-pink-soft sm:inline"
+              >
+                Legacy eadmin →
+              </Link>
             </div>
           </div>
-          <Link
-            href="/eadmin"
-            className="text-xs text-gls-muted transition hover:text-gls-pink-soft"
-          >
-            Legacy eadmin →
-          </Link>
+
+          {/* Quick jump chips on small screens */}
+          <div className="flex gap-2 overflow-x-auto px-3 pb-2.5 [-ms-overflow-style:none] [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden">
+            {NAV.slice(0, 8).map((item) => {
+              const active =
+                pathname === item.href ||
+                (item.href !== "/admin" && pathname.startsWith(item.href));
+              const color = ADMIN_NAV_COLORS[item.href] || "#ff6b9d";
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`shrink-0 rounded-full border px-3 py-1 text-[11px] font-semibold transition ${
+                    active
+                      ? "border-transparent text-white"
+                      : "border-white/15 text-white/65"
+                  }`}
+                  style={
+                    active
+                      ? {
+                          background: `color-mix(in srgb, ${color} 35%, #121018)`,
+                          boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${color} 50%, transparent)`,
+                        }
+                      : undefined
+                  }
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
         </header>
-        <div key={pathname} className="gls-admin-main p-5 sm:p-8 lg:p-10">
+
+        <div
+          key={pathname}
+          className="gls-admin-main px-3 py-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-6 lg:px-10 lg:py-8"
+        >
           {children}
         </div>
       </div>

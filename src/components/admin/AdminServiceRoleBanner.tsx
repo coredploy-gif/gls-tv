@@ -28,7 +28,7 @@ export function AdminServiceRoleBanner() {
 
   return (
     <div
-      className="mx-5 mt-4 rounded-lg border border-gls-red/40 bg-gls-red/15 px-4 py-3 text-sm text-red-100 sm:mx-8 lg:mx-10"
+      className="mx-3 mt-3 rounded-lg border border-gls-red/40 bg-gls-red/15 px-3 py-2.5 text-sm text-red-100 sm:mx-6 sm:mt-4 sm:px-4 sm:py-3 lg:mx-10"
       role="alert"
     >
       <p className="font-semibold">Admin APIs blocked — no service role</p>

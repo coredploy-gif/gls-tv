@@ -1,7 +1,13 @@
 import type { CatalogItem } from "@/data/types";
 import { createClient } from "@supabase/supabase-js";
+import overridesJson from "@/data/generated/channel-overrides.json";
 import { isArenaPayLinear } from "@/lib/channel-heal";
 import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
+
+const overrides = overridesJson as Record<
+  string,
+  { title?: string; url?: string; note?: string; categories?: string[] }
+>;
 
 function anon() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -35,7 +41,13 @@ type DbChannel = {
 
 export function catalogFromDbChannel(ch: DbChannel): CatalogItem | null {
   if (isExcludedBuiltinChannel(ch.slug, ch.title)) return null;
-  const url = (ch.active_source_url || ch.source_url || "").trim();
+  const override = overrides[ch.slug];
+  const url = (
+    override?.url ||
+    ch.active_source_url ||
+    ch.source_url ||
+    ""
+  ).trim();
   const cats = ch.categories || ["General"];
   const linearPay =
     cats.includes("LinearPay") ||
@@ -44,12 +56,14 @@ export function catalogFromDbChannel(ch: DbChannel): CatalogItem | null {
   // Linear pay tiles stay visible for discovery even when HLS is intentionally empty
   if (!url && !linearPay) return null;
   const rightsBlocked = linearPay || ch.health_status === "dead";
+  const healedOverride = Boolean(override?.url);
   return {
     id: ch.id,
     slug: ch.slug,
-    title: ch.title,
+    title: override?.title || ch.title,
     type: "live",
     description:
+      override?.note ||
       ch.description ||
       (linearPay
         ? `${ch.title} — linear pay-TV channel. Use the official licensed provider.`
@@ -58,13 +72,17 @@ export function catalogFromDbChannel(ch: DbChannel): CatalogItem | null {
     categories: [
       ...new Set([
         ...cats.filter((c) => c !== "Unavailable"),
+        ...(override?.categories || []),
         "IptvOrg",
         linearPay ? "LinearPay" : null,
-        ch.health_status === "healthy"
+        healedOverride
           ? "Playable"
-          : linearPay
-            ? null
-            : "ProxyOk",
+          : ch.health_status === "healthy"
+            ? "Playable"
+            : linearPay
+              ? null
+              : "ProxyOk",
+        healedOverride ? "Healed" : null,
       ].filter(Boolean) as string[]),
     ],
     languages: ch.languages || [],
@@ -81,8 +99,8 @@ export function catalogFromDbChannel(ch: DbChannel): CatalogItem | null {
               url,
               quality: ch.source_quality || "Auto",
               format: (ch.source_format as "hls" | "mp4") || "hls",
-              priority: 20,
-              label: "iptv-org-db",
+              priority: healedOverride ? 4 : 20,
+              label: healedOverride ? "heal-override" : "iptv-org-db",
             },
           ],
   };

@@ -67,7 +67,7 @@ export default function LegalPage() {
             Payments, cancellation and refunds
           </h2>
           <p>
-            Plans cost R55, R65 or R75 for 30 days. Payment is made manually
+            Plans cost R45, R55 or R65 for 30 days. Payment is made manually
             using a Yoco payment link or EFT with the exact GLS reference.
             Access starts only after verification. GLS TV does not automatically
             debit cards or bank accounts.

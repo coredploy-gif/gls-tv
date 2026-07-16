@@ -27,9 +27,9 @@ export function isManualPlan(value: string): value is ManualPlanId {
 }
 
 export function manualPlanCents(plan: ManualPlanId) {
-  if (plan === "gls_65") return 6500;
-  if (plan === "gls_75") return 7500;
-  return 5500;
+  if (plan === "gls_65") return 5500;
+  if (plan === "gls_75") return 6500;
+  return 4500;
 }
 
 export function memberReferenceFor(userId: string) {

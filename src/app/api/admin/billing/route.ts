@@ -734,13 +734,15 @@ export async function POST(req: NextRequest) {
     const planMeta = sub.metadata?.gls_plan;
     const plan: GlsPlanId =
       (planMeta && isBillablePlan(planMeta) && planMeta) ||
-      (amount === 5500
+      (amount === 4500
         ? "gls_55"
-        : amount === 6500
+        : amount === 5500
           ? "gls_65"
-          : amount === 7500
+          : amount === 6500
             ? "gls_75"
-            : "gls_55");
+            : amount === 7500
+              ? "gls_75"
+              : "gls_55");
 
     const active = ["active", "trialing", "past_due"].includes(sub.status);
     const periodEnd = sub.items.data[0]?.current_period_end

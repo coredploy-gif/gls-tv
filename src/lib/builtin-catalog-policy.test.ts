@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
-import { healChannelSources } from "@/lib/channel-heal";
+import {
+  healChannelSources,
+  healPrivatePlaylistSources,
+  primaryPrivateHealUrl,
+} from "@/lib/channel-heal";
 import { getAllChannels, getChannelBySlug } from "@/lib/channels";
 import { channelRowToCatalog, mineWatchHref } from "@/lib/playlists";
 
@@ -72,5 +76,116 @@ describe("owner-scoped playlist channels", () => {
     expect(mineWatchHref(channel.id.replace(/^user-/, ""))).toBe(
       "/watch/mine/8a94349c-609d-4800-a881-b7c80b7f1f7e",
     );
+  });
+
+  it("heals Trace+ playlist sources onto Amagi mirrors first", () => {
+    const channel = channelRowToCatalog({
+      id: "a1b2c3d4-609d-4800-a881-b7c80b7f1f7e",
+      playlist_id: "77e3191c-111c-43ec-8f4f-7010bcdbd82b",
+      user_id: "5a554ebf-22a7-48d6-8863-0bb5b47974a1",
+      slug: "trace-urban-sa",
+      title: "Trace Urban Southern Africa",
+      description: "",
+      poster: "",
+      backdrop: "",
+      categories: ["Music"],
+      countries: ["za"],
+      tvg_id: null,
+      stream_url: "https://channels.trace.plus/Traceprod/URBAN_SA_hd/index.m3u8",
+      quality: "HD",
+      format: "hls",
+      sort_order: 0,
+    });
+
+    expect(channel.sources[0]?.url).toContain("amagi.tv");
+    expect(channel.categories).toEqual(
+      expect.arrayContaining(["Healed", "Playable", "My Playlist"]),
+    );
+  });
+
+  it("heals open FTA packs on private playlists without clearing Arena URLs", () => {
+    const sabc = channelRowToCatalog({
+      id: "b2c3d4e5-609d-4800-a881-b7c80b7f1f7e",
+      playlist_id: "77e3191c-111c-43ec-8f4f-7010bcdbd82b",
+      user_id: "5a554ebf-22a7-48d6-8863-0bb5b47974a1",
+      slug: "sabc1-za-sd",
+      title: "SABC 1",
+      description: "",
+      poster: "",
+      backdrop: "",
+      categories: ["Entertainment"],
+      countries: ["za"],
+      tvg_id: null,
+      stream_url: "https://nl1.nghk.ai/SABC1/index.m3u8",
+      quality: "HD",
+      format: "hls",
+      sort_order: 0,
+    });
+    expect(sabc.sources[0]?.url).toContain("mangomolo.com");
+    expect(sabc.categories).toEqual(
+      expect.arrayContaining(["Healed", "Playable", "Geo"]),
+    );
+
+    const arena = healPrivatePlaylistSources(
+      "arenasport1-hr-sd",
+      "Arena Sport 1",
+      [
+        {
+          url: "https://nl1.nghk.ai/AS1HRHD/index.m3u8",
+          quality: "HD",
+          format: "hls",
+          label: "browser-direct",
+        },
+      ],
+    );
+    expect(arena.sources.some((s) => /nghk\.ai/.test(s.url))).toBe(true);
+    expect(arena.tags).toEqual(
+      expect.arrayContaining(["LinearPay", "Rights"]),
+    );
+    expect(primaryPrivateHealUrl("arenasport1-hr-sd", "Arena Sport 1")).toBeNull();
+  });
+
+  it("maps beIN Sports USA playlist rows onto curated XTRA FAST", () => {
+    const channel = channelRowToCatalog({
+      id: "c3d4e5f6-609d-4800-a881-b7c80b7f1f7e",
+      playlist_id: "77e3191c-111c-43ec-8f4f-7010bcdbd82b",
+      user_id: "5a554ebf-22a7-48d6-8863-0bb5b47974a1",
+      slug: "beinsportsusa-us-sd",
+      title: "beIN Sports USA",
+      description: "",
+      poster: "",
+      backdrop: "",
+      categories: ["Sports"],
+      countries: ["us"],
+      tvg_id: null,
+      stream_url: "http://23.237.104.106:8080/USA_BEIN/index.m3u8",
+      quality: "HD",
+      format: "hls",
+      sort_order: 0,
+    });
+    expect(channel.sources[0]?.url).toContain("bein-xtra-bein.amagi.tv");
+    expect(channel.categories).toEqual(
+      expect.arrayContaining(["Healed", "Playable"]),
+    );
+  });
+
+  it("demotes raw-IP sources but keeps them as last resort", () => {
+    const healed = healPrivatePlaylistSources("bridge-ru-sd", "BRIDGE", [
+      {
+        url: "http://31.148.48.15/Bridge_TV/index.m3u8",
+        quality: "Auto",
+        format: "hls",
+        label: "browser-direct",
+      },
+      {
+        url: "/api/hls?channelId=abc",
+        quality: "Auto",
+        format: "hls",
+        label: "secure-relay",
+      },
+    ]);
+    expect(healed.sources[0]?.label).toBe("secure-relay");
+    expect(healed.sources.at(-1)?.url).toContain("31.148.48.15");
+    expect(healed.tags).toContain("ProxyOk");
   });
 });

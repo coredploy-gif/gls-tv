@@ -15,6 +15,16 @@ import { operationalLog } from "@/lib/operations/logger";
 import { issueHlsTicket, verifyHlsTicket } from "@/lib/hls-ticket";
 import { rewriteHlsPlaylist } from "@/lib/hls-playlist";
 import { hlsUpstreamHeaders } from "@/lib/hls-upstream";
+import {
+  isFragileHost,
+  isRawIpUrl,
+  overrideHealUrl,
+  primaryPrivateHealUrl,
+} from "@/lib/channel-heal";
+import {
+  isBrokenTraceOrigin,
+  isTraceChannel,
+} from "@/lib/trace-mirrors";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -182,7 +192,7 @@ export async function GET(req: NextRequest) {
         "channel",
         supabase
           .from("user_playlist_channels")
-          .select("stream_url")
+          .select("stream_url, slug, title")
           .eq("id", channelId)
           .eq("user_id", user.id)
           .maybeSingle(),
@@ -192,7 +202,21 @@ export async function GET(req: NextRequest) {
           NextResponse.json({ error: "Channel not found" }, { status: 404 }),
         );
       }
-      persistedUrl = channel.stream_url;
+      const rawStream = channel.stream_url?.trim() || "";
+      const openHeal = primaryPrivateHealUrl(channel.slug, channel.title);
+      const override = overrideHealUrl(channel.slug);
+      const preferHeal =
+        !!openHeal &&
+        (!rawStream ||
+          isBrokenTraceOrigin(rawStream) ||
+          isFragileHost(rawStream) ||
+          isRawIpUrl(rawStream) ||
+          (!!override && rawStream !== override) ||
+          (isTraceChannel(channel.slug, channel.title) &&
+            !/amagi\.tv/i.test(rawStream)));
+      // Curated open FAST/FTA when stored origin is fragile/dead or overridden.
+      // Arena pay-linear returns null from primaryPrivateHealUrl — left alone.
+      persistedUrl = preferHeal && openHeal ? openHeal : rawStream;
     }
   }
 

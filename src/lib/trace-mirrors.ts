@@ -6,26 +6,28 @@ import type { MediaSource } from "@/data/types";
  */
 
 const TRACE_URBAN: MediaSource[] = [
-  {
-    url: "https://lightning-traceurban-samsungau.amagi.tv/playlist.m3u8",
-    quality: "HD",
-    format: "hls",
-    priority: 8,
-    label: "trace-amagi-au",
-  },
+  // Prefer CORS-friendly Amagi hosts for browser direct play.
+  // lightning-*.amagi.tv often omits ACAO and stalls behind /api/hls 502s.
   {
     url: "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00520-tcl-traceurban-tcl/playlist.m3u8",
     quality: "HD",
     format: "hls",
-    priority: 9,
+    priority: 8,
     label: "trace-amagi-tcl",
   },
   {
     url: "https://amg01131-tracetv-amg01131c1-rakuten-us-1081.playouts.now.amagi.tv/ts-us-e2-n2/playlist/amg01131-tracetvfast-traceurban-rakutenus/playlist.m3u8",
     quality: "HD",
     format: "hls",
-    priority: 11,
+    priority: 9,
     label: "trace-amagi-rakuten",
+  },
+  {
+    url: "https://lightning-traceurban-samsungau.amagi.tv/playlist.m3u8",
+    quality: "HD",
+    format: "hls",
+    priority: 12,
+    label: "trace-amagi-au",
   },
 ];
 
@@ -92,7 +94,15 @@ const TRACE_UK: MediaSource[] = [
 
 export function isTraceChannel(slug: string, title?: string | null): boolean {
   const hay = `${slug} ${title || ""}`.toLowerCase();
-  return /\btrace\b/.test(hay);
+  // iptv-org uses concatenated slugs (tracegospel-fr-…, tracesportstars-fr-…)
+  // where `\btrace\b` does not match — also accept Trace* brand prefixes.
+  return (
+    /\btrace\b/.test(hay) ||
+    /^trace[a-z0-9]/.test(slug.toLowerCase()) ||
+    /(?:^|[^a-z])trace(?:urban|gospel|latina|brazuca|sport|africa|ayiti|caribbean|ivoire|naija|mziki|kitoko|mboa|muzika|ngoma|toca|jama|uk|teranga|afrikora|vanillaislands)/i.test(
+      hay,
+    )
+  );
 }
 
 export function isBrokenTraceOrigin(url: string): boolean {
@@ -142,6 +152,14 @@ export function traceHealMirrors(
     default:
       return [...TRACE_URBAN];
   }
+}
+
+/** Best open mirror when a Trace+ CDN URL cannot be played. */
+export function primaryTraceHealUrl(
+  slug: string,
+  title?: string | null,
+): string | null {
+  return traceHealMirrors(slug, title)[0]?.url ?? null;
 }
 
 /**

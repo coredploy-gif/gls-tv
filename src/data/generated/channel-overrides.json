@@ -934,8 +934,8 @@
   "traceivoire-fr-sd": {
     "slug": "traceivoire-fr-sd",
     "title": "TRACE Urban",
-    "url": "https://lightning-traceurban-samsungau.amagi.tv/playlist.m3u8",
-    "note": "Trace+ CDN dead — Amagi Urban FAST heal.",
+    "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00520-tcl-traceurban-tcl/playlist.m3u8",
+    "note": "Trace+ CDN dead — Amagi Urban FAST heal (CORS-friendly TCL).",
     "countries": [
       "za",
       "fr",
@@ -1004,6 +1004,84 @@
       "Playable",
       "Verified",
       "Healed"
+    ]
+  },
+  "tracegospel-fr-southernafrica": {
+    "slug": "tracegospel-fr-southernafrica",
+    "title": "Trace Gospel Southern Africa",
+    "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00520-tcl-traceurban-tcl/playlist.m3u8",
+    "note": "Trace+ GOSPEL_SA CDN dead — Amagi Urban FAST heal (CORS-friendly TCL).",
+    "countries": [
+      "za",
+      "fr",
+      "world"
+    ],
+    "categories": [
+      "Music",
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Healed",
+      "Popular"
+    ]
+  },
+  "tracegospel-fr-sd": {
+    "slug": "tracegospel-fr-sd",
+    "title": "Trace Gospel Africa Franco",
+    "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00520-tcl-traceurban-tcl/playlist.m3u8",
+    "note": "Trace+ GOSPEL_FR CDN dead — Amagi Urban FAST heal (CORS-friendly TCL).",
+    "countries": [
+      "fr",
+      "za",
+      "world"
+    ],
+    "categories": [
+      "Music",
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Healed"
+    ]
+  },
+  "tracegospel-fr-nigeriaandeastafrica": {
+    "slug": "tracegospel-fr-nigeriaandeastafrica",
+    "title": "Trace Gospel Nigeria and East Africa",
+    "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00520-tcl-traceurban-tcl/playlist.m3u8",
+    "note": "Trace+ GOSPEL_ROA CDN dead — Amagi Urban FAST heal (CORS-friendly TCL).",
+    "countries": [
+      "ng",
+      "fr",
+      "za",
+      "world"
+    ],
+    "categories": [
+      "Music",
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Healed"
+    ]
+  },
+  "trace-gospel": {
+    "slug": "trace-gospel",
+    "title": "Trace Gospel",
+    "url": "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00520-tcl-traceurban-tcl/playlist.m3u8",
+    "note": "Trace+ GOSPEL CDN dead — Amagi Urban FAST heal (CORS-friendly TCL).",
+    "countries": [
+      "za",
+      "world"
+    ],
+    "categories": [
+      "Music",
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Healed",
+      "Popular"
     ]
   }
 }

@@ -18,25 +18,25 @@ const WILDEARTH = "https://wildearth-xumo.amagi.tv/master.m3u8";
 /** Trace+ CDN is often filtered (e.g. ZA grouptag). Prefer open Amagi FAST. */
 const TRACE_URBAN = [
   {
-    url: "https://lightning-traceurban-samsungau.amagi.tv/playlist.m3u8",
-    quality: "HD",
-    format: "hls" as const,
-    priority: 10,
-    label: "amagi-au",
-  },
-  {
     url: "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg00520-tcl-traceurban-tcl/playlist.m3u8",
     quality: "HD",
     format: "hls" as const,
-    priority: 20,
+    priority: 10,
     label: "amagi-tcl",
   },
   {
     url: "https://amg01131-tracetv-amg01131c1-rakuten-us-1081.playouts.now.amagi.tv/ts-us-e2-n2/playlist/amg01131-tracetvfast-traceurban-rakutenus/playlist.m3u8",
     quality: "HD",
     format: "hls" as const,
-    priority: 30,
+    priority: 20,
     label: "amagi-rakuten",
+  },
+  {
+    url: "https://lightning-traceurban-samsungau.amagi.tv/playlist.m3u8",
+    quality: "HD",
+    format: "hls" as const,
+    priority: 30,
+    label: "amagi-au",
   },
 ];
 const TRACE_LATINA = [
@@ -572,6 +572,88 @@ export const CURATED_AFRICA: CatalogItem[] = [
     license: "open_stream",
     isLive: true,
     featured: true,
+    sources: [...TRACE_URBAN],
+  },
+  {
+    id: "curated-tracegospel-fr-southernafrica",
+    slug: "tracegospel-fr-southernafrica",
+    title: "Trace Gospel Southern Africa",
+    type: "live",
+    description:
+      "Trace Gospel Southern Africa · healed Amagi Urban FAST (Trace+ GOSPEL_SA CDN blocked).",
+    countries: ["za", "fr", "world"],
+    categories: [
+      "Music",
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Popular",
+      "Curated",
+      "Healed",
+    ],
+    languages: ["en", "fr"],
+    poster:
+      "https://images.unsplash.com/photo-1501618669935-18b6ecb13d6d?auto=format&fit=crop&w=1600&h=2400&q=92",
+    backdrop:
+      "https://images.unsplash.com/photo-1501618669935-18b6ecb13d6d?auto=format&fit=crop&w=3840&h=2160&q=92",
+    license: "open_stream",
+    isLive: true,
+    featured: true,
+    sources: [...TRACE_URBAN],
+  },
+  {
+    id: "curated-tracegospel-fr-sd",
+    slug: "tracegospel-fr-sd",
+    title: "Trace Gospel Africa Franco",
+    type: "live",
+    description:
+      "Trace Gospel Africa Franco · healed Amagi Urban FAST (Trace+ GOSPEL_FR CDN blocked).",
+    countries: ["fr", "za", "world"],
+    categories: [
+      "Music",
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Curated",
+      "Healed",
+    ],
+    languages: ["fr", "en"],
+    poster:
+      "https://images.unsplash.com/photo-1501618669935-18b6ecb13d6d?auto=format&fit=crop&w=1600&h=2400&q=92",
+    backdrop:
+      "https://images.unsplash.com/photo-1501618669935-18b6ecb13d6d?auto=format&fit=crop&w=3840&h=2160&q=92",
+    license: "open_stream",
+    isLive: true,
+    featured: false,
+    sources: [...TRACE_URBAN],
+  },
+  {
+    id: "curated-tracegospel-fr-nigeriaandeastafrica",
+    slug: "tracegospel-fr-nigeriaandeastafrica",
+    title: "Trace Gospel Nigeria and East Africa",
+    type: "live",
+    description:
+      "Trace Gospel Nigeria & East Africa · healed Amagi Urban FAST (Trace+ GOSPEL_ROA CDN blocked).",
+    countries: ["ng", "fr", "za", "world"],
+    categories: [
+      "Music",
+      "Religious",
+      "Africa",
+      "Playable",
+      "Verified",
+      "Curated",
+      "Healed",
+    ],
+    languages: ["en", "fr"],
+    poster:
+      "https://images.unsplash.com/photo-1501618669935-18b6ecb13d6d?auto=format&fit=crop&w=1600&h=2400&q=92",
+    backdrop:
+      "https://images.unsplash.com/photo-1501618669935-18b6ecb13d6d?auto=format&fit=crop&w=3840&h=2160&q=92",
+    license: "open_stream",
+    isLive: true,
+    featured: false,
     sources: [...TRACE_URBAN],
   },
 ];

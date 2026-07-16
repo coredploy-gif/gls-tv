@@ -16,12 +16,12 @@ export type PlanTier = {
   badge: string;
 };
 
-/** R55 / R65 / R75 — adult slots + Kids. */
+/** R45 / R55 / R65 — adult slots + Kids. Plan IDs kept for existing memberships. */
 export const GLS_PLANS: PlanTier[] = [
   {
     id: "gls_55",
     name: "Standard",
-    priceZar: 55,
+    priceZar: 45,
     adultProfiles: 2,
     includesKids: true,
     badge: "2 profiles + Kids",
@@ -29,7 +29,7 @@ export const GLS_PLANS: PlanTier[] = [
   {
     id: "gls_65",
     name: "Plus",
-    priceZar: 65,
+    priceZar: 55,
     adultProfiles: 3,
     includesKids: true,
     badge: "3 profiles + Kids",
@@ -37,7 +37,7 @@ export const GLS_PLANS: PlanTier[] = [
   {
     id: "gls_75",
     name: "Family",
-    priceZar: 75,
+    priceZar: 65,
     adultProfiles: 4,
     includesKids: true,
     badge: "4 profiles + Kids",

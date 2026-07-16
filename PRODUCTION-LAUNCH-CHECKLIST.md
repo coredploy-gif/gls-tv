@@ -474,7 +474,7 @@ trial:
 - [ ] Register and verify email.
 - [ ] Confirm the 14-day trial and device lock behave as advertised.
 - [ ] Create/select a viewer profile and play representative live/VOD content.
-- [ ] Choose each plan and confirm the amount is R55/R65/R75.
+- [ ] Choose each plan and confirm the amount is R45/R55/R65.
 - [ ] Create a payment request and confirm unique member/payment references.
 - [ ] Test Yoco QR/link on a separate phone.
 - [ ] Test EFT details and proof submission.

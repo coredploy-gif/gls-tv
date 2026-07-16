@@ -1,7 +1,14 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 type Ticket = {
@@ -47,7 +54,10 @@ const STATUS_TONE: Record<string, string> = {
 };
 
 function HelpdeskBoardInner() {
+  const router = useRouter();
   const search = useSearchParams();
+  const ticketFromUrl = search.get("ticket");
+  const closingRef = useRef(false);
   const [view, setView] = useState<"list" | "board">("list");
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [status, setStatus] = useState("all");
@@ -58,54 +68,86 @@ function HelpdeskBoardInner() {
   const [selected, setSelected] = useState<Ticket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [reply, setReply] = useState("");
-  const [threadBusy, setThreadBusy] = useState(false);
+  const [threadLoading, setThreadLoading] = useState(false);
+  const [sending, setSending] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [threadErr, setThreadErr] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setBusy(true);
     setErr(null);
-    const params = new URLSearchParams({ status, priority, source, q });
-    const res = await fetch(`/api/admin/helpdesk?${params}`);
-    const json = await res.json();
-    setBusy(false);
-    if (!res.ok) {
-      setErr(json.error || "Failed");
-      return;
+    try {
+      const params = new URLSearchParams({ status, priority, source, q });
+      const res = await fetch(`/api/admin/helpdesk?${params}`);
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setErr((json as { error?: string }).error || "Failed");
+        return;
+      }
+      setTickets((json as { tickets?: Ticket[] }).tickets || []);
+    } catch {
+      setErr("Helpdesk list could not be loaded");
+    } finally {
+      setBusy(false);
     }
-    setTickets(json.tickets || []);
   }, [status, priority, source, q]);
 
   useEffect(() => {
     queueMicrotask(() => void load());
   }, [load]);
 
-  const openTicket = useCallback(async (t: Ticket | string) => {
-    const id = typeof t === "string" ? t : t.id;
-    setThreadBusy(true);
-    setThreadErr(null);
-    setReply("");
-    const res = await fetch(`/api/admin/helpdesk?ticketId=${id}`);
-    const json = await res.json();
-    setThreadBusy(false);
-    if (res.ok) {
-      setSelected(json.ticket);
-      setMessages(json.messages || []);
-      window.history.replaceState(
-        null,
-        "",
-        `/admin/helpdesk?ticket=${encodeURIComponent(id)}`,
-      );
-    } else {
-      setThreadErr(json.error || "Thread could not be loaded");
-      setMessages([]);
-    }
-  }, []);
+  const openTicket = useCallback(
+    async (t: Ticket | string) => {
+      const id = typeof t === "string" ? t : t.id;
+      closingRef.current = false;
+      setThreadLoading(true);
+      setThreadErr(null);
+      try {
+        const res = await fetch(`/api/admin/helpdesk?ticketId=${id}`);
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setThreadErr(
+            (json as { error?: string }).error || "Thread could not be loaded",
+          );
+          setMessages([]);
+          return;
+        }
+        const ticket = (json as { ticket: Ticket }).ticket;
+        const nextMessages = (json as { messages?: Message[] }).messages || [];
+        setSelected((prev) => {
+          if (prev?.id && prev.id !== ticket.id) {
+            queueMicrotask(() => setReply(""));
+          }
+          return ticket;
+        });
+        setMessages(nextMessages);
+        const nextUrl = `/admin/helpdesk?ticket=${encodeURIComponent(id)}`;
+        if (
+          typeof window !== "undefined" &&
+          `${window.location.pathname}${window.location.search}` !== nextUrl
+        ) {
+          router.replace(nextUrl, { scroll: false });
+        }
+      } catch {
+        setThreadErr("Thread could not be loaded");
+        setMessages([]);
+      } finally {
+        setThreadLoading(false);
+      }
+    },
+    [router],
+  );
 
   useEffect(() => {
-    const id = search.get("ticket");
-    if (id) queueMicrotask(() => void openTicket(id));
-  }, [search, openTicket]);
+    if (!ticketFromUrl) {
+      closingRef.current = false;
+      return;
+    }
+    // Avoid re-opening while router.replace is still clearing ?ticket=
+    if (closingRef.current) return;
+    if (selected?.id === ticketFromUrl) return;
+    queueMicrotask(() => void openTicket(ticketFromUrl));
+  }, [ticketFromUrl, openTicket, selected?.id]);
 
   const updateStatus = async (id: string, next: string) => {
     const res = await fetch("/api/admin/helpdesk", {
@@ -120,26 +162,39 @@ function HelpdeskBoardInner() {
   };
 
   const sendReply = async () => {
-    if (!selected || !reply.trim()) return;
-    setThreadBusy(true);
+    if (!selected || !reply.trim() || sending) return;
+    const ticketId = selected.id;
+    const body = reply.trim();
+    setSending(true);
     setThreadErr(null);
-    const res = await fetch("/api/admin/helpdesk", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "reply",
-        id: selected.id,
-        body: reply.trim(),
-      }),
-    });
-    const json = await res.json().catch(() => ({}));
-    setThreadBusy(false);
-    if (res.ok) {
+    try {
+      const res = await fetch("/api/admin/helpdesk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "reply",
+          id: ticketId,
+          body,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setThreadErr(
+          (json as { error?: string }).error || "Reply failed — try again",
+        );
+        return;
+      }
       setReply("");
-      await openTicket(selected.id);
+      setMessages((prev) => {
+        const optimistic = (json as { message?: Message }).message;
+        return optimistic ? [...prev, optimistic] : prev;
+      });
+      await openTicket(ticketId);
       void load();
-    } else {
-      setThreadErr((json as { error?: string }).error || "Reply failed — try again");
+    } catch {
+      setThreadErr("Reply failed — check your connection and try again");
+    } finally {
+      setSending(false);
     }
   };
 
@@ -164,8 +219,12 @@ function HelpdeskBoardInner() {
   }, [tickets]);
 
   const closeModal = () => {
+    closingRef.current = true;
     setSelected(null);
-    window.history.replaceState(null, "", "/admin/helpdesk");
+    setMessages([]);
+    setReply("");
+    setThreadErr(null);
+    router.replace("/admin/helpdesk", { scroll: false });
   };
 
   return (
@@ -430,7 +489,7 @@ function HelpdeskBoardInner() {
                   <p className="mt-1 whitespace-pre-wrap">{selected.description}</p>
                 </div>
               )}
-              {threadBusy && !messages.length && (
+              {threadLoading && !messages.length && (
                 <p className="text-sm text-gls-muted">Loading thread…</p>
               )}
               {messages.map((m) => {
@@ -472,16 +531,23 @@ function HelpdeskBoardInner() {
                 className="gls-admin-input min-h-[80px] w-full"
                 placeholder="Agent reply…"
                 value={reply}
+                disabled={sending}
                 onChange={(e) => setReply(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                    e.preventDefault();
+                    void sendReply();
+                  }
+                }}
               />
               <div className="mt-3 flex flex-wrap gap-2">
                 <button
                   type="button"
-                  disabled={threadBusy || !reply.trim()}
+                  disabled={sending || threadLoading || !reply.trim()}
                   onClick={() => void sendReply()}
                   className="gls-cta rounded-md px-5 py-2.5 text-sm disabled:opacity-40"
                 >
-                  {threadBusy ? "Sending…" : "Send reply"}
+                  {sending ? "Sending…" : "Send reply"}
                 </button>
                 <button
                   type="button"
