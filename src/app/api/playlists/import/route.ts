@@ -138,7 +138,7 @@ export async function POST(req: Request) {
   if (!url || !isHttpUrl(url)) {
     return responseError(
       "M3U_URL_INVALID",
-      "Paste a valid HTTP(S) M3U playlist link.",
+      "Paste a valid HTTP(S) M3U or HLS (.m3u8) link.",
       400,
       importId,
     );
@@ -172,14 +172,13 @@ export async function POST(req: Request) {
   const parsed = parseM3uDetailed(fetched.text, {
     baseUrl: fetched.finalUrl,
     maxChannels: PLAYLIST_LIMITS.maxChannels,
+    // Prefer the user-pasted URL so jmp2/pluto entry points stay stable after redirects.
+    singleStreamUrl: url,
   });
   if (!parsed.channels.length) {
-    const manifest = parsed.stats.kind.startsWith("hls-");
     return responseError(
-      manifest ? "M3U_SINGLE_STREAM" : "M3U_NO_CHANNELS",
-      manifest
-        ? "That URL is a single HLS stream, not an importable channel list."
-        : "No valid HTTP(S) channels were found in that playlist.",
+      "M3U_NO_CHANNELS",
+      "No valid HTTP(S) channels were found in that playlist.",
       400,
       importId,
     );

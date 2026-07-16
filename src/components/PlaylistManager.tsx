@@ -320,8 +320,9 @@ export function PlaylistManager() {
             My Playlists
           </h1>
           <p className="mt-3 max-w-2xl text-base text-gls-body sm:text-lg">
-            Paste an M3U link. We save it under your account, parse every channel,
-            and load them into the GLS layout so you can watch instantly.
+            Paste an M3U channel list or a single HLS (.m3u8) stream. We save it
+            under your account and load channels into the GLS layout so you can
+            watch instantly.
           </p>
         </div>
 
@@ -354,8 +355,9 @@ export function PlaylistManager() {
             </label>
             <p className="text-xs leading-relaxed text-white/55">
               Use a direct public HTTPS link to an <code className="text-white/80">.m3u</code>{" "}
-              or <code className="text-white/80">.m3u8</code> playlist you have
-              the right to use. GLS does not host streams — it plays your URL.
+              channel list or a single <code className="text-white/80">.m3u8</code>{" "}
+              stream (for example jmp2 Pluto/Roku links) you have the right to use.
+              GLS does not host streams — it plays your URL.
             </p>
             <button
               type="submit"

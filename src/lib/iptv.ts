@@ -52,6 +52,56 @@ function manifestKind(lines: string[]): M3uParseStats["kind"] {
   return upper.some((line) => line.startsWith("#EXTINF")) ? "channel-list" : "unknown";
 }
 
+function titleFromStreamUrl(streamUrl: string) {
+  try {
+    const leaf =
+      new URL(streamUrl).pathname.split("/").filter(Boolean).pop() || "stream";
+    const cleaned = leaf
+      .replace(/\.m3u8$/i, "")
+      .replace(/[+_-]+/g, " ")
+      .trim();
+    return cleaned.slice(0, 80) || "Imported stream";
+  } catch {
+    return "Imported stream";
+  }
+}
+
+/** Build a one-channel IPTV entry from a direct HLS master/media URL. */
+export function channelFromSingleHls(
+  streamUrl: string,
+  options: { defaultCountry?: string; forceCategory?: string; title?: string } = {},
+): IptvChannel {
+  const title = (options.title || titleFromStreamUrl(streamUrl)).slice(0, 200);
+  const group = options.forceCategory || "Imported";
+  const slug =
+    title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") ||
+    "imported-stream";
+  const fallbackArt =
+    "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=1200&q=80";
+  return {
+    id: `iptv-${slug}`,
+    slug,
+    title,
+    type: "live",
+    description: `${group} live channel`,
+    countries: [options.defaultCountry || "world"],
+    categories: [group],
+    languages: [],
+    poster: fallbackArt,
+    backdrop: fallbackArt,
+    license: "open_stream",
+    isLive: true,
+    sources: [
+      {
+        url: streamUrl,
+        quality: "Auto",
+        format: /\.m3u8(?:$|\?)/i.test(streamUrl) ? "hls" : "mp4",
+      },
+    ],
+    tvgId: null,
+  };
+}
+
 export function parseM3uDetailed(
   text: string,
   options: {
@@ -59,6 +109,8 @@ export function parseM3uDetailed(
     forceCategory?: string;
     baseUrl?: string;
     maxChannels?: number;
+    /** When set, HLS master/media manifests become one channel pointing at this URL. */
+    singleStreamUrl?: string;
   } = {},
 ): M3uParseResult {
   const {
@@ -66,6 +118,7 @@ export function parseM3uDetailed(
     forceCategory,
     baseUrl,
     maxChannels = Number.POSITIVE_INFINITY,
+    singleStreamUrl,
   } = options;
   const lines = text.replace(/^\uFEFF/, "").split(/\r\n?|\n|\u2028|\u2029/);
   const kind = manifestKind(lines);
@@ -78,6 +131,14 @@ export function parseM3uDetailed(
     kind,
   };
   if (kind === "hls-master" || kind === "hls-media") {
+    const stream = singleStreamUrl ? httpUrl(singleStreamUrl) : null;
+    if (stream) {
+      stats.parsed = 1;
+      return {
+        channels: [channelFromSingleHls(stream, { defaultCountry, forceCategory })],
+        stats,
+      };
+    }
     stats.invalid = 1;
     return { channels: [], stats };
   }

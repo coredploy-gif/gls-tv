@@ -73,6 +73,48 @@ export function isReservedAddress(address: string): boolean {
   return mapped ? isReservedAddress(mapped[1]) : false;
 }
 
+export type ResolvedPublicAddress = {
+  address: string;
+  family: number;
+};
+
+/** Node 17+ may call custom lookup with `{ all: true }` (happy eyeballs). */
+export function pinnedLookup(
+  addresses: ResolvedPublicAddress[],
+): (
+  hostname: string,
+  options: unknown,
+  callback?: (
+    err: NodeJS.ErrnoException | null,
+    address: string | dns.LookupAddress[],
+    family?: number,
+  ) => void,
+) => void {
+  const primary = addresses[0];
+  if (!primary) {
+    return (_hostname, options, callback) => {
+      const cb = typeof options === "function" ? options : callback;
+      cb?.(new Error("No resolved public addresses"));
+    };
+  }
+  return (_hostname, options, callback) => {
+    const cb = typeof options === "function" ? options : callback;
+    const opts = typeof options === "function" ? undefined : (options as { all?: boolean });
+    if (!cb) return;
+    if (opts?.all) {
+      cb(
+        null,
+        addresses.map((entry) => ({
+          address: entry.address,
+          family: entry.family,
+        })),
+      );
+      return;
+    }
+    cb(null, primary.address, primary.family);
+  };
+}
+
 export async function validatePublicUrl(
   raw: string,
   allowedHost?: (hostname: string) => boolean,
@@ -98,7 +140,7 @@ export async function validatePublicUrl(
   if (!addresses.length || addresses.some((entry) => isReservedAddress(entry.address))) {
     throw new Error("Private or reserved network targets are blocked");
   }
-  return { url, address: addresses[0] };
+  return { url, address: addresses[0], addresses };
 }
 
 export async function secureFetchStream(
@@ -112,7 +154,7 @@ export async function secureFetchStream(
     target: string,
     redirects: number,
   ): Promise<SecureFetchStreamResult> {
-    const { url, address } = await validatePublicUrl(target, options.allowedHost);
+    const { url, addresses } = await validatePublicUrl(target, options.allowedHost);
     const client = url.protocol === "https:" ? https : http;
     return new Promise((resolve, reject) => {
       const request = client.request(
@@ -124,8 +166,8 @@ export async function secureFetchStream(
           method: "GET",
           headers: { ...options.headers, Host: url.host },
           servername: url.hostname,
-          lookup: (_hostname, _opts, callback) =>
-            callback(null, address.address, address.family),
+          // Pin to pre-validated public IPs (SSRF). Support Node's all:true lookup.
+          lookup: pinnedLookup(addresses),
         },
         (response) => {
           const status = response.statusCode || 502;

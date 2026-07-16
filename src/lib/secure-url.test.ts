@@ -1,6 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Readable } from "node:stream";
-import { isReservedAddress, readStreamBuffered } from "./secure-url";
+import {
+  isReservedAddress,
+  pinnedLookup,
+  readStreamBuffered,
+} from "./secure-url";
 
 describe("secure URL address checks", () => {
   it.each([
@@ -27,5 +31,22 @@ describe("secure URL address checks", () => {
     await expect(readStreamBuffered(stream, 12)).rejects.toThrow(
       "Upstream response is too large",
     );
+  });
+
+  it("supports Node all:true lookup callbacks used by happy eyeballs", () => {
+    const lookup = pinnedLookup([
+      { address: "1.1.1.1", family: 4 },
+      { address: "2606:4700:4700::1111", family: 6 },
+    ]);
+    const allCb = vi.fn();
+    lookup("example.test", { all: true, hints: 0 }, allCb);
+    expect(allCb).toHaveBeenCalledWith(null, [
+      { address: "1.1.1.1", family: 4 },
+      { address: "2606:4700:4700::1111", family: 6 },
+    ]);
+
+    const oneCb = vi.fn();
+    lookup("example.test", { hints: 0 }, oneCb);
+    expect(oneCb).toHaveBeenCalledWith(null, "1.1.1.1", 4);
   });
 });

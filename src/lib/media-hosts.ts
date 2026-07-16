@@ -11,6 +11,8 @@ const MEDIA_HOST_SUFFIXES = [
   "jmp2.uk",
   "pluto.tv",
   "plutotv.net",
+  // Roku FAST stitchers (jmp2 rok-* redirects here)
+  "roku.com",
   "xumo.com",
   "wurl.tv",
   "amagi.tv",

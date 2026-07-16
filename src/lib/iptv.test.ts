@@ -21,7 +21,7 @@ describe("parseM3uDetailed", () => {
     expect(result.channels[0].countries).toEqual(["za"]);
   });
 
-  it("rejects single-stream HLS manifests", () => {
+  it("rejects single-stream HLS manifests by default", () => {
     const master = parseM3uDetailed(
       "#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=1000\n720.m3u8",
       { baseUrl: "https://example.test/master.m3u8" },
@@ -34,6 +34,23 @@ describe("parseM3uDetailed", () => {
     expect(media.stats.kind).toBe("hls-media");
     expect(master.channels).toEqual([]);
     expect(media.channels).toEqual([]);
+  });
+
+  it("wraps single-stream HLS manifests when singleStreamUrl is set", () => {
+    const stream =
+      "https://jmp2.uk/rok-0597d2a4b388b1497a9bf48812e5d070.m3u8";
+    const master = parseM3uDetailed(
+      "#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=1000\n720.m3u8",
+      {
+        baseUrl: "https://aka-live.delivery.roku.com/out/v1/live.m3u8",
+        singleStreamUrl: stream,
+      },
+    );
+    expect(master.stats).toMatchObject({ kind: "hls-master", parsed: 1, invalid: 0 });
+    expect(master.channels).toHaveLength(1);
+    expect(master.channels[0].sources[0].url).toBe(stream);
+    expect(master.channels[0].sources[0].format).toBe("hls");
+    expect(master.channels[0].title.toLowerCase()).toContain("rok");
   });
 
   it("validates URLs, deduplicates deterministically and reports truncation", () => {
