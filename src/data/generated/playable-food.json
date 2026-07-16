@@ -4,7 +4,7 @@
     "slug": "bbcfood-us-sd",
     "title": "BBC Food",
     "type": "live",
-    "description": "Food · Pluto stitcher primary (ProxyOk); CloudFront .ts 403 from ZA",
+    "description": "Food · CloudFront direct (ZA segment 200); Pluto stitcher fallback (ProxyOk)",
     "countries": [
       "us",
       "world"
@@ -28,11 +28,18 @@
     "featured": true,
     "sources": [
       {
-        "url": "https://service-stitcher.clusters.pluto.tv/v1/stitch/embed/hls/channel/5fb5844bf5514d0007945bda/master.m3u8?deviceId=channel&deviceModel=web&deviceVersion=1.0&appVersion=1.0&deviceType=rokuChannel&deviceMake=rokuChannel&deviceDNT=1&advertisingId=channel&embedPartner=rokuChannel&appName=rokuchannel&is_lat=1&bmodel=bm1&content=channel&platform=web&tags=ROKU_CONTENT_TAGS&coppa=false&content_type=livefeed&rdid=channel&genre=ROKU_ADS_CONTENT_GENRE&content_rating=ROKU_ADS_CONTENT_RATING&studio_id=viacom&channel_id=channel",
+        "url": "https://d1e9r0b71zfwk7.cloudfront.net/playlist.m3u8",
         "quality": "Auto",
         "format": "hls",
         "priority": 5,
-        "label": "pluto-stitcher"
+        "label": "bbc-food-cf"
+      },
+      {
+        "url": "https://service-stitcher.clusters.pluto.tv/v1/stitch/embed/hls/channel/5fb5844bf5514d0007945bda/master.m3u8?deviceId=channel&deviceModel=web&deviceVersion=1.0&appVersion=1.0&deviceType=rokuChannel&deviceMake=rokuChannel&deviceDNT=1&advertisingId=channel&embedPartner=rokuChannel&appName=rokuchannel&is_lat=1&bmodel=bm1&content=channel&platform=web&tags=ROKU_CONTENT_TAGS&coppa=false&content_type=livefeed&rdid=channel&genre=ROKU_ADS_CONTENT_GENRE&content_rating=ROKU_ADS_CONTENT_RATING&studio_id=viacom&channel_id=channel",
+        "quality": "Auto",
+        "format": "hls",
+        "priority": 80,
+        "label": "pluto-stitcher-fallback"
       }
     ]
   },

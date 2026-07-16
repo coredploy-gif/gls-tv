@@ -194,6 +194,17 @@ export function healPackFor(slug: string, title?: string | null): Pack | null {
   if (/fox[\s_-]?weather/.test(hay)) {
     return [src(FOX_WEATHER, 5, "heal-fox-weather")];
   }
+  // BBC Food — CloudFront plays direct from ZA; Pluto stitcher/jmp2 are dead here.
+  if (/bbc[\s_-]?food|bbcfood/.test(hay)) {
+    return [
+      src(
+        "https://d1e9r0b71zfwk7.cloudfront.net/playlist.m3u8",
+        5,
+        "heal-bbc-food-cf",
+      ),
+    ];
+  }
+
   // beIN XTRA FAST (open Amagi) — not pay beIN numbered linears.
   if (/bein/.test(hay) && /xtra|extra/.test(hay)) {
     return [src(BEIN_XTRA, 5, "heal-bein-xtra")];

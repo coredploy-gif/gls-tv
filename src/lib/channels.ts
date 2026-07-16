@@ -46,6 +46,31 @@ const top10 = getAllTop10();
 function applyOverride(item: CatalogItem): CatalogItem {
   const o = overrides[item.slug];
   if (!o?.url) return item;
+  const overrideUrl = o.url.trim();
+  const seen = new Set<string>();
+  const sources: CatalogItem["sources"] = [];
+  const push = (source: CatalogItem["sources"][number]) => {
+    if (!source.url || seen.has(source.url)) return;
+    seen.add(source.url);
+    sources.push(source);
+  };
+
+  push({
+    url: overrideUrl,
+    quality: item.sources[0]?.quality || "Auto",
+    format: "hls",
+    priority: 4,
+    label: `heal-override-${item.slug}`,
+  });
+  for (const source of item.sources) {
+    if (source.url === overrideUrl) continue;
+    push({
+      ...source,
+      priority: (source.priority ?? 100) + 50,
+      label: source.label || "catalog-mirror",
+    });
+  }
+
   return {
     ...item,
     title: o.title || item.title,
@@ -53,13 +78,7 @@ function applyOverride(item: CatalogItem): CatalogItem {
     categories: [
       ...new Set([...(o.categories || item.categories), "Healed", "Playable"]),
     ],
-    sources: [
-      {
-        url: o.url,
-        quality: item.sources[0]?.quality || "Auto",
-        format: "hls",
-      },
-    ],
+    sources,
   };
 }
 
@@ -175,30 +194,52 @@ export function getSeriesChannels() {
 }
 
 export function getChannelBySlug(slug: string): CatalogItem | undefined {
-  const found =
-    top10.find((c) => c.slug === slug) ||
-    CURATED_AFRICA.find((c) => c.slug === slug) ||
-    CURATED_PUBLIC_SPORTS.find((c) => c.slug === slug) ||
-    CURATED_PUBLIC_MOVIES.find((c) => c.slug === slug) ||
-    CURATED_SERIES_SEEDS.find((c) => c.slug === slug) ||
-    playableWrestling.find((c) => c.slug === slug) ||
-    playableSports.find((c) => c.slug === slug) ||
-    playableKids.find((c) => c.slug === slug) ||
-    playableFood.find((c) => c.slug === slug) ||
-    playableFoodComp.find((c) => c.slug === slug) ||
-    playableAfrica.find((c) => c.slug === slug) ||
-    playableAsia.find((c) => c.slug === slug) ||
-    playableAsiaSeries.find((c) => c.slug === slug) ||
-    playableKoreaSeries.find((c) => c.slug === slug) ||
-    VERIFIED_LIVE.find((c) => c.slug === slug) ||
-    CATALOG.find((c) => c.slug === slug) ||
-    sportsChannels.find((c) => c.slug === slug) ||
-    usChannels.find((c) => c.slug === slug) ||
-    africaChannels.find((c) => c.slug === slug) ||
-    asiaChannels.find((c) => c.slug === slug);
-  return found && !isExcludedBuiltinChannel(found.slug, found.title)
-    ? applyOverride(found)
-    : undefined;
+  const lists = [
+    top10,
+    CURATED_AFRICA,
+    CURATED_PUBLIC_SPORTS,
+    CURATED_PUBLIC_MOVIES,
+    CURATED_SERIES_SEEDS,
+    playableWrestling,
+    playableSports,
+    playableKids,
+    playableFood,
+    playableFoodComp,
+    playableAfrica,
+    playableAsia,
+    playableAsiaSeries,
+    playableKoreaSeries,
+    VERIFIED_LIVE,
+    CATALOG,
+    sportsChannels,
+    usChannels,
+    africaChannels,
+    asiaChannels,
+  ];
+
+  let found: CatalogItem | undefined;
+  const mergedSources: CatalogItem["sources"] = [];
+  const seen = new Set<string>();
+
+  for (const list of lists) {
+    const hit = list.find((c) => c.slug === slug);
+    if (!hit) continue;
+    if (!found) found = hit;
+    for (const source of hit.sources || []) {
+      if (!source.url || seen.has(source.url)) continue;
+      seen.add(source.url);
+      mergedSources.push(source);
+    }
+  }
+
+  if (!found || isExcludedBuiltinChannel(found.slug, found.title)) {
+    return undefined;
+  }
+
+  return applyOverride({
+    ...found,
+    sources: mergedSources.length ? mergedSources : found.sources,
+  });
 }
 
 export function getSportsChannels() {

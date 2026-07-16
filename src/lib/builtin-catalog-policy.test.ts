@@ -48,6 +48,17 @@ describe("built-in catalog exclusions", () => {
     );
     expect(teleArena.tags).toContain("Playable");
   });
+
+  it("merges channel overrides without dropping catalog mirrors", () => {
+    const hells = getChannelBySlug("gordonramsayshellskitchen-us-sd");
+    expect(hells?.sources[0]?.url).toContain("tubi.video");
+    expect(hells?.sources.some((s) => /jmp2\.uk/.test(s.url))).toBe(true);
+    expect(hells?.sources.length).toBeGreaterThan(1);
+
+    const bbc = getChannelBySlug("bbcfood-us-sd");
+    expect(bbc?.sources[0]?.url).toContain("d1e9r0b71zfwk7.cloudfront.net");
+    expect(bbc?.sources.some((s) => /stitcher/.test(s.url))).toBe(true);
+  });
 });
 
 describe("owner-scoped playlist channels", () => {

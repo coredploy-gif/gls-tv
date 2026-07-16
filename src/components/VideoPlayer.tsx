@@ -47,6 +47,8 @@ function prefersProxy(url: string) {
   if (requiresProxy(url)) return true;
   if (isBrokenTraceOrigin(url) || isFragileHost(url)) return true;
   if (isPlutoFamily(url)) return true;
+  // Publica/Ottera/Kaltura child CDNs may need same-origin relay after manifest rewrite.
+  if (/getpublica\.com|ottera\.tv|kaltura\.com/i.test(url)) return true;
   return false;
 }
 
@@ -102,6 +104,11 @@ function isUnstableCdn(url: string) {
   );
 }
 
+/** Food / cooking FAST — allow extra mirror steps before the offline overlay. */
+function isFoodChannel(item: CatalogItem) {
+  return item.categories.some((c) => /food|cook|chef|kitchen/i.test(c));
+}
+
 function initialPick(item: CatalogItem, sources: MediaSource[]) {
   const mem = getStreamMemory(item.slug);
   const hardGeo = isHardGeo(item);
@@ -142,6 +149,16 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
     isTraceChannel(item.slug, item.title) &&
     mem?.url &&
     isBrokenTraceOrigin(mem.url)
+  ) {
+    clearStreamMemory(item.slug);
+  }
+
+  // Drop poisoned Pluto/proxy memory when healed catalog now leads with a direct URL.
+  if (
+    first?.url &&
+    !prefersProxy(first.url) &&
+    mem?.url &&
+    (prefersProxy(mem.url) || mem.mode === "proxy")
   ) {
     clearStreamMemory(item.slug);
   }
@@ -733,7 +750,8 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
             setStatus("Reconnecting…");
             if (failOverPath()) return;
             recoverCount += 1;
-            if (recoverCount > 5) {
+            const foodRetries = isFoodChannel(item) ? 8 : 5;
+            if (recoverCount > foodRetries) {
               setError("This programme isn’t available right now. Please try another channel.");
               return;
             }
