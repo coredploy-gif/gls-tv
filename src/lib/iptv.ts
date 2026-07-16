@@ -111,6 +111,8 @@ export function parseM3uDetailed(
     maxChannels?: number;
     /** When set, HLS master/media manifests become one channel pointing at this URL. */
     singleStreamUrl?: string;
+    /** Friendly title for single-stream imports (overrides URL leaf). */
+    singleStreamTitle?: string;
   } = {},
 ): M3uParseResult {
   const {
@@ -135,7 +137,13 @@ export function parseM3uDetailed(
     if (stream) {
       stats.parsed = 1;
       return {
-        channels: [channelFromSingleHls(stream, { defaultCountry, forceCategory })],
+        channels: [
+          channelFromSingleHls(stream, {
+            defaultCountry,
+            forceCategory,
+            title: options.singleStreamTitle,
+          }),
+        ],
         stats,
       };
     }

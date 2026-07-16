@@ -63,6 +63,7 @@ export function PlaylistManager() {
   const { user, loading: authLoading } = useAuth();
   const [url, setUrl] = useState("");
   const [name, setName] = useState("My playlist");
+  const [channelTitle, setChannelTitle] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -202,6 +203,7 @@ export function PlaylistManager() {
         body: JSON.stringify({
           url: url.trim(),
           name: name.trim(),
+          channelTitle: channelTitle.trim() || undefined,
           playlistId: replacementPlaylistId,
         }),
       });
@@ -215,6 +217,7 @@ export function PlaylistManager() {
         } · Import ${data.importId}.`,
       );
       setUrl("");
+      setChannelTitle("");
       setReplacementPlaylistId(null);
       await load();
       if (data.playlist?.id) setActivePlaylistId(data.playlist.id);
@@ -296,6 +299,31 @@ export function PlaylistManager() {
     }
   };
 
+  const renameChannel = async (channel: UserPlaylistChannelRow) => {
+    const next = prompt("Channel name", channel.title)?.trim();
+    if (!next || next === channel.title) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/playlists/channels", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: channel.id, title: next }),
+      });
+      await readResponse(res);
+      setChannels((prev) =>
+        prev.map((row) =>
+          row.id === channel.id ? { ...row, title: next } : row,
+        ),
+      );
+      setSuccess(`Channel renamed to “${next}”.`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Channel rename failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const replaceSource = async (playlist: UserPlaylistRow) => {
     const replacement = prompt("New M3U source URL");
     if (!replacement?.trim()) return;
@@ -341,7 +369,7 @@ export function PlaylistManager() {
             </label>
             <label className="block">
               <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/70">
-                M3U file link
+                M3U / stream link
               </span>
               <input
                 value={url}
@@ -349,8 +377,22 @@ export function PlaylistManager() {
                 required
                 type="url"
                 inputMode="url"
-                placeholder="https://example.com/playlist.m3u"
+                placeholder="https://example.com/playlist.m3u or …/stream.m3u8"
                 className="w-full rounded-sm border-2 border-white/25 bg-black/55 px-4 py-4 text-lg text-white outline-none placeholder:text-white/35 focus:border-gls-red focus:ring-2 focus:ring-gls-red/40"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/70">
+                Channel title{" "}
+                <span className="font-normal normal-case tracking-normal text-white/45">
+                  (optional — for single .m3u8 links)
+                </span>
+              </span>
+              <input
+                value={channelTitle}
+                onChange={(e) => setChannelTitle(e.target.value)}
+                placeholder="e.g. BBC Food · Hell’s Kitchen"
+                className="w-full rounded-sm border border-white/20 bg-black/40 px-4 py-3 text-base text-white outline-none placeholder:text-white/35 focus:border-gls-red focus:ring-1 focus:ring-gls-red"
               />
             </label>
             <p className="text-xs leading-relaxed text-white/55">
@@ -562,22 +604,36 @@ export function PlaylistManager() {
             <div key={group}>
               <h3 className="mb-3 text-lg font-semibold text-white">{group}</h3>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                {items.slice(0, visibleByGroup[group] || 24).map((item) => (
-                  <div
-                    key={item.id}
-                    className="relative w-full [&_a]:w-full"
-                  >
-                    <TitleCard
-                      item={item}
-                      href={mineWatchHref(item.id.replace(/^user-/, ""))}
-                    />
-                    {item.categories.includes("Unavailable") && (
-                      <span className="pointer-events-none absolute right-2 top-2 rounded bg-amber-500/95 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-black shadow">
-                        Unavailable · retrying
-                      </span>
-                    )}
-                  </div>
-                ))}
+                {items.slice(0, visibleByGroup[group] || 24).map((item) => {
+                  const channelId = item.id.replace(/^user-/, "");
+                  const row = channels.find((c) => c.id === channelId);
+                  return (
+                    <div
+                      key={item.id}
+                      className="relative w-full space-y-2 [&_a]:w-full"
+                    >
+                      <TitleCard
+                        item={item}
+                        href={mineWatchHref(channelId)}
+                      />
+                      {item.categories.includes("Unavailable") && (
+                        <span className="pointer-events-none absolute right-2 top-2 rounded bg-amber-500/95 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-black shadow">
+                          Unavailable · retrying
+                        </span>
+                      )}
+                      {row && entitled && (
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => void renameChannel(row)}
+                          className="w-full rounded border border-white/15 px-2 py-1.5 text-[11px] font-medium text-gls-muted transition hover:border-white/35 hover:text-white disabled:opacity-40"
+                        >
+                          Rename channel
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               {items.length > (visibleByGroup[group] || 24) && (
                 <button

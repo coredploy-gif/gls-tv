@@ -32,6 +32,13 @@ export const BROWSE_NAV: NavAccent[] = [
     glow: "rgba(255,142,200,0.4)",
   },
   {
+    href: "/library",
+    label: "My Links",
+    color: "#f0a0ff",
+    bright: "#f8d0ff",
+    glow: "rgba(240,160,255,0.4)",
+  },
+  {
     href: "/sports",
     label: "Sports",
     color: "#5ee29a",

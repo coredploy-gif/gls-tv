@@ -46,3 +46,6 @@ next-env.d.ts
 
 # local generated working files
 /tmp/
+
+# local-only working notes (do not commit)
+LOCAL-USER-MEDIA-LINKS.md

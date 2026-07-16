@@ -81,7 +81,7 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { url?: string; name?: string; playlistId?: string };
+  let body: { url?: string; name?: string; playlistId?: string; channelTitle?: string };
   try {
     body = await req.json();
   } catch {
@@ -89,6 +89,7 @@ export async function POST(req: Request) {
   }
 
   const name = (body.name || "My playlist").trim().slice(0, 80) || "My playlist";
+  const channelTitle = (body.channelTitle || "").trim().slice(0, 200) || undefined;
   const playlistId = body.playlistId?.trim() || null;
   let url = (body.url || "").trim();
 
@@ -174,6 +175,7 @@ export async function POST(req: Request) {
     maxChannels: PLAYLIST_LIMITS.maxChannels,
     // Prefer the user-pasted URL so jmp2/pluto entry points stay stable after redirects.
     singleStreamUrl: url,
+    singleStreamTitle: channelTitle,
   });
   if (!parsed.channels.length) {
     return responseError(
