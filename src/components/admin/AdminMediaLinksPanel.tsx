@@ -8,6 +8,16 @@ import {
   validateMediaLinkUrl,
 } from "@/lib/media-links";
 
+type PreviewState = {
+  url: string;
+  title: string;
+  category: string;
+  notes: string;
+  format: MediaLinkFormat;
+  thumbnailUrl?: string;
+  embedUrl?: string;
+};
+
 export function AdminMediaLinksPanel() {
   const [links, setLinks] = useState<AdminMediaLink[]>([]);
   const [url, setUrl] = useState("");
@@ -16,6 +26,7 @@ export function AdminMediaLinksPanel() {
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [preview, setPreview] = useState<PreviewState | null>(null);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/media-links", { cache: "no-store" });
@@ -31,10 +42,37 @@ export function AdminMediaLinksPanel() {
     queueMicrotask(() => void load());
   }, [load]);
 
-  const preview = url.trim().length > 8 ? validateMediaLinkUrl(url, title) : null;
+  const liveCheck =
+    url.trim().length > 8 ? validateMediaLinkUrl(url, title) : null;
 
-  const save = async (e: React.FormEvent) => {
+  const openPreview = (e: React.FormEvent) => {
     e.preventDefault();
+    setStatus(null);
+    const v = validateMediaLinkUrl(url, title);
+    if (!v.ok || !v.format || !v.title) {
+      setStatus(v.error || "Invalid URL");
+      setPreview(null);
+      return;
+    }
+    setPreview({
+      url: url.trim(),
+      title: v.title,
+      category: category.trim() || "Featured",
+      notes: notes.trim(),
+      format: v.format,
+      thumbnailUrl: v.thumbnailUrl,
+      embedUrl: v.embedUrl,
+    });
+  };
+
+  const save = async (publish: boolean) => {
+    if (!preview) return;
+    if (publish) {
+      const ok = window.confirm(
+        `Publish “${preview.title}” to all members?\n\nIt will appear under My Links → Staff picks (not the licensed catalog).`,
+      );
+      if (!ok) return;
+    }
     setBusy(true);
     setStatus(null);
     try {
@@ -42,22 +80,60 @@ export function AdminMediaLinksPanel() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          url: url.trim(),
-          title: title.trim() || undefined,
-          category,
-          notes,
-          is_published: true,
+          url: preview.url,
+          title: preview.title,
+          category: preview.category,
+          notes: preview.notes,
+          is_published: publish,
         }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Save failed");
-      setStatus(`Saved “${data.link?.title}”.`);
+      setStatus(
+        publish
+          ? `Published “${data.link?.title}” — visible on My Links → Staff picks.`
+          : `Draft saved “${data.link?.title}”. Preview again, then Confirm publish.`,
+      );
       setUrl("");
       setTitle("");
       setNotes("");
+      setPreview(null);
       await load();
     } catch (cause) {
       setStatus(cause instanceof Error ? cause.message : "Save failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const setPublished = async (link: AdminMediaLink, is_published: boolean) => {
+    if (is_published) {
+      const ok = window.confirm(
+        `Publish “${link.title}” to all members under My Links → Staff picks?`,
+      );
+      if (!ok) return;
+    }
+    setBusy(true);
+    try {
+      const res = await fetch("/api/admin/media-links", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: link.id, is_published }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Update failed");
+      setLinks((prev) =>
+        prev.map((row) =>
+          row.id === link.id ? { ...row, is_published } : row,
+        ),
+      );
+      setStatus(
+        is_published
+          ? `Published “${link.title}”.`
+          : `Unpublished “${link.title}” (draft).`,
+      );
+    } catch (cause) {
+      setStatus(cause instanceof Error ? cause.message : "Update failed");
     } finally {
       setBusy(false);
     }
@@ -78,31 +154,43 @@ export function AdminMediaLinksPanel() {
   return (
     <section className="space-y-5">
       <div>
-        <h2 className="text-lg font-semibold text-white">Quick media links</h2>
+        <h2 className="text-lg font-semibold text-white">Staff media picks</h2>
         <p className="mt-1 text-sm text-gls-muted">
-          Import guaranteed-playable member-facing links: HLS (.m3u8), YouTube,
-          Vimeo, MP4, WebM. Use a clear title — avoid raw hash names.
+          Curate playable links for members. They appear on{" "}
+          <strong className="text-white/80">My Links → Staff picks</strong> after
+          you preview and confirm publish — never mixed into the licensed catalog.
+          Members self-import their own HLS / YouTube / Vimeo / MP4 / WebM under My
+          Links.
         </p>
       </div>
 
-      <form onSubmit={save} className="grid gap-3 sm:grid-cols-2">
+      <form onSubmit={openPreview} className="grid gap-3 sm:grid-cols-2">
         <input
           type="url"
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={(e) => {
+            setUrl(e.target.value);
+            setPreview(null);
+          }}
           required
           placeholder="https://jmp2.uk/rok-….m3u8"
           className="gls-admin-input sm:col-span-2"
         />
         <input
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            setPreview(null);
+          }}
           placeholder="Display title (e.g. Hell’s Kitchen)"
           className="gls-admin-input"
         />
         <input
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          onChange={(e) => {
+            setCategory(e.target.value);
+            setPreview(null);
+          }}
           placeholder="Category"
           className="gls-admin-input"
         />
@@ -112,25 +200,92 @@ export function AdminMediaLinksPanel() {
           placeholder="Internal notes (optional)"
           className="gls-admin-input sm:col-span-2"
         />
-        {preview && (
+        {liveCheck && (
           <p
             className={`sm:col-span-2 text-sm ${
-              preview.ok ? "text-gls-mint" : "text-amber-200"
+              liveCheck.ok ? "text-gls-mint" : "text-amber-200"
             }`}
           >
-            {preview.ok
-              ? `Ready · ${MEDIA_FORMAT_META[preview.format as MediaLinkFormat].label}`
-              : preview.error}
+            {liveCheck.ok
+              ? `Format OK · ${MEDIA_FORMAT_META[liveCheck.format as MediaLinkFormat].label}`
+              : liveCheck.error}
           </p>
         )}
         <button
           type="submit"
-          disabled={busy || !preview?.ok}
-          className="gls-cta rounded-lg px-5 py-2.5 text-sm disabled:opacity-40 sm:col-span-2 sm:w-fit"
+          disabled={busy || !liveCheck?.ok}
+          className="rounded-lg border border-white/20 px-5 py-2.5 text-sm text-white disabled:opacity-40 sm:col-span-2 sm:w-fit"
         >
-          {busy ? "Saving…" : "Publish link"}
+          Preview before publish
         </button>
       </form>
+
+      {preview && (
+        <div className="rounded-xl border border-gls-mint/30 bg-gls-mint/5 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gls-mint">
+            Member preview
+          </p>
+          <div className="mt-3 flex flex-col gap-4 sm:flex-row">
+            <div
+              className="relative flex h-36 w-full shrink-0 items-center justify-center overflow-hidden rounded-lg bg-black/50 sm:w-56"
+              style={{
+                background: `linear-gradient(135deg, ${MEDIA_FORMAT_META[preview.format].accent}33, #0a0a0a)`,
+              }}
+            >
+              {preview.thumbnailUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={preview.thumbnailUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-sm font-semibold text-white/80">
+                  {MEDIA_FORMAT_META[preview.format].label}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-lg font-semibold text-white">{preview.title}</p>
+              <p className="mt-1 truncate text-xs text-gls-muted">{preview.url}</p>
+              <p className="mt-2 text-xs uppercase tracking-wide text-gls-muted">
+                {MEDIA_FORMAT_META[preview.format].label} · {preview.category}
+              </p>
+              {preview.embedUrl && (
+                <p className="mt-2 text-xs text-gls-muted">
+                  Embed ready · members play via My Links watch page
+                </p>
+              )}
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void save(false)}
+                  className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white disabled:opacity-40"
+                >
+                  {busy ? "Saving…" : "Save draft"}
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void save(true)}
+                  className="gls-cta rounded-lg px-4 py-2 text-sm disabled:opacity-40"
+                >
+                  {busy ? "Publishing…" : "Confirm publish"}
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => setPreview(null)}
+                  className="rounded-lg px-3 py-2 text-sm text-gls-muted"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {status && <p className="text-sm text-gls-muted">{status}</p>}
 
@@ -149,13 +304,34 @@ export function AdminMediaLinksPanel() {
                 {link.is_published ? " · published" : " · draft"}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => void remove(link.id)}
-              className="rounded border border-gls-red/40 px-3 py-1.5 text-xs text-red-300"
-            >
-              Delete
-            </button>
+            <div className="flex flex-wrap gap-2">
+              {link.is_published ? (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void setPublished(link, false)}
+                  className="rounded border border-white/20 px-3 py-1.5 text-xs text-gls-muted"
+                >
+                  Unpublish
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void setPublished(link, true)}
+                  className="rounded border border-gls-mint/40 px-3 py-1.5 text-xs text-gls-mint"
+                >
+                  Confirm publish
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => void remove(link.id)}
+                className="rounded border border-gls-red/40 px-3 py-1.5 text-xs text-red-300"
+              >
+                Delete
+              </button>
+            </div>
           </li>
         ))}
         {!links.length && (

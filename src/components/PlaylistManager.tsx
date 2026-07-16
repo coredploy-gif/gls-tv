@@ -399,7 +399,12 @@ export function PlaylistManager() {
               Use a direct public HTTPS link to an <code className="text-white/80">.m3u</code>{" "}
               channel list or a single <code className="text-white/80">.m3u8</code>{" "}
               stream (for example jmp2 Pluto/Roku links) you have the right to use.
-              GLS does not host streams — it plays your URL.
+              GLS does not host streams — it plays your URL. For YouTube, Vimeo, MP4,
+              or WebM, use{" "}
+              <Link href="/library" className="text-white underline-offset-2 hover:underline">
+                My Links
+              </Link>{" "}
+              instead.
             </p>
             <button
               type="submit"

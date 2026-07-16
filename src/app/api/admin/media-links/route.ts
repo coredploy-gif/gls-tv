@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient, isEadminEmail } from "@/lib/eadmin";
-import { validateMediaLinkUrl } from "@/lib/media-links";
+import {
+  probeMediaLinkReachability,
+  validateMediaLinkUrl,
+} from "@/lib/media-links";
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -23,6 +26,9 @@ async function requireAdmin() {
   return { user, service };
 }
 
+const SELECT =
+  "id, url, title, format, category, thumbnail_url, embed_url, video_id, is_published, notes, created_at";
+
 export async function GET() {
   const gate = await requireAdmin();
   if ("error" in gate) return gate.error;
@@ -30,9 +36,7 @@ export async function GET() {
 
   const { data, error } = await service
     .from("admin_media_links")
-    .select(
-      "id, url, title, format, category, thumbnail_url, embed_url, video_id, is_published, notes, created_at",
-    )
+    .select(SELECT)
     .order("created_at", { ascending: false })
     .limit(200);
 
@@ -53,6 +57,7 @@ export async function POST(req: Request) {
     category?: string;
     notes?: string;
     is_published?: boolean;
+    skip_probe?: boolean;
   };
   try {
     body = await req.json();
@@ -68,31 +73,91 @@ export async function POST(req: Request) {
     );
   }
 
+  const url = (body.url || "").trim();
+  if (!body.skip_probe) {
+    const probe = await probeMediaLinkReachability(url, validation.format);
+    if (!probe.ok) {
+      return NextResponse.json(
+        { error: probe.detail || "URL is not reachable" },
+        { status: 400 },
+      );
+    }
+  }
+
+  // New saves are drafts unless explicitly published via confirm step.
+  const publish = body.is_published === true;
+
   const { data, error } = await service
     .from("admin_media_links")
     .upsert(
       {
         created_by: user.id,
-        url: (body.url || "").trim(),
+        url,
         title: validation.title!,
         format: validation.format,
         category: (body.category || "Featured").trim().slice(0, 60) || "Featured",
         thumbnail_url: validation.thumbnailUrl || null,
         embed_url: validation.embedUrl || null,
         video_id: validation.videoId || null,
-        is_published: body.is_published !== false,
+        is_published: publish,
         notes: (body.notes || "").trim().slice(0, 500) || null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "url" },
     )
-    .select(
-      "id, url, title, format, category, thumbnail_url, embed_url, video_id, is_published, notes, created_at",
-    )
+    .select(SELECT)
     .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  return NextResponse.json({ link: data });
+}
+
+export async function PATCH(req: Request) {
+  const gate = await requireAdmin();
+  if ("error" in gate) return gate.error;
+  const { service } = gate;
+
+  let body: { id?: string; is_published?: boolean; title?: string; category?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  if (!body.id) {
+    return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  }
+
+  const updates: Record<string, unknown> = {
+    updated_at: new Date().toISOString(),
+  };
+  if (typeof body.is_published === "boolean") {
+    updates.is_published = body.is_published;
+  }
+  if (typeof body.title === "string") {
+    const title = body.title.trim().slice(0, 200);
+    if (!title) {
+      return NextResponse.json({ error: "Title cannot be empty" }, { status: 400 });
+    }
+    updates.title = title;
+  }
+  if (typeof body.category === "string") {
+    updates.category = body.category.trim().slice(0, 60) || "Featured";
+  }
+  if (Object.keys(updates).length <= 1) {
+    return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+  }
+
+  const { data, error } = await service
+    .from("admin_media_links")
+    .update(updates)
+    .eq("id", body.id)
+    .select(SELECT)
+    .single();
+
+  if (error || !data) {
+    return NextResponse.json({ error: "Could not update link" }, { status: 500 });
   }
   return NextResponse.json({ link: data });
 }

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   detectPlayableFormat,
+  normalizeMediaLinkCategory,
   titleFromMediaUrl,
+  USER_MEDIA_DISCLAIMER,
   validateMediaLinkUrl,
 } from "@/lib/media-links";
 
@@ -38,5 +40,17 @@ describe("media-links", () => {
         "hls",
       ),
     ).toMatch(/rok/i);
+  });
+
+  it("exports a user responsibility disclaimer", () => {
+    expect(USER_MEDIA_DISCLAIMER.toLowerCase()).toContain("responsible");
+    expect(USER_MEDIA_DISCLAIMER.toLowerCase()).toContain("licensed catalog");
+  });
+
+  it("normalizes known folders and keeps custom labels", () => {
+    expect(normalizeMediaLinkCategory("movies")).toBe("Movies");
+    expect(normalizeMediaLinkCategory("  News  ")).toBe("News");
+    expect(normalizeMediaLinkCategory("My Cup Finals")).toBe("My Cup Finals");
+    expect(normalizeMediaLinkCategory("")).toBe("Uncategorized");
   });
 });

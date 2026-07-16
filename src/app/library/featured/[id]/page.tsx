@@ -6,21 +6,21 @@ import { WatchBackButton } from "@/components/WatchBackButton";
 import type { CatalogItem } from "@/data/types";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountEntitlement } from "@/lib/membership/account";
-import type { MediaLinkFormat, UserMediaLink } from "@/lib/media-links";
+import type { AdminMediaLink, MediaLinkFormat } from "@/lib/media-links";
 
 type Props = { params: Promise<{ id: string }> };
 
-function toCatalog(link: UserMediaLink): CatalogItem {
+function toCatalog(link: AdminMediaLink): CatalogItem {
   const format =
     link.format === "mp4" || link.format === "webm" ? "mp4" : "hls";
   return {
-    id: `media-${link.id}`,
-    slug: `media-${link.id}`,
+    id: `staff-${link.id}`,
+    slug: `staff-${link.id}`,
     title: link.title,
     type: link.format === "hls" ? "live" : "movie",
-    description: `${link.format.toUpperCase()} · My Links`,
+    description: `${link.format.toUpperCase()} · Staff pick`,
     countries: ["world"],
-    categories: ["My Links", link.category, "Playable"],
+    categories: ["Staff picks", link.category, "Playable"],
     languages: ["English"],
     poster:
       link.thumbnail_url ||
@@ -65,7 +65,7 @@ function EmbedPlayer({
   );
 }
 
-export default async function LibraryWatchPage({ params }: Props) {
+export default async function FeaturedMediaWatchPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
   const {
@@ -73,27 +73,22 @@ export default async function LibraryWatchPage({ params }: Props) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/auth?next=/library/watch/${encodeURIComponent(id)}`);
+    redirect(`/auth?next=/library/featured/${encodeURIComponent(id)}`);
   }
   const entitlement = await getAccountEntitlement(user.id, user.email);
   if (!entitlement.allowed) redirect("/pricing?reason=membership-required");
 
   const { data: row } = await supabase
-    .from("user_media_links")
-    .select("*")
-    .eq("user_id", user.id)
+    .from("admin_media_links")
+    .select(
+      "id, url, title, format, category, thumbnail_url, embed_url, video_id, is_published, notes, created_at",
+    )
     .eq("id", id)
+    .eq("is_published", true)
     .maybeSingle();
 
   if (!row) notFound();
-  const link = row as UserMediaLink;
-
-  // Fire-and-forget recently watched stamp (RLS-scoped).
-  void supabase
-    .from("user_media_links")
-    .update({ last_watched_at: new Date().toISOString() })
-    .eq("id", link.id)
-    .eq("user_id", user.id);
+  const link = row as AdminMediaLink;
 
   return (
     <main className="min-h-screen bg-gls-black pb-24 pt-20">
@@ -103,7 +98,7 @@ export default async function LibraryWatchPage({ params }: Props) {
           <WatchBackButton fallbackHref="/library" label="Back to My Links" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gls-muted">
-              My Links
+              Staff pick
             </p>
             <h1 className="text-xl font-semibold text-white sm:text-2xl">
               {link.title}
@@ -126,12 +121,9 @@ export default async function LibraryWatchPage({ params }: Props) {
         )}
 
         <p className="mt-4 text-sm text-gls-muted">
+          Staff-curated playable link — not part of the licensed catalog.{" "}
           <Link href="/library" className="text-white underline-offset-2 hover:underline">
-            Back to library
-          </Link>
-          {" · "}
-          <Link href="/playlists" className="text-white underline-offset-2 hover:underline">
-            My Playlists
+            Back to My Links
           </Link>
         </p>
       </div>

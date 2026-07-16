@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountEntitlement } from "@/lib/membership/account";
-import { validateMediaLinkUrl } from "@/lib/media-links";
+import {
+  normalizeMediaLinkCategory,
+  probeMediaLinkReachability,
+  validateMediaLinkUrl,
+} from "@/lib/media-links";
 
 const MAX_LINKS = 100;
+
+const SELECT =
+  "id, user_id, url, title, format, status, thumbnail_url, category, is_favorite, embed_url, video_id, metadata, last_checked_at, last_watched_at, created_at, updated_at";
 
 export async function GET() {
   const supabase = await createClient();
@@ -16,9 +23,7 @@ export async function GET() {
   const entitlement = await getAccountEntitlement(user.id, user.email);
   const { data, error } = await supabase
     .from("user_media_links")
-    .select(
-      "id, user_id, url, title, format, status, thumbnail_url, category, is_favorite, embed_url, video_id, metadata, last_checked_at, created_at, updated_at",
-    )
+    .select(SELECT)
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(MAX_LINKS);
@@ -64,6 +69,19 @@ export async function POST(req: Request) {
     );
   }
 
+  const url = (body.url || "").trim();
+  const probe = await probeMediaLinkReachability(url, validation.format);
+  if (!probe.ok) {
+    return NextResponse.json(
+      {
+        error:
+          probe.detail ||
+          "That URL failed the reachability check. Fix the link and try again.",
+      },
+      { status: 400 },
+    );
+  }
+
   const { count } = await supabase
     .from("user_media_links")
     .select("id", { count: "exact", head: true })
@@ -77,24 +95,22 @@ export async function POST(req: Request) {
 
   const row = {
     user_id: user.id,
-    url: (body.url || "").trim(),
+    url,
     title: validation.title!,
     format: validation.format,
-    status: "active" as const,
+    status: probe.status,
     thumbnail_url: validation.thumbnailUrl || null,
-    category: (body.category || "Uncategorized").trim().slice(0, 60) || "Uncategorized",
+    category: normalizeMediaLinkCategory(body.category),
     embed_url: validation.embedUrl || null,
     video_id: validation.videoId || null,
     last_checked_at: new Date().toISOString(),
-    metadata: {},
+    metadata: { probe: probe.detail || null },
   };
 
   const { data, error } = await supabase
     .from("user_media_links")
     .insert(row)
-    .select(
-      "id, user_id, url, title, format, status, thumbnail_url, category, is_favorite, embed_url, video_id, metadata, last_checked_at, created_at, updated_at",
-    )
+    .select(SELECT)
     .single();
 
   if (error) {
@@ -107,7 +123,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ link: data });
+  return NextResponse.json({ link: data, probe });
 }
 
 export async function PATCH(req: Request) {
@@ -124,6 +140,7 @@ export async function PATCH(req: Request) {
     title?: string;
     category?: string;
     is_favorite?: boolean;
+    mark_watched?: boolean;
   };
   try {
     body = await req.json();
@@ -143,10 +160,13 @@ export async function PATCH(req: Request) {
     updates.title = title;
   }
   if (typeof body.category === "string") {
-    updates.category = body.category.trim().slice(0, 60) || "Uncategorized";
+    updates.category = normalizeMediaLinkCategory(body.category);
   }
   if (typeof body.is_favorite === "boolean") {
     updates.is_favorite = body.is_favorite;
+  }
+  if (body.mark_watched === true) {
+    updates.last_watched_at = new Date().toISOString();
   }
   if (!Object.keys(updates).length) {
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
@@ -157,9 +177,7 @@ export async function PATCH(req: Request) {
     .update(updates)
     .eq("id", body.id)
     .eq("user_id", user.id)
-    .select(
-      "id, user_id, url, title, format, status, thumbnail_url, category, is_favorite, embed_url, video_id, metadata, last_checked_at, created_at, updated_at",
-    )
+    .select(SELECT)
     .single();
 
   if (error || !data) {

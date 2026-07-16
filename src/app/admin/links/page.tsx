@@ -9,7 +9,7 @@ export default function AdminLinksPage() {
       <AdminPageHeader
         eyebrow="Catalog"
         title="Links & streams"
-        description="Seed HLS URLs, import approved M3U lists, and publish quick playable media links for members."
+        description="Seed HLS URLs, import approved M3U lists, and curate Staff picks that members see on My Links after preview + confirm publish."
       />
       <div className="gls-admin-card mt-8 rounded-lg p-5 sm:p-6">
         <AdminMediaLinksPanel />

@@ -16,6 +16,7 @@ export type UserMediaLink = {
   video_id: string | null;
   metadata: Record<string, unknown>;
   last_checked_at: string | null;
+  last_watched_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -33,6 +34,35 @@ export type AdminMediaLink = {
   notes: string | null;
   created_at: string;
 };
+
+/** Shown wherever members add personal playable URLs. */
+export const USER_MEDIA_DISCLAIMER =
+  "You are responsible for any links you add. Only import media you have the right to watch. User-added links are not part of the GLS licensed catalog.";
+
+/** Default folders for organizing personal My Links (users can also keep custom labels). */
+export const MEDIA_LINK_CATEGORIES = [
+  "Movies",
+  "Sports",
+  "News",
+  "Live TV",
+  "Music",
+  "Kids",
+  "Food",
+  "Series",
+  "Other",
+  "Uncategorized",
+] as const;
+
+export type MediaLinkCategory = (typeof MEDIA_LINK_CATEGORIES)[number];
+
+export function normalizeMediaLinkCategory(raw?: string | null): string {
+  const value = (raw || "").trim().slice(0, 60);
+  if (!value) return "Uncategorized";
+  const match = MEDIA_LINK_CATEGORIES.find(
+    (c) => c.toLowerCase() === value.toLowerCase(),
+  );
+  return match || value;
+}
 
 export type MediaLinkValidation = {
   ok: boolean;
@@ -199,3 +229,68 @@ export const MEDIA_FORMAT_META: Record<
     accent: "#c4b5fd",
   },
 };
+
+export type MediaLinkProbeResult = {
+  ok: boolean;
+  status: MediaLinkStatus;
+  detail?: string;
+};
+
+/**
+ * Format-level validation plus a light reachability probe.
+ * YouTube / Vimeo rely on public embed IDs (no upstream fetch).
+ * HLS / MP4 / WebM fetch a small public response (SSRF-safe).
+ */
+export async function probeMediaLinkReachability(
+  url: string,
+  format: MediaLinkFormat,
+): Promise<MediaLinkProbeResult> {
+  if (format === "youtube" || format === "vimeo") {
+    return { ok: true, status: "active", detail: "Embed format verified" };
+  }
+
+  try {
+    const { secureFetchBuffered } = await import("@/lib/secure-url");
+    const result = await secureFetchBuffered(url, {
+      maxBytes: format === "hls" ? 64_000 : 8_192,
+      timeoutMs: 10_000,
+      headers: {
+        "User-Agent": "GLS-TV/1.0 media-link-probe",
+        Accept: "*/*",
+        ...(format === "mp4" || format === "webm"
+          ? { Range: "bytes=0-1023" }
+          : {}),
+      },
+    });
+
+    if (result.status >= 400) {
+      return {
+        ok: false,
+        status: "dead",
+        detail: `URL returned HTTP ${result.status}`,
+      };
+    }
+
+    if (format === "hls") {
+      const text = result.body.toString("utf8").slice(0, 512);
+      if (!/#EXTM3U/i.test(text)) {
+        return {
+          ok: false,
+          status: "error",
+          detail: "URL did not return an HLS playlist (#EXTM3U).",
+        };
+      }
+    }
+
+    return { ok: true, status: "active", detail: "Reachable" };
+  } catch (cause) {
+    return {
+      ok: false,
+      status: "error",
+      detail:
+        cause instanceof Error
+          ? cause.message
+          : "Could not reach that URL from our servers.",
+    };
+  }
+}
