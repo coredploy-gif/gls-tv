@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { isReservedAddress } from "./secure-url";
+import { Readable } from "node:stream";
+import { isReservedAddress, readStreamBuffered } from "./secure-url";
 
 describe("secure URL address checks", () => {
   it.each([
@@ -20,4 +21,11 @@ describe("secure URL address checks", () => {
       expect(isReservedAddress(address)).toBe(false);
     },
   );
+
+  it("stops buffering when a streamed response exceeds its byte limit", async () => {
+    const stream = Readable.from([Buffer.alloc(8), Buffer.alloc(8)]);
+    await expect(readStreamBuffered(stream, 12)).rejects.toThrow(
+      "Upstream response is too large",
+    );
+  });
 });

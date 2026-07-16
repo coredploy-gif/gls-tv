@@ -73,6 +73,13 @@ export async function proxy(request: NextRequest) {
   });
   response.headers.set("x-request-id", requestId);
 
+  // The HLS route performs its own full authorization. Avoid repeating
+  // Supabase auth, entitlement, and viewer-session queries for every manifest,
+  // key, and media segment request.
+  if (request.nextUrl.pathname === "/api/hls") {
+    return response;
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return response;

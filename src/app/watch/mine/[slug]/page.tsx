@@ -8,6 +8,7 @@ import {
   type UserPlaylistChannelRow,
 } from "@/lib/playlists";
 import { getAccountEntitlement } from "@/lib/membership/account";
+import { playlistHealthRank } from "@/lib/playlist-health";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 
@@ -56,15 +57,19 @@ export default async function WatchMinePage({ params }: Props) {
   ]);
 
   const primaryItem = channelRowToCatalog(row as UserPlaylistChannelRow);
+  const sourceCandidates = [
+    row as UserPlaylistChannelRow,
+    ...((mirrorRows || []) as UserPlaylistChannelRow[]),
+  ].sort(
+    (a, b) =>
+      playlistHealthRank(a.health_status) -
+      playlistHealthRank(b.health_status),
+  );
   const seenSources = new Set<string>();
   const item = {
     ...primaryItem,
-    sources: [
-      primaryItem,
-      ...(mirrorRows || []).map((mirror) =>
-        channelRowToCatalog(mirror as UserPlaylistChannelRow),
-      ),
-    ]
+    sources: sourceCandidates
+      .map((candidate) => channelRowToCatalog(candidate))
       .flatMap((candidate) => candidate.sources)
       .filter((source) => {
         if (seenSources.has(source.url)) return false;

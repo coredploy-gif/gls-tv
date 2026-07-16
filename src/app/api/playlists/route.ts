@@ -46,7 +46,7 @@ export async function GET(req: Request) {
   let channelQuery = supabase
     .from("user_playlist_channels")
     .select(
-      "id, playlist_id, user_id, slug, title, description, poster, backdrop, categories, countries, tvg_id, quality, format, sort_order",
+      "id, playlist_id, user_id, slug, title, description, poster, backdrop, categories, countries, tvg_id, quality, format, sort_order, health_status, fail_count, latency_ms, last_checked_at, last_ok_at, quarantined_at, quarantine_reason",
     )
     .eq("user_id", user.id)
     .order("playlist_id", { ascending: true })

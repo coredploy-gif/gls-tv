@@ -33,6 +33,13 @@ export type UserPlaylistChannelRow = {
   quality: string;
   format: string;
   sort_order: number;
+  health_status?: "unknown" | "healthy" | "degraded" | "unavailable";
+  fail_count?: number;
+  latency_ms?: number | null;
+  last_checked_at?: string | null;
+  last_ok_at?: string | null;
+  quarantined_at?: string | null;
+  quarantine_reason?: string | null;
 };
 
 const FALLBACK_ART =
@@ -52,7 +59,12 @@ export function channelRowToCatalog(
     description: row.description || "Imported from your playlist",
     countries: row.countries?.length ? row.countries : ["world"],
     categories: [
-      ...new Set([...(row.categories || []), "My Playlist", "Imported"]),
+      ...new Set([
+        ...(row.categories || []),
+        "My Playlist",
+        "Imported",
+        ...(row.health_status === "unavailable" ? ["Unavailable"] : []),
+      ]),
     ],
     languages: [],
     poster: row.poster || FALLBACK_ART,

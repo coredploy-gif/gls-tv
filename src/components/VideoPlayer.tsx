@@ -223,6 +223,7 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
   const deepBufferRef = useRef(false);
 
   const sources = useMemo(() => sortedSources(item), [item]);
+  const privatePlaylist = item.categories.includes("My Playlist");
 
   const [sourceIndex, setSourceIndex] = useState(0);
   const [mode, setMode] = useState<"direct" | "proxy">("direct");
@@ -1032,9 +1033,10 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
               <span className="gls-live-dot h-1.5 w-1.5 rounded-full bg-gls-red" />
             )}
             {status}
-            {aheadSec >= 5 && (
+            {(privatePlaylist || aheadSec >= 5) && (
               <span className="normal-case tracking-normal text-emerald-300/90">
-                · {aheadSec}s ahead
+                · {aheadSec}s
+                {privatePlaylist ? " / 60s buffer target" : " ahead"}
               </span>
             )}
             {item.categories.includes("Geo") && (

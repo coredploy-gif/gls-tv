@@ -2,8 +2,9 @@ import dns from "node:dns";
 import http from "node:http";
 import https from "node:https";
 import net from "node:net";
+import { Readable, Transform } from "node:stream";
 
-type SecureFetchOptions = {
+export type SecureFetchOptions = {
   headers?: Record<string, string>;
   maxBytes: number;
   timeoutMs?: number;
@@ -16,6 +17,10 @@ export type SecureFetchResult = {
   finalUrl: string;
   headers: http.IncomingHttpHeaders;
   body: Buffer;
+};
+
+export type SecureFetchStreamResult = Omit<SecureFetchResult, "body"> & {
+  body: Readable;
 };
 
 function ipv4Number(address: string) {
@@ -96,14 +101,17 @@ export async function validatePublicUrl(
   return { url, address: addresses[0] };
 }
 
-export async function secureFetchBuffered(
+export async function secureFetchStream(
   raw: string,
   options: SecureFetchOptions,
-): Promise<SecureFetchResult> {
+): Promise<SecureFetchStreamResult> {
   const maxRedirects = options.maxRedirects ?? 4;
   const timeoutMs = options.timeoutMs ?? 15_000;
 
-  async function requestUrl(target: string, redirects: number): Promise<SecureFetchResult> {
+  async function requestUrl(
+    target: string,
+    redirects: number,
+  ): Promise<SecureFetchStreamResult> {
     const { url, address } = await validatePublicUrl(target, options.allowedHost);
     const client = url.protocol === "https:" ? https : http;
     return new Promise((resolve, reject) => {
@@ -138,25 +146,28 @@ export async function secureFetchBuffered(
             reject(new Error("Upstream response is too large"));
             return;
           }
-          const chunks: Buffer[] = [];
           let size = 0;
-          response.on("data", (chunk: Buffer) => {
-            size += chunk.length;
-            if (size > options.maxBytes) {
-              response.destroy(new Error("Upstream response is too large"));
-              return;
-            }
-            chunks.push(chunk);
+          const limited = new Transform({
+            transform(chunk: Buffer, _encoding, callback) {
+              size += chunk.length;
+              if (size > options.maxBytes) {
+                callback(new Error("Upstream response is too large"));
+                return;
+              }
+              callback(null, chunk);
+            },
           });
-          response.on("end", () =>
-            resolve({
-              status,
-              finalUrl: url.href,
-              headers: response.headers,
-              body: Buffer.concat(chunks),
-            }),
-          );
-          response.on("error", reject);
+          response.on("error", (error) => limited.destroy(error));
+          limited.on("close", () => {
+            if (!response.destroyed) response.destroy();
+          });
+          response.pipe(limited);
+          resolve({
+            status,
+            finalUrl: url.href,
+            headers: response.headers,
+            body: limited,
+          });
         },
       );
       request.setTimeout(timeoutMs, () =>
@@ -168,5 +179,34 @@ export async function secureFetchBuffered(
   }
 
   return requestUrl(raw, 0);
+}
+
+export async function readStreamBuffered(
+  stream: Readable,
+  maxBytes: number,
+): Promise<Buffer> {
+  const chunks: Buffer[] = [];
+  let size = 0;
+  for await (const chunk of stream) {
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    size += buffer.length;
+    if (size > maxBytes) {
+      stream.destroy(new Error("Upstream response is too large"));
+      throw new Error("Upstream response is too large");
+    }
+    chunks.push(buffer);
+  }
+  return Buffer.concat(chunks);
+}
+
+export async function secureFetchBuffered(
+  raw: string,
+  options: SecureFetchOptions,
+): Promise<SecureFetchResult> {
+  const streamed = await secureFetchStream(raw, options);
+  return {
+    ...streamed,
+    body: await readStreamBuffered(streamed.body, options.maxBytes),
+  };
 }
 

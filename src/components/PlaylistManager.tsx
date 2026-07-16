@@ -268,7 +268,7 @@ export function PlaylistManager() {
       if (activePlaylistId === id) setActivePlaylistId("all");
       await load();
       setSuccess("Playlist removed.");
-    } catch (err) {
+    } catch {
       setError("We couldn’t remove that playlist right now. Please try again.");
     } finally {
       setBusy(false);
@@ -561,11 +561,19 @@ export function PlaylistManager() {
               <h3 className="mb-3 text-lg font-semibold text-white">{group}</h3>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                 {items.slice(0, visibleByGroup[group] || 24).map((item) => (
-                  <div key={item.id} className="w-full [&_a]:w-full">
+                  <div
+                    key={item.id}
+                    className="relative w-full [&_a]:w-full"
+                  >
                     <TitleCard
                       item={item}
                       href={mineWatchHref(item.id.replace(/^user-/, ""))}
                     />
+                    {item.categories.includes("Unavailable") && (
+                      <span className="pointer-events-none absolute right-2 top-2 rounded bg-amber-500/95 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-black shadow">
+                        Unavailable · retrying
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
