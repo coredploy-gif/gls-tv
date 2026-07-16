@@ -560,13 +560,14 @@
       "cat": "food",
       "title": "BBC Food",
       "slug": "bbcfood-us-sd",
-      "url": "https://d1e9r0b71zfwk7.cloudfront.net/playlist.m3u8",
+      "url": "https://service-stitcher.clusters.pluto.tv/v1/stitch/embed/hls/channel/5fb5844bf5514d0007945bda/master.m3u8?deviceId=channel&deviceModel=web&deviceVersion=1.0&appVersion=1.0&deviceType=rokuChannel&deviceMake=rokuChannel&deviceDNT=1&advertisingId=channel&embedPartner=rokuChannel&appName=rokuchannel&is_lat=1&bmodel=bm1&content=channel&platform=web&tags=ROKU_CONTENT_TAGS&coppa=false&content_type=livefeed&rdid=channel&genre=ROKU_ADS_CONTENT_GENRE&content_rating=ROKU_ADS_CONTENT_RATING&studio_id=viacom&channel_id=channel",
       "countries": [
         "us"
       ],
       "categories": [
         "Food",
-        "Cooking"
+        "Cooking",
+        "ProxyOk"
       ],
       "poster": "https://i.imgur.com/kcmHcSx.png",
       "cors": "",
@@ -673,9 +674,9 @@
     },
     {
       "cat": "food",
-      "title": "Delicious Eats",
-      "slug": "deliciouseats-us-sd",
-      "url": "https://jmp2.uk/plu-68bb16ba3efb41cd971f3ce6.m3u8",
+      "title": "Mad Dog and Merrill",
+      "slug": "maddogandmerrill-us-sd",
+      "url": "https://rpn.bozztv.com/gusa/gusa-mwg/index.m3u8",
       "countries": [
         "us"
       ],
@@ -683,51 +684,31 @@
         "Food",
         "Cooking"
       ],
-      "poster": "https://images.pluto.tv/channels/68bb16ba3efb41cd971f3ce6/colorLogoPNG.png",
-      "cors": "",
-      "direct": false,
+      "poster": "https://i.imgur.com/5QQy3aW.png",
+      "cors": "*",
+      "direct": true,
       "segs": 1,
       "score": 90,
-      "id": "iptv-deliciouseats-us-sd"
+      "id": "iptv-maddogandmerrill-us-sd"
     },
     {
       "cat": "food",
-      "title": "Hungry",
-      "slug": "hungry-us-sd",
-      "url": "https://dos35knl8v49a.cloudfront.net/v1/food/samsungheadend_us/latest/main/hls/playlist.m3u8",
+      "title": "Food Food",
+      "slug": "foodfood-in-sd",
+      "url": "https://mumt03.tangotv.in/Dsly5z3HFOODFOOD/index.m3u8",
       "countries": [
-        "us"
+        "in"
       ],
       "categories": [
         "Food",
         "Cooking"
       ],
-      "poster": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&h=2400&q=92",
+      "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Food_Food.png",
       "cors": "*",
       "direct": true,
       "segs": 1,
-      "score": 85,
-      "id": "iptv-hungry-us-sd"
-    },
-    {
-      "cat": "food",
-      "title": "In the kitchen",
-      "slug": "inthekitchen-us-sd",
-      "url": "https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc4us/master.m3u8",
-      "countries": [
-        "us"
-      ],
-      "categories": [
-        "Food",
-        "Cooking",
-        "Shop"
-      ],
-      "poster": "https://i.imgur.com/HrRUd6r.png",
-      "cors": "*",
-      "direct": true,
-      "segs": 1,
-      "score": 85,
-      "id": "iptv-inthekitchen-us-sd"
+      "score": 90,
+      "id": "iptv-foodfood-in-sd"
     },
     {
       "cat": "food",
@@ -742,10 +723,10 @@
         "Cooking"
       ],
       "poster": "https://i.imgur.com/15a9pG9.png",
-      "cors": "*, *",
-      "direct": false,
+      "cors": "*",
+      "direct": true,
       "segs": 1,
-      "score": 25,
+      "score": 85,
       "id": "iptv-chefchampion-us-sd"
     }
   ]

@@ -4,7 +4,7 @@
     "slug": "bbcfood-us-sd",
     "title": "BBC Food",
     "type": "live",
-    "description": "Food · CloudFront + Pluto stitcher fallback (ProxyOk)",
+    "description": "Food · Pluto stitcher primary (ProxyOk); CloudFront .ts 403 from ZA",
     "countries": [
       "us",
       "world"
@@ -28,14 +28,11 @@
     "featured": true,
     "sources": [
       {
-        "url": "https://d1e9r0b71zfwk7.cloudfront.net/playlist.m3u8",
-        "quality": "Auto",
-        "format": "hls"
-      },
-      {
         "url": "https://service-stitcher.clusters.pluto.tv/v1/stitch/embed/hls/channel/5fb5844bf5514d0007945bda/master.m3u8?deviceId=channel&deviceModel=web&deviceVersion=1.0&appVersion=1.0&deviceType=rokuChannel&deviceMake=rokuChannel&deviceDNT=1&advertisingId=channel&embedPartner=rokuChannel&appName=rokuchannel&is_lat=1&bmodel=bm1&content=channel&platform=web&tags=ROKU_CONTENT_TAGS&coppa=false&content_type=livefeed&rdid=channel&genre=ROKU_ADS_CONTENT_GENRE&content_rating=ROKU_ADS_CONTENT_RATING&studio_id=viacom&channel_id=channel",
         "quality": "Auto",
-        "format": "hls"
+        "format": "hls",
+        "priority": 5,
+        "label": "pluto-stitcher"
       }
     ]
   },
@@ -724,43 +721,11 @@
     ]
   },
   {
-    "id": "iptv-hungry-us-sd",
-    "slug": "hungry-us-sd",
-    "title": "Hungry",
-    "type": "live",
-    "description": "Food · direct Playable (CORS*)",
-    "countries": [
-      "us"
-    ],
-    "categories": [
-      "Food",
-      "Cooking",
-      "Playable",
-      "Verified",
-      "Popular"
-    ],
-    "languages": [
-      "English"
-    ],
-    "poster": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&h=2400&q=92",
-    "backdrop": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&h=2400&q=92",
-    "license": "open_stream",
-    "isLive": true,
-    "featured": true,
-    "sources": [
-      {
-        "url": "https://dos35knl8v49a.cloudfront.net/v1/food/samsungheadend_us/latest/main/hls/playlist.m3u8",
-        "quality": "Auto",
-        "format": "hls"
-      }
-    ]
-  },
-  {
     "id": "iptv-cookingpanda-us-sd",
     "slug": "cookingpanda-us-sd",
     "title": "Cooking Panda",
     "type": "live",
-    "description": "Food · direct Playable (CORS*)",
+    "description": "Food · Publica/Ottera (ProxyOk for child CDNs)",
     "countries": [
       "us"
     ],
@@ -769,7 +734,8 @@
       "Cooking",
       "Playable",
       "Verified",
-      "Popular"
+      "Popular",
+      "ProxyOk"
     ],
     "languages": [
       "English"

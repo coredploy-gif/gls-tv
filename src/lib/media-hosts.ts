@@ -18,6 +18,11 @@ const MEDIA_HOST_SUFFIXES = [
   "googleusercontent.com",
   "akamaized.net",
   "akamaihd.net",
+  // Food / FAST CDN child hosts (Publica → Ottera → Kaltura; Tubi Aegis)
+  "getpublica.com",
+  "ottera.tv",
+  "kaltura.com",
+  "tubi.video",
   // Wowza Cloud hosts already present in playable-* packs (TeleArena, racing, etc.)
   "streamlock.net",
 ];

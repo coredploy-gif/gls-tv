@@ -1087,8 +1087,8 @@
   "bbcfood-us-sd": {
     "slug": "bbcfood-us-sd",
     "title": "BBC Food",
-    "url": "https://d1e9r0b71zfwk7.cloudfront.net/playlist.m3u8",
-    "note": "Keep CloudFront primary (jmp2 plu-5fb5844 dead 404). Catalog also has Pluto stitcher fallback for buffering; ProxyOk + Healed.",
+    "url": "https://service-stitcher.clusters.pluto.tv/v1/stitch/embed/hls/channel/5fb5844bf5514d0007945bda/master.m3u8?deviceId=channel&deviceModel=web&deviceVersion=1.0&appVersion=1.0&deviceType=rokuChannel&deviceMake=rokuChannel&deviceDNT=1&advertisingId=channel&embedPartner=rokuChannel&appName=rokuchannel&is_lat=1&bmodel=bm1&content=channel&platform=web&tags=ROKU_CONTENT_TAGS&coppa=false&content_type=livefeed&rdid=channel&genre=ROKU_ADS_CONTENT_GENRE&content_rating=ROKU_ADS_CONTENT_RATING&studio_id=viacom&channel_id=channel",
+    "note": "CloudFront master 200 but .ts 403 from ZA. jmp2 plu-5fb5844 still 404. Pluto stitcher embed is primary (isPlutoFamily → ProxyOk).",
     "countries": [
       "us",
       "world"
@@ -1107,7 +1107,7 @@
     "slug": "gordonramsayshellskitchen-us-sd",
     "title": "Gordon Ramsay's Hell's Kitchen",
     "url": "https://aegis-cloudfront-1.tubi.video/c8364f36-c60b-4a39-8d86-0b92db4611c0/index.m3u8",
-    "note": "Promote Hell's Kitchen — Tubi primary (200); Pluto jmp2 kept as catalog second source.",
+    "note": "Tubi primary (segment 200 ZA); Pluto jmp2 secondary. ProxyOk for Tubi allowlist fallback.",
     "countries": [
       "us",
       "world"
@@ -1119,7 +1119,8 @@
       "Playable",
       "Verified",
       "Healed",
-      "Popular"
+      "Popular",
+      "ProxyOk"
     ]
   }
 }
