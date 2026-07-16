@@ -93,7 +93,7 @@ export default async function LibraryWatchPage({ params }: Props) {
       <BrowseNav />
       <div className="mx-auto max-w-[1200px] px-4 sm:px-8 lg:px-12">
         <div className="mb-4 flex items-center gap-3">
-          <WatchBackButton href="/library" />
+          <WatchBackButton fallbackHref="/library" label="Back to My Links" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gls-muted">
               My Links
