@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Tone Echo</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --accent: #b794f6; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+        background: radial-gradient(ellipse at top, #1a1230, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .card {
+        width: min(400px, 100%);
+        background: rgba(20,16,32,.92); border: 1px solid rgba(183,148,246,.3);
+        border-radius: 16px; padding: 14px;
+      }
+      .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .score { text-align: right; font-variant-numeric: tabular-nums; }
+      .score b { color: var(--accent); font-size: 1.2rem; }
+      .hint { margin: 0 0 12px; color: #a1a1aa; font-size: .8rem; }
+      .pads {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      }
+      .pad {
+        aspect-ratio: 1; border: 0; border-radius: 16px; cursor: pointer;
+        opacity: .72; transition: opacity .08s, transform .08s, filter .08s;
+      }
+      .pad:active, .pad.lit { opacity: 1; transform: scale(.97); filter: brightness(1.25); }
+      .pad[data-i="0"] { background: #ef4444; }
+      .pad[data-i="1"] { background: #22c55e; }
+      .pad[data-i="2"] { background: #3b82f6; }
+      .pad[data-i="3"] { background: #eab308; }
+      .status { margin-top: 10px; font-size: .85rem; color: #c4b5fd; min-height: 1.2em; }
+      .actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+      button.btn {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #1a0a2e;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <div class="top">
+          <h1>Tone Echo</h1>
+          <div class="score">Level<br /><b id="score">0</b></div>
+        </div>
+        <p class="hint">Watch the sequence, then tap it back. Soft tones optional.</p>
+        <div class="pads" id="pads">
+          <button type="button" class="pad" data-i="0" aria-label="Red"></button>
+          <button type="button" class="pad" data-i="1" aria-label="Green"></button>
+          <button type="button" class="pad" data-i="2" aria-label="Blue"></button>
+          <button type="button" class="pad" data-i="3" aria-label="Yellow"></button>
+        </div>
+        <p class="status" id="status">Press Start to listen.</p>
+        <div class="actions">
+          <button type="button" class="btn" id="restart">Start</button>
+          <button type="button" class="btn ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const FREQ = [329.6, 392, 440, 523.3];
+      const pads = [...document.querySelectorAll(".pad")];
+      const scoreEl = document.getElementById("score");
+      const status = document.getElementById("status");
+      let seq = [], step = 0, score = 0, bestSubmitted = 0, locked = true, audioCtx = null;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "tone-echo", score, force: !!force }, "*");
+      }
+
+      function beep(i, ms) {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = "sine";
+          o.frequency.value = FREQ[i];
+          g.gain.value = 0.08;
+          o.connect(g); g.connect(audioCtx.destination);
+          o.start();
+          setTimeout(() => { o.stop(); }, ms || 220);
+        } catch (_) {}
+      }
+
+      function light(i, on) {
+        pads[i].classList.toggle("lit", on);
+      }
+
+      function sleep(ms) {
+        return new Promise((r) => setTimeout(r, ms));
+      }
+
+      async function playSeq() {
+        locked = true;
+        status.textContent = "Listen…";
+        await sleep(350);
+        for (const i of seq) {
+          light(i, true);
+          beep(i, 280);
+          await sleep(320);
+          light(i, false);
+          await sleep(140);
+        }
+        step = 0;
+        locked = false;
+        status.textContent = "Your turn";
+      }
+
+      function nextRound() {
+        seq.push(Math.floor(Math.random() * 4));
+        score = seq.length - 1;
+        scoreEl.textContent = String(score);
+        if (score > 0) postScore(false);
+        void playSeq();
+      }
+
+      function fail() {
+        locked = true;
+        status.textContent = "Missed! Score " + score + " — try again.";
+        postScore(true);
+      }
+
+      pads.forEach((btn) => {
+        btn.addEventListener("pointerdown", (e) => {
+          e.preventDefault();
+          if (locked) return;
+          const i = Number(btn.dataset.i);
+          light(i, true);
+          beep(i, 180);
+          setTimeout(() => light(i, false), 160);
+          if (i !== seq[step]) { fail(); return; }
+          step += 1;
+          if (step >= seq.length) {
+            locked = true;
+            status.textContent = "Nice!";
+            score = seq.length;
+            scoreEl.textContent = String(score);
+            postScore(false);
+            setTimeout(nextRound, 500);
+          }
+        });
+      });
+
+      document.getElementById("restart").onclick = () => {
+        seq = [];
+        score = 0;
+        scoreEl.textContent = "0";
+        status.textContent = "Here we go…";
+        nextRound();
+      };
+      document.getElementById("submit").onclick = () => postScore(true);
+    </script>
+  </body>
+</html>

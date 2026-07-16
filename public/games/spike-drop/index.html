@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Spike Drop</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --accent: #f5c842; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        background: radial-gradient(ellipse at top, #1a2030, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(400px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      canvas {
+        width: 100%; aspect-ratio: 3/4; display: block; border-radius: 14px;
+        background: linear-gradient(#2a3348 0%, #1a2030 70%, #12161f 100%);
+        border: 1px solid rgba(245,200,66,.35);
+      }
+      .hint { margin: 8px 0 0; color: #a1a1aa; font-size: .8rem; }
+      .actions { margin-top: 10px; display: flex; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #1a1400;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Spike Drop</h1>
+          <div class="meta">Score <b id="score">0</b></div>
+        </div>
+        <canvas id="c" width="360" height="480"></canvas>
+        <p class="hint" id="hint">Slide to steer. Land on soft pads — avoid spikes!</p>
+        <div class="actions">
+          <button type="button" id="restart">Play</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const scoreEl = document.getElementById("score");
+      const hintEl = document.getElementById("hint");
+      const W = 360, H = 480;
+      const EMOJIS = ["😀", "😎", "🥳", "🐱", "🦊", "🐸", "🦄", "🍕"];
+      let player, platforms, score, bestSubmitted = 0, running = false, dead = false, raf = 0;
+      let camY = 0, targetX = W / 2;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "spike-drop", score, force: !!force }, "*");
+      }
+
+      function makePlatform(y, forceSafe) {
+        const w = 70 + Math.random() * 50;
+        const x = 20 + Math.random() * (W - w - 40);
+        const spiked = forceSafe ? false : Math.random() < 0.38;
+        return { x, y, w, h: 14, spiked, scored: false };
+      }
+
+      function reset() {
+        player = {
+          x: W / 2, y: 80, r: 18, vx: 0, vy: 0,
+          emoji: EMOJIS[(Math.random() * EMOJIS.length) | 0],
+        };
+        platforms = [];
+        let y = 160;
+        platforms.push({ x: W / 2 - 50, y, w: 100, h: 14, spiked: false, scored: false });
+        for (let i = 0; i < 10; i++) {
+          y += 55 + Math.random() * 25;
+          platforms.push(makePlatform(y, i < 1));
+        }
+        score = 0;
+        camY = 0;
+        targetX = W / 2;
+        dead = false;
+        running = false;
+        scoreEl.textContent = "0";
+        hintEl.textContent = "Slide to steer. Land on soft pads — avoid spikes!";
+        draw();
+      }
+
+      function hit() {
+        dead = true;
+        running = false;
+        hintEl.textContent = "Spiked! Submit score or play again.";
+        postScore(true);
+      }
+
+      function tick() {
+        if (!running || dead) { draw(); return; }
+
+        const dx = targetX - player.x;
+        player.vx = dx * 0.12;
+        player.x += player.vx;
+        player.vy += 0.32;
+        player.y += player.vy;
+
+        if (player.x < player.r) player.x = player.r;
+        if (player.x > W - player.r) player.x = W - player.r;
+
+        const viewY = player.y - camY;
+        if (viewY > H * 0.42) camY = player.y - H * 0.42;
+
+        for (const p of platforms) {
+          if (player.vy <= 0) continue;
+          const feet = player.y + player.r;
+          const prevFeet = feet - player.vy;
+          if (prevFeet <= p.y && feet >= p.y &&
+              player.x + player.r * 0.6 > p.x && player.x - player.r * 0.6 < p.x + p.w) {
+            if (p.spiked) { hit(); break; }
+            player.y = p.y - player.r;
+            player.vy = -7.2;
+            if (!p.scored) {
+              p.scored = true;
+              score += 1;
+              scoreEl.textContent = String(score);
+              postScore(false);
+            }
+          }
+        }
+
+        if (dead) { draw(); return; }
+
+        if (player.y - camY > H + 40) hit();
+
+        const last = platforms[platforms.length - 1];
+        while (last && last.y < player.y + H) {
+          const ny = platforms[platforms.length - 1].y + 55 + Math.random() * 30;
+          platforms.push(makePlatform(ny, false));
+        }
+        while (platforms.length && platforms[0].y < camY - 80) platforms.shift();
+
+        draw();
+        raf = requestAnimationFrame(tick);
+      }
+
+      function drawSpikes(p) {
+        const n = Math.max(3, Math.floor(p.w / 14));
+        const step = p.w / n;
+        ctx.fillStyle = "#c0c8d4";
+        ctx.beginPath();
+        for (let i = 0; i < n; i++) {
+          const sx = p.x + i * step;
+          ctx.moveTo(sx, p.y);
+          ctx.lineTo(sx + step / 2, p.y - 16);
+          ctx.lineTo(sx + step, p.y);
+        }
+        ctx.fill();
+        ctx.fillStyle = "#6b7380";
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+      }
+
+      function drawPad(p) {
+        ctx.fillStyle = "#3d9a6a";
+        ctx.beginPath();
+        ctx.roundRect(p.x, p.y, p.w, p.h, 6);
+        ctx.fill();
+        ctx.fillStyle = "#5ee29a";
+        ctx.fillRect(p.x + 4, p.y + 2, p.w - 8, 4);
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "#1a2030";
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "rgba(255,255,255,.06)";
+        for (let i = 0; i < 18; i++) {
+          const sx = (i * 97) % W;
+          const sy = ((i * 53) - camY * 0.3) % H;
+          ctx.beginPath();
+          ctx.arc(sx, (sy + H) % H, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        for (const p of platforms) {
+          const py = p.y - camY;
+          if (py < -40 || py > H + 40) continue;
+          if (p.spiked) drawSpikes({ ...p, y: py });
+          else drawPad({ ...p, y: py });
+        }
+
+        const py = player.y - camY;
+        ctx.font = "32px Segoe UI Emoji, Apple Color Emoji, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(player.emoji, player.x, py);
+
+        if (!running) {
+          ctx.fillStyle = "rgba(0,0,0,.45)";
+          ctx.fillRect(0, 0, W, H);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 22px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "alphabetic";
+          ctx.fillText(dead ? "Ouch · tap Play" : "Tap to drop", W / 2, H / 2);
+        }
+      }
+
+      function go() {
+        cancelAnimationFrame(raf);
+        reset();
+        running = true;
+        dead = false;
+        player.vy = 1;
+        raf = requestAnimationFrame(tick);
+      }
+
+      function pointerPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        return ((e.clientX - rect.left) / rect.width) * W;
+      }
+
+      canvas.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        targetX = pointerPos(e);
+        if (!running || dead) go();
+      });
+      canvas.addEventListener("pointermove", (e) => {
+        if (e.buttons || e.pressure > 0) targetX = pointerPos(e);
+      });
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft" || e.key === "a") { targetX = Math.max(20, player.x - 40); e.preventDefault(); }
+        if (e.key === "ArrowRight" || e.key === "d") { targetX = Math.min(W - 20, player.x + 40); e.preventDefault(); }
+        if (e.code === "Space") { e.preventDefault(); if (!running || dead) go(); }
+      });
+
+      document.getElementById("restart").onclick = go;
+      document.getElementById("submit").onclick = () => postScore(true);
+      reset();
+    </script>
+  </body>
+</html>

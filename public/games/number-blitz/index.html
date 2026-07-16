@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Number Blitz</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --muted: #a1a1aa; --accent: #fbbf24; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none;
+        background: radial-gradient(ellipse at top, #2a2008, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .card {
+        width: min(440px, 100%);
+        background: rgba(20,20,24,.92); border: 1px solid rgba(255,255,255,.1);
+        border-radius: 16px; padding: 16px;
+      }
+      .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .score { text-align: right; font-variant-numeric: tabular-nums; }
+      .score b { color: var(--accent); font-size: 1.2rem; }
+      .hint { margin: 0 0 12px; color: var(--muted); font-size: .8rem; }
+      .prompt {
+        text-align: center; padding: 20px 12px; border-radius: 14px;
+        background: #121218; border: 1px solid rgba(251,191,36,.25); margin-bottom: 12px;
+      }
+      .prompt .q { font-size: 1.75rem; font-weight: 800; letter-spacing: .04em; }
+      .prompt .timer { margin-top: 8px; color: var(--muted); font-variant-numeric: tabular-nums; }
+      .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .choices button {
+        border: 0; border-radius: 12px; padding: 16px; font-size: 1.25rem; font-weight: 800;
+        cursor: pointer; background: #1c1c24; color: #fff;
+        border: 1px solid rgba(255,255,255,.1);
+      }
+      .choices button:hover:not(:disabled) { background: #262630; border-color: rgba(251,191,36,.4); }
+      .choices button.good { background: #16432a; border-color: #5ee29a; }
+      .choices button.bad { background: #3a1518; border-color: #ff5a6a; }
+      .actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+      button.btn {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #1a1400;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <div class="top">
+          <h1>Number Blitz</h1>
+          <div class="score">Score<br /><b id="score">0</b></div>
+        </div>
+        <p class="hint">Solve as many as you can in 45 seconds. Speed + streak bonus.</p>
+        <div class="prompt">
+          <div class="q" id="q">Ready?</div>
+          <div class="timer">Time <span id="time">45</span>s · Streak <span id="streak">0</span></div>
+        </div>
+        <div class="choices" id="choices"></div>
+        <div class="actions">
+          <button type="button" class="btn" id="restart">Start</button>
+          <button type="button" class="btn ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const qEl = document.getElementById("q");
+      const choicesEl = document.getElementById("choices");
+      const scoreEl = document.getElementById("score");
+      const timeEl = document.getElementById("time");
+      const streakEl = document.getElementById("streak");
+
+      let score = 0;
+      let streak = 0;
+      let timeLeft = 45;
+      let running = false;
+      let answer = 0;
+      let bestSubmitted = 0;
+      let tickTimer = null;
+      let lock = false;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "number-blitz", score, force: !!force }, "*");
+      }
+
+      function rand(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+
+      function makeQuestion() {
+        const tier = Math.min(3, Math.floor(score / 80));
+        let a, b, op, correct;
+        if (tier === 0) {
+          a = rand(2, 12); b = rand(2, 12); op = "+"; correct = a + b;
+        } else if (tier === 1) {
+          a = rand(6, 20); b = rand(2, 12); op = Math.random() < 0.5 ? "+" : "−";
+          correct = op === "+" ? a + b : a - b;
+        } else if (tier === 2) {
+          a = rand(3, 12); b = rand(2, 9); op = "×"; correct = a * b;
+        } else {
+          b = rand(2, 9); correct = rand(3, 12); a = correct * b; op = "÷";
+        }
+        answer = correct;
+        const opts = new Set([correct]);
+        while (opts.size < 4) {
+          const delta = rand(-8, 8) || 3;
+          opts.add(correct + delta);
+        }
+        const list = [...opts].sort(() => Math.random() - 0.5);
+        qEl.textContent = a + " " + op + " " + b + " = ?";
+        choicesEl.innerHTML = "";
+        list.forEach((n) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = String(n);
+          btn.onclick = () => pick(n, btn);
+          choicesEl.appendChild(btn);
+        });
+        lock = false;
+      }
+
+      function pick(n, btn) {
+        if (!running || lock) return;
+        lock = true;
+        const buttons = [...choicesEl.querySelectorAll("button")];
+        buttons.forEach((b) => { b.disabled = true; });
+        if (n === answer) {
+          btn.classList.add("good");
+          streak++;
+          score += 10 + Math.min(40, streak * 4);
+          scoreEl.textContent = String(score);
+          streakEl.textContent = String(streak);
+          postScore(false);
+          setTimeout(makeQuestion, 220);
+        } else {
+          btn.classList.add("bad");
+          buttons.find((b) => Number(b.textContent) === answer)?.classList.add("good");
+          streak = 0;
+          streakEl.textContent = "0";
+          score = Math.max(0, score - 3);
+          scoreEl.textContent = String(score);
+          setTimeout(makeQuestion, 480);
+        }
+      }
+
+      function endGame() {
+        running = false;
+        clearInterval(tickTimer);
+        qEl.textContent = "Time!";
+        choicesEl.innerHTML = "";
+        postScore(true);
+      }
+
+      function reset() {
+        clearInterval(tickTimer);
+        score = 0;
+        streak = 0;
+        timeLeft = 45;
+        bestSubmitted = 0;
+        running = true;
+        scoreEl.textContent = "0";
+        streakEl.textContent = "0";
+        timeEl.textContent = "45";
+        makeQuestion();
+        tickTimer = setInterval(() => {
+          timeLeft--;
+          timeEl.textContent = String(timeLeft);
+          if (timeLeft <= 0) endGame();
+        }, 1000);
+      }
+
+      document.getElementById("restart").onclick = reset;
+      document.getElementById("submit").onclick = () => postScore(true);
+      qEl.textContent = "Tap Start";
+    </script>
+  </body>
+</html>

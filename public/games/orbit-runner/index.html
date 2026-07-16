@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Orbit Runner</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #05070f; overflow: hidden; color: #e8f1ff; font-family: "Segoe UI", system-ui, sans-serif; }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(640px, 100%); }
+      .bar { display: flex; justify-content: space-between; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      canvas { width: 100%; aspect-ratio: 16 / 10; background: #070b16; border-radius: 14px; border: 1px solid rgba(126,200,255,0.35); display: block; touch-action: none; }
+      button { margin-top: 10px; border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700; background: #7ec8ff; color: #041018; cursor: pointer; }
+      .ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #e8f1ff; margin-left: 8px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar"><h1>Orbit Runner</h1><div>Score <b id="score">0</b></div></div>
+        <canvas id="c" width="800" height="500"></canvas>
+        <div>
+          <button type="button" id="restart">Restart</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      let shipY, vy, rocks, score, alive, last, bestSubmitted = 0, raf;
+
+      function reset() {
+        shipY = canvas.height / 2;
+        vy = 0;
+        rocks = [];
+        score = 0;
+        bestSubmitted = 0;
+        alive = true;
+        last = performance.now();
+        document.getElementById("score").textContent = "0";
+        cancelAnimationFrame(raf);
+        loop(last);
+      }
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "orbit-runner", score, force: !!force }, "*");
+      }
+
+      function spawn() {
+        const h = 40 + Math.random() * 90;
+        const gap = 120 + Math.random() * 60;
+        const top = 30 + Math.random() * (canvas.height - gap - 60);
+        rocks.push({ x: canvas.width + 20, top, gap, h, scored: false });
+      }
+
+      function loop(now) {
+        const dt = Math.min(32, now - last) / 16.67;
+        last = now;
+        if (alive) {
+          vy += 0.35 * dt;
+          shipY += vy * dt;
+          if (shipY < 16 || shipY > canvas.height - 16) {
+            alive = false;
+            postScore(true);
+          }
+          if (rocks.length === 0 || rocks[rocks.length - 1].x < canvas.width - 260) spawn();
+          for (const r of rocks) {
+            r.x -= (4.2 + score / 400) * dt;
+            if (!r.scored && r.x + 36 < 120) {
+              r.scored = true;
+              score += 25;
+              document.getElementById("score").textContent = String(score);
+              postScore(false);
+            }
+            const inX = 120 + 14 > r.x && 120 - 14 < r.x + 36;
+            const hitTop = shipY - 12 < r.top;
+            const hitBot = shipY + 12 > r.top + r.gap;
+            if (inX && (hitTop || hitBot)) {
+              alive = false;
+              postScore(true);
+            }
+          }
+          rocks = rocks.filter((r) => r.x > -80);
+        }
+        draw();
+        raf = requestAnimationFrame(loop);
+      }
+
+      function draw() {
+        const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        g.addColorStop(0, "#0a1224");
+        g.addColorStop(1, "#05070f");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < 40; i++) {
+          ctx.fillStyle = "rgba(255,255,255,0.25)";
+          ctx.fillRect((i * 97) % canvas.width, (i * 53) % canvas.height, 2, 2);
+        }
+        ctx.fillStyle = "#7ec8ff";
+        for (const r of rocks) {
+          ctx.fillRect(r.x, 0, 36, r.top);
+          ctx.fillRect(r.x, r.top + r.gap, 36, canvas.height - (r.top + r.gap));
+        }
+        ctx.fillStyle = "#ff8ec8";
+        ctx.beginPath();
+        ctx.arc(120, shipY, 14, 0, Math.PI * 2);
+        ctx.fill();
+        if (!alive) {
+          ctx.fillStyle = "rgba(0,0,0,0.45)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 32px Segoe UI";
+          ctx.textAlign = "center";
+          ctx.fillText("Orbit lost · " + score, canvas.width / 2, canvas.height / 2);
+        }
+      }
+
+      function flap() {
+        if (!alive) return;
+        vy = -7.2;
+      }
+      window.addEventListener("keydown", (e) => {
+        if (e.code === "Space" || e.key === "ArrowUp") {
+          e.preventDefault();
+          flap();
+        }
+      });
+      canvas.addEventListener("pointerdown", flap);
+      document.getElementById("restart").onclick = reset;
+      document.getElementById("submit").onclick = () => postScore(true);
+      reset();
+    </script>
+  </body>
+</html>

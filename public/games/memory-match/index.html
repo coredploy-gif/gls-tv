@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Memory Match</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --muted: #a1a1aa; --accent: #f5c842; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none;
+        background: radial-gradient(ellipse at top, #2a2210, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .card {
+        width: min(440px, 100%);
+        background: rgba(20,20,24,.9); border: 1px solid rgba(255,255,255,.1);
+        border-radius: 16px; padding: 14px;
+      }
+      .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .score { text-align: right; font-variant-numeric: tabular-nums; }
+      .score b { color: var(--accent); font-size: 1.2rem; }
+      .hint { margin: 0 0 10px; color: var(--muted); font-size: .8rem; }
+      .grid {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+      }
+      .tile {
+        aspect-ratio: 1; border: 0; border-radius: 12px; cursor: pointer;
+        background: #1c1c24; color: transparent; font-size: 1.6rem; font-weight: 800;
+        transition: transform 100ms ease, background 120ms ease;
+      }
+      .tile:hover:not(:disabled) { transform: scale(1.03); }
+      .tile.flipped, .tile.matched {
+        background: linear-gradient(145deg, #3a3218, #1f1a0c);
+        color: var(--accent); border: 1px solid rgba(245,200,66,.35);
+      }
+      .tile.matched { opacity: .55; cursor: default; }
+      .actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+      button.btn {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #1a1400;
+      }
+      button.ghost {
+        background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <div class="top">
+          <h1>Memory Match</h1>
+          <div class="score">Score<br /><b id="score">0</b></div>
+        </div>
+        <p class="hint">Flip pairs. Fewer moves = higher score. Great for kids.</p>
+        <div class="grid" id="grid"></div>
+        <div class="actions">
+          <button type="button" class="btn" id="restart">New game</button>
+          <button type="button" class="btn ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const ICONS = ["★", "◆", "●", "▲", "■", "✚", "☾", "☀"];
+      const grid = document.getElementById("grid");
+      const scoreEl = document.getElementById("score");
+      let cards = [];
+      let open = [];
+      let locked = false;
+      let moves = 0;
+      let matched = 0;
+      let score = 0;
+      let bestSubmitted = 0;
+      let done = false;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "memory-match", score, force: !!force }, "*");
+      }
+
+      function shuffle(a) {
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      function calcScore() {
+        const base = 1000;
+        const penalty = moves * 12;
+        score = Math.max(50, base - penalty + matched * 40);
+        scoreEl.textContent = String(score);
+      }
+
+      function render() {
+        grid.innerHTML = "";
+        cards.forEach((card, i) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "tile" + (card.open || card.matched ? " flipped" : "") + (card.matched ? " matched" : "");
+          btn.textContent = card.open || card.matched ? card.icon : "?";
+          btn.disabled = card.matched || locked;
+          btn.onclick = () => flip(i);
+          grid.appendChild(btn);
+        });
+      }
+
+      function flip(i) {
+        if (locked || done || cards[i].open || cards[i].matched) return;
+        cards[i].open = true;
+        open.push(i);
+        moves++;
+        calcScore();
+        render();
+        if (open.length < 2) return;
+        locked = true;
+        const [a, b] = open;
+        if (cards[a].icon === cards[b].icon) {
+          cards[a].matched = cards[b].matched = true;
+          matched += 2;
+          open = [];
+          locked = false;
+          calcScore();
+          render();
+          if (matched === cards.length) {
+            done = true;
+            score += 250;
+            scoreEl.textContent = String(score);
+            postScore(true);
+          } else postScore(false);
+        } else {
+          setTimeout(() => {
+            cards[a].open = cards[b].open = false;
+            open = [];
+            locked = false;
+            calcScore();
+            render();
+          }, 520);
+        }
+      }
+
+      function reset() {
+        const deck = shuffle([...ICONS, ...ICONS]);
+        cards = deck.map((icon) => ({ icon, open: false, matched: false }));
+        open = [];
+        locked = false;
+        moves = 0;
+        matched = 0;
+        score = 1000;
+        bestSubmitted = 0;
+        done = false;
+        scoreEl.textContent = String(score);
+        render();
+      }
+
+      document.getElementById("restart").onclick = reset;
+      document.getElementById("submit").onclick = () => postScore(true);
+      reset();
+    </script>
+  </body>
+</html>

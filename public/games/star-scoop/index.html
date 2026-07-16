@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Star Scoop</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --accent: #f5c842; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        background: radial-gradient(ellipse at top, #1a1430, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(420px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      canvas {
+        width: 100%; aspect-ratio: 3/4; display: block; border-radius: 14px;
+        background: linear-gradient(#0b1020, #12182a); border: 1px solid rgba(245,200,66,.3);
+      }
+      .hint { margin: 8px 0 0; color: #a1a1aa; font-size: .8rem; }
+      .actions { margin-top: 10px; display: flex; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #1a1400;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Star Scoop</h1>
+          <div class="meta">Score <b id="score">0</b><br /><span id="lives">♥♥♥</span></div>
+        </div>
+        <canvas id="c" width="400" height="520"></canvas>
+        <p class="hint">Drag / move to catch stars. Avoid the rocks.</p>
+        <div class="actions">
+          <button type="button" id="restart">Play</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const scoreEl = document.getElementById("score");
+      const livesEl = document.getElementById("lives");
+      const W = canvas.width, H = canvas.height;
+      let basket, items, score, lives, running = false, bestSubmitted = 0, last = 0, spawnAcc = 0, raf = 0;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "star-scoop", score, force: !!force }, "*");
+      }
+
+      function reset() {
+        basket = { x: W / 2, w: 72, h: 18 };
+        items = [];
+        score = 0;
+        lives = 3;
+        running = false;
+        spawnAcc = 0;
+        scoreEl.textContent = "0";
+        livesEl.textContent = "♥♥♥";
+        draw(0);
+      }
+
+      function spawn() {
+        const rock = Math.random() < 0.28;
+        items.push({
+          x: 20 + Math.random() * (W - 40),
+          y: -20,
+          r: rock ? 14 : 11,
+          vy: 110 + Math.random() * 80 + score * 1.5,
+          rock,
+        });
+      }
+
+      function end() {
+        running = false;
+        postScore(true);
+      }
+
+      function loop(t) {
+        if (!running) return;
+        const dt = Math.min(0.05, (t - last) / 1000 || 0.016);
+        last = t;
+        spawnAcc += dt;
+        const rate = Math.max(0.35, 0.9 - score * 0.01);
+        if (spawnAcc >= rate) { spawnAcc = 0; spawn(); }
+        const by = H - 48;
+        for (let i = items.length - 1; i >= 0; i--) {
+          const it = items[i];
+          it.y += it.vy * dt;
+          const hit =
+            it.y + it.r > by &&
+            it.y - it.r < by + basket.h &&
+            it.x > basket.x - basket.w / 2 &&
+            it.x < basket.x + basket.w / 2;
+          if (hit) {
+            if (it.rock) {
+              lives -= 1;
+              livesEl.textContent = "♥".repeat(Math.max(0, lives)) || "—";
+              if (lives <= 0) end();
+            } else {
+              score += 1;
+              scoreEl.textContent = String(score);
+              postScore(false);
+            }
+            items.splice(i, 1);
+          } else if (it.y - it.r > H) {
+            if (!it.rock) {
+              lives -= 1;
+              livesEl.textContent = "♥".repeat(Math.max(0, lives)) || "—";
+              if (lives <= 0) end();
+            }
+            items.splice(i, 1);
+          }
+        }
+        draw(t);
+        if (running) raf = requestAnimationFrame(loop);
+        else draw(t);
+      }
+
+      function star(x, y, r) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.fillStyle = "#f5c842";
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const a = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+          const px = Math.cos(a) * r, py = Math.sin(a) * r;
+          if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function draw(t) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "#0b1020";
+        ctx.fillRect(0, 0, W, H);
+        for (let i = 0; i < 40; i++) {
+          ctx.fillStyle = "rgba(255,255,255,.25)";
+          ctx.fillRect((i * 97) % W, (i * 53) % (H - 60), 2, 2);
+        }
+        for (const it of items) {
+          if (it.rock) {
+            ctx.fillStyle = "#8a7a6a";
+            ctx.beginPath();
+            ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
+            ctx.fill();
+          } else star(it.x, it.y, it.r);
+        }
+        const by = H - 48;
+        ctx.fillStyle = "#6ec8ff";
+        ctx.fillRect(basket.x - basket.w / 2, by, basket.w, basket.h);
+        ctx.fillStyle = "rgba(110,200,255,.35)";
+        ctx.fillRect(basket.x - basket.w / 2 + 4, by + 4, basket.w - 8, 6);
+        if (!running) {
+          ctx.fillStyle = "rgba(0,0,0,.5)";
+          ctx.fillRect(0, 0, W, H);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 20px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(lives <= 0 ? "Game over · tap Play" : "Tap Play to scoop", W / 2, H / 2);
+        }
+      }
+
+      function pointer(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * W;
+        basket.x = Math.max(basket.w / 2, Math.min(W - basket.w / 2, x));
+      }
+      canvas.addEventListener("pointerdown", pointer);
+      canvas.addEventListener("pointermove", (e) => { if (e.buttons || e.pressure) pointer(e); else pointer(e); });
+
+      function start() {
+        cancelAnimationFrame(raf);
+        reset();
+        running = true;
+        lives = 3;
+        livesEl.textContent = "♥♥♥";
+        last = performance.now();
+        raf = requestAnimationFrame(loop);
+      }
+
+      document.getElementById("restart").onclick = start;
+      document.getElementById("submit").onclick = () => postScore(true);
+      reset();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Balloon Burst</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --accent: #5ec8ff; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        background: radial-gradient(ellipse at top, #102438, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(400px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      canvas {
+        width: 100%; aspect-ratio: 3/4; display: block; border-radius: 14px;
+        background: linear-gradient(#87b8e8 0%, #c5e4ff 40%, #8fbc6a 40%, #5a8a3a 100%);
+        border: 1px solid rgba(94,200,255,.35);
+      }
+      .hint { margin: 8px 0 0; color: #a1a1aa; font-size: .8rem; }
+      .actions { margin-top: 10px; display: flex; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #062033;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Balloon Burst</h1>
+          <div class="meta">Score <b id="score">0</b><br /><span id="lives">❤ ❤ ❤</span></div>
+        </div>
+        <canvas id="c" width="360" height="480"></canvas>
+        <p class="hint" id="hint">Aim and tap to shoot arrows at balloons.</p>
+        <div class="actions">
+          <button type="button" id="restart">Play</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const scoreEl = document.getElementById("score");
+      const livesEl = document.getElementById("lives");
+      const hintEl = document.getElementById("hint");
+      const W = 360, H = 480;
+      const COLORS = ["#ff6b8a", "#ffd166", "#7dd3fc", "#c4b5fd", "#fb923c", "#6ee7b7"];
+      let balloons = [], arrows = [], score = 0, lives = 3, bestSubmitted = 0;
+      let running = false, dead = false, aimX = W / 2, aimY = H / 2, raf = 0, spawnT = 0;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "balloon-burst", score, force: !!force }, "*");
+      }
+
+      function livesText() {
+        return "❤ ".repeat(Math.max(0, lives)).trim() || "—";
+      }
+
+      function spawnBalloon() {
+        const r = 16 + Math.random() * 10;
+        balloons.push({
+          x: 30 + Math.random() * (W - 60),
+          y: H * 0.42 + Math.random() * 40,
+          r,
+          vy: -(0.55 + Math.random() * 0.55 + score * 0.008),
+          vx: (Math.random() - 0.5) * 0.6,
+          color: COLORS[(Math.random() * COLORS.length) | 0],
+          wobble: Math.random() * Math.PI * 2,
+        });
+      }
+
+      function reset() {
+        balloons = [];
+        arrows = [];
+        score = 0;
+        lives = 3;
+        dead = false;
+        running = false;
+        spawnT = 0;
+        scoreEl.textContent = "0";
+        livesEl.textContent = livesText();
+        hintEl.textContent = "Aim and tap to shoot arrows at balloons.";
+        for (let i = 0; i < 4; i++) spawnBalloon();
+        draw();
+      }
+
+      function shoot(tx, ty) {
+        if (!running || dead) return;
+        const ox = W / 2, oy = H - 28;
+        const dx = tx - ox, dy = ty - oy;
+        const len = Math.hypot(dx, dy) || 1;
+        const speed = 9.5;
+        arrows.push({
+          x: ox, y: oy,
+          vx: (dx / len) * speed,
+          vy: (dy / len) * speed,
+          ang: Math.atan2(dy, dx),
+        });
+      }
+
+      function loseLife() {
+        lives--;
+        livesEl.textContent = livesText();
+        if (lives <= 0) {
+          dead = true;
+          running = false;
+          hintEl.textContent = "Missed too many · submit or play again.";
+          postScore(true);
+        }
+      }
+
+      function hit(b, i) {
+        balloons.splice(i, 1);
+        score += 1;
+        scoreEl.textContent = String(score);
+        postScore(false);
+      }
+
+      function tick() {
+        if (!running || dead) { draw(); return; }
+        spawnT++;
+        const interval = Math.max(36, 70 - (score >> 1));
+        if (spawnT % interval === 0) spawnBalloon();
+
+        for (let i = balloons.length - 1; i >= 0; i--) {
+          const b = balloons[i];
+          b.wobble += 0.04;
+          b.x += b.vx + Math.sin(b.wobble) * 0.35;
+          b.y += b.vy;
+          if (b.x < b.r) { b.x = b.r; b.vx *= -1; }
+          if (b.x > W - b.r) { b.x = W - b.r; b.vx *= -1; }
+          if (b.y + b.r < -20) {
+            balloons.splice(i, 1);
+            loseLife();
+            if (dead) break;
+          }
+        }
+
+        for (let i = arrows.length - 1; i >= 0; i--) {
+          const a = arrows[i];
+          a.x += a.vx;
+          a.y += a.vy;
+          let popped = false;
+          for (let j = balloons.length - 1; j >= 0; j--) {
+            const b = balloons[j];
+            if (Math.hypot(a.x - b.x, a.y - b.y) < b.r + 4) {
+              hit(b, j);
+              popped = true;
+              break;
+            }
+          }
+          if (popped || a.x < -20 || a.x > W + 20 || a.y < -20 || a.y > H + 20) {
+            arrows.splice(i, 1);
+          }
+        }
+
+        draw();
+        raf = requestAnimationFrame(tick);
+      }
+
+      function drawBow() {
+        const ox = W / 2, oy = H - 28;
+        const ang = Math.atan2(aimY - oy, aimX - ox);
+        ctx.save();
+        ctx.translate(ox, oy);
+        ctx.rotate(ang);
+        ctx.strokeStyle = "#5a3a1a";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(0, 0, 22, -0.9, 0.9);
+        ctx.stroke();
+        ctx.strokeStyle = "#ddd";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(18, -14);
+        ctx.lineTo(18, 14);
+        ctx.stroke();
+        ctx.fillStyle = "#c45c26";
+        ctx.fillRect(8, -2, 28, 4);
+        ctx.beginPath();
+        ctx.moveTo(36, 0);
+        ctx.lineTo(46, -4);
+        ctx.lineTo(46, 4);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "#87b8e8";
+        ctx.fillRect(0, 0, W, H * 0.4);
+        ctx.fillStyle = "#8fbc6a";
+        ctx.fillRect(0, H * 0.4, W, H * 0.6);
+        ctx.fillStyle = "rgba(255,255,255,.5)";
+        for (let i = 0; i < 5; i++) {
+          const cx = 40 + i * 70;
+          ctx.beginPath();
+          ctx.ellipse(cx, 48 + (i % 2) * 10, 28, 12, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        for (const b of balloons) {
+          ctx.save();
+          ctx.translate(b.x, b.y);
+          ctx.fillStyle = b.color;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, b.r, b.r * 1.15, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "rgba(255,255,255,.45)";
+          ctx.beginPath();
+          ctx.ellipse(-b.r * 0.3, -b.r * 0.35, b.r * 0.25, b.r * 0.35, -0.4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = "#666";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(0, b.r * 1.15);
+          ctx.quadraticCurveTo(4, b.r * 1.15 + 18, 0, b.r * 1.15 + 28);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        for (const a of arrows) {
+          ctx.save();
+          ctx.translate(a.x, a.y);
+          ctx.rotate(a.ang);
+          ctx.fillStyle = "#c45c26";
+          ctx.fillRect(-14, -1.5, 22, 3);
+          ctx.fillStyle = "#ddd";
+          ctx.beginPath();
+          ctx.moveTo(8, 0);
+          ctx.lineTo(18, -4);
+          ctx.lineTo(18, 4);
+          ctx.fill();
+          ctx.fillStyle = "#5ec8ff";
+          ctx.beginPath();
+          ctx.moveTo(-14, 0);
+          ctx.lineTo(-20, -5);
+          ctx.lineTo(-18, 0);
+          ctx.lineTo(-20, 5);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        drawBow();
+
+        if (!running) {
+          ctx.fillStyle = "rgba(0,0,0,.45)";
+          ctx.fillRect(0, 0, W, H);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 22px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(dead ? "Balloons escaped · tap Play" : "Tap to aim & shoot", W / 2, H / 2);
+        }
+      }
+
+      function go() {
+        cancelAnimationFrame(raf);
+        if (dead || !running) {
+          reset();
+          running = true;
+          dead = false;
+        }
+        raf = requestAnimationFrame(tick);
+      }
+
+      function pointerPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: ((e.clientX - rect.left) / rect.width) * W,
+          y: ((e.clientY - rect.top) / rect.height) * H,
+        };
+      }
+
+      canvas.addEventListener("pointermove", (e) => {
+        const p = pointerPos(e);
+        aimX = p.x; aimY = p.y;
+        if (!running) draw();
+      });
+      canvas.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        const p = pointerPos(e);
+        aimX = p.x; aimY = p.y;
+        if (!running || dead) { go(); return; }
+        shoot(p.x, p.y);
+      });
+
+      document.getElementById("restart").onclick = go;
+      document.getElementById("submit").onclick = () => postScore(true);
+      reset();
+    </script>
+  </body>
+</html>

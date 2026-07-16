@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Flutter Dash</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --accent: #6ec8ff; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        background: radial-gradient(ellipse at top, #102030, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(400px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      canvas {
+        width: 100%; aspect-ratio: 3/4; display: block; border-radius: 14px;
+        background: linear-gradient(#87ceeb 0%, #87ceeb 55%, #5a9e3a 55%, #3d6b28 100%);
+        border: 1px solid rgba(110,200,255,.35);
+      }
+      .hint { margin: 8px 0 0; color: #a1a1aa; font-size: .8rem; }
+      .actions { margin-top: 10px; display: flex; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #062033;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Flutter Dash</h1>
+          <div class="meta">Score <b id="score">0</b></div>
+        </div>
+        <canvas id="c" width="360" height="480"></canvas>
+        <p class="hint">Tap / Space to flap. Clear the gaps.</p>
+        <div class="actions">
+          <button type="button" id="restart">Play</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const scoreEl = document.getElementById("score");
+      const W = canvas.width, H = canvas.height;
+      let bird, pipes, score, bestSubmitted = 0, running = false, dead = false, raf = 0;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "flutter-dash", score, force: !!force }, "*");
+      }
+
+      function reset() {
+        bird = { x: 72, y: H / 2, vy: 0, r: 14 };
+        pipes = [];
+        score = 0;
+        dead = false;
+        running = false;
+        scoreEl.textContent = "0";
+        spawnPipe(W + 40);
+        spawnPipe(W + 220);
+        draw();
+      }
+
+      function spawnPipe(x) {
+        const gap = 118;
+        const top = 60 + Math.random() * (H - 200 - gap);
+        pipes.push({ x, w: 52, top, gap, scored: false });
+      }
+
+      function flap() {
+        if (dead) { go(); return; }
+        if (!running) { go(); return; }
+        bird.vy = -5.6;
+      }
+
+      function hit() {
+        dead = true;
+        running = false;
+        postScore(true);
+      }
+
+      function tick() {
+        if (!running || dead) { draw(); return; }
+        bird.vy += 0.28;
+        bird.y += bird.vy;
+        if (bird.y + bird.r > H - 8 || bird.y - bird.r < 0) hit();
+        for (const p of pipes) {
+          p.x -= 2.4;
+          if (!p.scored && p.x + p.w < bird.x) {
+            p.scored = true;
+            score += 1;
+            scoreEl.textContent = String(score);
+            postScore(false);
+          }
+          const inX = bird.x + bird.r > p.x && bird.x - bird.r < p.x + p.w;
+          const inGap = bird.y - bird.r > p.top && bird.y + bird.r < p.top + p.gap;
+          if (inX && !inGap) hit();
+        }
+        if (pipes[0] && pipes[0].x + pipes[0].w < -10) {
+          pipes.shift();
+          spawnPipe(pipes[pipes.length - 1].x + 180);
+        }
+        draw();
+        raf = requestAnimationFrame(tick);
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "#87ceeb";
+        ctx.fillRect(0, 0, W, H * 0.55);
+        ctx.fillStyle = "#5a9e3a";
+        ctx.fillRect(0, H * 0.55, W, H * 0.45);
+        for (const p of pipes) {
+          ctx.fillStyle = "#2d8a3e";
+          ctx.fillRect(p.x, 0, p.w, p.top);
+          ctx.fillRect(p.x, p.top + p.gap, p.w, H - (p.top + p.gap));
+          ctx.fillStyle = "#3db854";
+          ctx.fillRect(p.x - 3, p.top - 14, p.w + 6, 14);
+          ctx.fillRect(p.x - 3, p.top + p.gap, p.w + 6, 14);
+        }
+        ctx.fillStyle = "#f5c842";
+        ctx.beginPath();
+        ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#1a1a1a";
+        ctx.beginPath();
+        ctx.arc(bird.x + 5, bird.y - 3, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ff6b35";
+        ctx.beginPath();
+        ctx.moveTo(bird.x + bird.r - 2, bird.y);
+        ctx.lineTo(bird.x + bird.r + 10, bird.y + 3);
+        ctx.lineTo(bird.x + bird.r - 2, bird.y + 6);
+        ctx.fill();
+        if (!running) {
+          ctx.fillStyle = "rgba(0,0,0,.45)";
+          ctx.fillRect(0, 0, W, H);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 22px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(dead ? "Crashed · tap to retry" : "Tap to flutter", W / 2, H / 2);
+        }
+      }
+
+      function go() {
+        cancelAnimationFrame(raf);
+        reset();
+        running = true;
+        raf = requestAnimationFrame(tick);
+      }
+
+      canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); if (!running && !dead) go(); else flap(); });
+      window.addEventListener("keydown", (e) => {
+        if (e.code === "Space" || e.code === "ArrowUp") { e.preventDefault(); if (!running && !dead) go(); else flap(); }
+      });
+      document.getElementById("restart").onclick = go;
+      document.getElementById("submit").onclick = () => postScore(true);
+      reset();
+    </script>
+  </body>
+</html>

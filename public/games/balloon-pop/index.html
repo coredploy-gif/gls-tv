@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Balloon Pop</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --accent: #ff7ab8; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        background: radial-gradient(ellipse at top, #2a1020, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(520px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      canvas {
+        width: 100%; aspect-ratio: 3/4; display: block; border-radius: 14px;
+        background: linear-gradient(#0e1524, #0a0c12); border: 1px solid rgba(255,122,184,.3);
+      }
+      .actions { margin-top: 10px; display: flex; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #2a0618;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Balloon Pop</h1>
+          <div class="meta">Score <b id="score">0</b><br /><span id="lives">♥♥♥</span></div>
+        </div>
+        <canvas id="c" width="420" height="560"></canvas>
+        <div class="actions">
+          <button type="button" id="restart">New game</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const PALETTE = ["#ff7ab8", "#7ec8ff", "#f5c842", "#5ee29a", "#ff8a65"];
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const scoreEl = document.getElementById("score");
+      const livesEl = document.getElementById("lives");
+
+      let balloons = [];
+      let particles = [];
+      let score = 0;
+      let lives = 3;
+      let running = false;
+      let bestSubmitted = 0;
+      let last = 0;
+      let spawnAcc = 0;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "balloon-pop", score, force: !!force }, "*");
+      }
+
+      function spawn() {
+        const r = 22 + Math.random() * 18;
+        balloons.push({
+          x: r + Math.random() * (canvas.width - r * 2),
+          y: canvas.height + r,
+          r,
+          vy: -(70 + Math.random() * 50 + score * 0.15),
+          color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
+          wobble: Math.random() * Math.PI * 2,
+        });
+      }
+
+      function burst(b) {
+        for (let i = 0; i < 10; i++) {
+          particles.push({
+            x: b.x, y: b.y,
+            vx: (Math.random() - 0.5) * 180,
+            vy: (Math.random() - 0.5) * 180,
+            life: 0.45 + Math.random() * 0.3,
+            color: b.color,
+          });
+        }
+      }
+
+      function drawBalloon(b) {
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.beginPath();
+        ctx.fillStyle = b.color;
+        ctx.ellipse(0, 0, b.r * 0.85, b.r, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(255,255,255,.35)";
+        ctx.lineWidth = 2;
+        ctx.moveTo(0, b.r);
+        ctx.lineTo(0, b.r + 18);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const b of balloons) drawBalloon(b);
+        for (const p of particles) {
+          ctx.globalAlpha = Math.max(0, p.life);
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+        if (!running) {
+          ctx.fillStyle = "rgba(0,0,0,.5)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.textAlign = "center";
+          ctx.font = "bold 26px Segoe UI, sans-serif";
+          ctx.fillText(lives <= 0 ? "Popped out!" : "Ready", canvas.width / 2, canvas.height / 2);
+          ctx.font = "16px Segoe UI, sans-serif";
+          ctx.fillStyle = "#ff7ab8";
+          ctx.fillText("Score " + score, canvas.width / 2, canvas.height / 2 + 28);
+        }
+      }
+
+      function tick(ts) {
+        if (!running) { draw(); return; }
+        const dt = Math.min(0.05, (ts - last) / 1000 || 0.016);
+        last = ts;
+        spawnAcc += dt;
+        const rate = Math.max(0.35, 0.9 - score * 0.002);
+        while (spawnAcc > rate) { spawn(); spawnAcc -= rate; }
+        for (const b of balloons) {
+          b.wobble += dt * 2;
+          b.x += Math.sin(b.wobble) * 28 * dt;
+          b.y += b.vy * dt;
+        }
+        const escaped = balloons.filter((b) => b.y + b.r < -10);
+        if (escaped.length) {
+          lives = Math.max(0, lives - escaped.length);
+          livesEl.textContent = "♥".repeat(lives) || "—";
+          if (lives <= 0) {
+            running = false;
+            postScore(true);
+          }
+        }
+        balloons = balloons.filter((b) => b.y + b.r >= -10);
+        for (const p of particles) {
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.life -= dt;
+        }
+        particles = particles.filter((p) => p.life > 0);
+        draw();
+        requestAnimationFrame(tick);
+      }
+
+      function hit(x, y) {
+        if (!running) return;
+        const rect = canvas.getBoundingClientRect();
+        const sx = ((x - rect.left) / rect.width) * canvas.width;
+        const sy = ((y - rect.top) / rect.height) * canvas.height;
+        for (let i = balloons.length - 1; i >= 0; i--) {
+          const b = balloons[i];
+          const dx = b.x - sx, dy = b.y - sy;
+          if (dx * dx + dy * dy <= b.r * b.r) {
+            burst(b);
+            balloons.splice(i, 1);
+            score += 10;
+            scoreEl.textContent = String(score);
+            postScore(false);
+            return;
+          }
+        }
+      }
+
+      function reset() {
+        balloons = [];
+        particles = [];
+        score = 0;
+        lives = 3;
+        bestSubmitted = 0;
+        running = true;
+        spawnAcc = 0;
+        last = performance.now();
+        scoreEl.textContent = "0";
+        livesEl.textContent = "♥♥♥";
+        requestAnimationFrame(tick);
+      }
+
+      canvas.addEventListener("pointerdown", (e) => hit(e.clientX, e.clientY));
+      document.getElementById("restart").onclick = reset;
+      document.getElementById("submit").onclick = () => postScore(true);
+      reset();
+    </script>
+  </body>
+</html>

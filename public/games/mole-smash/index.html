@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Mole Smash</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --accent: #c4a35a; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+        background: radial-gradient(ellipse at top, #1a2410, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(420px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      .grid {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+        background: rgba(20,28,12,.9); border: 1px solid rgba(196,163,90,.35);
+        border-radius: 14px; padding: 12px;
+      }
+      .hole {
+        aspect-ratio: 1; border-radius: 50%; background: #0c1008;
+        border: 2px solid rgba(255,255,255,.08); position: relative; overflow: hidden; cursor: pointer;
+      }
+      .mole {
+        position: absolute; left: 50%; bottom: -55%; width: 62%; aspect-ratio: 1; border-radius: 50% 50% 40% 40%;
+        background: radial-gradient(circle at 35% 30%, #e8b86d, #8a5a2b 70%);
+        transform: translateX(-50%); transition: bottom .12s ease; pointer-events: none;
+      }
+      .mole.up { bottom: 8%; }
+      .mole::after {
+        content: ""; position: absolute; top: 28%; left: 22%; width: 14%; height: 14%;
+        border-radius: 50%; background: #1a1208; box-shadow: 28px 0 #1a1208;
+      }
+      .hint { margin: 8px 0 0; color: #a1a1aa; font-size: .8rem; }
+      .actions { margin-top: 10px; display: flex; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #1a1208;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Mole Smash</h1>
+          <div class="meta">Score <b id="score">0</b><br /><span id="time">30s</span></div>
+        </div>
+        <div class="grid" id="grid"></div>
+        <p class="hint" id="hint">Tap moles as they pop up. Misses cost points near the end.</p>
+        <div class="actions">
+          <button type="button" id="restart">Start</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const grid = document.getElementById("grid");
+      const scoreEl = document.getElementById("score");
+      const timeEl = document.getElementById("time");
+      const hint = document.getElementById("hint");
+      const holes = [];
+      let score = 0, bestSubmitted = 0, running = false, left = 30, timer = null, popTimer = null, active = -1;
+
+      for (let i = 0; i < 9; i++) {
+        const hole = document.createElement("button");
+        hole.type = "button";
+        hole.className = "hole";
+        hole.setAttribute("aria-label", "Hole " + (i + 1));
+        const mole = document.createElement("div");
+        mole.className = "mole";
+        hole.appendChild(mole);
+        hole.addEventListener("pointerdown", (e) => {
+          e.preventDefault();
+          if (!running || active !== i) return;
+          score += 1;
+          scoreEl.textContent = String(score);
+          hideMole();
+          postScore(false);
+        });
+        grid.appendChild(hole);
+        holes.push(mole);
+      }
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "mole-smash", score, force: !!force }, "*");
+      }
+
+      function hideMole() {
+        if (active >= 0) holes[active].classList.remove("up");
+        active = -1;
+      }
+
+      function pop() {
+        if (!running) return;
+        hideMole();
+        active = Math.floor(Math.random() * 9);
+        holes[active].classList.add("up");
+        const speed = Math.max(420, 900 - score * 18);
+        popTimer = setTimeout(() => {
+          hideMole();
+          if (running) pop();
+        }, speed);
+      }
+
+      function end() {
+        running = false;
+        clearInterval(timer);
+        clearTimeout(popTimer);
+        hideMole();
+        hint.textContent = "Time’s up! Score " + score + " — submit or play again.";
+        document.getElementById("restart").textContent = "Play again";
+        postScore(true);
+      }
+
+      function start() {
+        clearInterval(timer);
+        clearTimeout(popTimer);
+        hideMole();
+        score = 0;
+        left = 30;
+        running = true;
+        scoreEl.textContent = "0";
+        timeEl.textContent = "30s";
+        hint.textContent = "Smash those moles!";
+        document.getElementById("restart").textContent = "Restart";
+        timer = setInterval(() => {
+          left -= 1;
+          timeEl.textContent = left + "s";
+          if (left <= 0) end();
+        }, 1000);
+        pop();
+      }
+
+      document.getElementById("restart").onclick = start;
+      document.getElementById("submit").onclick = () => postScore(true);
+    </script>
+  </body>
+</html>

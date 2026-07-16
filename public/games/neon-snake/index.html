@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Neon Snake</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #05070a; overflow: hidden; font-family: "Segoe UI", system-ui, sans-serif; color: #e8fff2; }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(560px, 100%); }
+      .bar { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      canvas { width: 100%; aspect-ratio: 1; background: #0a1210; border-radius: 14px; border: 1px solid rgba(94,226,154,0.35); display: block; touch-action: none; }
+      button { margin-top: 10px; border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700; background: #5ee29a; color: #052013; cursor: pointer; }
+      .ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #e8fff2; margin-left: 8px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar"><h1>Neon Snake</h1><div>Score <b id="score">0</b></div></div>
+        <canvas id="c" width="480" height="480"></canvas>
+        <div>
+          <button type="button" id="restart">Restart</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const CELL = 20;
+      const COLS = canvas.width / CELL;
+      const ROWS = canvas.height / CELL;
+      let snake, dir, pending, food, score, alive, timer, bestSubmitted = 0;
+
+      function randFood() {
+        while (true) {
+          const p = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
+          if (!snake.some((s) => s.x === p.x && s.y === p.y)) return p;
+        }
+      }
+
+      function reset() {
+        snake = [{ x: 8, y: 10 }, { x: 7, y: 10 }, { x: 6, y: 10 }];
+        dir = { x: 1, y: 0 };
+        pending = dir;
+        food = randFood();
+        score = 0;
+        bestSubmitted = 0;
+        alive = true;
+        document.getElementById("score").textContent = "0";
+        clearInterval(timer);
+        timer = setInterval(tick, 110);
+        draw();
+      }
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "neon-snake", score, force: !!force }, "*");
+      }
+
+      function tick() {
+        if (!alive) return;
+        dir = pending;
+        const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+        if (head.x < 0 || head.y < 0 || head.x >= COLS || head.y >= ROWS || snake.some((s) => s.x === head.x && s.y === head.y)) {
+          alive = false;
+          postScore(true);
+          draw();
+          return;
+        }
+        snake.unshift(head);
+        if (head.x === food.x && head.y === food.y) {
+          score += 10;
+          document.getElementById("score").textContent = String(score);
+          food = randFood();
+          postScore(false);
+        } else snake.pop();
+        draw();
+      }
+
+      function draw() {
+        ctx.fillStyle = "#07110e";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#5ee29a";
+        ctx.shadowColor = "#5ee29a";
+        ctx.shadowBlur = 12;
+        snake.forEach((s, i) => {
+          ctx.globalAlpha = i === 0 ? 1 : 0.75;
+          ctx.fillRect(s.x * CELL + 1, s.y * CELL + 1, CELL - 2, CELL - 2);
+        });
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#ff8ec8";
+        ctx.shadowColor = "#ff8ec8";
+        ctx.fillRect(food.x * CELL + 2, food.y * CELL + 2, CELL - 4, CELL - 4);
+        ctx.shadowBlur = 0;
+        if (!alive) {
+          ctx.fillStyle = "rgba(0,0,0,0.45)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 28px Segoe UI";
+          ctx.textAlign = "center";
+          ctx.fillText("Game over · " + score, canvas.width / 2, canvas.height / 2);
+        }
+      }
+
+      const map = { ArrowUp: { x: 0, y: -1 }, ArrowDown: { x: 0, y: 1 }, ArrowLeft: { x: -1, y: 0 }, ArrowRight: { x: 1, y: 0 } };
+      window.addEventListener("keydown", (e) => {
+        const n = map[e.key];
+        if (!n) return;
+        e.preventDefault();
+        if (n.x === -dir.x && n.y === -dir.y) return;
+        pending = n;
+      });
+
+      let sx = 0, sy = 0;
+      canvas.addEventListener("touchstart", (e) => { sx = e.changedTouches[0].clientX; sy = e.changedTouches[0].clientY; }, { passive: true });
+      canvas.addEventListener("touchend", (e) => {
+        const dx = e.changedTouches[0].clientX - sx;
+        const dy = e.changedTouches[0].clientY - sy;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 20) return;
+        const n = Math.abs(dx) > Math.abs(dy) ? { x: dx > 0 ? 1 : -1, y: 0 } : { x: 0, y: dy > 0 ? 1 : -1 };
+        if (n.x === -dir.x && n.y === -dir.y) return;
+        pending = n;
+      }, { passive: true });
+
+      document.getElementById("restart").onclick = reset;
+      document.getElementById("submit").onclick = () => postScore(true);
+      reset();
+    </script>
+  </body>
+</html>

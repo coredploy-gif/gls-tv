@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Pixel Race</title>
+    <style>
+      :root { color-scheme: dark; --bg: #0a0a0c; --ink: #f0f0f2; --accent: #f5c842; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        background: radial-gradient(ellipse at top, #2a2410, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(360px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      canvas {
+        width: 100%; aspect-ratio: 3/5; display: block; border-radius: 12px;
+        background: #0c0e12; border: 1px solid rgba(245,200,66,.35);
+        image-rendering: pixelated;
+      }
+      .actions { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #1a1404;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+      .steer { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+      .steer button { padding: 14px; font-size: 1rem; }
+      .hint { margin-top: 8px; font-size: 0.75rem; color: rgba(240,240,242,.5); text-align: center; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Pixel Race</h1>
+          <div class="meta">Score <b id="score">0</b><br />Speed <span id="spd">1</span>x</div>
+        </div>
+        <canvas id="c" width="180" height="300"></canvas>
+        <div class="actions">
+          <button type="button" id="restart">Restart</button>
+          <button type="button" class="ghost" id="mute">Mute</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+        <div class="steer">
+          <button type="button" id="left">◀ Lane</button>
+          <button type="button" id="right">Lane ▶</button>
+        </div>
+        <p class="hint">← → / A D to switch lanes · dodge oncoming cars</p>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const LANES = 3;
+      const ROAD_W = 140;
+      const ROAD_X = (canvas.width - ROAD_W) / 2;
+      const LANE_W = ROAD_W / LANES;
+
+      let playerLane, cars, score, speed, running, scroll, last, bestSubmitted, muted, spawnTimer, audioCtx;
+
+      function ensureAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+      }
+
+      function beep(freq, dur, type, gain) {
+        if (muted) return;
+        try {
+          ensureAudio();
+          const t = audioCtx.currentTime;
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = type || "square";
+          o.frequency.value = freq;
+          g.gain.setValueAtTime(gain || 0.05, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+          o.connect(g); g.connect(audioCtx.destination);
+          o.start(t); o.stop(t + dur);
+        } catch (_) {}
+      }
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "pixel-race", score, force: !!force }, "*");
+      }
+
+      function laneCenter(lane) {
+        return ROAD_X + lane * LANE_W + LANE_W / 2;
+      }
+
+      function reset() {
+        playerLane = 1;
+        cars = [];
+        score = 0;
+        speed = 140;
+        scroll = 0;
+        spawnTimer = 0;
+        bestSubmitted = 0;
+        running = true;
+        document.getElementById("score").textContent = "0";
+        document.getElementById("spd").textContent = "1";
+        last = performance.now();
+        requestAnimationFrame(loop);
+      }
+
+      function shift(dir) {
+        if (!running) return;
+        const next = Math.max(0, Math.min(LANES - 1, playerLane + dir));
+        if (next !== playerLane) {
+          playerLane = next;
+          beep(260, 0.04, "square", 0.04);
+        }
+      }
+
+      function spawnCar() {
+        let lane = (Math.random() * LANES) | 0;
+        const recent = cars.filter((c) => c.y < 80);
+        if (recent.length && recent.every((c) => c.lane === lane)) {
+          lane = (lane + 1 + ((Math.random() * (LANES - 1)) | 0)) % LANES;
+        }
+        cars.push({ lane, y: -36, w: 22, h: 32 });
+      }
+
+      function update(dt) {
+        if (!running) return;
+        scroll += speed * dt;
+        spawnTimer -= dt;
+        if (spawnTimer <= 0) {
+          spawnCar();
+          spawnTimer = Math.max(0.45, 1.1 - score / 800);
+        }
+        const py = canvas.height - 48;
+        for (const car of cars) {
+          car.y += speed * dt;
+          const px = laneCenter(playerLane);
+          const cx = laneCenter(car.lane);
+          if (
+            Math.abs(px - cx) < 18 &&
+            car.y + car.h > py - 14 &&
+            car.y < py + 14
+          ) {
+            running = false;
+            beep(90, 0.4, "sawtooth", 0.09);
+            beep(60, 0.25, "square", 0.06);
+            postScore(true);
+            return;
+          }
+        }
+        cars = cars.filter((c) => c.y < canvas.height + 40);
+        const gained = Math.floor(speed * dt * 0.15);
+        if (gained > 0) {
+          score += gained;
+          document.getElementById("score").textContent = String(score);
+          if (score % 50 < gained) {
+            beep(440, 0.03, "triangle", 0.03);
+            postScore(false);
+          }
+        }
+        speed = 140 + Math.min(220, score * 0.35);
+        document.getElementById("spd").textContent = String(Math.round(speed / 140 * 10) / 10);
+      }
+
+      function drawCar(x, y, color, mirror) {
+        ctx.fillStyle = color;
+        ctx.fillRect(x - 11, y - 16, 22, 32);
+        ctx.fillStyle = "#1a1a1e";
+        ctx.fillRect(x - 7, y - 8, 14, 10);
+        ctx.fillStyle = "#fff";
+        const ly = mirror ? y + 10 : y - 12;
+        ctx.fillRect(x - 9, ly, 5, 4);
+        ctx.fillRect(x + 4, ly, 5, 4);
+      }
+
+      function draw() {
+        ctx.fillStyle = "#0c0e12";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#1a1d24";
+        ctx.fillRect(ROAD_X - 6, 0, ROAD_W + 12, canvas.height);
+        ctx.fillStyle = "#12151a";
+        ctx.fillRect(ROAD_X, 0, ROAD_W, canvas.height);
+        ctx.strokeStyle = "#f5c842";
+        ctx.setLineDash([12, 14]);
+        ctx.lineWidth = 2;
+        const dashOff = scroll % 26;
+        for (let i = 1; i < LANES; i++) {
+          ctx.beginPath();
+          ctx.moveTo(ROAD_X + i * LANE_W, -26 + dashOff);
+          ctx.lineTo(ROAD_X + i * LANE_W, canvas.height);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        for (const car of cars) drawCar(laneCenter(car.lane), car.y + 16, "#ff5a6a", true);
+        drawCar(laneCenter(playerLane), canvas.height - 48, "#f5c842", false);
+        if (!running) {
+          ctx.fillStyle = "rgba(0,0,0,.55)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 22px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("Crash!", canvas.width / 2, canvas.height / 2 - 6);
+          ctx.fillStyle = "#f5c842";
+          ctx.font = "15px Segoe UI, sans-serif";
+          ctx.fillText("Score " + score, canvas.width / 2, canvas.height / 2 + 22);
+        }
+      }
+
+      function loop(ts) {
+        const dt = Math.min(0.04, (ts - last) / 1000 || 0.016);
+        last = ts;
+        update(dt);
+        draw();
+        if (running) requestAnimationFrame(loop);
+        else draw();
+      }
+
+      window.addEventListener("keydown", (e) => {
+        const k = e.key.toLowerCase();
+        if (["arrowleft","arrowright","a","d"].includes(k)) e.preventDefault();
+        if (k === "arrowleft" || k === "a") shift(-1);
+        if (k === "arrowright" || k === "d") shift(1);
+      });
+      document.getElementById("left").onclick = () => shift(-1);
+      document.getElementById("right").onclick = () => shift(1);
+      document.getElementById("restart").onclick = () => { ensureAudio(); reset(); };
+      document.getElementById("submit").onclick = () => postScore(true);
+      muted = false;
+      document.getElementById("mute").onclick = () => {
+        muted = !muted;
+        document.getElementById("mute").textContent = muted ? "Unmute" : "Mute";
+      };
+      canvas.addEventListener("pointerdown", (e) => {
+        ensureAudio();
+        const rect = canvas.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * canvas.width;
+        shift(x < canvas.width / 2 ? -1 : 1);
+      });
+      reset();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Brick Break</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --accent: #ff8a65; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        background: radial-gradient(ellipse at top, #2a1810, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(520px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      canvas {
+        width: 100%; aspect-ratio: 4/5; display: block; border-radius: 14px;
+        background: #0a0c12; border: 1px solid rgba(255,138,101,.35);
+      }
+      .actions { margin-top: 10px; display: flex; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #2a1008;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Brick Break</h1>
+          <div class="meta">Score <b id="score">0</b><br />Lives <span id="lives">3</span></div>
+        </div>
+        <canvas id="c" width="400" height="500"></canvas>
+        <div class="actions">
+          <button type="button" id="restart">Restart</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const scoreEl = document.getElementById("score");
+      const livesEl = document.getElementById("lives");
+      const COLS = 8, ROWS = 5;
+      const BRICK_W = 44, BRICK_H = 16, GAP = 4, TOP = 48;
+
+      let paddle, ball, bricks, score, lives, running, launched, bestSubmitted, last;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "brick-break", score, force: !!force }, "*");
+      }
+
+      function makeBricks() {
+        const colors = ["#ff8a65", "#fbbf24", "#5ee29a", "#7ec8ff", "#ff7ab8"];
+        bricks = [];
+        const offsetX = (canvas.width - (COLS * (BRICK_W + GAP) - GAP)) / 2;
+        for (let r = 0; r < ROWS; r++) {
+          for (let c = 0; c < COLS; c++) {
+            bricks.push({
+              x: offsetX + c * (BRICK_W + GAP),
+              y: TOP + r * (BRICK_H + GAP),
+              w: BRICK_W, h: BRICK_H,
+              alive: true,
+              color: colors[r % colors.length],
+              points: (ROWS - r) * 10,
+            });
+          }
+        }
+      }
+
+      function resetBall(attach) {
+        ball = {
+          x: paddle.x + paddle.w / 2,
+          y: paddle.y - 10,
+          r: 7,
+          vx: 0,
+          vy: 0,
+        };
+        launched = !attach;
+        if (!attach) {
+          const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.8;
+          const speed = 260;
+          ball.vx = Math.cos(angle) * speed;
+          ball.vy = Math.sin(angle) * speed;
+        }
+      }
+
+      function reset() {
+        paddle = { x: canvas.width / 2 - 45, y: canvas.height - 36, w: 90, h: 12 };
+        score = 0;
+        lives = 3;
+        bestSubmitted = 0;
+        running = true;
+        scoreEl.textContent = "0";
+        livesEl.textContent = "3";
+        makeBricks();
+        resetBall(true);
+        last = performance.now();
+        requestAnimationFrame(loop);
+      }
+
+      function setPaddle(x) {
+        paddle.x = Math.max(8, Math.min(canvas.width - paddle.w - 8, x - paddle.w / 2));
+        if (!launched) ball.x = paddle.x + paddle.w / 2;
+      }
+
+      function collideBrick(b) {
+        if (!b.alive) return false;
+        if (ball.x + ball.r < b.x || ball.x - ball.r > b.x + b.w) return false;
+        if (ball.y + ball.r < b.y || ball.y - ball.r > b.y + b.h) return false;
+        b.alive = false;
+        score += b.points;
+        scoreEl.textContent = String(score);
+        postScore(false);
+        const overlapL = ball.x + ball.r - b.x;
+        const overlapR = b.x + b.w - (ball.x - ball.r);
+        const overlapT = ball.y + ball.r - b.y;
+        const overlapB = b.y + b.h - (ball.y - ball.r);
+        const min = Math.min(overlapL, overlapR, overlapT, overlapB);
+        if (min === overlapL || min === overlapR) ball.vx *= -1;
+        else ball.vy *= -1;
+        return true;
+      }
+
+      function update(dt) {
+        if (!running || !launched) return;
+        ball.x += ball.vx * dt;
+        ball.y += ball.vy * dt;
+        if (ball.x - ball.r < 0) { ball.x = ball.r; ball.vx = Math.abs(ball.vx); }
+        if (ball.x + ball.r > canvas.width) { ball.x = canvas.width - ball.r; ball.vx = -Math.abs(ball.vx); }
+        if (ball.y - ball.r < 0) { ball.y = ball.r; ball.vy = Math.abs(ball.vy); }
+        if (
+          ball.y + ball.r >= paddle.y &&
+          ball.y - ball.r <= paddle.y + paddle.h &&
+          ball.x >= paddle.x &&
+          ball.x <= paddle.x + paddle.w &&
+          ball.vy > 0
+        ) {
+          const hit = (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);
+          const angle = -Math.PI / 2 + hit * 1.1;
+          const speed = Math.min(420, Math.hypot(ball.vx, ball.vy) * 1.02 + 4);
+          ball.vx = Math.cos(angle) * speed;
+          ball.vy = Math.sin(angle) * speed;
+          ball.y = paddle.y - ball.r;
+        }
+        for (const b of bricks) collideBrick(b);
+        if (bricks.every((b) => !b.alive)) {
+          makeBricks();
+          score += 100;
+          scoreEl.textContent = String(score);
+          resetBall(false);
+          postScore(false);
+        }
+        if (ball.y - ball.r > canvas.height) {
+          lives--;
+          livesEl.textContent = String(lives);
+          if (lives <= 0) {
+            running = false;
+            postScore(true);
+          } else resetBall(true);
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(255,255,255,0.03)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (const b of bricks) {
+          if (!b.alive) continue;
+          ctx.fillStyle = b.color;
+          ctx.fillRect(b.x, b.y, b.w, b.h);
+        }
+        ctx.fillStyle = "#e8e8ec";
+        ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
+        ctx.beginPath();
+        ctx.fillStyle = "#ff8a65";
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fill();
+        if (!launched && running) {
+          ctx.fillStyle = "rgba(255,255,255,.7)";
+          ctx.font = "14px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("Tap / click to launch", canvas.width / 2, canvas.height / 2);
+        }
+        if (!running) {
+          ctx.fillStyle = "rgba(0,0,0,.55)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 26px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("Game over", canvas.width / 2, canvas.height / 2);
+          ctx.fillStyle = "#ff8a65";
+          ctx.font = "16px Segoe UI, sans-serif";
+          ctx.fillText("Score " + score, canvas.width / 2, canvas.height / 2 + 28);
+        }
+      }
+
+      function loop(ts) {
+        const dt = Math.min(0.033, (ts - last) / 1000 || 0.016);
+        last = ts;
+        update(dt);
+        draw();
+        if (running || lives > 0) requestAnimationFrame(loop);
+        else draw();
+      }
+
+      function pointerX(e) {
+        const rect = canvas.getBoundingClientRect();
+        return ((e.clientX - rect.left) / rect.width) * canvas.width;
+      }
+
+      canvas.addEventListener("pointermove", (e) => setPaddle(pointerX(e)));
+      canvas.addEventListener("pointerdown", (e) => {
+        setPaddle(pointerX(e));
+        if (running && !launched) resetBall(false);
+      });
+      document.getElementById("restart").onclick = reset;
+      document.getElementById("submit").onclick = () => postScore(true);
+      reset();
+    </script>
+  </body>
+</html>

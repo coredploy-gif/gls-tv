@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Block Tank</title>
+    <style>
+      :root { color-scheme: dark; --bg: #08090c; --ink: #e8eef6; --accent: #7ec8ff; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        background: radial-gradient(ellipse at top, #142030, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(420px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      canvas {
+        width: 100%; aspect-ratio: 1; display: block; border-radius: 12px;
+        background: #0a1018; border: 1px solid rgba(126,200,255,.35);
+        image-rendering: pixelated;
+      }
+      .actions { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #061018;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+      .pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+      .pad button { padding: 12px; }
+      .hint { margin-top: 8px; font-size: 0.75rem; color: rgba(232,238,246,.5); text-align: center; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Block Tank</h1>
+          <div class="meta">Score <b id="score">0</b><br />Wave <span id="wave">1</span></div>
+        </div>
+        <canvas id="c" width="320" height="320"></canvas>
+        <div class="actions">
+          <button type="button" id="restart">Restart</button>
+          <button type="button" class="ghost" id="mute">Mute</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+        <div class="pad">
+          <button type="button" id="left">◀</button>
+          <button type="button" id="fire">Fire</button>
+          <button type="button" id="right">▶</button>
+        </div>
+        <p class="hint">← → / A D move · Space / ↑ fire · clear enemy tanks</p>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const CELL = 16;
+      const COLS = 20, ROWS = 20;
+
+      let player, bullets, enemies, walls, score, wave, running, last, fireCool, spawnLeft, bestSubmitted, muted, audioCtx;
+
+      function ensureAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+      }
+
+      function beep(freq, dur, type, gain) {
+        if (muted) return;
+        try {
+          ensureAudio();
+          const t = audioCtx.currentTime;
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = type || "square";
+          o.frequency.value = freq;
+          g.gain.setValueAtTime(gain || 0.05, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+          o.connect(g); g.connect(audioCtx.destination);
+          o.start(t); o.stop(t + dur);
+        } catch (_) {}
+      }
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "block-tank", score, force: !!force }, "*");
+      }
+
+      function makeWalls() {
+        walls = [];
+        for (let i = 0; i < 18; i++) {
+          const x = 2 + ((Math.random() * (COLS - 4)) | 0);
+          const y = 3 + ((Math.random() * (ROWS - 8)) | 0);
+          if (y > ROWS - 4) continue;
+          walls.push({ x, y });
+        }
+      }
+
+      function blocked(x, y) {
+        if (x < 0 || y < 0 || x >= COLS || y >= ROWS) return true;
+        return walls.some((w) => w.x === x && w.y === y);
+      }
+
+      function spawnEnemy() {
+        let tries = 20;
+        while (tries--) {
+          const x = 1 + ((Math.random() * (COLS - 2)) | 0);
+          const y = 1 + ((Math.random() * 5) | 0);
+          if (!blocked(x, y) && !(x === player.x && y === player.y)) {
+            enemies.push({ x, y, cool: 0.6 + Math.random(), dir: 1 });
+            return;
+          }
+        }
+      }
+
+      function reset() {
+        player = { x: (COLS / 2) | 0, y: ROWS - 2 };
+        bullets = [];
+        enemies = [];
+        score = 0;
+        wave = 1;
+        fireCool = 0;
+        spawnLeft = 4;
+        bestSubmitted = 0;
+        running = true;
+        makeWalls();
+        for (let i = 0; i < 3; i++) spawnEnemy();
+        document.getElementById("score").textContent = "0";
+        document.getElementById("wave").textContent = "1";
+        last = performance.now();
+        requestAnimationFrame(loop);
+      }
+
+      function movePlayer(dx) {
+        if (!running) return;
+        const nx = player.x + dx;
+        if (!blocked(nx, player.y) && !enemies.some((e) => e.x === nx && e.y === player.y)) {
+          player.x = nx;
+          beep(200, 0.025, "square", 0.03);
+        }
+      }
+
+      function fire() {
+        if (!running || fireCool > 0) return;
+        fireCool = 0.28;
+        bullets.push({ x: player.x, y: player.y - 1, vy: -10, friendly: true });
+        beep(520, 0.05, "square", 0.05);
+      }
+
+      function update(dt) {
+        if (!running) return;
+        fireCool = Math.max(0, fireCool - dt);
+        for (const b of bullets) b.y += b.vy * dt;
+        bullets = bullets.filter((b) => b.y > -1 && b.y < ROWS + 1);
+
+        for (const e of enemies) {
+          e.cool -= dt;
+          if (e.cool <= 0) {
+            e.cool = 0.7 + Math.random() * 0.5;
+            const opts = [];
+            if (!blocked(e.x - 1, e.y)) opts.push(-1);
+            if (!blocked(e.x + 1, e.y)) opts.push(1);
+            if (opts.length) e.x += opts[(Math.random() * opts.length) | 0];
+            if (Math.random() < 0.55) {
+              bullets.push({ x: e.x, y: e.y + 1, vy: 7 + wave * 0.4, friendly: false });
+            }
+            if (e.y < ROWS - 4 && Math.random() < 0.25 && !blocked(e.x, e.y + 1)) e.y++;
+          }
+          if (e.x === player.x && e.y === player.y) {
+            running = false;
+            beep(80, 0.35, "sawtooth", 0.08);
+            postScore(true);
+            return;
+          }
+        }
+
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          const b = bullets[i];
+          const bx = Math.round(b.x), by = Math.round(b.y);
+          if (walls.some((w, wi) => {
+            if (w.x === bx && w.y === by) { walls.splice(wi, 1); return true; }
+            return false;
+          })) {
+            bullets.splice(i, 1);
+            beep(150, 0.04, "triangle", 0.03);
+            continue;
+          }
+          if (b.friendly) {
+            const ei = enemies.findIndex((e) => e.x === bx && e.y === by);
+            if (ei >= 0) {
+              enemies.splice(ei, 1);
+              bullets.splice(i, 1);
+              score += 50 + wave * 10;
+              document.getElementById("score").textContent = String(score);
+              beep(380, 0.08, "triangle", 0.07);
+              postScore(false);
+              spawnLeft--;
+              if (enemies.length === 0 && spawnLeft <= 0) {
+                wave++;
+                spawnLeft = 3 + wave;
+                document.getElementById("wave").textContent = String(wave);
+                score += 100;
+                document.getElementById("score").textContent = String(score);
+                beep(600, 0.12, "triangle", 0.08);
+                for (let n = 0; n < Math.min(2 + wave, 5); n++) spawnEnemy();
+                spawnLeft -= enemies.length;
+              } else if (enemies.length < 2 && spawnLeft > 0) {
+                spawnEnemy();
+                spawnLeft--;
+              }
+              continue;
+            }
+          } else if (bx === player.x && by === player.y) {
+            running = false;
+            beep(90, 0.4, "sawtooth", 0.09);
+            postScore(true);
+            return;
+          }
+        }
+      }
+
+      function drawTank(x, y, color, up) {
+        const px = x * CELL, py = y * CELL;
+        ctx.fillStyle = color;
+        ctx.fillRect(px + 2, py + 3, CELL - 4, CELL - 6);
+        ctx.fillStyle = "#0a1018";
+        ctx.fillRect(px + 5, py + 6, CELL - 10, 5);
+        ctx.fillStyle = color;
+        if (up) ctx.fillRect(px + CELL / 2 - 2, py - 2, 4, 8);
+        else ctx.fillRect(px + CELL / 2 - 2, py + CELL - 6, 4, 8);
+      }
+
+      function draw() {
+        ctx.fillStyle = "#0a1018";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "rgba(126,200,255,.06)";
+        for (let i = 0; i <= COLS; i++) {
+          ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(canvas.width, i * CELL); ctx.stroke();
+        }
+        for (const w of walls) {
+          ctx.fillStyle = "#3a4658";
+          ctx.fillRect(w.x * CELL + 1, w.y * CELL + 1, CELL - 2, CELL - 2);
+          ctx.fillStyle = "#5a6a80";
+          ctx.fillRect(w.x * CELL + 3, w.y * CELL + 3, CELL - 6, CELL - 6);
+        }
+        for (const b of bullets) {
+          ctx.fillStyle = b.friendly ? "#f5c842" : "#ff5a6a";
+          ctx.fillRect(b.x * CELL + 6, b.y * CELL + 4, 4, 8);
+        }
+        for (const e of enemies) drawTank(e.x, e.y, "#ff5a6a", false);
+        drawTank(player.x, player.y, "#7ec8ff", true);
+        if (!running) {
+          ctx.fillStyle = "rgba(0,0,0,.55)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 24px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("Destroyed", canvas.width / 2, canvas.height / 2 - 6);
+          ctx.fillStyle = "#7ec8ff";
+          ctx.font = "15px Segoe UI, sans-serif";
+          ctx.fillText("Score " + score, canvas.width / 2, canvas.height / 2 + 22);
+        }
+      }
+
+      function loop(ts) {
+        const dt = Math.min(0.04, (ts - last) / 1000 || 0.016);
+        last = ts;
+        update(dt);
+        draw();
+        if (running) requestAnimationFrame(loop);
+        else draw();
+      }
+
+      window.addEventListener("keydown", (e) => {
+        const k = e.key.toLowerCase();
+        if (["arrowleft","arrowright","arrowup"," ","a","d","w"].includes(k) || e.code === "Space") e.preventDefault();
+        if (k === "arrowleft" || k === "a") movePlayer(-1);
+        if (k === "arrowright" || k === "d") movePlayer(1);
+        if (k === "arrowup" || k === "w" || e.code === "Space") fire();
+      });
+      document.getElementById("left").onclick = () => movePlayer(-1);
+      document.getElementById("right").onclick = () => movePlayer(1);
+      document.getElementById("fire").onclick = fire;
+      document.getElementById("restart").onclick = () => { ensureAudio(); reset(); };
+      document.getElementById("submit").onclick = () => postScore(true);
+      muted = false;
+      document.getElementById("mute").onclick = () => {
+        muted = !muted;
+        document.getElementById("mute").textContent = muted ? "Unmute" : "Mute";
+      };
+      canvas.addEventListener("pointerdown", ensureAudio);
+      reset();
+    </script>
+  </body>
+</html>

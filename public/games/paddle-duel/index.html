@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Paddle Duel</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --accent: #5ee29a; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        background: radial-gradient(ellipse at top, #102018, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(440px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      canvas {
+        width: 100%; aspect-ratio: 4/5; display: block; border-radius: 14px;
+        background: #0a0e0c; border: 1px solid rgba(94,226,154,.3);
+      }
+      .hint { margin: 8px 0 0; color: #a1a1aa; font-size: .8rem; }
+      .actions { margin-top: 10px; display: flex; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #062014;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Paddle Duel</h1>
+          <div class="meta"><span id="board">0 — 0</span><br />You <b id="score">0</b></div>
+        </div>
+        <canvas id="c" width="400" height="500"></canvas>
+        <p class="hint">Drag to move. First to 7 — your score is points you win.</p>
+        <div class="actions">
+          <button type="button" id="restart">Serve</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const scoreEl = document.getElementById("score");
+      const boardEl = document.getElementById("board");
+      const W = canvas.width, H = canvas.height;
+      const PW = 70, PH = 12;
+      let you, cpu, ball, youScore = 0, cpuScore = 0, running = false, bestSubmitted = 0, raf = 0;
+
+      function postScore(force) {
+        const score = youScore;
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "paddle-duel", score, force: !!force }, "*");
+      }
+
+      function serve(dir) {
+        ball = {
+          x: W / 2, y: H / 2, r: 7,
+          vx: (Math.random() > 0.5 ? 1 : -1) * (2.6 + Math.random()),
+          vy: dir * (2.8 + Math.random()),
+        };
+      }
+
+      function resetMatch() {
+        you = { x: W / 2, y: H - 36 };
+        cpu = { x: W / 2, y: 28 };
+        youScore = 0;
+        cpuScore = 0;
+        running = false;
+        updateHud();
+        serve(1);
+        draw();
+      }
+
+      function updateHud() {
+        boardEl.textContent = youScore + " — " + cpuScore;
+        scoreEl.textContent = String(youScore);
+      }
+
+      function point(toYou) {
+        if (toYou) youScore += 1; else cpuScore += 1;
+        updateHud();
+        postScore(false);
+        if (youScore >= 7 || cpuScore >= 7) {
+          running = false;
+          postScore(true);
+          return;
+        }
+        serve(toYou ? -1 : 1);
+      }
+
+      function bouncePaddle(p, fromBelow) {
+        const hit = ball.y + ball.r > p.y && ball.y - ball.r < p.y + PH &&
+          ball.x > p.x - PW / 2 && ball.x < p.x + PW / 2;
+        if (!hit) return;
+        ball.vy = Math.abs(ball.vy) * (fromBelow ? -1 : 1);
+        ball.vx += (ball.x - p.x) * 0.08;
+        ball.y = fromBelow ? p.y - ball.r - 0.5 : p.y + PH + ball.r + 0.5;
+      }
+
+      function tick() {
+        if (!running) { draw(); return; }
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+        if (ball.x < ball.r || ball.x > W - ball.r) {
+          ball.vx *= -1;
+          ball.x = Math.max(ball.r, Math.min(W - ball.r, ball.x));
+        }
+        const target = ball.x + (Math.random() - 0.5) * 10;
+        cpu.x += (target - cpu.x) * 0.08;
+        cpu.x = Math.max(PW / 2, Math.min(W - PW / 2, cpu.x));
+        bouncePaddle(you, true);
+        bouncePaddle(cpu, false);
+        if (ball.y > H + 20) point(false);
+        else if (ball.y < -20) point(true);
+        draw();
+        raf = requestAnimationFrame(tick);
+      }
+
+      function draw() {
+        ctx.fillStyle = "#0a0e0c";
+        ctx.fillRect(0, 0, W, H);
+        ctx.strokeStyle = "rgba(255,255,255,.12)";
+        ctx.setLineDash([6, 8]);
+        ctx.beginPath();
+        ctx.moveTo(0, H / 2);
+        ctx.lineTo(W, H / 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#5ee29a";
+        ctx.fillRect(you.x - PW / 2, you.y, PW, PH);
+        ctx.fillStyle = "#7ec8ff";
+        ctx.fillRect(cpu.x - PW / 2, cpu.y, PW, PH);
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fill();
+        if (!running) {
+          ctx.fillStyle = "rgba(0,0,0,.45)";
+          ctx.fillRect(0, 0, W, H);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 18px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          const done = youScore >= 7 || cpuScore >= 7;
+          ctx.fillText(done ? (youScore > cpuScore ? "You win!" : "CPU wins") : "Tap Serve to play", W / 2, H / 2);
+        }
+      }
+
+      function move(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * W;
+        you.x = Math.max(PW / 2, Math.min(W - PW / 2, x));
+      }
+      canvas.addEventListener("pointerdown", move);
+      canvas.addEventListener("pointermove", move);
+
+      document.getElementById("restart").onclick = () => {
+        cancelAnimationFrame(raf);
+        if (youScore >= 7 || cpuScore >= 7) resetMatch();
+        running = true;
+        if (!ball) serve(1);
+        raf = requestAnimationFrame(tick);
+      };
+      document.getElementById("submit").onclick = () => postScore(true);
+      resetMatch();
+    </script>
+  </body>
+</html>

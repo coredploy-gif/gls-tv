@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Color Catch</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --muted: #a1a1aa; --accent: #4ade80; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        background: radial-gradient(ellipse at top, #102818, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(520px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; font-size: .9rem; }
+      .meta b { color: var(--accent); }
+      .target {
+        margin-bottom: 8px; padding: 8px 12px; border-radius: 999px;
+        background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+        font-size: .9rem; display: flex; align-items: center; gap: 10px;
+      }
+      .swatch { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; }
+      canvas {
+        width: 100%; aspect-ratio: 1; display: block; border-radius: 14px;
+        background: #0a1210; border: 1px solid rgba(74,222,128,.35);
+      }
+      .actions { margin-top: 10px; display: flex; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #052013;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Color Catch</h1>
+          <div class="meta">Score <b id="score">0</b><br />Time <span id="time">30</span>s</div>
+        </div>
+        <div class="target">Tap only: <span class="swatch" id="swatch"></span> <b id="label">Green</b></div>
+        <canvas id="c" width="480" height="480"></canvas>
+        <div class="actions">
+          <button type="button" id="restart">Play again</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const COLORS = [
+        { name: "Green", hex: "#4ade80" },
+        { name: "Sky", hex: "#38bdf8" },
+        { name: "Gold", hex: "#fbbf24" },
+        { name: "Coral", hex: "#fb7185" },
+        { name: "Violet", hex: "#a78bfa" },
+      ];
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const scoreEl = document.getElementById("score");
+      const timeEl = document.getElementById("time");
+      const swatch = document.getElementById("swatch");
+      const label = document.getElementById("label");
+
+      let orbs = [];
+      let target = COLORS[0];
+      let score = 0;
+      let timeLeft = 30;
+      let running = false;
+      let bestSubmitted = 0;
+      let last = 0;
+      let spawnAcc = 0;
+      let endTimer = null;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "color-catch", score, force: !!force }, "*");
+      }
+
+      function pickTarget() {
+        target = COLORS[Math.floor(Math.random() * COLORS.length)];
+        swatch.style.background = target.hex;
+        label.textContent = target.name;
+      }
+
+      function spawn() {
+        const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+        orbs.push({
+          x: 40 + Math.random() * (canvas.width - 80),
+          y: -30,
+          r: 18 + Math.random() * 16,
+          vy: 90 + Math.random() * 120 + score * 0.4,
+          color,
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(255,255,255,0.03)";
+        for (let i = 0; i < 8; i++) {
+          ctx.beginPath();
+          ctx.arc((i * 67) % canvas.width, (i * 91) % canvas.height, 40, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        for (const o of orbs) {
+          ctx.beginPath();
+          ctx.fillStyle = o.color.hex;
+          ctx.shadowColor = o.color.hex;
+          ctx.shadowBlur = 16;
+          ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+        if (!running && score > 0) {
+          ctx.fillStyle = "rgba(0,0,0,.55)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 28px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("Time's up!", canvas.width / 2, canvas.height / 2 - 10);
+          ctx.font = "18px Segoe UI, sans-serif";
+          ctx.fillStyle = "#4ade80";
+          ctx.fillText("Score " + score, canvas.width / 2, canvas.height / 2 + 24);
+        }
+      }
+
+      function tick(ts) {
+        if (!running) { draw(); return; }
+        const dt = Math.min(0.05, (ts - last) / 1000 || 0.016);
+        last = ts;
+        spawnAcc += dt;
+        while (spawnAcc > 0.45) { spawn(); spawnAcc -= 0.45; }
+        for (const o of orbs) o.y += o.vy * dt;
+        orbs = orbs.filter((o) => o.y - o.r < canvas.height + 10);
+        draw();
+        requestAnimationFrame(tick);
+      }
+
+      function hit(x, y) {
+        if (!running) return;
+        const rect = canvas.getBoundingClientRect();
+        const sx = ((x - rect.left) / rect.width) * canvas.width;
+        const sy = ((y - rect.top) / rect.height) * canvas.height;
+        for (let i = orbs.length - 1; i >= 0; i--) {
+          const o = orbs[i];
+          const dx = o.x - sx, dy = o.y - sy;
+          if (dx * dx + dy * dy <= o.r * o.r) {
+            if (o.color.name === target.name) {
+              score += 10;
+              if (score % 50 === 0) pickTarget();
+            } else {
+              score = Math.max(0, score - 5);
+            }
+            scoreEl.textContent = String(score);
+            orbs.splice(i, 1);
+            postScore(false);
+            return;
+          }
+        }
+      }
+
+      function endGame() {
+        running = false;
+        clearInterval(endTimer);
+        postScore(true);
+        draw();
+      }
+
+      function reset() {
+        clearInterval(endTimer);
+        orbs = [];
+        score = 0;
+        timeLeft = 30;
+        bestSubmitted = 0;
+        running = true;
+        spawnAcc = 0;
+        last = performance.now();
+        scoreEl.textContent = "0";
+        timeEl.textContent = "30";
+        pickTarget();
+        endTimer = setInterval(() => {
+          timeLeft--;
+          timeEl.textContent = String(timeLeft);
+          if (timeLeft <= 0) endGame();
+        }, 1000);
+        requestAnimationFrame(tick);
+      }
+
+      canvas.addEventListener("pointerdown", (e) => hit(e.clientX, e.clientY));
+      document.getElementById("restart").onclick = reset;
+      document.getElementById("submit").onclick = () => postScore(true);
+      reset();
+    </script>
+  </body>
+</html>

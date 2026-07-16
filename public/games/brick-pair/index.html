@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Brick Pair</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09080c; --ink: #f2eef6; --accent: #ff8a65; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+        background: radial-gradient(ellipse at top, #2a1814, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(400px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      .board {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+        padding: 10px; border-radius: 12px; background: #120e10;
+        border: 1px solid rgba(255,138,101,.35);
+      }
+      .tile {
+        aspect-ratio: 1; border: 0; border-radius: 8px; cursor: pointer;
+        background: #1c1618; color: transparent; font-size: 1.4rem; font-weight: 800;
+        transition: transform .12s ease, background .12s ease;
+      }
+      .tile.open, .tile.matched { color: #120e10; transform: scale(1.02); }
+      .tile.matched { opacity: 0.55; cursor: default; }
+      .tile:disabled { cursor: default; }
+      .actions { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+      button.btn {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #2a1008;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+      .hint { margin-top: 8px; font-size: 0.75rem; color: rgba(242,238,246,.5); text-align: center; }
+      .overlay {
+        display: none; margin-top: 10px; text-align: center; padding: 12px;
+        border-radius: 10px; background: rgba(0,0,0,.45); border: 1px solid rgba(255,138,101,.3);
+      }
+      .overlay.show { display: block; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Brick Pair</h1>
+          <div class="meta">Score <b id="score">0</b><br />Moves <span id="moves">0</span></div>
+        </div>
+        <div class="board" id="board" aria-label="Match pairs board"></div>
+        <div class="overlay" id="done">Clear! Tap Restart for a new round.</div>
+        <div class="actions">
+          <button type="button" class="btn" id="restart">Restart</button>
+          <button type="button" class="btn ghost" id="mute">Mute</button>
+          <button type="button" class="btn ghost" id="submit">Submit score</button>
+        </div>
+        <p class="hint">Tap two tiles — match shapes like the old handheld puzzle packs</p>
+      </div>
+    </div>
+    <script>
+      const SYMBOLS = ["■", "▲", "●", "◆", "✚", "★", "▣", "▼"];
+      const COLORS = ["#ff8a65", "#f5c842", "#5ee29a", "#7ec8ff", "#ff7ab8", "#fbbf24", "#a78bfa", "#4ade80"];
+      const boardEl = document.getElementById("board");
+      let cards, open, lock, score, moves, matched, bestSubmitted, muted, audioCtx;
+
+      function ensureAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+      }
+
+      function beep(freq, dur, type, gain) {
+        if (muted) return;
+        try {
+          ensureAudio();
+          const t = audioCtx.currentTime;
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = type || "square";
+          o.frequency.value = freq;
+          g.gain.setValueAtTime(gain || 0.05, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+          o.connect(g); g.connect(audioCtx.destination);
+          o.start(t); o.stop(t + dur);
+        } catch (_) {}
+      }
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "brick-pair", score, force: !!force }, "*");
+      }
+
+      function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = (Math.random() * (i + 1)) | 0;
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function reset() {
+        const pool = [];
+        for (let i = 0; i < 8; i++) {
+          pool.push({ id: i, sym: SYMBOLS[i], color: COLORS[i] });
+          pool.push({ id: i, sym: SYMBOLS[i], color: COLORS[i] });
+        }
+        cards = shuffle(pool).map((c, i) => ({ ...c, key: i, open: false, matched: false }));
+        open = [];
+        lock = false;
+        score = 0;
+        moves = 0;
+        matched = 0;
+        bestSubmitted = 0;
+        document.getElementById("score").textContent = "0";
+        document.getElementById("moves").textContent = "0";
+        document.getElementById("done").classList.remove("show");
+        render();
+      }
+
+      function render() {
+        boardEl.innerHTML = "";
+        cards.forEach((card, idx) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "tile" + (card.open || card.matched ? " open" : "") + (card.matched ? " matched" : "");
+          btn.textContent = card.sym;
+          if (card.open || card.matched) {
+            btn.style.background = card.color;
+            btn.style.color = "#120e10";
+          }
+          btn.disabled = card.matched || lock;
+          btn.onclick = () => flip(idx);
+          boardEl.appendChild(btn);
+        });
+      }
+
+      function flip(idx) {
+        ensureAudio();
+        const card = cards[idx];
+        if (lock || card.open || card.matched || open.length >= 2) return;
+        card.open = true;
+        open.push(idx);
+        beep(280, 0.04, "square", 0.035);
+        render();
+        if (open.length < 2) return;
+        moves++;
+        document.getElementById("moves").textContent = String(moves);
+        lock = true;
+        const a = cards[open[0]], b = cards[open[1]];
+        if (a.id === b.id) {
+          a.matched = b.matched = true;
+          matched += 2;
+          const bonus = Math.max(20, 120 - moves * 2);
+          score += bonus;
+          document.getElementById("score").textContent = String(score);
+          beep(480, 0.1, "triangle", 0.07);
+          open = [];
+          lock = false;
+          postScore(false);
+          render();
+          if (matched >= cards.length) {
+            score += 200;
+            document.getElementById("score").textContent = String(score);
+            document.getElementById("done").classList.add("show");
+            beep(620, 0.15, "triangle", 0.08);
+            postScore(true);
+          }
+        } else {
+          beep(120, 0.08, "sawtooth", 0.04);
+          setTimeout(() => {
+            a.open = false;
+            b.open = false;
+            open = [];
+            lock = false;
+            render();
+          }, 520);
+        }
+      }
+
+      document.getElementById("restart").onclick = reset;
+      document.getElementById("submit").onclick = () => postScore(true);
+      muted = false;
+      document.getElementById("mute").onclick = () => {
+        muted = !muted;
+        document.getElementById("mute").textContent = muted ? "Unmute" : "Mute";
+      };
+      reset();
+    </script>
+  </body>
+</html>

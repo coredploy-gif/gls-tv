@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Reaction Rush</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --muted: #a1a1aa; --accent: #ff5a6a; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+        background: radial-gradient(ellipse at top, #2a1014, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .card {
+        width: min(440px, 100%);
+        background: rgba(20,20,24,.92); border: 1px solid rgba(255,255,255,.1);
+        border-radius: 16px; padding: 16px;
+      }
+      .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .score { text-align: right; font-variant-numeric: tabular-nums; }
+      .score b { color: var(--accent); font-size: 1.2rem; }
+      .hint { margin: 0 0 12px; color: var(--muted); font-size: .8rem; }
+      .pad {
+        height: min(280px, 48vw); border-radius: 16px; display: grid; place-items: center;
+        border: 1px solid rgba(255,255,255,.12); cursor: pointer; transition: background 80ms ease;
+        background: #14141a; text-align: center; padding: 16px;
+      }
+      .pad.wait { background: #1a1a22; }
+      .pad.ready { background: linear-gradient(145deg, #1a5c3a, #0f3a24); border-color: rgba(94,226,154,.5); }
+      .pad.early { background: linear-gradient(145deg, #5c1a1a, #3a1010); }
+      .pad.done { background: #181820; }
+      .msg { font-size: 1.25rem; font-weight: 800; letter-spacing: .02em; }
+      .sub { margin-top: 8px; color: var(--muted); font-size: .9rem; }
+      .stats {
+        margin-top: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+        font-variant-numeric: tabular-nums; text-align: center; font-size: .85rem;
+      }
+      .stats div {
+        background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+        border-radius: 10px; padding: 8px;
+      }
+      .stats b { display: block; font-size: 1.05rem; color: #fff; margin-top: 2px; }
+      .actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+      button.btn {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #fff;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <div class="top">
+          <h1>Reaction Rush</h1>
+          <div class="score">Score<br /><b id="score">0</b></div>
+        </div>
+        <p class="hint">Wait for green, then tap. Early taps hurt. Best of 5 rounds.</p>
+        <div class="pad wait" id="pad">
+          <div>
+            <div class="msg" id="msg">Tap to start</div>
+            <div class="sub" id="sub">5 rounds · lower ms = higher score</div>
+          </div>
+        </div>
+        <div class="stats">
+          <div>Round<br /><b id="round">0/5</b></div>
+          <div>Last<br /><b id="last">—</b></div>
+          <div>Avg ms<br /><b id="avg">—</b></div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="restart">Restart</button>
+          <button type="button" class="btn ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const ROUNDS = 5;
+      const pad = document.getElementById("pad");
+      const msg = document.getElementById("msg");
+      const sub = document.getElementById("sub");
+      const scoreEl = document.getElementById("score");
+      const roundEl = document.getElementById("round");
+      const lastEl = document.getElementById("last");
+      const avgEl = document.getElementById("avg");
+
+      let phase = "idle"; // idle | waiting | ready | finished
+      let times = [];
+      let goAt = 0;
+      let waitTimer = null;
+      let score = 0;
+      let bestSubmitted = 0;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "reaction-rush", score, force: !!force }, "*");
+      }
+
+      function setPad(cls) {
+        pad.className = "pad " + cls;
+      }
+
+      function computeScore() {
+        if (!times.length) return 0;
+        const avg = times.reduce((a, b) => a + b, 0) / times.length;
+        return Math.max(50, Math.round(1200 - avg * 1.8 + times.length * 40));
+      }
+
+      function updateStats() {
+        roundEl.textContent = times.length + "/" + ROUNDS;
+        lastEl.textContent = times.length ? times[times.length - 1] + " ms" : "—";
+        if (times.length) {
+          const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+          avgEl.textContent = avg + " ms";
+        } else avgEl.textContent = "—";
+        score = computeScore();
+        scoreEl.textContent = String(score);
+      }
+
+      function armWait() {
+        clearTimeout(waitTimer);
+        phase = "waiting";
+        setPad("wait");
+        msg.textContent = "Wait…";
+        sub.textContent = "Don't tap yet";
+        const delay = 900 + Math.random() * 2400;
+        waitTimer = setTimeout(() => {
+          phase = "ready";
+          goAt = performance.now();
+          setPad("ready");
+          msg.textContent = "GO!";
+          sub.textContent = "Tap now";
+        }, delay);
+      }
+
+      function finish() {
+        phase = "finished";
+        setPad("done");
+        const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+        msg.textContent = "Done · " + avg + " ms avg";
+        sub.textContent = "Score " + score + " — submit or restart";
+        postScore(true);
+      }
+
+      function onTap() {
+        if (phase === "idle" || phase === "finished") {
+          times = [];
+          bestSubmitted = 0;
+          score = 0;
+          updateStats();
+          armWait();
+          return;
+        }
+        if (phase === "waiting") {
+          clearTimeout(waitTimer);
+          phase = "waiting";
+          setPad("early");
+          msg.textContent = "Too early!";
+          sub.textContent = "Wait for green… retrying";
+          waitTimer = setTimeout(armWait, 700);
+          return;
+        }
+        if (phase === "ready") {
+          const ms = Math.round(performance.now() - goAt);
+          times.push(ms);
+          updateStats();
+          postScore(false);
+          if (times.length >= ROUNDS) finish();
+          else {
+            msg.textContent = ms + " ms";
+            sub.textContent = "Nice — next round…";
+            setPad("done");
+            phase = "waiting";
+            waitTimer = setTimeout(armWait, 650);
+          }
+        }
+      }
+
+      pad.addEventListener("pointerdown", (e) => { e.preventDefault(); onTap(); });
+      document.getElementById("restart").onclick = () => {
+        clearTimeout(waitTimer);
+        phase = "idle";
+        times = [];
+        score = 0;
+        bestSubmitted = 0;
+        setPad("wait");
+        msg.textContent = "Tap to start";
+        sub.textContent = "5 rounds · lower ms = higher score";
+        updateStats();
+      };
+      document.getElementById("submit").onclick = () => postScore(true);
+      updateStats();
+    </script>
+  </body>
+</html>

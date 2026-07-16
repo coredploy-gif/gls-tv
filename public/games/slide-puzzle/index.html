@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Slide Puzzle</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --muted: #a1a1aa; --accent: #7ec8ff; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none;
+        background: radial-gradient(ellipse at top, #102030, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .card {
+        width: min(420px, 100%);
+        background: rgba(20,20,24,.9); border: 1px solid rgba(255,255,255,.1);
+        border-radius: 16px; padding: 14px;
+      }
+      .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .score { text-align: right; font-variant-numeric: tabular-nums; }
+      .score b { color: var(--accent); font-size: 1.2rem; }
+      .hint { margin: 0 0 10px; color: var(--muted); font-size: .8rem; }
+      .board {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+        background: #0c0c10; padding: 8px; border-radius: 12px;
+      }
+      .cell {
+        aspect-ratio: 1; border: 0; border-radius: 10px; font-size: 1.6rem; font-weight: 800;
+        cursor: pointer; background: #1c2430; color: #e8f4ff;
+        transition: transform 80ms ease, background 120ms ease;
+      }
+      .cell:hover:not(.empty):not(:disabled) { transform: scale(1.04); background: #243044; }
+      .cell.empty { background: #10141a; cursor: default; color: transparent; }
+      .cell.solved { background: linear-gradient(145deg, #2a5070, #1a3048); color: var(--accent); }
+      .actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+      button.btn {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #061018;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <div class="top">
+          <h1>Slide Puzzle</h1>
+          <div class="score">Score<br /><b id="score">0</b></div>
+        </div>
+        <p class="hint">Slide tiles into order 1–8. Fewer moves win bigger.</p>
+        <div class="board" id="board"></div>
+        <div class="actions">
+          <button type="button" class="btn" id="restart">Shuffle</button>
+          <button type="button" class="btn ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const SIZE = 3;
+      const boardEl = document.getElementById("board");
+      const scoreEl = document.getElementById("score");
+      let tiles = [];
+      let moves = 0;
+      let score = 0;
+      let bestSubmitted = 0;
+      let solved = false;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "slide-puzzle", score, force: !!force }, "*");
+      }
+
+      function indexOfEmpty() { return tiles.indexOf(0); }
+
+      function canSlide(i) {
+        const e = indexOfEmpty();
+        const er = Math.floor(e / SIZE), ec = e % SIZE;
+        const r = Math.floor(i / SIZE), c = i % SIZE;
+        return (r === er && Math.abs(c - ec) === 1) || (c === ec && Math.abs(r - er) === 1);
+      }
+
+      function isSolved() {
+        for (let i = 0; i < tiles.length - 1; i++) if (tiles[i] !== i + 1) return false;
+        return tiles[tiles.length - 1] === 0;
+      }
+
+      function inversions(arr) {
+        let inv = 0;
+        const flat = arr.filter((n) => n !== 0);
+        for (let i = 0; i < flat.length; i++)
+          for (let j = i + 1; j < flat.length; j++) if (flat[i] > flat[j]) inv++;
+        return inv;
+      }
+
+      function solvable(arr) {
+        return inversions(arr) % 2 === 0;
+      }
+
+      function updateScore() {
+        score = Math.max(25, 900 - moves * 8);
+        if (solved) score += 300;
+        scoreEl.textContent = String(score);
+      }
+
+      function render() {
+        boardEl.innerHTML = "";
+        tiles.forEach((n, i) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "cell" + (n === 0 ? " empty" : "") + (solved && n !== 0 ? " solved" : "");
+          btn.textContent = n || "";
+          btn.disabled = solved || n === 0;
+          btn.onclick = () => slide(i);
+          boardEl.appendChild(btn);
+        });
+      }
+
+      function slide(i) {
+        if (solved || !canSlide(i)) return;
+        const e = indexOfEmpty();
+        [tiles[e], tiles[i]] = [tiles[i], tiles[e]];
+        moves++;
+        updateScore();
+        if (isSolved()) {
+          solved = true;
+          updateScore();
+          postScore(true);
+        } else postScore(false);
+        render();
+      }
+
+      function shuffle() {
+        do {
+          tiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+          for (let i = tiles.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+          }
+        } while (!solvable(tiles) || isSolved());
+        moves = 0;
+        solved = false;
+        bestSubmitted = 0;
+        updateScore();
+        render();
+      }
+
+      document.getElementById("restart").onclick = shuffle;
+      document.getElementById("submit").onclick = () => postScore(true);
+      shuffle();
+    </script>
+  </body>
+</html>

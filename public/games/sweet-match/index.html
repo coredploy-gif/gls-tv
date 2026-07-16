@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Sweet Match</title>
+    <style>
+      :root { color-scheme: dark; --bg: #09090b; --ink: #f4f4f5; --accent: #ff8fab; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        background: radial-gradient(ellipse at top, #2a1530, var(--bg) 55%);
+        color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
+      .frame { width: min(400px, 100%); }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      h1 { margin: 0; font-size: 1.1rem; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; }
+      .meta b { color: var(--accent); font-size: 1.15rem; }
+      canvas {
+        width: 100%; aspect-ratio: 1; display: block; border-radius: 14px;
+        background: linear-gradient(160deg, #1a1224, #120c18);
+        border: 1px solid rgba(255,143,171,.35);
+      }
+      .hint { margin: 8px 0 0; color: #a1a1aa; font-size: .8rem; }
+      .actions { margin-top: 10px; display: flex; gap: 8px; }
+      button {
+        border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
+        cursor: pointer; background: var(--accent); color: #2a0a16;
+      }
+      button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="frame">
+        <div class="bar">
+          <h1>Sweet Match</h1>
+          <div class="meta">Score <b id="score">0</b><br /><span id="moves">30 moves</span></div>
+        </div>
+        <canvas id="c" width="360" height="360"></canvas>
+        <p class="hint" id="hint">Swap neighbors to make 3+ in a row.</p>
+        <div class="actions">
+          <button type="button" id="restart">Play</button>
+          <button type="button" class="ghost" id="submit">Submit score</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const scoreEl = document.getElementById("score");
+      const movesEl = document.getElementById("moves");
+      const hintEl = document.getElementById("hint");
+      const N = 8, PAD = 8;
+      const CELL = (360 - PAD * 2) / N;
+      const COLORS = ["#ff6b8a", "#ffd166", "#6ee7b7", "#7dd3fc", "#c4b5fd", "#fb923c"];
+      const SHAPES = ["circle", "square", "diamond", "heart", "star", "hex"];
+      let grid = [], score = 0, moves = 30, bestSubmitted = 0;
+      let sel = null, busy = false, over = false;
+
+      function postScore(force) {
+        if (!force && score <= bestSubmitted) return;
+        bestSubmitted = Math.max(bestSubmitted, score);
+        parent.postMessage({ type: "gls-game-score", gameId: "sweet-match", score, force: !!force }, "*");
+      }
+
+      function randTile() {
+        const i = (Math.random() * COLORS.length) | 0;
+        return { color: COLORS[i], shape: SHAPES[i], pop: 0, fall: 0 };
+      }
+
+      function fillNoMatches() {
+        grid = [];
+        for (let r = 0; r < N; r++) {
+          grid[r] = [];
+          for (let c = 0; c < N; c++) {
+            let t;
+            do { t = randTile(); } while (
+              (c >= 2 && grid[r][c - 1].shape === t.shape && grid[r][c - 2].shape === t.shape) ||
+              (r >= 2 && grid[r - 1][c].shape === t.shape && grid[r - 2][c].shape === t.shape)
+            );
+            grid[r][c] = t;
+          }
+        }
+      }
+
+      function findMatches() {
+        const mark = Array.from({ length: N }, () => Array(N).fill(false));
+        for (let r = 0; r < N; r++) {
+          let run = 1;
+          for (let c = 1; c <= N; c++) {
+            const same = c < N && grid[r][c].shape === grid[r][c - 1].shape;
+            if (same) run++;
+            else {
+              if (run >= 3) for (let k = 0; k < run; k++) mark[r][c - 1 - k] = true;
+              run = 1;
+            }
+          }
+        }
+        for (let c = 0; c < N; c++) {
+          let run = 1;
+          for (let r = 1; r <= N; r++) {
+            const same = r < N && grid[r][c].shape === grid[r - 1][c].shape;
+            if (same) run++;
+            else {
+              if (run >= 3) for (let k = 0; k < run; k++) mark[r - 1 - k][c] = true;
+              run = 1;
+            }
+          }
+        }
+        return mark;
+      }
+
+      function countMarked(mark) {
+        let n = 0;
+        for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (mark[r][c]) n++;
+        return n;
+      }
+
+      function collapse(mark) {
+        for (let c = 0; c < N; c++) {
+          let write = N - 1;
+          for (let r = N - 1; r >= 0; r--) {
+            if (!mark[r][c]) {
+              if (write !== r) {
+                grid[write][c] = grid[r][c];
+                grid[write][c].fall = (write - r) * CELL;
+              }
+              write--;
+            }
+          }
+          while (write >= 0) {
+            grid[write][c] = randTile();
+            grid[write][c].fall = (write + 1) * CELL + 40;
+            write--;
+          }
+        }
+      }
+
+      function neighbors(a, b) {
+        return Math.abs(a.r - b.r) + Math.abs(a.c - b.c) === 1;
+      }
+
+      function swapCells(a, b) {
+        const t = grid[a.r][a.c];
+        grid[a.r][a.c] = grid[b.r][b.c];
+        grid[b.r][b.c] = t;
+      }
+
+      function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+      async function resolveBoard(chain) {
+        while (true) {
+          const mark = findMatches();
+          const n = countMarked(mark);
+          if (!n) break;
+          score += n * 10 * (chain + 1);
+          scoreEl.textContent = String(score);
+          postScore(false);
+          for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (mark[r][c]) grid[r][c].pop = 1;
+          draw();
+          await sleep(160);
+          collapse(mark);
+          draw();
+          await sleep(180);
+          for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+            grid[r][c].pop = 0;
+            grid[r][c].fall = 0;
+          }
+          chain++;
+        }
+      }
+
+      async function trySwap(a, b) {
+        if (busy || over) return;
+        busy = true;
+        swapCells(a, b);
+        draw();
+        const mark = findMatches();
+        if (!countMarked(mark)) {
+          await sleep(120);
+          swapCells(a, b);
+          draw();
+          busy = false;
+          return;
+        }
+        moves--;
+        movesEl.textContent = moves + " moves";
+        await resolveBoard(0);
+        if (moves <= 0) {
+          over = true;
+          hintEl.textContent = "Out of moves · submit or play again.";
+          postScore(true);
+        }
+        busy = false;
+        draw();
+      }
+
+      function cellAt(x, y) {
+        const c = Math.floor((x - PAD) / CELL);
+        const r = Math.floor((y - PAD) / CELL);
+        if (r < 0 || c < 0 || r >= N || c >= N) return null;
+        return { r, c };
+      }
+
+      function drawGem(x, y, tile, size, selected) {
+        const s = size * (tile.pop ? 0.55 : 1);
+        const cy = y - (tile.fall || 0);
+        ctx.save();
+        ctx.translate(x, cy);
+        if (selected) {
+          ctx.strokeStyle = "#fff";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.roundRect(-size / 2 - 2, -size / 2 - 2, size + 4, size + 4, 8);
+          ctx.stroke();
+        }
+        ctx.fillStyle = tile.color;
+        ctx.shadowColor = tile.color;
+        ctx.shadowBlur = 10;
+        const half = s / 2 - 4;
+        ctx.beginPath();
+        if (tile.shape === "circle") ctx.arc(0, 0, half, 0, Math.PI * 2);
+        else if (tile.shape === "square") ctx.roundRect(-half, -half, half * 2, half * 2, 6);
+        else if (tile.shape === "diamond") {
+          ctx.moveTo(0, -half); ctx.lineTo(half, 0); ctx.lineTo(0, half); ctx.lineTo(-half, 0);
+        } else if (tile.shape === "heart") {
+          ctx.moveTo(0, half * 0.7);
+          ctx.bezierCurveTo(half, 0, half * 0.7, -half, 0, -half * 0.35);
+          ctx.bezierCurveTo(-half * 0.7, -half, -half, 0, 0, half * 0.7);
+        } else if (tile.shape === "star") {
+          for (let i = 0; i < 5; i++) {
+            const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
+            const b = a + Math.PI / 5;
+            ctx.lineTo(Math.cos(a) * half, Math.sin(a) * half);
+            ctx.lineTo(Math.cos(b) * half * 0.45, Math.sin(b) * half * 0.45);
+          }
+          ctx.closePath();
+        } else {
+          for (let i = 0; i < 6; i++) {
+            const a = (i * Math.PI) / 3;
+            ctx.lineTo(Math.cos(a) * half, Math.sin(a) * half);
+          }
+          ctx.closePath();
+        }
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, 360, 360);
+        ctx.fillStyle = "rgba(255,255,255,.04)";
+        for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+          const x = PAD + c * CELL + CELL / 2;
+          const y = PAD + r * CELL + CELL / 2;
+          ctx.beginPath();
+          ctx.roundRect(x - CELL / 2 + 2, y - CELL / 2 + 2, CELL - 4, CELL - 4, 8);
+          ctx.fill();
+          const t = grid[r][c];
+          const selected = sel && sel.r === r && sel.c === c;
+          drawGem(x, y, t, CELL, selected);
+        }
+        if (over) {
+          ctx.fillStyle = "rgba(0,0,0,.45)";
+          ctx.fillRect(0, 0, 360, 360);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 22px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("Round over · " + score, 180, 180);
+        }
+      }
+
+      function reset() {
+        score = 0;
+        moves = 30;
+        over = false;
+        busy = false;
+        sel = null;
+        scoreEl.textContent = "0";
+        movesEl.textContent = "30 moves";
+        hintEl.textContent = "Swap neighbors to make 3+ in a row.";
+        fillNoMatches();
+        draw();
+      }
+
+      function pointerPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const sx = canvas.width / rect.width;
+        const sy = canvas.height / rect.height;
+        return { x: (e.clientX - rect.left) * sx, y: (e.clientY - rect.top) * sy };
+      }
+
+      canvas.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        if (busy || over) return;
+        const p = pointerPos(e);
+        const cell = cellAt(p.x, p.y);
+        if (!cell) return;
+        if (!sel) { sel = cell; draw(); return; }
+        if (sel.r === cell.r && sel.c === cell.c) { sel = null; draw(); return; }
+        if (neighbors(sel, cell)) {
+          const a = sel; sel = null;
+          void trySwap(a, cell);
+        } else {
+          sel = cell;
+          draw();
+        }
+      });
+
+      document.getElementById("restart").onclick = reset;
+      document.getElementById("submit").onclick = () => postScore(true);
+      reset();
+    </script>
+  </body>
+</html>
