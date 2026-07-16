@@ -31,6 +31,12 @@ export default function LandingPage() {
             Plans
           </Link>
           <Link
+            href="/faq"
+            className="hidden text-sm text-gls-muted transition hover:text-white sm:inline"
+          >
+            FAQ
+          </Link>
+          <Link
             href="/legal"
             className="hidden text-sm text-gls-muted transition hover:text-white sm:inline"
           >
@@ -135,6 +141,17 @@ export default function LandingPage() {
 
       <footer className="relative z-10 border-t border-white/10 px-6 py-7 text-center text-xs text-gls-muted">
         <p>GLS TV · A better way to find your next watch.</p>
+        <p className="mt-2 flex flex-wrap justify-center gap-3">
+          <Link href="/faq" className="hover:text-white hover:underline">
+            FAQ
+          </Link>
+          <Link href="/pricing" className="hover:text-white hover:underline">
+            Plans
+          </Link>
+          <Link href="/legal" className="hover:text-white hover:underline">
+            Legal
+          </Link>
+        </p>
       </footer>
     </main>
   );

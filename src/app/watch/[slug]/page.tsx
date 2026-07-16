@@ -3,6 +3,7 @@ import { ContentRow } from "@/components/ContentRow";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { WatchBackButton } from "@/components/WatchBackButton";
 import { WatchLibrarySync } from "@/components/HubExtras";
+import { EpgNowNext } from "@/components/EpgNowNext";
 import { getChannelBySlug } from "@/lib/channels";
 import { withLiveSources } from "@/lib/supabase/live-sources";
 import { getSeedCatalogItem } from "@/lib/stream-seeds-catalog";
@@ -13,7 +14,9 @@ import {
   hubKeyForItem,
   ROW_LIMIT,
 } from "@/lib/hubs";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { rankSourcesForCountry, requestCountry } from "@/lib/geo-source-rank";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -24,7 +27,13 @@ export default async function WatchPage({ params }: Props) {
     (await getSeedCatalogItem(slug)) ??
     (await getDbCatalogItem(slug));
   if (!base) notFound();
-  const item = await withLiveSources(base);
+  const live = await withLiveSources(base);
+  const hdrs = await headers();
+  const country = requestCountry(hdrs);
+  const item = {
+    ...live,
+    sources: rankSourcesForCountry(live.sources, country),
+  };
 
   const related = getRelatedChannels(item, 24);
   const hubKey = hubKeyForItem(item);
@@ -72,6 +81,7 @@ export default async function WatchPage({ params }: Props) {
             poster={item.poster}
             backdrop={item.backdrop}
           />
+          <EpgNowNext slug={item.slug} />
           <div className="mt-3 flex flex-wrap gap-3 text-sm text-gls-body">
             {item.year && <span>{item.year}</span>}
             {item.sources[0] && (

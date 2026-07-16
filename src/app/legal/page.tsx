@@ -10,7 +10,10 @@ export default function LegalPage() {
         <GlsLogo size="sm" href="/" />
         <h1 className="gls-display mt-8 text-5xl text-white">Policies</h1>
         <p className="mt-2 text-sm text-gls-muted">
-          Version 1.0 · Effective 15 July 2026
+          Version 1.0 · Effective 15 July 2026 ·{" "}
+          <Link href="/faq" className="text-white underline-offset-2 hover:underline">
+            FAQ
+          </Link>
         </p>
 
         <section className="mt-10 space-y-4 text-sm leading-relaxed">
@@ -92,6 +95,14 @@ export default function LegalPage() {
               service, overload proxies, or upload malicious content.
             </li>
             <li>Do not use GLS TV to infringe copyright or other rights.</li>
+            <li>
+              GLS TV does not provide a VPN or other tools to circumvent
+              region locks. See the{" "}
+              <Link href="/faq#region-vpn" className="text-white underline">
+                FAQ on regions &amp; VPN
+              </Link>
+              .
+            </li>
           </ul>
 
           <h2 id="copyright" className="pt-4 text-xl font-semibold text-white">

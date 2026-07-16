@@ -78,6 +78,7 @@ Required:
   ```
   supports it.
   ```
+  App AuthPanel already surfaces breach-style signup errors when Auth returns them.
 - [ ] Re-run Supabase Security Advisor and resolve every warning or document a
   ```
   deliberate exception.
@@ -348,6 +349,7 @@ and Production/Preview/Development scopes of these names remain owner checks.
 - [ ] `EADMIN_EMAILS` = exact comma-separated admin emails
 - [ ] `TMDB_API_KEY` if TMDB-backed metadata remains enabled and licensed
 - [ ] `YOCO_SECRET_KEY` when Yoco is enabled
+- [ ] `YOCO_WEBHOOK_SECRET` for `/api/yoco/webhook` (HMAC) when using event-driven activation
 - [ ] `GLS_STREAM_PROXY` only if a lawful, trusted proxy is required
 
 Leave Stripe variables unset while Stripe is dormant. If Stripe is reintroduced,

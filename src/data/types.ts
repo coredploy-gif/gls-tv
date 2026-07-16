@@ -14,6 +14,8 @@ export interface MediaSource {
   /** Lower = preferred. Used for failover mirrors. */
   priority?: number;
   label?: string;
+  /** Comma-separated region codes e.g. ZA,AF,WORLD */
+  geo_regions?: string | null;
 }
 
 export interface CatalogItem {

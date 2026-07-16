@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthProvider";
@@ -12,6 +12,46 @@ const DEFAULT_POST_LOGIN_HREF = "/profiles";
 function safeNextPath(next: string | null): string | null {
   if (!next || !next.startsWith("/") || next.startsWith("//")) return null;
   return next;
+}
+
+function PasswordField({
+  mode,
+  password,
+  setPassword,
+}: {
+  mode: Mode;
+  password: string;
+  setPassword: (v: string) => void;
+}) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gls-muted">
+        Password
+      </span>
+      <div className="relative">
+        <input
+          type={visible ? "text" : "password"}
+          required
+          minLength={6}
+          autoComplete={mode === "signin" ? "current-password" : "new-password"}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="At least 6 characters"
+          className="w-full rounded-sm border border-white/15 bg-black/50 px-4 py-3 pr-24 text-white outline-none ring-gls-red placeholder:text-white/30 focus:border-gls-red focus:ring-1"
+        />
+        <button
+          type="button"
+          onClick={() => setVisible((v) => !v)}
+          className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs font-semibold text-gls-muted hover:text-white"
+          aria-pressed={visible}
+          aria-label={visible ? "Hide password" : "Show password"}
+        >
+          {visible ? "Hide" : "Show"}
+        </button>
+      </div>
+    </label>
+  );
 }
 
 export function AuthPanel({
@@ -34,6 +74,18 @@ export function AuthPanel({
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
+  const [signupsAllowed, setSignupsAllowed] = useState(true);
+  const [signupFreezeMsg, setSignupFreezeMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    void fetch("/api/auth/signup-status", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        setSignupsAllowed(data.allowed !== false);
+        setSignupFreezeMsg(data.message || null);
+      })
+      .catch(() => undefined);
+  }, []);
 
   const goAfterLogin = () => {
     onDone?.();
@@ -43,9 +95,7 @@ export function AuthPanel({
   };
 
   if (loading) {
-    return (
-      <p className="text-sm text-gls-muted">Checking your account…</p>
-    );
+    return <p className="text-sm text-gls-muted">Checking your account…</p>;
   }
 
   if (user) {
@@ -75,12 +125,37 @@ export function AuthPanel({
     setBusy(true);
     setError(null);
     setInfo(null);
-    const action =
-      mode === "signin" ? signInWithPassword : signUpWithPassword;
+
+    if (mode === "signup") {
+      if (!signupsAllowed) {
+        setBusy(false);
+        setError(signupFreezeMsg || "Signups are temporarily paused.");
+        return;
+      }
+      const status = await fetch("/api/auth/signup-status", { cache: "no-store" })
+        .then((r) => r.json())
+        .catch(() => ({ allowed: true }));
+      if (status.allowed === false) {
+        setBusy(false);
+        setError(status.message || "Signups are temporarily paused.");
+        return;
+      }
+    }
+
+    const action = mode === "signin" ? signInWithPassword : signUpWithPassword;
     const err = await action(email, password);
     setBusy(false);
     if (err) {
-      setError("We couldn’t sign you in with those details. Please check them and try again.");
+      const lower = err.toLowerCase();
+      if (lower.includes("leak") || lower.includes("pwned") || lower.includes("breach")) {
+        setError(
+          "That password appears in a known data breach. Choose a different, stronger password.",
+        );
+      } else if (lower.includes("invalid login") || lower.includes("invalid credentials")) {
+        setError("Email or password is incorrect. Use Show to check your password, then try again.");
+      } else {
+        setError(err);
+      }
       return;
     }
     if (mode === "signup") {
@@ -106,7 +181,7 @@ export function AuthPanel({
           <h2 className="gls-display text-3xl text-white">Account</h2>
           <p className="mt-2 max-w-xl text-sm text-gls-body">
             Sign in or register with a valid email. After verify, choose who’s
-            watching — then Home.
+            watching — then Home. Use Show to confirm your password as you type.
           </p>
         </>
       )}
@@ -126,7 +201,8 @@ export function AuthPanel({
         <button
           type="button"
           onClick={() => setMode("signup")}
-          className={`rounded px-3 py-1.5 text-sm font-medium transition ${
+          disabled={!signupsAllowed}
+          className={`rounded px-3 py-1.5 text-sm font-medium transition disabled:opacity-40 ${
             mode === "signup"
               ? "bg-white text-black"
               : "bg-white/10 text-gls-body hover:bg-white/15"
@@ -135,6 +211,12 @@ export function AuthPanel({
           Create account
         </button>
       </div>
+
+      {!signupsAllowed && (
+        <p className="mt-3 rounded bg-amber-500/15 px-3 py-2 text-sm text-amber-100">
+          {signupFreezeMsg || "New registrations are temporarily paused."}
+        </p>
+      )}
 
       <form onSubmit={submit} className="mt-4 space-y-3">
         <label className="block">
@@ -173,23 +255,7 @@ export function AuthPanel({
             </span>
           </label>
         )}
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gls-muted">
-            Password
-          </span>
-          <input
-            type="password"
-            required
-            minLength={6}
-            autoComplete={
-              mode === "signin" ? "current-password" : "new-password"
-            }
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="At least 6 characters"
-            className="w-full rounded-sm border border-white/15 bg-black/50 px-4 py-3 text-white outline-none ring-gls-red placeholder:text-white/30 focus:border-gls-red focus:ring-1"
-          />
-        </label>
+        <PasswordField mode={mode} password={password} setPassword={setPassword} />
         {error && (
           <p className="rounded bg-gls-red/20 px-3 py-2 text-sm text-red-200">
             {error}
@@ -202,8 +268,8 @@ export function AuthPanel({
         )}
         <button
           type="submit"
-          disabled={busy}
-          className="gls-cta w-full rounded py-3 text-base font-semibold disabled:opacity-60"
+          disabled={busy || (mode === "signup" && (!acceptedPolicies || !signupsAllowed))}
+          className="gls-cta mt-1 w-full rounded py-3 text-sm font-semibold disabled:opacity-50"
         >
           {busy
             ? "Please wait…"
@@ -212,12 +278,11 @@ export function AuthPanel({
               : "Create account"}
         </button>
         {mode === "signin" && (
-          <Link
-            href="/auth/reset"
-            className="block text-center text-sm text-gls-pink-soft hover:text-white"
-          >
-            Forgot password?
-          </Link>
+          <p className="text-center text-xs text-gls-muted">
+            <Link href="/auth/reset" className="underline hover:text-white">
+              Forgot password?
+            </Link>
+          </p>
         )}
       </form>
     </div>

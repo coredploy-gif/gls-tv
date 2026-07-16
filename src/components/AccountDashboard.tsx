@@ -50,6 +50,7 @@ export function AccountDashboard() {
   const [data, setData] = useState<AccountData | null>(null);
   const [status, setStatus] = useState("Loading account…");
   const [busy, setBusy] = useState(false);
+  const [showPasswords, setShowPasswords] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -239,23 +240,34 @@ export function AccountDashboard() {
           Security
         </h2>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <input
-            type="password"
-            autoComplete="current-password"
-            className="gls-admin-input"
-            placeholder="Current password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-          />
-          <input
-            type="password"
-            autoComplete="new-password"
-            className="gls-admin-input"
-            placeholder="New password (8+ characters)"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
+          <label className="relative block">
+            <input
+              type={showPasswords ? "text" : "password"}
+              autoComplete="current-password"
+              className="gls-admin-input w-full pr-16"
+              placeholder="Current password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+          </label>
+          <label className="relative block">
+            <input
+              type={showPasswords ? "text" : "password"}
+              autoComplete="new-password"
+              className="gls-admin-input w-full pr-16"
+              placeholder="New password (8+ characters)"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </label>
         </div>
+        <button
+          type="button"
+          className="mt-2 text-xs text-gls-muted underline hover:text-white"
+          onClick={() => setShowPasswords((v) => !v)}
+        >
+          {showPasswords ? "Hide passwords" : "Show passwords"}
+        </button>
         <button
           disabled={busy}
           className="mt-3 rounded border border-white/20 px-4 py-2 text-sm text-white"

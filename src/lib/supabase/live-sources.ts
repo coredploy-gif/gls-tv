@@ -109,7 +109,7 @@ export async function withLiveSources(
       if (channel.id) {
         const { data: sources } = await sb
           .from("channel_sources")
-          .select("url, priority, label, health_status")
+          .select("url, priority, label, health_status, geo_regions")
           .eq("channel_id", channel.id)
           .in("health_status", ["healthy", "degraded"])
           .order("priority", { ascending: true });
@@ -121,6 +121,7 @@ export async function withLiveSources(
             format: "hls",
             priority: 10 + (s.priority ?? 100),
             label: s.label || undefined,
+            geo_regions: s.geo_regions || null,
           });
         }
       }

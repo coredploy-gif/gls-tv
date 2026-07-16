@@ -8,6 +8,8 @@ import { ContentRow } from "@/components/ContentRow";
 import { MyPlaylistHomeRow } from "@/components/MyPlaylistHomeRow";
 import { TitleCard } from "@/components/TitleCard";
 import { useLibrary } from "@/lib/library";
+import { useActiveViewer } from "@/lib/membership/active-viewer";
+import { writeLastChannel } from "@/lib/last-channel";
 import { getChannelBySlug } from "@/lib/channels";
 import {
   filterByCountry,
@@ -124,18 +126,29 @@ export function WatchLibrarySync({
   title,
   poster,
   backdrop,
+  href,
 }: {
   slug: string;
   title: string;
   poster: string;
   backdrop: string;
+  href?: string;
 }) {
   const lib = useLibrary();
+  const { viewer } = useActiveViewer();
 
   useEffect(() => {
     lib.addContinue({ slug, title, poster, backdrop, progress: 0 });
+    if (viewer?.id) {
+      writeLastChannel(viewer.id, {
+        slug,
+        title,
+        href: href || `/watch/${encodeURIComponent(slug)}`,
+        poster,
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug]);
+  }, [slug, viewer?.id]);
 
   return (
     <div className="mt-4 flex flex-wrap gap-2">

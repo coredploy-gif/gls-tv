@@ -2,6 +2,7 @@ import { BrowseNav } from "@/components/BrowseNav";
 import { ContentRow } from "@/components/ContentRow";
 import { HeroBillboard } from "@/components/HeroBillboard";
 import { HomeLibraryRows } from "@/components/HubExtras";
+import { LastChannelResume } from "@/components/LastChannelResume";
 import { getByType } from "@/data/catalog";
 import { TOP10, getPopularFirst, getUkTop } from "@/data/top10";
 import { VERIFIED_LIVE } from "@/data/verified";
@@ -49,6 +50,9 @@ export default function BrowsePage() {
       <BrowseNav />
       <HeroBillboard item={featured} />
       <div className="relative z-20 -mt-20 space-y-2">
+        <div className="px-4 sm:px-8 lg:px-12">
+          <LastChannelResume />
+        </div>
         <HomeLibraryRows />
 
         <ContentRow

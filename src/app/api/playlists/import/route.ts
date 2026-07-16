@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { parseM3uDetailed } from "@/lib/iptv";
 import { PLAYLIST_LIMITS } from "@/lib/playlists";
 import { getAccountEntitlement } from "@/lib/membership/account";
 import { secureFetchBuffered } from "@/lib/secure-url";
 import { isFeatureEnabled } from "@/lib/operations/feature-flags";
+import { consumeRateLimit, clientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -48,7 +50,7 @@ async function fetchM3u(url: string) {
   };
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const importId = crypto.randomUUID();
   if (!(await isFeatureEnabled("playlist_imports"))) {
     return responseError(
@@ -71,6 +73,22 @@ export async function POST(req: Request) {
       importId,
     );
   }
+
+  const rl = await consumeRateLimit({
+    bucket: "playlist-import",
+    key: `${user.id}:${clientIp(req)}`,
+    limit: 10,
+    windowMs: 60 * 60 * 1000,
+  });
+  if (!rl.allowed) {
+    return responseError(
+      "M3U_RATE_LIMITED",
+      "Too many playlist imports. Try again later.",
+      429,
+      importId,
+    );
+  }
+
   const entitlement = await getAccountEntitlement(user.id, user.email);
   if (!entitlement.allowed) {
     return responseError(

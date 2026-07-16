@@ -44,6 +44,7 @@ function LinkCard({
   onRename,
   onMoveCategory,
   onRemove,
+  onReport,
   busy,
   badge,
 }: {
@@ -59,6 +60,7 @@ function LinkCard({
   onRename?: () => void;
   onMoveCategory?: (next: string) => void;
   onRemove?: () => void;
+  onReport?: () => void;
   busy?: boolean;
   badge?: string;
 }) {
@@ -164,6 +166,15 @@ function LinkCard({
               className="rounded-lg border border-gls-red/30 px-3 py-1.5 text-xs text-red-300"
             >
               Remove
+            </button>
+          ) : null}
+          {onReport ? (
+            <button
+              type="button"
+              onClick={onReport}
+              className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-gls-muted hover:text-white"
+            >
+              Report
             </button>
           ) : null}
         </div>
@@ -402,6 +413,36 @@ export function MediaLibrary() {
     setLinks((prev) => prev.filter((row) => row.id !== link.id));
   };
 
+  const reportLink = async (
+    link: { id: string; title: string; url: string },
+    kind: "user_media_link" | "admin_media_link",
+  ) => {
+    const reason =
+      prompt(
+        "Report reason (copyright, illegal, broken, malware, other)",
+        "broken",
+      )?.trim() || "other";
+    const details = prompt("Optional details")?.trim() || undefined;
+    const res = await fetch("/api/media-links/report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        target_kind: kind,
+        target_id: link.id,
+        target_url: link.url,
+        target_title: link.title,
+        reason,
+        details,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(data.error || "Could not submit report");
+      return;
+    }
+    setSuccess("Report submitted. Thanks — our team will review it.");
+  };
+
   return (
     <div className="space-y-10">
       <section className="overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(145deg,rgba(229,9,20,0.16),rgba(8,8,8,0.95)_42%,rgba(20,20,20,0.98))] shadow-2xl shadow-black/40">
@@ -575,6 +616,7 @@ export function MediaLibrary() {
                 thumbnailUrl={link.thumbnail_url}
                 href={`/library/featured/${link.id}`}
                 badge="Staff"
+                onReport={() => void reportLink(link, "admin_media_link")}
               />
             ))}
           </div>
@@ -600,6 +642,7 @@ export function MediaLibrary() {
                 onRename={() => void renameLink(link)}
                 onMoveCategory={(next) => void moveCategory(link, next)}
                 onRemove={() => void removeLink(link)}
+                onReport={() => void reportLink(link, "user_media_link")}
                 busy={busy}
               />
             ))}
@@ -742,6 +785,7 @@ export function MediaLibrary() {
                   onRename={() => void renameLink(link)}
                   onMoveCategory={(next) => void moveCategory(link, next)}
                   onRemove={() => void removeLink(link)}
+                  onReport={() => void reportLink(link, "user_media_link")}
                   busy={busy}
                 />
               ))}
@@ -781,6 +825,7 @@ export function MediaLibrary() {
                         onRename={() => void renameLink(link)}
                         onMoveCategory={(next) => void moveCategory(link, next)}
                         onRemove={() => void removeLink(link)}
+                        onReport={() => void reportLink(link, "user_media_link")}
                         busy={busy}
                       />
                     ))}

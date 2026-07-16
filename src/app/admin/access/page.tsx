@@ -63,7 +63,12 @@ export default function AdminAccessPage() {
       </section>
       <section className="gls-admin-card mt-6 rounded-xl p-5">
         <h2 className="text-lg font-semibold text-white">Feature kill switches</h2>
-        <p className="mt-1 text-xs text-gls-muted">Disabling is fail-closed in protected server routes. Catalog publishing remains disabled until rights are approved.</p>
+        <p className="mt-1 text-xs text-gls-muted">
+          Disabling is fail-closed in protected server routes. Turn off{" "}
+          <strong className="text-white/80">signups</strong> to freeze new
+          registrations; <strong className="text-white/80">payments</strong> for
+          billing; Yoco/EFT also toggle under Finance → Settings.
+        </p>
         <div className="mt-4 space-y-2">
           {flags.map((flag) => (
             <div key={flag.key} className="flex items-center justify-between rounded border border-white/10 p-3">

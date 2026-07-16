@@ -103,6 +103,11 @@ function SearchInner() {
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [personal, setPersonal] = useState<{
+    playlists: Array<{ id: string; title: string; href: string }>;
+    links: Array<{ id: string; title: string; href: string; category: string }>;
+    staff: Array<{ id: string; title: string; href: string; category: string }>;
+  }>({ playlists: [], links: [], staff: [] });
 
   const localResults = useMemo(() => {
     // Name search: only keep local hits that match title/slug (don't pollute with Popular pack)
@@ -175,6 +180,29 @@ function SearchInner() {
     const t = setTimeout(() => void fetchRemote(0, false), 280);
     return () => clearTimeout(t);
   }, [fetchRemote]);
+
+  useEffect(() => {
+    const query = q.trim();
+    if (query.length < 2 || country || category) {
+      setPersonal({ playlists: [], links: [], staff: [] });
+      return;
+    }
+    const t = setTimeout(() => {
+      void fetch(`/api/search/unified?q=${encodeURIComponent(query)}`, {
+        cache: "no-store",
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          setPersonal({
+            playlists: data.playlists || [],
+            links: data.links || [],
+            staff: data.staff || [],
+          });
+        })
+        .catch(() => setPersonal({ playlists: [], links: [], staff: [] }));
+    }, 280);
+    return () => clearTimeout(t);
+  }, [q, country, category]);
 
   const results = useMemo(() => {
     const seen = new Set<string>();
@@ -321,6 +349,68 @@ function SearchInner() {
 
       {browsing && (
         <>
+          {(personal.playlists.length > 0 ||
+            personal.links.length > 0 ||
+            personal.staff.length > 0) && (
+            <div className="mt-8 space-y-5">
+              <p className="text-sm text-gls-muted">
+                Your library &amp; staff picks (separate from the licensed catalog)
+              </p>
+              {personal.playlists.length > 0 && (
+                <div>
+                  <h2 className="text-base font-semibold text-white">My Playlists</h2>
+                  <ul className="mt-2 space-y-1">
+                    {personal.playlists.map((row) => (
+                      <li key={row.id}>
+                        <Link
+                          href={row.href}
+                          className="text-sm text-gls-body underline-offset-2 hover:text-white hover:underline"
+                        >
+                          {row.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {personal.links.length > 0 && (
+                <div>
+                  <h2 className="text-base font-semibold text-white">My Links</h2>
+                  <ul className="mt-2 space-y-1">
+                    {personal.links.map((row) => (
+                      <li key={row.id}>
+                        <Link
+                          href={row.href}
+                          className="text-sm text-gls-body underline-offset-2 hover:text-white hover:underline"
+                        >
+                          {row.title}
+                          <span className="text-gls-muted"> · {row.category}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {personal.staff.length > 0 && (
+                <div>
+                  <h2 className="text-base font-semibold text-white">Staff picks</h2>
+                  <ul className="mt-2 space-y-1">
+                    {personal.staff.map((row) => (
+                      <li key={row.id}>
+                        <Link
+                          href={row.href}
+                          className="text-sm text-gls-body underline-offset-2 hover:text-white hover:underline"
+                        >
+                          {row.title}
+                          <span className="text-gls-muted"> · {row.category}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
           <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {loading && results.length === 0
               ? Array.from({ length: 12 }, (_, i) => <div key={i} className="gls-skeleton aspect-[2/3] rounded-md" aria-hidden />)

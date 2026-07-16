@@ -6,6 +6,8 @@ import {
   probeMediaLinkReachability,
   validateMediaLinkUrl,
 } from "@/lib/media-links";
+import { consumeRateLimit, clientIp } from "@/lib/rate-limit";
+import type { NextRequest } from "next/server";
 
 const MAX_LINKS = 100;
 
@@ -38,7 +40,7 @@ export async function GET() {
   });
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -46,6 +48,20 @@ export async function POST(req: Request) {
   if (!user) {
     return NextResponse.json({ error: "Sign in to save links." }, { status: 401 });
   }
+
+  const rl = await consumeRateLimit({
+    bucket: "media-links-post",
+    key: `${user.id}:${clientIp(req)}`,
+    limit: 20,
+    windowMs: 60 * 60 * 1000,
+  });
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Too many link imports. Try again in a bit." },
+      { status: 429 },
+    );
+  }
+
   const entitlement = await getAccountEntitlement(user.id, user.email);
   if (!entitlement.allowed) {
     return NextResponse.json(

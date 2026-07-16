@@ -255,16 +255,59 @@ export function DailyOpsBoard() {
             {data.channelHealth.slice(0, 6).map((c) => (
               <li
                 key={c.slug}
-                className="flex items-center justify-between gap-3 rounded-lg border border-white/[0.06] bg-black/30 px-3 py-2 text-sm"
+                className="flex flex-col gap-2 rounded-lg border border-white/[0.06] bg-black/30 px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between"
               >
-                <span className="truncate text-white">{c.title || c.slug}</span>
-                <span
-                  className={`text-[11px] uppercase ${
-                    c.health_status === "dead" ? "text-red-300" : "text-amber-200"
-                  }`}
-                >
-                  {c.health_status}
-                </span>
+                <div className="min-w-0">
+                  <span className="truncate text-white">{c.title || c.slug}</span>
+                  <span
+                    className={`ml-2 text-[11px] uppercase ${
+                      c.health_status === "dead" ? "text-red-300" : "text-amber-200"
+                    }`}
+                  >
+                    {c.health_status}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  <button
+                    type="button"
+                    className="rounded border border-red-400/40 px-2 py-1 text-[10px] text-red-200"
+                    onClick={() =>
+                      void fetch("/api/admin/ops/channel", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "quarantine", slug: c.slug }),
+                      }).then(() => load())
+                    }
+                  >
+                    Quarantine
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded border border-white/20 px-2 py-1 text-[10px] text-gls-muted"
+                    onClick={() =>
+                      void fetch("/api/admin/ops/channel", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "recheck", slug: c.slug }),
+                      }).then(() => load())
+                    }
+                  >
+                    Recheck
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded border border-gls-mint/40 px-2 py-1 text-[10px] text-gls-mint"
+                    onClick={() =>
+                      void fetch("/api/admin/ops/channel", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "restore", slug: c.slug }),
+                      }).then(() => load())
+                    }
+                  >
+                    Restore
+                  </button>
+                </div>
               </li>
             ))}
             {!data.channelHealth.length && (

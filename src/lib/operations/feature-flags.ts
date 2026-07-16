@@ -5,7 +5,8 @@ export type FeatureFlagKey =
   | "payments"
   | "playlist_imports"
   | "hls_proxy"
-  | "catalog_publish";
+  | "catalog_publish"
+  | "signups";
 
 export async function isFeatureEnabled(
   key: FeatureFlagKey,

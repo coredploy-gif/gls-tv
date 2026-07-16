@@ -2,6 +2,7 @@ import { EadminSeedsPanel } from "@/components/EadminSeedsPanel";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminM3uImport } from "@/components/admin/AdminM3uImport";
 import { AdminMediaLinksPanel } from "@/components/admin/AdminMediaLinksPanel";
+import { LinkReportsPanel } from "@/components/admin/LinkReportsPanel";
 
 export default function AdminLinksPage() {
   return (
@@ -13,6 +14,9 @@ export default function AdminLinksPage() {
       />
       <div className="gls-admin-card mt-8 rounded-lg p-5 sm:p-6">
         <AdminMediaLinksPanel />
+      </div>
+      <div className="gls-admin-card mt-8 rounded-lg p-5 sm:p-6">
+        <LinkReportsPanel />
       </div>
       <div className="gls-admin-card mt-8 rounded-lg p-5 sm:p-6">
         <EadminSeedsPanel />

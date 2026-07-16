@@ -45,7 +45,7 @@ const SKIP_VIEWER_GATE = [
   "/support",
 ];
 
-const AUTH_PUBLIC = ["/auth", "/pricing", "/legal", "/api"];
+const AUTH_PUBLIC = ["/auth", "/pricing", "/legal", "/faq", "/api"];
 
 const ENTITLEMENT_PREFIXES = [
   "/browse",
