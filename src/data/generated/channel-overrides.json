@@ -1083,5 +1083,43 @@
       "Healed",
       "Popular"
     ]
+  },
+  "bbcfood-us-sd": {
+    "slug": "bbcfood-us-sd",
+    "title": "BBC Food",
+    "url": "https://d1e9r0b71zfwk7.cloudfront.net/playlist.m3u8",
+    "note": "Keep CloudFront primary (jmp2 plu-5fb5844 dead 404). Catalog also has Pluto stitcher fallback for buffering; ProxyOk + Healed.",
+    "countries": [
+      "us",
+      "world"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Playable",
+      "Verified",
+      "Healed",
+      "Popular",
+      "ProxyOk"
+    ]
+  },
+  "gordonramsayshellskitchen-us-sd": {
+    "slug": "gordonramsayshellskitchen-us-sd",
+    "title": "Gordon Ramsay's Hell's Kitchen",
+    "url": "https://aegis-cloudfront-1.tubi.video/c8364f36-c60b-4a39-8d86-0b92db4611c0/index.m3u8",
+    "note": "Promote Hell's Kitchen — Tubi primary (200); Pluto jmp2 kept as catalog second source.",
+    "countries": [
+      "us",
+      "world"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Competition",
+      "Playable",
+      "Verified",
+      "Healed",
+      "Popular"
+    ]
   }
 }

@@ -46,7 +46,8 @@
       "Cooking",
       "Playable",
       "Verified",
-      "Popular"
+      "Popular",
+      "Competition"
     ],
     "languages": [
       "English"
@@ -78,7 +79,8 @@
       "Cooking",
       "Playable",
       "Verified",
-      "Popular"
+      "Popular",
+      "Competition"
     ],
     "languages": [
       "English"
@@ -185,6 +187,113 @@
     "sources": [
       {
         "url": "https://tvf-tv5ch.otteravision.com/tvf/tv5ch/tv5ch.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-gordonramsayshellskitchen-us-sd",
+    "slug": "gordonramsayshellskitchen-us-sd",
+    "title": "Gordon Ramsay's Hell's Kitchen",
+    "type": "live",
+    "description": "Food · Competition · Tubi + Pluto FAST",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Competition",
+      "Playable",
+      "Verified",
+      "Popular",
+      "ProxyOk"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://i.imgur.com/WgN4T18.png",
+    "backdrop": "https://i.imgur.com/WgN4T18.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://aegis-cloudfront-1.tubi.video/c8364f36-c60b-4a39-8d86-0b92db4611c0/index.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      },
+      {
+        "url": "https://jmp2.uk/plu-5b4e99f4423e067bd6df6903.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-bestofbobbyflay-us-sd",
+    "slug": "bestofbobbyflay-us-sd",
+    "title": "Best of Bobby Flay",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Competition",
+      "Playable",
+      "Verified",
+      "Popular",
+      "ProxyOk"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://images.pluto.tv/channels/68bb167e00a2f063fdf7ee8f/colorLogoPNG.png",
+    "backdrop": "https://images.pluto.tv/channels/68bb167e00a2f063fdf7ee8f/colorLogoPNG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://jmp2.uk/plu-68bb167e00a2f063fdf7ee8f.m3u8",
+        "quality": "Auto",
+        "format": "hls"
+      }
+    ]
+  },
+  {
+    "id": "iptv-chefvschef-us-sd",
+    "slug": "chefvschef-us-sd",
+    "title": "Chef vs Chef by Food Network",
+    "type": "live",
+    "description": "Food · plays via proxy",
+    "countries": [
+      "us"
+    ],
+    "categories": [
+      "Food",
+      "Cooking",
+      "Competition",
+      "Playable",
+      "Verified",
+      "Popular",
+      "ProxyOk"
+    ],
+    "languages": [
+      "English"
+    ],
+    "poster": "https://images.pluto.tv/channels/68bb16a500a2f063fdf89f8c/colorLogoPNG.png",
+    "backdrop": "https://images.pluto.tv/channels/68bb16a500a2f063fdf89f8c/colorLogoPNG.png",
+    "license": "open_stream",
+    "isLive": true,
+    "featured": true,
+    "sources": [
+      {
+        "url": "https://jmp2.uk/plu-68bb16a500a2f063fdf89f8c.m3u8",
         "quality": "Auto",
         "format": "hls"
       }

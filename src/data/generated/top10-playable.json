@@ -538,80 +538,42 @@
   "food": [
     {
       "cat": "food",
-      "title": "In the kitchen",
-      "slug": "inthekitchen-us-sd",
-      "url": "https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc4us/master.m3u8",
+      "title": "Gordon Ramsay's Hell's Kitchen",
+      "slug": "gordonramsayshellskitchen-us-sd",
+      "url": "https://aegis-cloudfront-1.tubi.video/c8364f36-c60b-4a39-8d86-0b92db4611c0/index.m3u8",
       "countries": [
         "us"
       ],
       "categories": [
         "Food",
         "Cooking",
-        "Shop"
+        "Competition"
       ],
-      "poster": "https://i.imgur.com/HrRUd6r.png",
-      "cors": "*",
-      "direct": true,
-      "segs": 1,
-      "score": 85,
-      "id": "iptv-inthekitchen-us-sd"
-    },
-    {
-      "cat": "food",
-      "title": "Chef Champion (720p) [Not 24/7]",
-      "slug": "chefchampion-us-sd",
-      "url": "https://rpn.bozztv.com/gusa/gusa-chefchampion/index.m3u8",
-      "countries": [
-        "us"
-      ],
-      "categories": [
-        "Food",
-        "Cooking"
-      ],
-      "poster": "https://i.imgur.com/15a9pG9.png",
-      "cors": "*, *",
-      "direct": false,
-      "segs": 1,
-      "score": 25,
-      "id": "iptv-chefchampion-us-sd"
-    },
-    {
-      "cat": "food",
-      "title": "Chef Roc Show (720p) [Not 24/7]",
-      "slug": "chefrocshow-us-sd",
-      "url": "https://rpn.bozztv.com/gusa/gusa-chefrock/index.m3u8",
-      "countries": [
-        "us"
-      ],
-      "categories": [
-        "Food",
-        "Cooking"
-      ],
-      "poster": "https://i.imgur.com/vhVnAzE.png",
-      "cors": "*, *",
-      "direct": false,
-      "segs": 1,
-      "score": 25,
-      "id": "iptv-chefrocshow-us-sd"
-    },
-    {
-      "cat": "food",
-      "title": "Jordan Kitchen",
-      "slug": "jordankitchen-jo-sd",
-      "url": "https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/cooking/playlist.m3u8",
-      "countries": [
-        "jo"
-      ],
-      "categories": [
-        "Food",
-        "Cooking"
-      ],
-      "poster": "https://i.imgur.com/B45qcQX.png",
+      "poster": "https://i.imgur.com/WgN4T18.png",
       "cors": "",
       "direct": false,
       "segs": 1,
-      "score": 25,
-      "id": "iptv-jordankitchen-jo-sd"
+      "score": 95,
+      "id": "iptv-gordonramsayshellskitchen-us-sd"
+    },
+    {
+      "cat": "food",
+      "title": "BBC Food",
+      "slug": "bbcfood-us-sd",
+      "url": "https://d1e9r0b71zfwk7.cloudfront.net/playlist.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://i.imgur.com/kcmHcSx.png",
+      "cors": "",
+      "direct": false,
+      "segs": 1,
+      "score": 90,
+      "id": "iptv-bbcfood-us-sd"
     },
     {
       "cat": "food",
@@ -653,9 +615,29 @@
     },
     {
       "cat": "food",
-      "title": "BBC Food",
-      "slug": "bbcfood-us-sd",
-      "url": "https://d1e9r0b71zfwk7.cloudfront.net/playlist.m3u8",
+      "title": "Best of Bobby Flay",
+      "slug": "bestofbobbyflay-us-sd",
+      "url": "https://jmp2.uk/plu-68bb167e00a2f063fdf7ee8f.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Food",
+        "Cooking",
+        "Competition"
+      ],
+      "poster": "https://images.pluto.tv/channels/68bb167e00a2f063fdf7ee8f/colorLogoPNG.png",
+      "cors": "",
+      "direct": false,
+      "segs": 1,
+      "score": 90,
+      "id": "iptv-bestofbobbyflay-us-sd"
+    },
+    {
+      "cat": "food",
+      "title": "Home Cooking by Food Network",
+      "slug": "homecookingfoodnetwork-us-sd",
+      "url": "https://jmp2.uk/plu-68bb16916523408b14bac7f8.m3u8",
       "countries": [
         "us"
       ],
@@ -663,70 +645,108 @@
         "Food",
         "Cooking"
       ],
-      "poster": "https://i.imgur.com/kcmHcSx.png",
-      "cors": "*",
-      "direct": true,
-      "segs": 0,
-      "score": 75,
-      "id": "iptv-bbcfood-us-sd"
+      "poster": "https://images.pluto.tv/channels/68bb16916523408b14bac7f8/colorLogoPNG.png",
+      "cors": "",
+      "direct": false,
+      "segs": 1,
+      "score": 90,
+      "id": "iptv-homecookingfoodnetwork-us-sd"
     },
     {
       "cat": "food",
-      "title": "Food Food",
-      "slug": "foodfood-in-sd",
-      "url": "https://mumt03.tangotv.in/Dsly5z3HFOODFOOD/index.m3u8",
+      "title": "America's Test Kitchen",
+      "slug": "americastestkitchen-us-sd",
+      "url": "https://jmp2.uk/plu-5e84f54a82f05300080e6746.m3u8",
       "countries": [
-        "in"
+        "us"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://images.pluto.tv/channels/5e84f54a82f05300080e6746/colorLogoPNG.png",
+      "cors": "",
+      "direct": false,
+      "segs": 1,
+      "score": 90,
+      "id": "iptv-americastestkitchen-us-sd"
+    },
+    {
+      "cat": "food",
+      "title": "Delicious Eats",
+      "slug": "deliciouseats-us-sd",
+      "url": "https://jmp2.uk/plu-68bb16ba3efb41cd971f3ce6.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://images.pluto.tv/channels/68bb16ba3efb41cd971f3ce6/colorLogoPNG.png",
+      "cors": "",
+      "direct": false,
+      "segs": 1,
+      "score": 90,
+      "id": "iptv-deliciouseats-us-sd"
+    },
+    {
+      "cat": "food",
+      "title": "Hungry",
+      "slug": "hungry-us-sd",
+      "url": "https://dos35knl8v49a.cloudfront.net/v1/food/samsungheadend_us/latest/main/hls/playlist.m3u8",
+      "countries": [
+        "us"
+      ],
+      "categories": [
+        "Food",
+        "Cooking"
+      ],
+      "poster": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&h=2400&q=92",
+      "cors": "*",
+      "direct": true,
+      "segs": 1,
+      "score": 85,
+      "id": "iptv-hungry-us-sd"
+    },
+    {
+      "cat": "food",
+      "title": "In the kitchen",
+      "slug": "inthekitchen-us-sd",
+      "url": "https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc4us/master.m3u8",
+      "countries": [
+        "us"
       ],
       "categories": [
         "Food",
         "Cooking",
-        "Lifestyle"
+        "Shop"
       ],
-      "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Food_Food.png",
+      "poster": "https://i.imgur.com/HrRUd6r.png",
       "cors": "*",
       "direct": true,
       "segs": 1,
-      "score": 55,
-      "id": "iptv-foodfood-in-sd"
+      "score": 85,
+      "id": "iptv-inthekitchen-us-sd"
     },
     {
       "cat": "food",
-      "title": "Kulinar TV",
-      "slug": "kulinartv-ru-sd",
-      "url": "https://api.alpaca.t62a.com/hls/9110/stream0.m3u8",
+      "title": "Chef Champion",
+      "slug": "chefchampion-us-sd",
+      "url": "https://rpn.bozztv.com/gusa/gusa-chefchampion/index.m3u8",
       "countries": [
-        "ru"
+        "us"
       ],
       "categories": [
         "Food",
         "Cooking"
       ],
-      "poster": "https://smotret.tv/images/kulinar-tv.webp",
-      "cors": "*",
-      "direct": true,
-      "segs": 1,
-      "score": 55,
-      "id": "iptv-kulinartv-ru-sd"
-    },
-    {
-      "cat": "food",
-      "title": "Gusto TV",
-      "slug": "gustotv-ca-poland",
-      "url": "https://563f72af.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X0d1c3RvVFZfSExT/playlist.m3u8",
-      "countries": [
-        "ca"
-      ],
-      "categories": [
-        "Food",
-        "Cooking"
-      ],
-      "poster": "https://jiotvimages.cdn.jio.com/dare_images/images/Gusto_TV.png",
-      "cors": "",
+      "poster": "https://i.imgur.com/15a9pG9.png",
+      "cors": "*, *",
       "direct": false,
       "segs": 1,
       "score": 25,
-      "id": "iptv-gustotv-ca-poland"
+      "id": "iptv-chefchampion-us-sd"
     }
   ]
 }
