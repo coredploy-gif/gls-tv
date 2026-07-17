@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AuthPanel } from "@/components/AuthPanel";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import {
+  isWeakMediaLinkTitle,
   MEDIA_FORMAT_META,
   MEDIA_LINK_CATEGORIES,
   normalizeMediaLinkCategory,
@@ -241,7 +242,12 @@ export function MediaLibrary() {
       setPreview(null);
       return;
     }
-    setPreview(validateMediaLinkUrl(url, title));
+    const next = validateMediaLinkUrl(url, title);
+    setPreview(next);
+    // Prefill Display name with the smart default while the field is empty/weak.
+    if (next.ok && next.title && isWeakMediaLinkTitle(title)) {
+      setTitle(next.title);
+    }
   }, [url, title]);
 
   const favorites = useMemo(
@@ -485,12 +491,12 @@ export function MediaLibrary() {
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/70">
-                  Display name
+                  Display name / Title
                 </span>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="BBC Food · My clip"
+                  placeholder="Prefills from URL — edit before save"
                   className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-white outline-none focus:border-gls-red"
                 />
               </label>

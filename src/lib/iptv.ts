@@ -1,4 +1,8 @@
 import type { CatalogItem } from "@/data/types";
+import {
+  isWeakMediaLinkTitle,
+  titleFromMediaUrl,
+} from "@/lib/media-links";
 
 export type IptvChannel = CatalogItem & {
   tvgId?: string | null;
@@ -53,17 +57,7 @@ function manifestKind(lines: string[]): M3uParseStats["kind"] {
 }
 
 function titleFromStreamUrl(streamUrl: string) {
-  try {
-    const leaf =
-      new URL(streamUrl).pathname.split("/").filter(Boolean).pop() || "stream";
-    const cleaned = leaf
-      .replace(/\.m3u8$/i, "")
-      .replace(/[+_-]+/g, " ")
-      .trim();
-    return cleaned.slice(0, 80) || "Imported stream";
-  } catch {
-    return "Imported stream";
-  }
+  return titleFromMediaUrl(streamUrl, "hls");
 }
 
 /** Build a one-channel IPTV entry from a direct HLS master/media URL. */
@@ -71,7 +65,12 @@ export function channelFromSingleHls(
   streamUrl: string,
   options: { defaultCountry?: string; forceCategory?: string; title?: string } = {},
 ): IptvChannel {
-  const title = (options.title || titleFromStreamUrl(streamUrl)).slice(0, 200);
+  const preferred = (options.title || "").trim();
+  const title = (
+    preferred && !isWeakMediaLinkTitle(preferred)
+      ? preferred
+      : titleFromStreamUrl(streamUrl)
+  ).slice(0, 200);
   const group = options.forceCategory || "Imported";
   const slug =
     title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") ||
@@ -216,13 +215,17 @@ export function parseM3uDetailed(
     const cleanTitle =
       title.replace(/\s*\((\d{3,4}p|SD|HD|FHD|4K|UHD)\)\s*$/i, "").trim() ||
       title;
+    const displayTitle =
+      cleanTitle && !isWeakMediaLinkTitle(cleanTitle)
+        ? cleanTitle
+        : titleFromStreamUrl(streamUrl);
     const fallbackArt =
       "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&fit=crop&w=1200&q=80";
 
     items.push({
       id: `iptv-${slug}`,
       slug,
-      title: cleanTitle,
+      title: displayTitle,
       type: "live",
       description: `${categories.join(" · ")} live channel`,
       countries: [country],

@@ -385,6 +385,70 @@ export function detectPlayableFormat(url: string): MediaLinkFormat | null {
   return formatFromQueryHints(u);
 }
 
+/** Strip a known media extension from a path segment. */
+function stripMediaExt(segment: string): string {
+  return segment.replace(/\.(m3u8?|mp4|m4v|mov|webm)$/i, "");
+}
+
+function humanizePathSegment(segment: string): string {
+  return stripMediaExt(segment)
+    .replace(/[+_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Bare playlist leaves / hash filenames that should not become the card title
+ * when a better path segment or hostname exists.
+ */
+export function isWeakMediaLinkTitle(raw?: string | null): boolean {
+  const value = (raw || "").trim();
+  if (!value) return true;
+  const stem = stripMediaExt(value).trim();
+  if (!stem) return true;
+  const lower = stem.toLowerCase();
+  if (
+    [
+      "index",
+      "playlist",
+      "master",
+      "stream",
+      "live",
+      "video",
+      "media",
+      "chunklist",
+      "manifest",
+      "prog_index",
+      "prog index",
+      "imported link",
+      "imported stream",
+    ].includes(lower)
+  ) {
+    return true;
+  }
+  // Roku FAST redirect leaves (rok-<hex>)
+  if (/^rok-[0-9a-f]{8,}$/i.test(stem)) return true;
+  // UUID
+  if (
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      stem,
+    )
+  ) {
+    return true;
+  }
+  // Long hex / opaque id (no letters outside a-f, or mixed alnum hash ≥16)
+  if (/^[0-9a-f]{16,}$/i.test(stem)) return true;
+  if (/^[0-9a-z]{20,}$/i.test(stem) && /[0-9]/.test(stem) && /[a-z]/i.test(stem)) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Default display title from a media URL.
+ * Prefers a meaningful path segment (e.g. TSN_5 before /index.m3u8), then
+ * hostname — never leaves bare "index" / "playlist" / hash leaves.
+ */
 export function titleFromMediaUrl(url: string, format: MediaLinkFormat): string {
   if (format === "youtube") {
     const id = extractYouTubeId(url);
@@ -399,8 +463,8 @@ export function titleFromMediaUrl(url: string, format: MediaLinkFormat): string 
       const path = new URL(url).pathname.replace(/\/+$/, "");
       if (path && path !== "") {
         const leaf = path.split("/").filter(Boolean).pop();
-        if (leaf && leaf.length > 1) {
-          return `eVOD · ${leaf.replace(/[+_-]+/g, " ").slice(0, 60)}`;
+        if (leaf && leaf.length > 1 && !isWeakMediaLinkTitle(leaf)) {
+          return `eVOD · ${humanizePathSegment(leaf).slice(0, 60)}`;
         }
       }
     } catch {
@@ -409,18 +473,41 @@ export function titleFromMediaUrl(url: string, format: MediaLinkFormat): string 
     return "eVOD · e.tv / eExtra";
   }
   try {
-    const leaf =
-      new URL(url).pathname.split("/").filter(Boolean).pop() || "stream";
-    return (
-      leaf
-        .replace(/\.(m3u8?|mp4|m4v|mov|webm)$/i, "")
-        .replace(/[+_-]+/g, " ")
-        .trim()
-        .slice(0, 80) || "Imported link"
-    );
+    const u = new URL(url);
+    const segments = decodePathname(u.pathname).split("/").filter(Boolean);
+    const leafStem = stripMediaExt(segments[segments.length - 1] || "");
+
+    if (/^rok-[0-9a-f]{8,}$/i.test(leafStem)) {
+      return "Roku stream";
+    }
+
+    // Prefer the last non-weak segment (often the channel folder before index.m3u8).
+    for (let i = segments.length - 1; i >= 0; i--) {
+      const stem = stripMediaExt(segments[i]!);
+      if (!stem || isWeakMediaLinkTitle(stem)) continue;
+      const label = humanizePathSegment(stem);
+      if (label) return label.slice(0, 80);
+    }
+
+    const host = u.hostname.replace(/^www\./i, "").replace(/\.$/, "");
+    if (host) return host.slice(0, 80);
+    return "Imported link";
   } catch {
     return "Imported link";
   }
+}
+
+/** Prefer an explicit title unless it is empty or a weak leaf like "index". */
+export function resolveMediaLinkTitle(
+  url: string,
+  format: MediaLinkFormat,
+  preferredTitle?: string | null,
+): string {
+  const preferred = (preferredTitle || "").trim();
+  if (preferred && !isWeakMediaLinkTitle(preferred)) {
+    return preferred.slice(0, 200);
+  }
+  return titleFromMediaUrl(url, format).slice(0, 200);
 }
 
 export function embedUrlFor(
@@ -651,12 +738,10 @@ export function validateMediaLinkUrl(
       };
     }
     // No extension / hint — provisional MP4; server probe must confirm video.
-    const title =
-      (preferredTitle || "").trim() || titleFromMediaUrl(url, "mp4");
     return {
       ok: true,
       format: "mp4",
-      title: title.slice(0, 200),
+      title: resolveMediaLinkTitle(url, "mp4", preferredTitle),
       provisional: true,
     };
   }
@@ -668,12 +753,11 @@ export function validateMediaLinkUrl(
         ? extractVimeoId(url)
         : null;
   const embedUrl = embedUrlFor(url, format);
-  const title = (preferredTitle || "").trim() || titleFromMediaUrl(url, format);
 
   return {
     ok: true,
     format,
-    title: title.slice(0, 200),
+    title: resolveMediaLinkTitle(url, format, preferredTitle),
     embedUrl,
     videoId: videoId || undefined,
     thumbnailUrl: thumbnailFor(format, videoId),

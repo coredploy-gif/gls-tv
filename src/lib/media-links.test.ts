@@ -234,7 +234,42 @@ describe("media-links", () => {
         "https://jmp2.uk/rok-0597d2a4b388b1497a9bf48812e5d070.m3u8",
         "hls",
       ),
-    ).toMatch(/rok/i);
+    ).toBe("Roku stream");
+  });
+
+  it("prefers channel folder over index.m3u8 leaf", () => {
+    expect(
+      titleFromMediaUrl("http://40.160.24.55/TSN_5/index.m3u8", "hls"),
+    ).toBe("TSN 5");
+    expect(
+      validateMediaLinkUrl("http://40.160.24.55/TSN_5/index.m3u8").title,
+    ).toBe("TSN 5");
+  });
+
+  it("falls back to hostname for root index.m3u8", () => {
+    expect(
+      titleFromMediaUrl("https://cdn.example.com/index.m3u8", "hls"),
+    ).toBe("cdn.example.com");
+  });
+
+  it("ignores weak preferred titles like index", () => {
+    expect(
+      validateMediaLinkUrl("http://40.160.24.55/TSN_1/index.m3u8", "index")
+        .title,
+    ).toBe("TSN 1");
+    expect(
+      validateMediaLinkUrl(
+        "https://jmp2.uk/rok-0597d2a4b388b1497a9bf48812e5d070.m3u8",
+        "playlist",
+      ).title,
+    ).toBe("Roku stream");
+  });
+
+  it("keeps a real preferred title", () => {
+    expect(
+      validateMediaLinkUrl("http://40.160.24.55/TSN_5/index.m3u8", "TSN 5 Live")
+        .title,
+    ).toBe("TSN 5 Live");
   });
 
   it("exports a user responsibility disclaimer", () => {

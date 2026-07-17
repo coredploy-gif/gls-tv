@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import {
+  isWeakMediaLinkTitle,
   MEDIA_FORMAT_META,
   type AdminMediaLink,
   type MediaLinkFormat,
@@ -41,6 +42,14 @@ export function AdminMediaLinksPanel() {
   useEffect(() => {
     queueMicrotask(() => void load());
   }, [load]);
+
+  useEffect(() => {
+    if (url.trim().length < 8) return;
+    const next = validateMediaLinkUrl(url, title);
+    if (next.ok && next.title && isWeakMediaLinkTitle(title)) {
+      setTitle(next.title);
+    }
+  }, [url, title]);
 
   const liveCheck =
     url.trim().length > 8 ? validateMediaLinkUrl(url, title) : null;
@@ -175,6 +184,29 @@ export function AdminMediaLinksPanel() {
     setLinks((prev) => prev.filter((l) => l.id !== id));
   };
 
+  const rename = async (link: AdminMediaLink) => {
+    const next = prompt("Display name / Title", link.title)?.trim();
+    if (!next || next === link.title) return;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/admin/media-links", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: link.id, title: next }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Rename failed");
+      setLinks((prev) =>
+        prev.map((row) => (row.id === link.id ? { ...row, title: next } : row)),
+      );
+      setStatus(`Renamed to “${next}”.`);
+    } catch (cause) {
+      setStatus(cause instanceof Error ? cause.message : "Rename failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <section className="space-y-5">
       <div>
@@ -189,35 +221,50 @@ export function AdminMediaLinksPanel() {
       </div>
 
       <form onSubmit={openPreview} className="grid gap-3 sm:grid-cols-2">
-        <input
-          type="url"
-          value={url}
-          onChange={(e) => {
-            setUrl(e.target.value);
-            setPreview(null);
-          }}
-          required
-          placeholder="https://…/index.m3u8 (any public host; http IP OK)"
-          className="gls-admin-input sm:col-span-2"
-        />
-        <input
-          value={title}
-          onChange={(e) => {
-            setTitle(e.target.value);
-            setPreview(null);
-          }}
-          placeholder="Display title (e.g. Hell’s Kitchen)"
-          className="gls-admin-input"
-        />
-        <input
-          value={category}
-          onChange={(e) => {
-            setCategory(e.target.value);
-            setPreview(null);
-          }}
-          placeholder="Category"
-          className="gls-admin-input"
-        />
+        <label className="sm:col-span-2 block">
+          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/70">
+            Media URL
+          </span>
+          <input
+            type="url"
+            value={url}
+            onChange={(e) => {
+              setUrl(e.target.value);
+              setPreview(null);
+            }}
+            required
+            placeholder="https://…/index.m3u8 (any public host; http IP OK)"
+            className="gls-admin-input w-full"
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/70">
+            Display name / Title
+          </span>
+          <input
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setPreview(null);
+            }}
+            placeholder="Prefills from URL — edit before save"
+            className="gls-admin-input w-full"
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/70">
+            Category
+          </span>
+          <input
+            value={category}
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setPreview(null);
+            }}
+            placeholder="Category"
+            className="gls-admin-input w-full"
+          />
+        </label>
         <input
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -231,7 +278,9 @@ export function AdminMediaLinksPanel() {
             }`}
           >
             {liveCheck.ok
-              ? `Format OK · ${MEDIA_FORMAT_META[liveCheck.format as MediaLinkFormat].label}`
+              ? `Format OK · ${MEDIA_FORMAT_META[liveCheck.format as MediaLinkFormat].label}${
+                  liveCheck.title ? ` · ${liveCheck.title}` : ""
+                }`
               : liveCheck.error}
           </p>
         )}
@@ -348,6 +397,14 @@ export function AdminMediaLinksPanel() {
                   Confirm publish
                 </button>
               )}
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void rename(link)}
+                className="rounded border border-white/20 px-3 py-1.5 text-xs text-white/80"
+              >
+                Rename
+              </button>
               <button
                 type="button"
                 onClick={() => void remove(link.id)}

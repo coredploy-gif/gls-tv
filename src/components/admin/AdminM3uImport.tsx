@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import {
+  resolveMediaLinkTitle,
+  validateMediaLinkUrl,
+} from "@/lib/media-links";
 
 type PreviewChannel = {
   index: number;
@@ -15,6 +19,7 @@ export function AdminM3uImport() {
   const [token, setToken] = useState("");
   const [channels, setChannels] = useState<PreviewChannel[]>([]);
   const [targets, setTargets] = useState<Record<number, string>>({});
+  const [titles, setTitles] = useState<Record<number, string>>({});
   const [selected, setSelected] = useState<Record<number, boolean>>({});
   const [singleStream, setSingleStream] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -35,6 +40,7 @@ export function AdminM3uImport() {
     setBusy(true);
     setStatus("Fetching and parsing source…");
     setTargets({});
+    setTitles({});
     setSelected({});
     try {
       const data = await request({ action: "preview", url });
@@ -43,10 +49,16 @@ export function AdminM3uImport() {
       setChannels(nextChannels);
       setSingleStream(Boolean(data.singleStream));
       const defaults: Record<number, boolean> = {};
+      const titleDefaults: Record<number, string> = {};
       for (const channel of nextChannels) {
         defaults[channel.index] = Boolean(data.singleStream);
+        const resolved = channel.url
+          ? resolveMediaLinkTitle(channel.url, "hls", channel.title)
+          : channel.title;
+        titleDefaults[channel.index] = resolved;
       }
       setSelected(defaults);
+      setTitles(titleDefaults);
       setStatus(
         data.note ||
           `Preview ready: ${data.stats.parsed} parsed, ${data.stats.invalid} invalid, ${data.stats.duplicates} duplicates.`,
@@ -95,12 +107,19 @@ export function AdminM3uImport() {
     try {
       const saved: string[] = [];
       for (const channel of picks) {
+        const preferred =
+          titles[channel.index]?.trim() || channel.title;
+        const validation = validateMediaLinkUrl(channel.url, preferred);
+        const displayTitle =
+          validation.ok && validation.title
+            ? validation.title
+            : resolveMediaLinkTitle(channel.url, "hls", preferred);
         const response = await fetch("/api/admin/media-links", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             url: channel.url,
-            title: channel.title,
+            title: displayTitle,
             category: channel.group || "Live TV",
             notes: `Imported from M3U preview (${url.trim().slice(0, 120)})`,
             is_published: publish,
@@ -109,10 +128,10 @@ export function AdminM3uImport() {
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
           throw new Error(
-            data.error || `Failed to save “${channel.title}” as Staff pick`,
+            data.error || `Failed to save “${displayTitle}” as Staff pick`,
           );
         }
-        saved.push(data.link?.title || channel.title);
+        saved.push(data.link?.title || displayTitle);
       }
       setStatus(
         publish
@@ -179,16 +198,29 @@ export function AdminM3uImport() {
                   }
                   className="mt-1"
                 />
-                <span>
-                  {channel.title}
-                  <span className="ml-2 text-xs text-gls-muted">{channel.group}</span>
-                  {singleStream && (
-                    <span className="mt-1 block text-xs text-gls-mint">
-                      Single HLS — Staff picks recommended
-                    </span>
-                  )}
+                <span className="min-w-0">
+                  <span className="block text-xs text-gls-muted">
+                    {channel.group}
+                    {singleStream && (
+                      <span className="ml-2 text-gls-mint">
+                        Single HLS — Staff picks recommended
+                      </span>
+                    )}
+                  </span>
                 </span>
               </label>
+              <input
+                value={titles[channel.index] ?? channel.title}
+                onChange={(event) =>
+                  setTitles((current) => ({
+                    ...current,
+                    [channel.index]: event.target.value,
+                  }))
+                }
+                placeholder="Display name / Title"
+                className="gls-admin-input"
+                aria-label="Display name / Title"
+              />
               <input
                 value={targets[channel.index] || ""}
                 onChange={(event) =>
@@ -198,7 +230,7 @@ export function AdminM3uImport() {
                   }))
                 }
                 placeholder="catalog slug (optional — only for licensed publish)"
-                className="gls-admin-input sm:col-span-2"
+                className="gls-admin-input"
               />
             </div>
           ))}
