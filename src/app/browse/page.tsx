@@ -8,6 +8,8 @@ import { TOP10, getPopularFirst, getUkTop } from "@/data/top10";
 import { VERIFIED_LIVE } from "@/data/verified";
 import { getAllChannels } from "@/lib/channels";
 import { getRelatedChannels } from "@/lib/hubs";
+import { getMalawiBrowseItems } from "@/lib/radio";
+import { isTraceChannel } from "@/lib/trace-mirrors";
 
 export default function BrowsePage() {
   const popular = getPopularFirst();
@@ -30,6 +32,34 @@ export default function BrowsePage() {
     "trace-urban-africa",
     "trace-africa",
   ];
+  const tracePriority = [
+    "trace-urban-africa",
+    "trace-africa",
+    "trace-gospel",
+    "trace-mziki",
+    "trace-urban-international",
+    "trace-latina",
+    "tracegospel-fr-southernafrica",
+    "trace-urban-france",
+    "trace-ayiti",
+    "trace-caribbean",
+  ];
+  const traceChannels = [
+    ...tracePriority
+      .map((slug) => bySlug.get(slug))
+      .filter((channel): channel is NonNullable<typeof channel> =>
+        Boolean(channel),
+      ),
+    ...allChannels.filter(
+      (channel) =>
+        isTraceChannel(channel.slug, channel.title) &&
+        !tracePriority.includes(channel.slug),
+    ),
+  ].filter(
+    (channel, index, list) =>
+      list.findIndex((candidate) => candidate.slug === channel.slug) === index,
+  );
+
   const southAfricanPicks = [
     ...southAfricanPriority
       .map((slug) => bySlug.get(slug))
@@ -44,6 +74,8 @@ export default function BrowsePage() {
     (channel, index, list) =>
       list.findIndex((candidate) => candidate.slug === channel.slug) === index,
   );
+
+  const malawiItems = getMalawiBrowseItems();
 
   return (
     <main className="min-h-screen bg-gls-black pb-20">
@@ -61,6 +93,22 @@ export default function BrowsePage() {
           limit={12}
           viewMoreHref="/live"
         />
+
+        <ContentRow
+          title="🎵 Trace Music · Africa & urban"
+          items={traceChannels}
+          limit={12}
+          viewMoreHref="/africa/more/all?q=trace"
+        />
+
+        {malawiItems.length > 0 && (
+          <ContentRow
+            title="🇲🇼 Malawi · MBC radio"
+            items={malawiItems}
+            limit={12}
+            viewMoreHref="/radio"
+          />
+        )}
 
         <ContentRow
           title="Top 10 Sports"

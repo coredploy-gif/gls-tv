@@ -74,6 +74,13 @@ export const BROWSE_NAV: NavAccent[] = [
     glow: "rgba(255,176,116,0.4)",
   },
   {
+    href: "/radio",
+    label: "Radio",
+    color: "#ff7078",
+    bright: "#ff9aa0",
+    glow: "rgba(255,112,120,0.45)",
+  },
+  {
     href: "/asia",
     label: "Asia",
     color: "#ff7eb6",
