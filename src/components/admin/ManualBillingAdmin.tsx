@@ -1197,28 +1197,66 @@ function SettingsView({
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gls-pink-soft">
             Payment methods
           </p>
-          <label className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-white/10 px-3 py-3">
-            <span>
-              <span className="block text-sm font-semibold text-white">
-                PayFast
+          <div className="mt-4 rounded-lg border border-white/10 px-3 py-3">
+            <label className="flex items-center justify-between gap-3">
+              <span>
+                <span className="block text-sm font-semibold text-white">
+                  PayFast
+                </span>
+                <span className="text-[11px] text-gls-muted">
+                  {payfastConfigured
+                    ? payfastSandbox
+                      ? "Configured (sandbox)"
+                      : "Configured (live)"
+                    : "Add PAYFAST_MERCHANT_ID + KEY on server"}
+                </span>
               </span>
-              <span className="text-[11px] text-gls-muted">
-                {payfastConfigured
-                  ? payfastSandbox
-                    ? "Configured (sandbox)"
-                    : "Configured (live)"
-                  : "Add PAYFAST_MERCHANT_ID + KEY on server"}
-              </span>
-            </span>
-            <input
-              type="checkbox"
-              checked={settings.payfast_enabled !== false}
-              onChange={(e) =>
-                setSettings({ ...settings, payfast_enabled: e.target.checked })
-              }
-              className="h-4 w-4 accent-pink-500"
-            />
-          </label>
+              <input
+                type="checkbox"
+                checked={settings.payfast_enabled !== false}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    payfast_enabled: e.target.checked,
+                  })
+                }
+                className="h-4 w-4 accent-pink-500"
+              />
+            </label>
+            <ol className="mt-3 list-decimal space-y-1.5 pl-4 text-[11px] leading-relaxed text-gls-muted">
+              <li>
+                Sign up at{" "}
+                <span className="text-white/70">sandbox.payfast.co.za</span>{" "}
+                (Individual / Sole Trader is fine).
+              </li>
+              <li>
+                Copy Merchant ID, Merchant Key, and Salt Passphrase into Vercel
+                env:{" "}
+                <span className="text-white/70">
+                  PAYFAST_MERCHANT_ID / KEY / PASSPHRASE
+                </span>
+                , set{" "}
+                <span className="text-white/70">PAYFAST_SANDBOX=true</span>,
+                redeploy.
+              </li>
+              <li>
+                ITN notify URL:{" "}
+                <span className="text-white/70">
+                  https://glstv.site/api/payfast/itn
+                </span>
+              </li>
+              <li>
+                Enable PayFast here → Save → member Pricing → Card (PayFast)
+                sandbox payment → membership unlocks via in-app notification.
+              </li>
+            </ol>
+            {!payfastConfigured && (
+              <p className="mt-2 text-[11px] text-amber-200/90">
+                Toggle stays off until keys are on the server. EFT still works
+                without PayFast.
+              </p>
+            )}
+          </div>
           <label className="mt-2 flex items-center justify-between gap-3 rounded-lg border border-white/10 px-3 py-3">
             <span>
               <span className="block text-sm font-semibold text-white">Yoco</span>

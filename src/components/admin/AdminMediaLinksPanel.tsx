@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   isWeakMediaLinkTitle,
   MEDIA_FORMAT_META,
+  MEDIA_LINK_CATEGORIES,
   type AdminMediaLink,
   type MediaLinkFormat,
   validateMediaLinkUrl,
@@ -23,7 +24,7 @@ export function AdminMediaLinksPanel() {
   const [links, setLinks] = useState<AdminMediaLink[]>([]);
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("Featured");
+  const [category, setCategory] = useState("Sports");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
@@ -49,7 +50,10 @@ export function AdminMediaLinksPanel() {
     if (next.ok && next.title && isWeakMediaLinkTitle(title)) {
       setTitle(next.title);
     }
-  }, [url, title]);
+    if (next.ok && next.format === "hls" && category === "Featured") {
+      setCategory("Sports");
+    }
+  }, [url, title, category]);
 
   const liveCheck =
     url.trim().length > 8 ? validateMediaLinkUrl(url, title) : null;
@@ -71,7 +75,7 @@ export function AdminMediaLinksPanel() {
         body: JSON.stringify({
           url: url.trim(),
           title: v.title,
-          category: category.trim() || "Featured",
+          category: category.trim() || "Sports",
           notes: notes.trim(),
           preview_only: true,
         }),
@@ -253,17 +257,28 @@ export function AdminMediaLinksPanel() {
         </label>
         <label className="block">
           <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/70">
-            Category
+            Folder
           </span>
-          <input
-            value={category}
+          <select
+            value={
+              MEDIA_LINK_CATEGORIES.includes(
+                category as (typeof MEDIA_LINK_CATEGORIES)[number],
+              )
+                ? category
+                : "Other"
+            }
             onChange={(e) => {
               setCategory(e.target.value);
               setPreview(null);
             }}
-            placeholder="Category"
             className="gls-admin-input w-full"
-          />
+          >
+            {MEDIA_LINK_CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
         </label>
         <input
           value={notes}
@@ -319,10 +334,22 @@ export function AdminMediaLinksPanel() {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-lg font-semibold text-white">{preview.title}</p>
+              <label className="block">
+                <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-white/50">
+                  Name on My Links
+                </span>
+                <input
+                  value={preview.title}
+                  onChange={(e) =>
+                    setPreview({ ...preview, title: e.target.value })
+                  }
+                  className="gls-admin-input w-full text-lg font-semibold"
+                />
+              </label>
               <p className="mt-1 truncate text-xs text-gls-muted">{preview.url}</p>
               <p className="mt-2 text-xs uppercase tracking-wide text-gls-muted">
-                {MEDIA_FORMAT_META[preview.format].label} · {preview.category}
+                {MEDIA_FORMAT_META[preview.format].label} · Folder:{" "}
+                {preview.category}
               </p>
               {preview.embedUrl && (
                 <p className="mt-2 text-xs text-gls-muted">
@@ -332,7 +359,7 @@ export function AdminMediaLinksPanel() {
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   type="button"
-                  disabled={busy}
+                  disabled={busy || !preview.title.trim()}
                   onClick={() => void save(false)}
                   className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white disabled:opacity-40"
                 >
@@ -340,7 +367,7 @@ export function AdminMediaLinksPanel() {
                 </button>
                 <button
                   type="button"
-                  disabled={busy}
+                  disabled={busy || !preview.title.trim()}
                   onClick={() => void save(true)}
                   className="gls-cta rounded-lg px-4 py-2 text-sm disabled:opacity-40"
                 >
