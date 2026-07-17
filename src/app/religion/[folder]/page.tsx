@@ -1,9 +1,6 @@
 import { notFound } from "next/navigation";
-import {
-  parseReligionFolderParam,
-  ReligionFolderHub,
-} from "@/components/ReligionHub";
-import { RELIGION_FOLDERS } from "@/lib/religion";
+import { ReligionFolderHub } from "@/components/ReligionHub";
+import { parseReligionFolderParam, RELIGION_FOLDERS } from "@/lib/religion";
 
 type Props = { params: Promise<{ folder: string }> };
 

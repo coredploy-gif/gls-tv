@@ -321,12 +321,6 @@ export function ReligionFolderMore({ folderKey, row }: FolderMoreProps) {
   );
 }
 
-export function parseReligionFolderParam(
-  folder: string,
-): ReligionFolderKey | null {
-  return isReligionFolderKey(folder) ? folder : null;
-}
-
 export function folderPreviewItems(
   pool: CatalogItem[],
   folderKey: ReligionFolderKey,

@@ -1,9 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import {
-  parseReligionFolderParam,
-  ReligionFolderMore,
-} from "@/components/ReligionHub";
+import { ReligionFolderMore } from "@/components/ReligionHub";
+import { parseReligionFolderParam } from "@/lib/religion";
 
 type Props = { params: Promise<{ folder: string; row: string }> };
 

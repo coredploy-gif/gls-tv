@@ -86,6 +86,12 @@ export function isReligionFolderKey(key: string): key is ReligionFolderKey {
   return key in FOLDER_BY_KEY;
 }
 
+export function parseReligionFolderParam(
+  folder: string,
+): ReligionFolderKey | null {
+  return isReligionFolderKey(folder) ? folder : null;
+}
+
 export function isIslamChannel(item: CatalogItem): boolean {
   if (item.categories.some((c) => /^islam$/i.test(c))) return true;
   if (
