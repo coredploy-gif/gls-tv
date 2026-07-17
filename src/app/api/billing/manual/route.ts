@@ -12,6 +12,7 @@ import {
   payfastConfigured,
   yocoConfigured,
   type ManualPaymentMethod,
+  type ManualPlanId,
 } from "@/lib/manual-billing";
 import {
   buildDebitOrderQuote,
@@ -46,6 +47,9 @@ function payfastItemName(
   plan: string,
   billingKind: string,
 ) {
+  if (billingKind === "outstanding") {
+    return `${settings.trading_name} ${plan} · outstanding (+3% fee)`;
+  }
   if (billingKind === "debit_order") {
     return `${settings.trading_name} ${plan} · monthly debit`;
   }
@@ -90,7 +94,7 @@ function checkoutPayload(
   });
 }
 
-function debitOrderFields(plan: string, debitDay: PayfastDebitDay) {
+function debitOrderFields(plan: ManualPlanId, debitDay: PayfastDebitDay) {
   const monthlyCents = manualPlanCents(plan);
   const quote = buildDebitOrderQuote({ monthlyCents, debitDay });
   return {
@@ -376,10 +380,11 @@ export async function POST(req: NextRequest) {
         { status: 409 },
       );
     }
+    const isOutstanding = payment.billing_kind === "outstanding";
     const debitDay =
       parsePayfastDebitDay(body.debitDay) ??
       parsePayfastDebitDay(payment.debit_day);
-    if (!debitDay) {
+    if (!isOutstanding && !debitDay) {
       return NextResponse.json(
         { error: "Choose a debit day (1, 15, or 30) for PayFast" },
         { status: 400 },
@@ -387,15 +392,21 @@ export async function POST(req: NextRequest) {
     }
     const member = await ensureMemberReference(service, user);
     const now = new Date().toISOString();
-    const debitFields = debitOrderFields(String(payment.plan), debitDay);
+    const updatePayload: Record<string, unknown> = {
+      payment_method: "payfast",
+      status: payment.status === "pending" ? "verifying" : payment.status,
+      updated_at: now,
+    };
+    if (!isOutstanding && debitDay) {
+      const planForDebit = String(payment.plan);
+      if (!isManualPlan(planForDebit)) {
+        return NextResponse.json({ error: "Invalid plan on payment" }, { status: 409 });
+      }
+      Object.assign(updatePayload, debitOrderFields(planForDebit, debitDay));
+    }
     const { data: updated, error } = await service
       .from("manual_payment_requests")
-      .update({
-        payment_method: "payfast",
-        status: payment.status === "pending" ? "verifying" : payment.status,
-        ...debitFields,
-        updated_at: now,
-      })
+      .update(updatePayload)
       .eq("id", paymentId)
       .eq("user_id", user.id)
       .select("*")
@@ -417,13 +428,18 @@ export async function POST(req: NextRequest) {
         user_id: user.id,
         event_type: "payfast_checkout_started",
         actor_email: user.email,
-        meta: { debitDay, billingKind: "debit_order" },
+        meta: {
+          debitDay: debitDay ?? null,
+          billingKind: isOutstanding ? "outstanding" : "debit_order",
+        },
       }),
       service.from("user_reminders").insert({
         user_id: user.id,
         kind: "system",
-        title: "Debit order setup",
-        body: `Complete card setup on PayFast for ${payment.payment_reference}. Your monthly debit continues on the ${debitDayLabel(debitDay)}.`,
+        title: isOutstanding ? "Paying outstanding" : "Debit order setup",
+        body: isOutstanding
+          ? `Complete the outstanding payment (plan + 3% fee) for ${payment.payment_reference}.`
+          : `Complete card setup on PayFast for ${payment.payment_reference}. Your monthly debit continues on the ${debitDayLabel(debitDay!)}.`,
         href: `/pricing/pay/${paymentId}`,
         severity: "info",
         dedupe_key: `payfast-started-${paymentId}`,

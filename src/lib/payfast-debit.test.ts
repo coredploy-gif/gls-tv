@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDebitOrderQuote,
+  declineFeeCents,
+  dunningSchedule,
   inclusiveDaySpan,
   nextDebitDate,
+  outstandingCents,
   parsePayfastDebitDay,
   prorataCents,
 } from "@/lib/payfast-debit";
@@ -73,5 +76,32 @@ describe("inclusiveDaySpan", () => {
         new Date(Date.UTC(2026, 0, 1)),
       ),
     ).toBe(1);
+  });
+});
+
+describe("declineFeeCents / outstandingCents", () => {
+  it("adds 3% for Standard R45", () => {
+    expect(declineFeeCents(4500)).toBe(135);
+    expect(outstandingCents(4500)).toBe(4635);
+  });
+
+  it("adds 3% for Plus R55 and Family R65", () => {
+    expect(declineFeeCents(5500)).toBe(165);
+    expect(outstandingCents(5500)).toBe(5665);
+    expect(declineFeeCents(6500)).toBe(195);
+    expect(outstandingCents(6500)).toBe(6695);
+  });
+
+  it("uses min fee of 1 cent", () => {
+    expect(declineFeeCents(1)).toBe(1);
+  });
+});
+
+describe("dunningSchedule", () => {
+  it("sets remind +3d and pause +5d", () => {
+    const from = new Date(Date.UTC(2026, 6, 10, 12, 0, 0));
+    const s = dunningSchedule(from);
+    expect(s.remind3At.toISOString().slice(0, 10)).toBe("2026-07-13");
+    expect(s.pauseAt.toISOString().slice(0, 10)).toBe("2026-07-15");
   });
 });

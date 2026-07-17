@@ -2,8 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/eadmin";
 import {
   activateManualPayment,
+  paymentReferenceFor,
   renewPayfastDebit,
 } from "@/lib/manual-billing";
+import {
+  declineFeeCents,
+  dunningSchedule,
+  formatZarFromCents,
+  outstandingCents,
+} from "@/lib/payfast-debit";
 import {
   confirmPayfastItn,
   isPayfastItnIpAllowed,
@@ -72,26 +79,126 @@ async function handleDebitFailure(
   pfPaymentId: string,
   mPaymentId: string,
 ) {
+  const parentKey = pfPaymentId || `m:${mPaymentId}` || token;
+  if (pfPaymentId) {
+    const { data: existing } = await service
+      .from("manual_payment_requests")
+      .select("id")
+      .eq("billing_kind", "outstanding")
+      .eq("dunning_parent_pf_payment_id", pfPaymentId)
+      .in("status", ["pending", "verifying", "proof_submitted", "paid"])
+      .maybeSingle();
+    if (existing) return;
+  }
+
+  const { data: sub } = await service
+    .from("subscriptions")
+    .select(
+      "plan, amount_zar_cents, debit_day, next_billing_at, payfast_token",
+    )
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  const { data: profile } = await service
+    .from("profiles")
+    .select("member_reference, plan")
+    .eq("id", userId)
+    .maybeSingle();
+
+  const plan = String(sub?.plan || profile?.plan || "gls_55");
+  const monthlyCents =
+    Number(sub?.amount_zar_cents) > 0
+      ? Number(sub?.amount_zar_cents)
+      : plan === "gls_65"
+        ? 5500
+        : plan === "gls_75"
+          ? 6500
+          : 4500;
+  const feeCents = declineFeeCents(monthlyCents);
+  const dueCents = outstandingCents(monthlyCents);
+  const schedule = dunningSchedule();
+  const memberRef = profile?.member_reference || `GLS-${userId.slice(0, 8)}`;
+  const paymentReference = paymentReferenceFor(memberRef);
+
+  const { data: outstanding, error } = await service
+    .from("manual_payment_requests")
+    .insert({
+      user_id: userId,
+      member_reference: memberRef,
+      payment_reference: paymentReference,
+      plan,
+      amount_zar_cents: dueCents,
+      recurring_amount_cents: monthlyCents,
+      dunning_fee_cents: feeCents,
+      currency: "zar",
+      status: "pending",
+      payment_method: "payfast",
+      billing_kind: "outstanding",
+      debit_day: sub?.debit_day ?? null,
+      next_billing_at: sub?.next_billing_at ?? null,
+      payfast_token: token || sub?.payfast_token || null,
+      dunning_opened_at: schedule.openedAt.toISOString(),
+      dunning_remind3_at: schedule.remind3At.toISOString(),
+      dunning_pause_at: schedule.pauseAt.toISOString(),
+      dunning_parent_pf_payment_id: pfPaymentId || parentKey,
+      member_note: `Failed debit ${paymentStatus}; outstanding = plan + 3% fee`,
+      expires_at: new Date(
+        schedule.pauseAt.getTime() + 30 * 86_400_000,
+      ).toISOString(),
+    })
+    .select("id")
+    .single();
+
+  if (error || !outstanding) {
+    return;
+  }
+
+  const now = new Date().toISOString();
   await service
     .from("subscriptions")
     .update({
-      debit_status: "paused",
-      updated_at: new Date().toISOString(),
+      debit_status: "past_due",
+      updated_at: now,
     })
     .eq("user_id", userId);
 
-  await service.from("user_reminders").insert({
-    user_id: userId,
-    kind: "payment_failed",
-    title: "Debit order payment failed",
-    body:
-      "Your monthly GLS TV card debit did not succeed. Update your card or choose another payment method on Pricing to keep access.",
-    href: "/pricing",
-    severity: "urgent",
-    dedupe_key: `payfast-debit-failed-${pfPaymentId || mPaymentId || token}`,
-    created_by: "payfast-itn",
-    meta: { paymentStatus, pfPaymentId, mPaymentId, token },
-  });
+  await Promise.all([
+    service.from("manual_payment_events").insert({
+      payment_request_id: outstanding.id,
+      user_id: userId,
+      event_type: "debit_dunning_opened",
+      actor_email: "payfast-itn",
+      meta: {
+        pfPaymentId,
+        mPaymentId,
+        paymentStatus,
+        monthlyCents,
+        feeCents,
+        dueCents,
+        remind3At: schedule.remind3At.toISOString(),
+        pauseAt: schedule.pauseAt.toISOString(),
+      },
+    }),
+    service.from("user_reminders").insert({
+      user_id: userId,
+      kind: "payment_failed",
+      title: "Please pay this month’s outstanding",
+      body: `Your card debit did not go through. Please click here and pay ${formatZarFromCents(dueCents)} outstanding for this month (plan + 3% fee). Access stays on for 5 days.`,
+      href: `/pricing/pay/${outstanding.id}`,
+      severity: "urgent",
+      dedupe_key: `payfast-dunning-day0-${parentKey}`,
+      created_by: "payfast-itn",
+      meta: {
+        paymentStatus,
+        pfPaymentId,
+        mPaymentId,
+        token,
+        outstandingId: outstanding.id,
+        feeCents,
+        dueCents,
+      },
+    }),
+  ]);
 }
 
 /**
@@ -260,16 +367,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (paymentStatus !== "COMPLETE") {
-      if (token) {
-        await handleDebitFailure(
-          service,
-          openPayment.user_id,
-          token,
-          paymentStatus,
-          pfPaymentId,
-          mPaymentId,
-        );
-      }
+      // First checkout decline: leave pending; no dunning until an active debit exists.
       return new NextResponse("OK", { status: 200 });
     }
 

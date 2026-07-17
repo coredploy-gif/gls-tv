@@ -116,7 +116,7 @@ export async function GET(req: NextRequest) {
           ? service
               .from("subscriptions")
               .select(
-                "user_id, status, current_period_end, provider, plan, debit_day, next_billing_at, debit_status",
+                "user_id, status, current_period_end, provider, plan, debit_day, next_billing_at, debit_status, dunning_paused_at",
               )
               .in("user_id", ids)
           : Promise.resolve({ data: [] }),

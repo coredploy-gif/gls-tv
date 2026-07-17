@@ -121,3 +121,30 @@ export function buildDebitOrderQuote(input: {
     summary: `${formatZarFromCents(amountCents)} now (${coverDays || 1} day${(coverDays || 1) === 1 ? "" : "s"}) · then ${formatZarFromCents(input.monthlyCents)} on the ${debitDayLabel(input.debitDay)} every month`,
   };
 }
+
+/** Decline fee: 3% of monthly plan, min R0.01. */
+export const DEBIT_DECLINE_FEE_RATE = 0.03;
+export const DUNNING_REMIND_DAYS = 3;
+export const DUNNING_PAUSE_DAYS = 5;
+
+export function declineFeeCents(monthlyCents: number): number {
+  if (monthlyCents <= 0) return 0;
+  return Math.max(1, Math.round(monthlyCents * DEBIT_DECLINE_FEE_RATE));
+}
+
+/** Full month + 3% decline fee. */
+export function outstandingCents(monthlyCents: number): number {
+  if (monthlyCents <= 0) return 0;
+  return monthlyCents + declineFeeCents(monthlyCents);
+}
+
+export function dunningSchedule(from: Date = new Date()) {
+  const opened = new Date(from.getTime());
+  const remind3 = new Date(from.getTime() + DUNNING_REMIND_DAYS * 86_400_000);
+  const pause = new Date(from.getTime() + DUNNING_PAUSE_DAYS * 86_400_000);
+  return {
+    openedAt: opened,
+    remind3At: remind3,
+    pauseAt: pause,
+  };
+}

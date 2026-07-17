@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { GlsLogo } from "@/components/GlsLogo";
 import {
   buildDebitOrderQuote,
+  formatZarFromCents,
   PAYFAST_DEBIT_DAYS,
   type PayfastDebitDay,
 } from "@/lib/payfast-debit";
@@ -34,6 +35,8 @@ type Payment = {
   submitted_at: string | null;
   membership_ends_at: string | null;
   expires_at: string;
+  dunning_fee_cents?: number | null;
+  dunning_pause_at?: string | null;
 };
 
 type Settings = {
@@ -285,9 +288,12 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
   const showYoco = settings.yoco_enabled && settings.yoco_ready;
   const showEft = settings.eft_enabled;
   const displayCents =
-    method === "payfast" && debitQuote
-      ? debitQuote.amountCents
-      : payment.amount_zar_cents;
+    payment.billing_kind === "outstanding"
+      ? payment.amount_zar_cents
+      : method === "payfast" && debitQuote
+        ? debitQuote.amountCents
+        : payment.amount_zar_cents;
+  const isOutstanding = payment.billing_kind === "outstanding";
 
   return (
     <main className="min-h-screen bg-gls-black px-4 py-8 text-white sm:px-6">
@@ -489,6 +495,40 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
 
                   {method === "payfast" && showPayfast ? (
                     <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+                      {isOutstanding ? (
+                        <>
+                          <p className="font-semibold text-white">
+                            Pay outstanding for this month
+                          </p>
+                          <p className="mt-2 text-sm text-gls-body">
+                            Your monthly card debit did not succeed. Pay{" "}
+                            <span className="font-semibold text-white">
+                              {formatZarFromCents(payment.amount_zar_cents)}
+                            </span>{" "}
+                            now (plan
+                            {payment.dunning_fee_cents
+                              ? ` + ${formatZarFromCents(payment.dunning_fee_cents)} fee`
+                              : " + 3% fee"}
+                            ) to keep access. Access pauses on day 5 if still
+                            unpaid
+                            {payment.dunning_pause_at
+                              ? ` (${new Date(payment.dunning_pause_at).toLocaleDateString("en-ZA")})`
+                              : ""}
+                            .
+                          </p>
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => void startPayfast()}
+                            className="gls-cta mt-5 w-full rounded-md px-5 py-3 text-sm disabled:opacity-40"
+                          >
+                            {busy
+                              ? "Opening PayFast…"
+                              : "Click here and pay outstanding"}
+                          </button>
+                        </>
+                      ) : (
+                        <>
                       <p className="font-semibold text-white">
                         Monthly debit order via PayFast
                       </p>
@@ -550,6 +590,8 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                           ? "Opening PayFast…"
                           : "Add card & start debit order"}
                       </button>
+                        </>
+                      )}
                       <p className="mt-3 text-xs text-gls-muted">
                         Reference {payment.payment_reference} is attached
                         automatically. Status updates are in-app only for now.

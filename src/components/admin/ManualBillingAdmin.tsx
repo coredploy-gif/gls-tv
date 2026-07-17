@@ -21,6 +21,9 @@ type Payment = {
   billing_kind?: string | null;
   debit_day?: number | null;
   next_billing_at?: string | null;
+  dunning_fee_cents?: number | null;
+  dunning_pause_at?: string | null;
+  dunning_opened_at?: string | null;
   proof_reference: string | null;
   proof_note: string | null;
   external_transaction_id: string | null;
@@ -47,6 +50,7 @@ type Member = {
     debit_day?: number | null;
     next_billing_at?: string | null;
     debit_status?: string | null;
+    dunning_paused_at?: string | null;
   } | null;
 };
 
@@ -647,6 +651,12 @@ function PaymentsView({
                 {payment.billing_kind === "debit_order"
                   ? ` · debit${debitDayLabel(payment.debit_day) ? ` ${debitDayLabel(payment.debit_day)}` : ""}`
                   : ""}
+                {payment.billing_kind === "outstanding"
+                  ? ` · outstanding${payment.dunning_fee_cents ? ` (+${money(payment.dunning_fee_cents)} fee)` : " +3%"}`
+                  : ""}
+                {payment.billing_kind === "outstanding" && payment.dunning_pause_at
+                  ? ` · pause ${formatBillingDate(payment.dunning_pause_at)}`
+                  : ""}
                 {payment.next_billing_at
                   ? ` · next ${formatBillingDate(payment.next_billing_at)}`
                   : ""}
@@ -701,6 +711,18 @@ function PaymentsView({
                         : ""}
                       {selected.next_billing_at
                         ? ` · next ${formatBillingDate(selected.next_billing_at)}`
+                        : ""}
+                    </>
+                  )}
+                  {selected.billing_kind === "outstanding" && (
+                    <>
+                      {" "}
+                      · outstanding
+                      {selected.dunning_fee_cents
+                        ? ` · fee ${money(selected.dunning_fee_cents)}`
+                        : " · +3% fee"}
+                      {selected.dunning_pause_at
+                        ? ` · pause ${formatBillingDate(selected.dunning_pause_at)}`
                         : ""}
                     </>
                   )}
@@ -899,6 +921,9 @@ function MembersView({
                   {member.subscription?.debit_status &&
                   member.subscription.debit_status !== "active"
                     ? ` · ${member.subscription.debit_status}`
+                    : ""}
+                  {member.subscription?.dunning_paused_at
+                    ? ` · paused ${formatBillingDate(member.subscription.dunning_paused_at)}`
                     : ""}
                 </p>
               </div>
