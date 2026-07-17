@@ -185,6 +185,7 @@ const VIMEO_RE = /(?:vimeo\.com\/)(\d+)/i;
 /** Path/query extensions we map into player formats (m4v/mov → native mp4 path). */
 const EXT_FORMAT: Record<string, MediaLinkFormat> = {
   m3u8: "hls",
+  m3u: "hls",
   mp4: "mp4",
   m4v: "mp4",
   mov: "mp4",
@@ -377,7 +378,7 @@ export function detectPlayableFormat(url: string): MediaLinkFormat | null {
   if (fromPath) return fromPath;
 
   // Legacy full-string check (covers odd encodings); same ext set.
-  if (/\.m3u8(\?|#|$)/i.test(url)) return "hls";
+  if (/\.m3u8?(\?|#|$)/i.test(url)) return "hls";
   if (/\.webm(\?|#|$)/i.test(url)) return "webm";
   if (/\.(mp4|m4v|mov)(\?|#|$)/i.test(url)) return "mp4";
 
@@ -412,7 +413,7 @@ export function titleFromMediaUrl(url: string, format: MediaLinkFormat): string 
       new URL(url).pathname.split("/").filter(Boolean).pop() || "stream";
     return (
       leaf
-        .replace(/\.(m3u8|mp4|m4v|mov|webm)$/i, "")
+        .replace(/\.(m3u8?|mp4|m4v|mov|webm)$/i, "")
         .replace(/[+_-]+/g, " ")
         .trim()
         .slice(0, 80) || "Imported link"
@@ -558,13 +559,67 @@ export function isTrustedAppMediaUrl(
   }
 }
 
+/**
+ * Browser-safe literal host check (no DNS). Blocks private/reserved IP literals
+ * and localhost; DNS rebinding is still handled server-side by validatePublicUrl.
+ * Same-app `/media/…` on loopback stays allowed via {@link isTrustedAppMediaUrl}.
+ */
+export function isBlockedMediaLinkHostname(hostname: string): boolean {
+  const host = hostname
+    .toLowerCase()
+    .replace(/\.$/, "")
+    .replace(/^\[|\]$/g, "");
+  if (!host) return true;
+  if (
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    host.endsWith(".local")
+  ) {
+    return true;
+  }
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(host)) {
+    const parts = host.split(".").map(Number);
+    if (parts.length !== 4 || parts.some((p) => Number.isNaN(p) || p > 255)) {
+      return true;
+    }
+    const [a, b] = parts as [number, number, number, number];
+    if (a === 0 || a === 10 || a === 127) return true;
+    if (a === 169 && b === 254) return true;
+    if (a === 192 && b === 168) return true;
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    if (a === 100 && b >= 64 && b <= 127) return true;
+    if (a === 192 && b === 0 && (parts[2] === 0 || parts[2] === 2)) return true;
+    if (a === 198 && (b === 18 || b === 19 || (b === 51 && parts[2] === 100))) {
+      return true;
+    }
+    if (a === 203 && b === 0 && parts[2] === 113) return true;
+    if (a >= 224) return true;
+    return false;
+  }
+  if (host.includes(":")) {
+    if (host === "::" || host === "::1") return true;
+    if (
+      host.startsWith("fc") ||
+      host.startsWith("fd") ||
+      /^fe[89ab]/i.test(host) ||
+      host.startsWith("ff") ||
+      host.startsWith("2001:db8:")
+    ) {
+      return true;
+    }
+    const mapped = host.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
+    return mapped ? isBlockedMediaLinkHostname(mapped[1]!) : false;
+  }
+  return false;
+}
+
 export function validateMediaLinkUrl(
   raw: string,
   preferredTitle?: string,
 ): MediaLinkValidation {
   const url = raw.trim();
   if (!url) {
-    return { ok: false, error: "Paste an HTTPS media URL." };
+    return { ok: false, error: "Paste an http(s) media URL." };
   }
   let parsed: URL;
   try {
@@ -575,6 +630,16 @@ export function validateMediaLinkUrl(
   if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
     return { ok: false, error: "Only http(s) links are supported." };
   }
+  if (
+    isBlockedMediaLinkHostname(parsed.hostname) &&
+    !isTrustedAppMediaUrl(url)
+  ) {
+    return {
+      ok: false,
+      error:
+        "Private or local network addresses can’t be saved. Use a public http(s) URL.",
+    };
+  }
 
   const format = detectPlayableFormat(url);
   if (!format) {
@@ -582,7 +647,7 @@ export function validateMediaLinkUrl(
       return {
         ok: false,
         error:
-          "Supported: .m3u8 (HLS), .mp4 / .m4v / .mov, .webm, YouTube, Vimeo, or eVOD (watch.evod.co.za). Extensionless links are OK if the server returns video/*.",
+          "Supported: .m3u / .m3u8 (HLS), .mp4 / .m4v / .mov, .webm, YouTube, Vimeo, or eVOD (watch.evod.co.za). Extensionless links are OK if the server returns video/*.",
       };
     }
     // No extension / hint — provisional MP4; server probe must confirm video.
@@ -621,7 +686,7 @@ export const MEDIA_FORMAT_META: Record<
 > = {
   hls: {
     label: "HLS live",
-    hint: "jmp2 / Pluto / Roku .m3u8 streams",
+    hint: "Any public .m3u / .m3u8 (http IP OK; owned relay skips catalogue allowlist)",
     accent: "#5ee29a",
   },
   youtube: {

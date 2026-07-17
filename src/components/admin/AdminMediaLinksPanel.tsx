@@ -197,7 +197,7 @@ export function AdminMediaLinksPanel() {
             setPreview(null);
           }}
           required
-          placeholder="https://jmp2.uk/rok-….m3u8"
+          placeholder="https://…/index.m3u8 (any public host; http IP OK)"
           className="gls-admin-input sm:col-span-2"
         />
         <input

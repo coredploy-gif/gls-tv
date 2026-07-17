@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   isAllowedMediaHost,
+  isIndividualPlaylistUrl,
   isLikelySingleStreamHlsUrl,
   isPublicIpHostname,
 } from "./media-hosts";
@@ -34,6 +35,29 @@ describe("isPublicIpHostname", () => {
   it("rejects non-IP hostnames", () => {
     expect(isPublicIpHostname("jmp2.uk")).toBe(false);
     expect(isPublicIpHostname("example.com")).toBe(false);
+  });
+});
+
+describe("isIndividualPlaylistUrl", () => {
+  it("accepts public-IP and arbitrary-hostname .m3u8 / .m3u paths", () => {
+    expect(
+      isIndividualPlaylistUrl("http://40.160.24.55/TSN_5/index.m3u8"),
+    ).toBe(true);
+    expect(
+      isIndividualPlaylistUrl(
+        "https://cdn.random-public.example/live/master.m3u8?token=1",
+      ),
+    ).toBe(true);
+    expect(
+      isIndividualPlaylistUrl("https://lists.example.org/channels.m3u"),
+    ).toBe(true);
+  });
+
+  it("rejects non-playlist paths", () => {
+    expect(isIndividualPlaylistUrl("https://cdn.example/clip.mp4")).toBe(
+      false,
+    );
+    expect(isIndividualPlaylistUrl("not-a-url")).toBe(false);
   });
 });
 

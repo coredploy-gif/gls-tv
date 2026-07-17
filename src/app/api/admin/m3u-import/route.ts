@@ -6,8 +6,7 @@ import { secureFetchBuffered, validatePublicUrl } from "@/lib/secure-url";
 import { writeAuditLog } from "@/lib/admin/audit";
 import {
   isAllowedMediaHost,
-  isLikelySingleStreamHlsUrl,
-  isPublicIpHostname,
+  isIndividualPlaylistUrl,
 } from "@/lib/media-hosts";
 import {
   getAdminAccess,
@@ -26,18 +25,15 @@ const DEFAULT_SOURCE_HOSTS = [
   "githubusercontent.com",
 ];
 
-function allowedSource(hostname: string) {
+/** Multi-channel list hosts only — individual .m3u/.m3u8 skip this via fetchAndParse. */
+function allowedListSource(hostname: string) {
   const configured = (process.env.GLS_ADMIN_M3U_ALLOWED_HOSTS || "")
     .split(",")
     .map((host) => host.trim().toLowerCase())
     .filter(Boolean);
-  const listHost = [...DEFAULT_SOURCE_HOSTS, ...configured].some(
+  return [...DEFAULT_SOURCE_HOSTS, ...configured].some(
     (host) => hostname === host || hostname.endsWith(`.${host}`),
   );
-  // Single-stream HLS (jmp2 → Roku, Pluto, public-IP .m3u8) uses media CDN
-  // allowlist or public IP literals; multi-channel M3U lists stay on GitHub /
-  // configured list hosts. Private/reserved IPs remain blocked by validatePublicUrl.
-  return listHost || isAllowedMediaHost(hostname) || isPublicIpHostname(hostname);
 }
 
 function signingKey() {
@@ -78,16 +74,16 @@ async function gate() {
 }
 
 async function fetchAndParse(url: string) {
-  // Single .m3u8 streams (incl. public-IP HLS): skip catalogue host allowlist
-  // like owned mediaLinkId plays — validatePublicUrl still blocks SSRF targets.
-  // Multi-channel .m3u lists keep the source-host allowlist.
-  const singleHls = isLikelySingleStreamHlsUrl(url);
+  // Individual .m3u / .m3u8 (any public host, incl. public-IP HTTP): skip catalogue
+  // host allowlist like owned mediaLinkId plays — validatePublicUrl still blocks SSRF.
+  // Non-playlist URLs (if any) keep the GitHub / configured list-host allowlist.
+  const individualPlaylist = isIndividualPlaylistUrl(url);
   const fetched = await secureFetchBuffered(url, {
     maxBytes: 4 * 1024 * 1024,
     timeoutMs: 20_000,
     // jmp2.uk → aka-live*.delivery.roku.com (and similar FAST chains)
     maxRedirects: 5,
-    allowedHost: singleHls ? undefined : allowedSource,
+    allowedHost: individualPlaylist ? undefined : allowedListSource,
     headers: {
       Accept: "application/vnd.apple.mpegurl,audio/x-mpegurl,text/plain,*/*",
       "User-Agent": "GLS-TV/1.0 (admin-m3u-preview)",
@@ -153,9 +149,18 @@ export async function POST(req: Request) {
           ? "Single HLS stream. Prefer Save as Staff picks (My Links) for members — catalog publish maps to licensed tiles and needs MFA (AAL2)."
           : "Preview only. Catalog publish maps selections to existing licensed catalog slugs (requires catalog permission + MFA). For individual member streams, use Save as Staff picks instead.",
       });
-    } catch {
+    } catch (cause) {
+      const detail =
+        cause instanceof Error && cause.message
+          ? cause.message
+          : "Source is unavailable";
+      const playlist = isIndividualPlaylistUrl(url);
       return NextResponse.json(
-        { error: "Source is unavailable or not on the approved host list" },
+        {
+          error: playlist
+            ? `Could not preview playlist (${detail}). Private/reserved IPs are blocked; the URL must return #EXTM3U.`
+            : `Source is unavailable or not on the approved list-host allowlist (${detail}).`,
+        },
         { status: 400 },
       );
     }

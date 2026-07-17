@@ -131,16 +131,16 @@ export function AdminM3uImport() {
   return (
     <section className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-white">Import approved M3U / HLS</h2>
+        <h2 className="text-lg font-semibold text-white">Import M3U / HLS</h2>
         <p className="mt-1 text-sm text-gls-muted">
           Preview never publishes. For{" "}
           <strong className="text-white/80">individual</strong> streams members
-          should use (jmp2, public-IP HLS, etc.), prefer{" "}
+          should use (any public .m3u8, http IP OK), prefer{" "}
           <strong className="text-white/80">Save as Staff picks</strong> — same
           path as Staff media picks above (My Links), no catalog MFA.{" "}
           <strong className="text-white/80">Publish mapped streams</strong> is
           only for the licensed catalog (map to existing slugs; needs catalog
-          permission + verified MFA).
+          permission + verified MFA; stream hosts stay allowlisted).
         </p>
       </div>
       <div className="flex gap-2">
@@ -148,7 +148,7 @@ export function AdminM3uImport() {
           type="url"
           value={url}
           onChange={(event) => setUrl(event.target.value)}
-          placeholder="https://…m3u8 or approved .m3u list (http public-IP HLS OK)"
+          placeholder="https://…/stream.m3u8 or allowlisted .m3u list (http public-IP OK)"
           className="gls-admin-input flex-1"
         />
         <button

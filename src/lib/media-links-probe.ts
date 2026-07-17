@@ -215,6 +215,7 @@ export async function probeMediaLinkReachability(
     const result = await secureFetchBuffered(url, {
       maxBytes: format === "hls" || provisional ? 64_000 : 8_192,
       timeoutMs: 10_000,
+      maxRedirects: 5,
       headers: {
         "User-Agent": "GLS-TV/1.0 media-link-probe",
         Accept: "*/*",

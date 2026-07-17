@@ -58,6 +58,38 @@ describe("media-links", () => {
     expect(v.title).toBe("TSN 5");
   });
 
+  it("accepts arbitrary public hostname .m3u8 without catalogue allowlist", () => {
+    const url = "https://cdn.random-public.example/live/index.m3u8";
+    expect(detectPlayableFormat(url)).toBe("hls");
+    const v = validateMediaLinkUrl(url, "Random HLS");
+    expect(v.ok).toBe(true);
+    expect(v.format).toBe("hls");
+  });
+
+  it("accepts .m3u playlist paths as HLS for individual links", () => {
+    const url = "https://lists.example.org/pack/channels.m3u";
+    expect(detectPlayableFormat(url)).toBe("hls");
+    const v = validateMediaLinkUrl(url, "Pack");
+    expect(v.ok).toBe(true);
+    expect(v.format).toBe("hls");
+  });
+
+  it("rejects private and loopback IP literals on the individual path", () => {
+    expect(validateMediaLinkUrl("http://10.0.0.5/secret.m3u8").ok).toBe(false);
+    expect(validateMediaLinkUrl("http://127.0.0.1/live/index.m3u8").ok).toBe(
+      false,
+    );
+    expect(validateMediaLinkUrl("http://192.168.1.10/a.m3u8").ok).toBe(false);
+  });
+
+  it("still allows trusted same-app /media/ on loopback", () => {
+    const v = validateMediaLinkUrl(
+      "http://127.0.0.1:3010/media/sample.mp4",
+    );
+    expect(v.ok).toBe(true);
+    expect(v.format).toBe("mp4");
+  });
+
   it("detects YouTube and builds embed", () => {
     const v = validateMediaLinkUrl(
       "https://www.youtube.com/watch?v=dQw4w9WgXcQ",

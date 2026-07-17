@@ -67,4 +67,15 @@ describe("media-links-probe trusted app media", () => {
     expect(probe.ok).toBe(false);
     expect(probe.detail).toMatch(/Private or reserved network targets are blocked/);
   });
+
+  it("rejects loopback HLS that is not trusted app media", async () => {
+    const probe = await probeMediaLinkReachability(
+      "http://127.0.0.1/live/index.m3u8",
+      "hls",
+    );
+    expect(probe.ok).toBe(false);
+    expect(probe.detail).toMatch(
+      /Private or reserved|Host is not allowed|localhost/i,
+    );
+  });
 });

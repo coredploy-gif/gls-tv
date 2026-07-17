@@ -478,7 +478,7 @@ export function MediaLibrary() {
                 onChange={(e) => setUrl(e.target.value)}
                 required
                 type="url"
-                placeholder="https://jmp2.uk/rok-….m3u8 or YouTube / MP4"
+                placeholder="https://…/index.m3u8 or YouTube / MP4 (http public IP OK)"
                 className="w-full rounded-xl border-2 border-white/20 bg-black/50 px-4 py-3.5 text-base text-white outline-none placeholder:text-white/35 focus:border-gls-red"
               />
             </label>
@@ -822,7 +822,7 @@ export function MediaLibrary() {
               <p className="mt-2 text-sm text-gls-muted">
                 {categoryFilter
                   ? `Nothing in ${categoryFilter} yet — add a link and pick that folder.`
-                  : "Paste a jmp2 .m3u8, YouTube URL, or MP4 above to start."}
+                  : "Paste a public .m3u8, YouTube URL, or MP4 above to start."}
               </p>
             </div>
           ) : categoryFilter ? (
