@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type CSSProperties } from "react";
 import { GlsLogo } from "./GlsLogo";
 import { ProfileAvatarMenu } from "@/components/ProfileAvatarMenu";
+import { HeaderRefreshButton } from "@/components/HeaderRefreshButton";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { BROWSE_NAV } from "@/lib/nav-theme";
@@ -123,6 +124,7 @@ export function BrowseNav() {
           </Link>
           <NotificationBell />
           <ProfileAvatarMenu />
+          <HeaderRefreshButton />
         </div>
       </div>
       <nav className="flex gap-4 overflow-x-auto px-4 pb-3 lg:hidden" aria-label="Browse categories">
