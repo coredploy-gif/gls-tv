@@ -18,6 +18,9 @@ type Payment = {
   amount_zar_cents: number;
   payment_method: string;
   status: string;
+  billing_kind?: string | null;
+  debit_day?: number | null;
+  next_billing_at?: string | null;
   proof_reference: string | null;
   proof_note: string | null;
   external_transaction_id: string | null;
@@ -41,6 +44,9 @@ type Member = {
     current_period_end: string | null;
     provider: string;
     plan: string;
+    debit_day?: number | null;
+    next_billing_at?: string | null;
+    debit_status?: string | null;
   } | null;
 };
 
@@ -144,6 +150,20 @@ function money(cents: number) {
 
 function planLabel(plan: string) {
   return GLS_PLANS.find((p) => p.id === plan)?.name || plan;
+}
+
+function debitDayLabel(day: number | null | undefined) {
+  if (day === 1) return "1st";
+  if (day === 15) return "15th";
+  if (day === 30) return "30th";
+  return null;
+}
+
+function formatBillingDate(value: string | null | undefined) {
+  if (!value) return null;
+  const parsed = new Date(`${value}T12:00:00`);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString("en-ZA");
 }
 
 export function ManualBillingAdmin({
@@ -624,6 +644,12 @@ function PaymentsView({
               <p className="mt-1 truncate text-xs text-gls-muted">
                 {payment.email || payment.display_name || payment.user_id} ·{" "}
                 {planLabel(payment.plan)} · {payment.payment_method}
+                {payment.billing_kind === "debit_order"
+                  ? ` · debit${debitDayLabel(payment.debit_day) ? ` ${debitDayLabel(payment.debit_day)}` : ""}`
+                  : ""}
+                {payment.next_billing_at
+                  ? ` · next ${formatBillingDate(payment.next_billing_at)}`
+                  : ""}
                 {payment.proof_reference
                   ? ` · proof ${payment.proof_reference}`
                   : ""}
@@ -666,6 +692,18 @@ function PaymentsView({
                 <p className="mt-1 text-xs text-gls-muted">
                   {selected.member_reference} · {planLabel(selected.plan)} ·{" "}
                   {money(selected.amount_zar_cents)}
+                  {selected.billing_kind === "debit_order" && (
+                    <>
+                      {" "}
+                      · debit order
+                      {debitDayLabel(selected.debit_day)
+                        ? ` · day ${debitDayLabel(selected.debit_day)}`
+                        : ""}
+                      {selected.next_billing_at
+                        ? ` · next ${formatBillingDate(selected.next_billing_at)}`
+                        : ""}
+                    </>
+                  )}
                 </p>
               </div>
               <span
@@ -818,6 +856,10 @@ function MembersView({
       <div className="mt-5 space-y-2">
         {members.map((member) => {
           const activeUntil = member.subscription?.current_period_end;
+          const nextDebit =
+            member.subscription?.next_billing_at ||
+            null;
+          const debitDay = member.subscription?.debit_day;
           const active =
             member.is_premium && member.subscription?.status === "active";
           return (
@@ -847,6 +889,16 @@ function MembersView({
                   {planLabel(member.plan)} · {member.subscription?.provider || "no provider"}
                   {activeUntil
                     ? ` · ends ${new Date(activeUntil).toLocaleDateString("en-ZA")}`
+                    : ""}
+                  {debitDayLabel(debitDay)
+                    ? ` · debit ${debitDayLabel(debitDay)}`
+                    : ""}
+                  {nextDebit
+                    ? ` · next debit ${formatBillingDate(nextDebit)}`
+                    : ""}
+                  {member.subscription?.debit_status &&
+                  member.subscription.debit_status !== "active"
+                    ? ` · ${member.subscription.debit_status}`
                     : ""}
                 </p>
               </div>

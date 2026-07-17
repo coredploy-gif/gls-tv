@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
   const q = (req.nextUrl.searchParams.get("q") || "").trim().toLowerCase();
   const status = req.nextUrl.searchParams.get("status") || "all";
 
-  if (view === "queue") {
+  if (view === "queue" || view === "payments") {
     let query = service
       .from("manual_payment_requests")
       .select("*")
@@ -115,7 +115,9 @@ export async function GET(req: NextRequest) {
         ids.length
           ? service
               .from("subscriptions")
-              .select("user_id, status, current_period_end, provider, plan")
+              .select(
+                "user_id, status, current_period_end, provider, plan, debit_day, next_billing_at, debit_status",
+              )
               .in("user_id", ids)
           : Promise.resolve({ data: [] }),
         ids.length

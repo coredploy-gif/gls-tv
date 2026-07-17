@@ -110,6 +110,10 @@ export function buildPayfastCheckout(input: {
   nameFirst?: string | null;
   nameLast?: string | null;
   origin?: string | null;
+  subscription?: {
+    billingDateIso: string;
+    recurringAmountCents: number;
+  };
 }): { actionUrl: string; fields: PayfastCheckoutFields } | null {
   if (!payfastConfigured()) return null;
   const { merchantId, merchantKey, passphrase } = payfastCredentials();
@@ -131,6 +135,15 @@ export function buildPayfastCheckout(input: {
   fields.m_payment_id = input.paymentReference.slice(0, 100);
   fields.amount = amount;
   fields.item_name = input.itemName.slice(0, 100);
+  if (input.subscription) {
+    fields.subscription_type = "1";
+    fields.billing_date = input.subscription.billingDateIso;
+    fields.recurring_amount = (
+      input.subscription.recurringAmountCents / 100
+    ).toFixed(2);
+    fields.frequency = "3";
+    fields.cycles = "0";
+  }
   fields.signature = generatePayfastSignature(fields, passphrase || null);
   return { actionUrl: payfastProcessUrl(), fields };
 }

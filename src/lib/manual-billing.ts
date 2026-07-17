@@ -238,3 +238,30 @@ export async function activateManualPayment(input: {
   };
   return { ok: true as const, ...result };
 }
+
+export async function renewPayfastDebit(input: {
+  service: SupabaseClient;
+  userId: string;
+  pfPaymentId: string;
+  token?: string | null;
+  amountCents: number;
+  adminEmail?: string;
+}) {
+  const { data, error } = await input.service.rpc("renew_payfast_debit", {
+    p_user_id: input.userId,
+    p_pf_payment_id: input.pfPaymentId.trim(),
+    p_token: input.token?.trim() || null,
+    p_amount_cents: input.amountCents,
+    p_admin_email: input.adminEmail || "payfast-itn",
+  });
+  if (error || !data) {
+    return { ok: false as const, error: error?.message || "Renewal failed" };
+  }
+  const result = data as {
+    alreadyProcessed: boolean;
+    payment: Record<string, unknown>;
+    receipt: Record<string, unknown>;
+    subscription?: Record<string, unknown>;
+  };
+  return { ok: true as const, ...result };
+}

@@ -13,6 +13,12 @@ import {
   yocoConfigured,
   type ManualPaymentMethod,
 } from "@/lib/manual-billing";
+import {
+  buildDebitOrderQuote,
+  debitDayLabel,
+  parsePayfastDebitDay,
+  type PayfastDebitDay,
+} from "@/lib/payfast-debit";
 import { buildPayfastCheckout } from "@/lib/payfast";
 import { isFeatureEnabled } from "@/lib/operations/feature-flags";
 
@@ -35,6 +41,17 @@ function yocoReady(settings: { yoco_enabled: boolean }) {
   return settings.yoco_enabled && yocoConfigured();
 }
 
+function payfastItemName(
+  settings: { trading_name: string },
+  plan: string,
+  billingKind: string,
+) {
+  if (billingKind === "debit_order") {
+    return `${settings.trading_name} ${plan} · monthly debit`;
+  }
+  return `${settings.trading_name} ${plan} · 30 days`;
+}
+
 function checkoutPayload(
   payment: Record<string, unknown>,
   settings: Awaited<ReturnType<typeof getManualPaymentSettings>>,
@@ -49,16 +66,40 @@ function checkoutPayload(
   ) {
     return null;
   }
+  const billingKind = String(payment.billing_kind || "once");
+  const plan = String(payment.plan);
+  const subscription =
+    billingKind === "debit_order" &&
+    payment.recurring_amount_cents != null &&
+    payment.next_billing_at
+      ? {
+          billingDateIso: String(payment.next_billing_at).slice(0, 10),
+          recurringAmountCents: Number(payment.recurring_amount_cents) || 0,
+        }
+      : undefined;
   return buildPayfastCheckout({
     paymentId: String(payment.id),
     paymentReference: String(payment.payment_reference),
     amountCents: Number(payment.amount_zar_cents) || 0,
-    itemName: `${settings.trading_name} ${String(payment.plan)} · 30 days`,
+    itemName: payfastItemName(settings, plan, billingKind),
     email: member.email,
     nameFirst: member.displayName?.split(/\s+/)[0] || null,
     nameLast: member.displayName?.split(/\s+/).slice(1).join(" ") || null,
     origin,
+    subscription,
   });
+}
+
+function debitOrderFields(plan: string, debitDay: PayfastDebitDay) {
+  const monthlyCents = manualPlanCents(plan);
+  const quote = buildDebitOrderQuote({ monthlyCents, debitDay });
+  return {
+    billing_kind: "debit_order" as const,
+    debit_day: debitDay,
+    recurring_amount_cents: monthlyCents,
+    amount_zar_cents: quote.amountCents,
+    next_billing_at: quote.billingDateIso,
+  };
 }
 
 export async function GET(req: NextRequest) {
@@ -153,7 +194,7 @@ export async function POST(req: NextRequest) {
     const member = await ensureMemberReference(service, user);
     const settings = await getManualPaymentSettings(service);
     const paymentReference = paymentReferenceFor(member.memberReference);
-    const amountCents = manualPlanCents(plan);
+    const monthlyCents = manualPlanCents(plan);
     const requestedMethod = String(
       body.paymentMethod || "unselected",
     ) as ManualPaymentMethod;
@@ -169,19 +210,44 @@ export async function POST(req: NextRequest) {
       ? requestedMethod
       : "unselected";
 
+    const debitDay = parsePayfastDebitDay(body.debitDay);
+    const isPayfastDebit =
+      paymentMethod === "payfast" ||
+      (paymentMethod === "unselected" && payfastReady(settings));
+    const isEftOnce = paymentMethod === "eft";
+
+    if (paymentMethod === "payfast" && !debitDay) {
+      return NextResponse.json(
+        { error: "Choose a debit day (1, 15, or 30) for PayFast" },
+        { status: 400 },
+      );
+    }
+
+    const insertRow: Record<string, unknown> = {
+      user_id: user.id,
+      member_reference: member.memberReference,
+      payment_reference: paymentReference,
+      plan,
+      amount_zar_cents: monthlyCents,
+      payment_method: paymentMethod,
+      status: "pending",
+      billing_kind: "once",
+      member_note:
+        body.memberNote != null ? String(body.memberNote).slice(0, 500) : null,
+    };
+
+    if (isEftOnce) {
+      insertRow.billing_kind = "once";
+      insertRow.amount_zar_cents = monthlyCents;
+    } else if (isPayfastDebit && debitDay) {
+      Object.assign(insertRow, debitOrderFields(plan, debitDay));
+      insertRow.payment_method =
+        paymentMethod === "unselected" ? "payfast" : paymentMethod;
+    }
+
     const { data: payment, error } = await service
       .from("manual_payment_requests")
-      .insert({
-        user_id: user.id,
-        member_reference: member.memberReference,
-        payment_reference: paymentReference,
-        plan,
-        amount_zar_cents: amountCents,
-        payment_method: paymentMethod,
-        status: "pending",
-        member_note:
-          body.memberNote != null ? String(body.memberNote).slice(0, 500) : null,
-      })
+      .insert(insertRow)
       .select("*")
       .single();
     if (error)
@@ -202,7 +268,7 @@ export async function POST(req: NextRequest) {
     if (preferYoco) {
       try {
         const link = await createYocoPaymentLink({
-          amountCents,
+          amountCents: monthlyCents,
           paymentReference,
           orderId: payment.id,
           description: `${settings.trading_name} ${plan} · 30 days`,
@@ -247,12 +313,12 @@ export async function POST(req: NextRequest) {
         user_id: user.id,
         event_type: "payment_request_created",
         actor_email: user.email,
-        meta: { plan, amountCents, method: current.payment_method },
+        meta: { plan, amountCents: current.amount_zar_cents, method: current.payment_method },
       }),
       service.from("billing_events").insert({
         event_type: "manual_payment_requested",
         user_id: user.id,
-        amount_zar_cents: amountCents,
+        amount_zar_cents: current.amount_zar_cents,
         payload: {
           paymentId: payment.id,
           paymentReference,
@@ -310,13 +376,24 @@ export async function POST(req: NextRequest) {
         { status: 409 },
       );
     }
+    const debitDay =
+      parsePayfastDebitDay(body.debitDay) ??
+      parsePayfastDebitDay(payment.debit_day);
+    if (!debitDay) {
+      return NextResponse.json(
+        { error: "Choose a debit day (1, 15, or 30) for PayFast" },
+        { status: 400 },
+      );
+    }
     const member = await ensureMemberReference(service, user);
     const now = new Date().toISOString();
+    const debitFields = debitOrderFields(String(payment.plan), debitDay);
     const { data: updated, error } = await service
       .from("manual_payment_requests")
       .update({
         payment_method: "payfast",
         status: payment.status === "pending" ? "verifying" : payment.status,
+        ...debitFields,
         updated_at: now,
       })
       .eq("id", paymentId)
@@ -326,16 +403,7 @@ export async function POST(req: NextRequest) {
     if (error)
       return NextResponse.json({ error: error.message }, { status: 500 });
 
-    const payfast = buildPayfastCheckout({
-      paymentId,
-      paymentReference: payment.payment_reference,
-      amountCents: payment.amount_zar_cents,
-      itemName: `${settings.trading_name} ${payment.plan} · 30 days`,
-      email: member.email,
-      nameFirst: member.displayName?.split(/\s+/)[0] || null,
-      nameLast: member.displayName?.split(/\s+/).slice(1).join(" ") || null,
-      origin,
-    });
+    const payfast = checkoutPayload(updated, settings, member, origin);
     if (!payfast) {
       return NextResponse.json(
         { error: "PayFast is not configured" },
@@ -349,12 +417,13 @@ export async function POST(req: NextRequest) {
         user_id: user.id,
         event_type: "payfast_checkout_started",
         actor_email: user.email,
+        meta: { debitDay, billingKind: "debit_order" },
       }),
       service.from("user_reminders").insert({
         user_id: user.id,
         kind: "system",
-        title: "Payment verifying",
-        body: `Complete card payment on PayFast for ${payment.payment_reference}. Status updates appear in your account notifications (no email until Resend is set up).`,
+        title: "Debit order setup",
+        body: `Complete card setup on PayFast for ${payment.payment_reference}. Your monthly debit continues on the ${debitDayLabel(debitDay)}.`,
         href: `/pricing/pay/${paymentId}`,
         severity: "info",
         dedupe_key: `payfast-started-${paymentId}`,

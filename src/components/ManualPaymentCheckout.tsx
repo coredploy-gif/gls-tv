@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { GlsLogo } from "@/components/GlsLogo";
+import {
+  buildDebitOrderQuote,
+  PAYFAST_DEBIT_DAYS,
+  type PayfastDebitDay,
+} from "@/lib/payfast-debit";
 
 type PayfastCheckout = {
   actionUrl: string;
@@ -17,6 +22,9 @@ type Payment = {
   payment_reference: string;
   plan: string;
   amount_zar_cents: number;
+  recurring_amount_cents: number | null;
+  billing_kind: string;
+  debit_day: number | null;
   payment_method: string;
   status: string;
   yoco_payment_url: string | null;
@@ -76,12 +84,15 @@ function statusLabel(status: string) {
 function defaultMethod(settings: Settings, payment: Payment): CheckoutMethod {
   if (payment.payment_method === "eft") return "eft";
   if (payment.payment_method === "yoco" && settings.yoco_ready) return "yoco";
+  if (settings.payfast_ready) return "payfast";
   if (payment.payment_method === "payfast" && settings.payfast_ready)
     return "payfast";
-  if (settings.payfast_ready && !settings.yoco_ready) return "payfast";
   if (settings.yoco_ready) return "yoco";
-  if (settings.payfast_ready) return "payfast";
   return "eft";
+}
+
+function monthlyCentsForPayment(payment: Payment) {
+  return payment.recurring_amount_cents ?? payment.amount_zar_cents;
 }
 
 function postToPayfast(checkout: PayfastCheckout) {
@@ -107,6 +118,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [method, setMethod] = useState<CheckoutMethod>("eft");
+  const [debitDay, setDebitDay] = useState<PayfastDebitDay>(15);
   const [proofReference, setProofReference] = useState("");
   const [proofNote, setProofNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -129,6 +141,12 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
     setSettings(nextSettings);
     setReceipts(json.receipts || []);
     if (nextPayment && nextSettings) {
+      if (
+        nextPayment.debit_day &&
+        PAYFAST_DEBIT_DAYS.includes(nextPayment.debit_day as PayfastDebitDay)
+      ) {
+        setDebitDay(nextPayment.debit_day as PayfastDebitDay);
+      }
       setMethod((prev) => {
         if (
           (prev === "payfast" && nextSettings.payfast_ready) ||
@@ -175,6 +193,14 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
     setTimeout(() => setCopied(null), 1400);
   };
 
+  const debitQuote = useMemo(() => {
+    if (!payment) return null;
+    return buildDebitOrderQuote({
+      monthlyCents: monthlyCentsForPayment(payment),
+      debitDay,
+    });
+  }, [payment, debitDay]);
+
   const startPayfast = async () => {
     if (!payment) return;
     setBusy(true);
@@ -183,7 +209,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
     const res = await fetch("/api/billing/manual", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "start_payfast", paymentId }),
+      body: JSON.stringify({ action: "start_payfast", paymentId, debitDay }),
     });
     const json = await res.json();
     if (!res.ok || !json.payfast) {
@@ -258,6 +284,10 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
   const showPayfast = settings.payfast_ready;
   const showYoco = settings.yoco_enabled && settings.yoco_ready;
   const showEft = settings.eft_enabled;
+  const displayCents =
+    method === "payfast" && debitQuote
+      ? debitQuote.amountCents
+      : payment.amount_zar_cents;
 
   return (
     <main className="min-h-screen bg-gls-black px-4 py-8 text-white sm:px-6">
@@ -283,7 +313,9 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                     {planName(payment.plan)}
                   </h1>
                   <p className="mt-1 text-sm text-gls-muted">
-                    No automatic debit · renew when you choose
+                    {method === "payfast" && showPayfast
+                      ? "Monthly debit order · cancel anytime in account"
+                      : "No automatic debit · renew when you choose"}
                   </p>
                   <p className="mt-2 text-xs text-gls-muted">
                     By paying, you accept the{" "}
@@ -302,7 +334,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                   </p>
                 </div>
                 <p className="gls-display text-5xl text-gls-pink-soft">
-                  R{(payment.amount_zar_cents / 100).toFixed(0)}
+                  R{(displayCents / 100).toFixed(2)}
                 </p>
               </div>
 
@@ -423,7 +455,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                             : "text-gls-muted hover:text-white"
                         }`}
                       >
-                        Card (PayFast)
+                        Card (PayFast debit)
                       </button>
                     )}
                     {showYoco && (
@@ -458,13 +490,53 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                   {method === "payfast" && showPayfast ? (
                     <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-5">
                       <p className="font-semibold text-white">
-                        Pay with card via PayFast
+                        Monthly debit order via PayFast
                       </p>
-                      <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-gls-body">
-                        <li>Tap pay — you leave GLS for PayFast’s secure page.</li>
-                        <li>Complete the card payment, then return here.</li>
+                      <p className="mt-2 text-sm text-gls-body">
+                        Choose the day each month your card is debited. You pay
+                        a prorata amount today for access until that date, then
+                        the full plan amount on your chosen day every month.
+                      </p>
+                      <div className="mt-4">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gls-muted">
+                          Debit day
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {PAYFAST_DEBIT_DAYS.map((day) => (
+                            <button
+                              key={day}
+                              type="button"
+                              onClick={() => setDebitDay(day)}
+                              className={`rounded-lg border px-4 py-2 text-sm font-semibold transition ${
+                                debitDay === day
+                                  ? "border-gls-pink bg-gls-pink/15 text-white"
+                                  : "border-white/15 text-gls-muted hover:border-white/30 hover:text-white"
+                              }`}
+                            >
+                              {day}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {debitQuote && (
+                        <div className="mt-4 rounded-lg border border-white/10 bg-black/30 p-4 text-sm text-gls-body">
+                          <p className="font-semibold text-white">
+                            {debitQuote.summary}
+                          </p>
+                          <p className="mt-1 text-xs text-gls-muted">
+                            First full debit on{" "}
+                            {new Date(
+                              `${debitQuote.billingDateIso}T12:00:00Z`,
+                            ).toLocaleDateString("en-ZA", { dateStyle: "long" })}
+                            .
+                          </p>
+                        </div>
+                      )}
+                      <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-gls-body">
+                        <li>Tap below — you leave GLS for PayFast’s secure page.</li>
+                        <li>Add your card and confirm the debit order setup.</li>
                         <li>
-                          We unlock membership when PayFast confirms (watch the
+                          Membership unlocks when PayFast confirms (watch the
                           notification bell).
                         </li>
                       </ol>
@@ -476,7 +548,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                       >
                         {busy
                           ? "Opening PayFast…"
-                          : `Pay R${(payment.amount_zar_cents / 100).toFixed(0)} with PayFast`}
+                          : "Add card & start debit order"}
                       </button>
                       <p className="mt-3 text-xs text-gls-muted">
                         Reference {payment.payment_reference} is attached
@@ -649,7 +721,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                     1
                   </span>
                   {showPayfast
-                    ? "Pay with card via PayFast, or use EFT with the exact reference."
+                    ? "Set up a PayFast debit order, or pay once by EFT with the exact reference."
                     : "Pay with Yoco or EFT using the exact reference."}
                 </li>
                 <li className="flex gap-3">
