@@ -142,7 +142,7 @@ function evaluateDirectMediaBody(
     ok: true,
     status: "active",
     detail: prefix,
-    format: resolved === "hls" ? format : resolved,
+    format: resolved,
   };
 }
 
