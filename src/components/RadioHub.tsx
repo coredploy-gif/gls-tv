@@ -77,7 +77,7 @@ export function RadioHub() {
           </h1>
           <p className="mt-4 text-base leading-relaxed text-white/65">
             Curated legal live streams from official broadcasters — SABC, Primedia,
-            MBC Malawi, and community stations. Tap a station to listen in the GLS
+            MBC, Zodiak, and community stations. Tap a station to listen in the GLS
             player.
           </p>
         </div>
@@ -130,7 +130,7 @@ export function RadioHub() {
             <>
               {malawi.length > 0 && (
                 <ContentRow
-                  title="🇲🇼 Malawi · MBC"
+                  title="🇲🇼 Malawi"
                   items={malawi}
                   limit={24}
                 />

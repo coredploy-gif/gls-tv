@@ -114,6 +114,14 @@ VALUES
     'Radio',
     true,
     'Malawi Broadcasting Corporation · official BroadWave stream'
+  ),
+  (
+    'https://ice31.securenetsystems.net/0079',
+    'Zodiak Radio',
+    'mp4',
+    'Radio',
+    true,
+    'Zodiak Broadcasting Station · SecureNet Systems official Icecast (station 0079)'
   )
 ON CONFLICT (url) DO UPDATE SET
   title = EXCLUDED.title,

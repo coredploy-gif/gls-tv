@@ -103,7 +103,7 @@ export default function BrowsePage() {
 
         {malawiItems.length > 0 && (
           <ContentRow
-            title="🇲🇼 Malawi · MBC radio"
+            title="🇲🇼 Malawi radio"
             items={malawiItems}
             limit={12}
             viewMoreHref="/radio"

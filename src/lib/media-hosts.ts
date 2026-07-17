@@ -22,6 +22,7 @@ const MEDIA_HOST_SUFFIXES = [
   "streamtheworld.com",
   "bokradio.co.za",
   "mbc.mw",
+  "securenetsystems.net",
   "cloudfront.net",
   "googleusercontent.com",
   "akamaized.net",
