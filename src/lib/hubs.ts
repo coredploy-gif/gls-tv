@@ -10,6 +10,7 @@ import {
   getAsiaChannels,
   getAsiaSeries,
   getReligionChannels,
+  isLiveTvEligible,
 } from "@/lib/channels";
 
 export type HubKey =
@@ -163,8 +164,9 @@ export const HUBS: HubDef[] = [
     href: "/africa",
     blurb: "Public African live TV — news, sports, entertainment by country.",
     match: (i) =>
-      i.categories.includes("Africa") ||
-      i.countries.some((c) => AFRICA_CODES.has(c)),
+      (i.categories.includes("Africa") ||
+        i.countries.some((c) => AFRICA_CODES.has(c))) &&
+      isLiveTvEligible(i),
     top10: getAfricaChannels()
       .filter(
         (c) =>
@@ -180,8 +182,9 @@ export const HUBS: HubDef[] = [
     blurb:
       "India, Korea, China, Japan & more — food, kids, sports, news, and Asian series.",
     match: (i) =>
-      i.categories.includes("Asia") ||
-      i.countries.some((c) => ASIA_CODES.has(c)),
+      (i.categories.includes("Asia") ||
+        i.countries.some((c) => ASIA_CODES.has(c))) &&
+      isLiveTvEligible(i),
     top10: [
       ...getAsiaChannels()
         .filter(
@@ -202,7 +205,7 @@ export const HUBS: HubDef[] = [
     title: "Live TV",
     href: "/live",
     blurb: "All live channels by country.",
-    match: (i) => i.type === "live",
+    match: (i) => isLiveTvEligible(i),
     top10: [...TOP10.sports, ...TOP10.news].slice(0, 10),
   },
 ];

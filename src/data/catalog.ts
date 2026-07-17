@@ -1,4 +1,5 @@
 import type { CatalogItem, CountryMeta } from "./types";
+import { CURATED_VOD_SERIES } from "./curated-vod-series";
 
 export const COUNTRIES: CountryMeta[] = [
   { code: "za", name: "South Africa", flag: "🇿🇦" },
@@ -321,16 +322,17 @@ export const CATALOG: CatalogItem[] = [
     title: "Voyage to the Planet of Prehistoric Women",
     type: "series",
     description:
-      "Public-domain space adventure presented as episodic chapters for browse demo.",
+      "Public-domain space adventure presented as episodic chapters. On demand (pause / rewind).",
     year: 1968,
     countries: ["us"],
-    categories: ["Sci-Fi", "Adventure"],
+    categories: ["Sci-Fi", "Adventure", "OnDemand"],
     languages: ["English"],
     poster: "https://archive.org/services/img/VoyageToThePlanetOfPrehistoricWomen",
     backdrop:
       "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80",
     rating: "G",
     license: "public_domain",
+    isLive: false,
     seasons: 1,
     episodes: 3,
     sources: [
@@ -347,10 +349,10 @@ export const CATALOG: CatalogItem[] = [
     title: "Open Movie Anthology",
     type: "series",
     description:
-      "A curated shelf of Creative Commons open movies — animation, fantasy, and sci-fi.",
+      "A curated shelf of Creative Commons open movies — animation, fantasy, and sci-fi. On demand (pause / rewind).",
     year: 2012,
     countries: ["world"],
-    categories: ["Animation", "Anthology"],
+    categories: ["Animation", "Anthology", "OnDemand"],
     languages: ["English"],
     poster:
       "https://peach.blender.org/wp-content/uploads/poster_bunny_small.jpg",
@@ -358,6 +360,7 @@ export const CATALOG: CatalogItem[] = [
       "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&w=2400&q=80",
     rating: "G",
     license: "creative_commons",
+    isLive: false,
     seasons: 1,
     episodes: 4,
     sources: [
@@ -375,16 +378,17 @@ export const CATALOG: CatalogItem[] = [
     title: "Silent Classics",
     type: "series",
     description:
-      "Restored public-domain silent cinema — comedy, chase, and early Hollywood craft.",
+      "Restored public-domain silent cinema — comedy, chase, and early Hollywood craft. On demand (pause / rewind).",
     year: 1926,
     countries: ["us"],
-    categories: ["Classic", "Silent", "Comedy"],
+    categories: ["Classic", "Silent", "Comedy", "OnDemand"],
     languages: ["Silent"],
     poster: "https://archive.org/services/img/TheGeneral",
     backdrop:
       "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=2400&q=80",
     rating: "G",
     license: "public_domain",
+    isLive: false,
     seasons: 1,
     episodes: 2,
     sources: [
@@ -395,6 +399,9 @@ export const CATALOG: CatalogItem[] = [
       },
     ],
   },
+
+  // —— On-demand VOD series pack (pause / rewind) ——
+  ...CURATED_VOD_SERIES,
 
   // —— Live TV (public open streams) ——
   {

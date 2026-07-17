@@ -29,3 +29,33 @@ export function isLargeScreen(): boolean {
     Math.min(window.innerWidth, window.screen?.width || 0) >= 1280
   );
 }
+
+/**
+ * Client-only TV detection. Server snapshot is always false so phone/desktop
+ * never hydrate into a QR-primary auth UI.
+ */
+export function subscribeTvLikeDevice(onStoreChange: () => void): () => void {
+  if (typeof window === "undefined") return () => undefined;
+  const mqCoarse = window.matchMedia("(pointer: coarse)");
+  const mqHover = window.matchMedia("(hover: none)");
+  mqCoarse.addEventListener("change", onStoreChange);
+  mqHover.addEventListener("change", onStoreChange);
+  window.addEventListener("resize", onStoreChange);
+  return () => {
+    mqCoarse.removeEventListener("change", onStoreChange);
+    mqHover.removeEventListener("change", onStoreChange);
+    window.removeEventListener("resize", onStoreChange);
+  };
+}
+
+export function readTvOverrideFromSearch(search: string | null | undefined): boolean {
+  if (!search) return false;
+  try {
+    const params = new URLSearchParams(
+      search.startsWith("?") ? search.slice(1) : search,
+    );
+    return params.get("tv") === "1";
+  } catch {
+    return false;
+  }
+}

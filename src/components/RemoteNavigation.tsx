@@ -1,6 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import {
+  isTvLikeDevice,
+  readTvOverrideFromSearch,
+  subscribeTvLikeDevice,
+} from "@/lib/tv-detect";
 
 const SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -9,10 +14,70 @@ function isFocusable(el: Element | null): el is HTMLElement {
   return Boolean(el && (el as HTMLElement).matches?.(SELECTOR));
 }
 
+function isTvModeActive(): boolean {
+  if (typeof window === "undefined") return false;
+  if (readTvOverrideFromSearch(window.location.search)) return true;
+  return isTvLikeDevice();
+}
+
+function syncTvDocumentMode(active: boolean) {
+  const root = document.documentElement;
+  if (active) {
+    root.dataset.tv = "1";
+    root.setAttribute("data-tv", "1");
+  } else {
+    delete root.dataset.tv;
+    root.removeAttribute("data-tv");
+  }
+}
+
 /** Spatial D-pad / arrow-key navigation for TV remotes and keyboards. */
 export function RemoteNavigation() {
   useEffect(() => {
+    const applyTvMode = () => syncTvDocumentMode(isTvModeActive());
+    applyTvMode();
+    const unsubscribe = subscribeTvLikeDevice(applyTvMode);
+
+    // Land focus on a browse target so the first D-pad press isn't "lost".
+    if (isTvModeActive() && !isFocusable(document.activeElement)) {
+      const first =
+        document.querySelector<HTMLElement>(
+          ".gls-tile, .gls-nav-link, .gls-player-center, .gls-cta",
+        ) || document.querySelector<HTMLElement>(SELECTOR);
+      first?.focus({ preventScroll: true });
+    }
+
     const onKeyDown = (event: KeyboardEvent) => {
+      // Android TV / browser Back → leave overlays or go back in history.
+      const isBack =
+        event.key === "Escape" ||
+        event.key === "BrowserBack" ||
+        event.key === "GoBack" ||
+        (event.key === "Backspace" &&
+          !(document.activeElement as HTMLElement | null)?.matches?.(
+            "input, textarea, select, [contenteditable=true]",
+          ));
+      if (isBack && isTvModeActive()) {
+        const dialog = document.querySelector<HTMLElement>(
+          '[role="dialog"][aria-modal="true"], [data-tv-back-root]',
+        );
+        if (dialog) {
+          const closer = dialog.querySelector<HTMLElement>(
+            '[data-tv-back-close], [aria-label="Close"], [aria-label="close"]',
+          );
+          if (closer) {
+            event.preventDefault();
+            closer.click();
+            return;
+          }
+        }
+        if (window.history.length > 1) {
+          event.preventDefault();
+          window.history.back();
+        }
+        return;
+      }
+
       if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
         return;
       }
@@ -24,8 +89,9 @@ export function RemoteNavigation() {
       // First arrow press with no focus: land on a primary browse target
       if (!isFocusable(active) || active === document.body) {
         const first =
-          document.querySelector<HTMLElement>(".gls-tile, .gls-nav-link, .gls-player-center, .gls-cta") ||
-          document.querySelector<HTMLElement>(SELECTOR);
+          document.querySelector<HTMLElement>(
+            ".gls-tile, .gls-nav-link, .gls-player-center, .gls-cta",
+          ) || document.querySelector<HTMLElement>(SELECTOR);
         if (first) {
           event.preventDefault();
           first.focus({ preventScroll: false });
@@ -39,7 +105,10 @@ export function RemoteNavigation() {
       const candidates = [...document.querySelectorAll<HTMLElement>(SELECTOR)]
         .filter((element) => {
           if (element === active) return false;
-          if (element.offsetParent === null && getComputedStyle(element).position !== "fixed") {
+          if (
+            element.offsetParent === null &&
+            getComputedStyle(element).position !== "fixed"
+          ) {
             return false;
           }
           const style = getComputedStyle(element);
@@ -83,7 +152,11 @@ export function RemoteNavigation() {
       }
     };
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    return () => {
+      unsubscribe();
+      syncTvDocumentMode(false);
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, []);
   return null;
 }

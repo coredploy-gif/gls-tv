@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useIsTvLikeDevice } from "@/lib/useIsTvLikeDevice";
 
 type Reminder = {
   id: string;
@@ -13,11 +14,14 @@ type Reminder = {
   severity: string;
 };
 
-/** Top-of-app banner for urgent billing / admin reminders (hidden on admin/auth). */
+/** Top-of-app banner for urgent billing / admin reminders (hidden on admin/auth/TV). */
 export function ReminderBanner() {
   const pathname = usePathname();
   const [item, setItem] = useState<Reminder | null>(null);
+  const tvLike = useIsTvLikeDevice();
+
   const hidden =
+    tvLike ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/eadmin") ||
     pathname.startsWith("/auth") ||
@@ -77,13 +81,6 @@ export function ReminderBanner() {
           <Link
             href={item.href}
             className="rounded-md bg-white/15 px-3 py-1.5 text-xs font-bold uppercase tracking-wide hover:bg-white/25"
-            onClick={() => {
-              void fetch("/api/membership/reminders", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "read", id: item.id }),
-              });
-            }}
           >
             Open
           </Link>
@@ -91,8 +88,7 @@ export function ReminderBanner() {
         <button
           type="button"
           onClick={() => void dismiss()}
-          className="rounded-md px-2 py-1.5 text-xs opacity-80 hover:opacity-100"
-          aria-label="Dismiss reminder"
+          className="rounded-md px-2 py-1.5 text-xs opacity-80 hover:bg-white/10 hover:opacity-100"
         >
           Dismiss
         </button>

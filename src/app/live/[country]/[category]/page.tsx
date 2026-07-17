@@ -1,15 +1,23 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { BrowseNav } from "@/components/BrowseNav";
 import {
   getCountry,
   getLiveByCountryAndCategory,
 } from "@/data/catalog";
-import { getUsChannels } from "@/lib/channels";
+import { getUsChannels, isLiveTvEligible } from "@/lib/channels";
 
 type Props = {
   params: Promise<{ country: string; category: string }>;
 };
+
+function isMoviesCategory(name: string) {
+  return /^(movies?|film|cinema)$/i.test(name.trim());
+}
+
+function isSeriesCategory(name: string) {
+  return /^(series|drama|liveseries|24\/7)$/i.test(name.trim());
+}
 
 export default async function LiveCategoryPage({ params }: Props) {
   const { country: code, category } = await params;
@@ -17,12 +25,23 @@ export default async function LiveCategoryPage({ params }: Props) {
   if (!country) notFound();
 
   const decoded = decodeURIComponent(category);
-  const seed = getLiveByCountryAndCategory(code, decoded);
+
+  // 24/7 movie & series FASTs live under /movies and /series, not Live TV.
+  if (isMoviesCategory(decoded)) redirect("/movies");
+  if (isSeriesCategory(decoded)) redirect("/series");
+
+  const seed = getLiveByCountryAndCategory(code, decoded).filter(
+    isLiveTvEligible,
+  );
   const fromUs =
     code === "us"
-      ? getUsChannels().filter((ch) =>
-          ch.categories.some((c) => c.toLowerCase() === decoded.toLowerCase()),
-        )
+      ? getUsChannels()
+          .filter(isLiveTvEligible)
+          .filter((ch) =>
+            ch.categories.some(
+              (c) => c.toLowerCase() === decoded.toLowerCase(),
+            ),
+          )
       : [];
   const channels = [...fromUs, ...seed];
   if (!channels.length) notFound();

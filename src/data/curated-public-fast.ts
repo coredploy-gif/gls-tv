@@ -55,9 +55,11 @@ function movie(
 }
 
 /**
- * These are catalogue entries for active, user-managed Supabase seeds.
- * Their URLs are intentionally loaded at watch time by `withLiveSources`,
- * so the latest configured source remains the one GLS plays.
+ * 24/7 linear “series channels” (FAST-style), not Netflix-style episode VOD.
+ * Playback is live HLS (`isLive: true`) → pause/scrub is limited (behind live).
+ * URLs load at watch time via `withLiveSources` / Eadmin `stream_seeds`.
+ * For on-demand pause/rewind, use catalog items with `isLive: false` + VOD MP4/HLS
+ * (see Public anthologies on /series and docs/SERIES-LIVE-VS-VOD.md).
  */
 function seriesSeed(
   slug: string,
@@ -69,9 +71,17 @@ function seriesSeed(
     slug,
     title,
     type: "series",
-    description: "24/7 series channel · source managed in GLS Eadmin.",
+    description:
+      "24/7 live series channel (FAST) · not on-demand episodes. Source managed in GLS Eadmin.",
     countries: ["us", "world"],
-    categories: ["Series", "Playable", "Curated", ...categories],
+    categories: [
+      "Series",
+      "LiveSeries",
+      "24/7",
+      "Playable",
+      "Curated",
+      ...categories,
+    ],
     languages: ["en"],
     poster: seriesArt,
     backdrop: seriesArt.replace("w=1600&h=2400", "w=3840&h=2160"),

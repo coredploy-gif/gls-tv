@@ -4,7 +4,7 @@ import { TitleCard } from "@/components/TitleCard";
 import { ContentRow } from "@/components/ContentRow";
 import { getByType } from "@/data/catalog";
 import { CURATED_PUBLIC_MOVIES } from "@/data/curated-public-fast";
-import { getMovieChannels } from "@/lib/channels";
+import { getLiveMovieChannels, getMovieChannels } from "@/lib/channels";
 import {
   discoverMovies,
   getMovieGenres,
@@ -58,6 +58,7 @@ function MovieTile({ movie }: { movie: TmdbMovie }) {
 export default async function MoviesPage() {
   const seedMovies = [...getByType("movie"), ...CURATED_PUBLIC_MOVIES];
   const movieChannels = getMovieChannels();
+  const liveMovies = getLiveMovieChannels();
   const tmdbReady = hasTmdbKey();
 
   let popular: TmdbMovie[] = [];
@@ -166,6 +167,19 @@ export default async function MoviesPage() {
           </div>
         </section>
       ))}
+
+      <ContentRow
+        title="Featured 24/7 movie channels"
+        items={CURATED_PUBLIC_MOVIES}
+        limit={12}
+      />
+
+      <ContentRow
+        title="All 24/7 movie channels (from Live TV)"
+        items={liveMovies}
+        limit={18}
+        viewMoreHref="/movies/more"
+      />
 
       <ContentRow
         title="Movie channels · live & FAST"

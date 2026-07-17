@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useAppCopy } from "@/lib/useAppCopy";
+import { TvPairingPanel } from "@/components/TvPairingPanel";
+import { useIsTvLikeDevice } from "@/lib/useIsTvLikeDevice";
 
 type Mode = "signin" | "signup";
 
@@ -58,9 +60,12 @@ function PasswordField({
 export function AuthPanel({
   onDone,
   compact = false,
+  /** Phone pairing / embedded flows must never show TV QR as primary. */
+  forceEmail = false,
 }: {
   onDone?: () => void;
   compact?: boolean;
+  forceEmail?: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -78,6 +83,9 @@ export function AuthPanel({
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
   const [signupsAllowed, setSignupsAllowed] = useState(true);
   const [signupFreezeMsg, setSignupFreezeMsg] = useState<string | null>(null);
+  const [preferEmailOnTv, setPreferEmailOnTv] = useState(false);
+  const tvOverride = searchParams.get("tv") === "1";
+  const isTv = useIsTvLikeDevice(tvOverride) && !forceEmail;
 
   useEffect(() => {
     void fetch("/api/auth/signup-status", { cache: "no-store" })
@@ -90,7 +98,10 @@ export function AuthPanel({
   }, []);
 
   const goAfterLogin = () => {
-    onDone?.();
+    if (onDone) {
+      onDone();
+      return;
+    }
     const next =
       safeNextPath(searchParams.get("next")) ?? DEFAULT_POST_LOGIN_HREF;
     router.replace(next);
@@ -119,6 +130,15 @@ export function AuthPanel({
           Sign out
         </button>
       </div>
+    );
+  }
+
+  if (isTv && !preferEmailOnTv) {
+    return (
+      <TvPairingPanel
+        onDone={onDone}
+        onUseEmail={() => setPreferEmailOnTv(true)}
+      />
     );
   }
 

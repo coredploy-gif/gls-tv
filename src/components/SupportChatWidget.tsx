@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useActiveViewer } from "@/lib/membership/active-viewer";
 import { createClient } from "@/lib/supabase/client";
+import { useIsTvLikeDevice } from "@/lib/useIsTvLikeDevice";
 
 type Config = {
   welcome_title: string;
@@ -86,8 +87,10 @@ export function SupportChatWidget() {
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
+  const tvLike = useIsTvLikeDevice();
 
   const hide =
+    tvLike ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/eadmin") ||
     pathname.startsWith("/auth") ||

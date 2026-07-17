@@ -31,6 +31,7 @@ import {
   CURATED_PUBLIC_SPORTS,
   CURATED_SERIES_SEEDS,
 } from "@/data/curated-public-fast";
+import { CURATED_VOD_SERIES } from "@/data/curated-vod-series";
 import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
 
 const sportsChannels = sportsJson as CatalogItem[];
@@ -132,6 +133,7 @@ export function getVerifiedChannels() {
     CURATED_PUBLIC_SPORTS,
     CURATED_PUBLIC_MOVIES,
     CURATED_SERIES_SEEDS,
+    CURATED_VOD_SERIES,
     VERIFIED_LIVE,
     playableSports,
     playableWrestling,
@@ -155,6 +157,7 @@ export function getAllChannels(): CatalogItem[] {
     CURATED_PUBLIC_SPORTS,
     CURATED_PUBLIC_MOVIES,
     CURATED_SERIES_SEEDS,
+    CURATED_VOD_SERIES,
     VERIFIED_LIVE,
     playableSports,
     playableWrestling,
@@ -178,38 +181,104 @@ function catalogueMatch(item: CatalogItem, pattern: RegExp) {
   return pattern.test(`${item.title} ${item.categories.join(" ")}`);
 }
 
+function categoryHas(item: CatalogItem, pattern: RegExp) {
+  return item.categories.some((c) => pattern.test(c));
+}
+
+function isNewsPrimary(item: CatalogItem) {
+  return (
+    categoryHas(item, /^news$/i) ||
+    /\b(news|zee\s*24|ndtv|reuters|bbc news|france 24|al jazeera)\b/i.test(
+      item.title,
+    )
+  );
+}
+
+/**
+ * 24/7 movie / cinema FAST (or VOD movie). Belongs under /movies, not Live TV.
+ */
+export function isMovieFast(item: CatalogItem): boolean {
+  if (item.type === "movie") return true;
+  if (categoryHas(item, /^(movies?|film|cinema)$/i)) return true;
+  if (categoryHas(item, /\b(movies?|film|cinema)\b/i)) return true;
+  return catalogueMatch(item, /\b(movie\s*channel|cinema\s*tv|film\s*channel)\b/i);
+}
+
+/**
+ * 24/7 series / show FAST (or typed series). Belongs under /series, not Live TV.
+ * Excludes news-primary channels mis-tagged with Drama/Series.
+ */
+export function isSeriesFast(item: CatalogItem): boolean {
+  if (item.type === "series") return true;
+  if (isNewsPrimary(item) && !categoryHas(item, /^(series|liveseries)$/i)) {
+    return false;
+  }
+  if (categoryHas(item, /^(series|liveseries|24\/7)$/i)) return true;
+  if (
+    categoryHas(item, /\bseries\b/i) ||
+    item.categories.includes("LiveSeries")
+  ) {
+    return true;
+  }
+  // Explicit drama-show packs, but not generic "Entertainment"
+  if (
+    categoryHas(item, /^drama$/i) &&
+    catalogueMatch(item, /\b(series|anthology|universe|trek|csi|dynasty)\b/i)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/** True live TV for country hubs — excludes movie/series FAST dumps. */
+export function isLiveTvEligible(item: CatalogItem): boolean {
+  if (item.type !== "live") return false;
+  if (isMovieFast(item) || isSeriesFast(item)) return false;
+  return true;
+}
+
+function sortCatalogScore(a: CatalogItem, b: CatalogItem) {
+  const score = (item: CatalogItem) =>
+    (item.categories.includes("OnDemand") || item.isLive === false ? 5 : 0) +
+    (item.categories.includes("Playable") ? 4 : 0) +
+    (item.categories.includes("Verified") ? 2 : 0) +
+    (item.categories.includes("Curated") ? 1 : 0);
+  return score(b) - score(a) || a.title.localeCompare(b.title);
+}
+
 /** Movie VOD plus 24/7 movie/film FAST channels from every imported catalogue. */
 export function getMovieChannels() {
-  return getAllChannels()
-    .filter(
-      (item) =>
-        item.type === "movie" ||
-        catalogueMatch(item, /\bmovies?\b|\bfilm\b|\bcinema\b/i),
-    )
-    .sort((a, b) => {
-      const score = (item: CatalogItem) =>
-        (item.categories.includes("Playable") ? 4 : 0) +
-        (item.categories.includes("Verified") ? 2 : 0) +
-        (item.categories.includes("Curated") ? 1 : 0);
-      return score(b) - score(a) || a.title.localeCompare(b.title);
-    });
+  return getAllChannels().filter(isMovieFast).sort(sortCatalogScore);
 }
 
 /** Episodic/anthology VOD plus 24/7 drama and series channels from all catalogues. */
 export function getSeriesChannels() {
-  return getAllChannels()
-    .filter(
-      (item) =>
-        item.type === "series" ||
-        catalogueMatch(item, /\bseries\b|\bdrama\b|\banthology\b/i),
-    )
-    .sort((a, b) => {
-      const score = (item: CatalogItem) =>
-        (item.categories.includes("Playable") ? 4 : 0) +
-        (item.categories.includes("Verified") ? 2 : 0) +
-        (item.categories.includes("Curated") ? 1 : 0);
-      return score(b) - score(a) || a.title.localeCompare(b.title);
-    });
+  return getAllChannels().filter(isSeriesFast).sort(sortCatalogScore);
+}
+
+/** 24/7 series FASTs only (excludes on-demand VOD shelves). */
+export function getLiveSeriesChannels() {
+  return getSeriesChannels().filter((item) => item.isLive !== false);
+}
+
+/** 24/7 movie FASTs only (excludes public-domain VOD files). */
+export function getLiveMovieChannels() {
+  return getMovieChannels().filter((item) => item.isLive !== false);
+}
+
+export function getVodSeriesChannels() {
+  return getAllChannels().filter(
+    (item) =>
+      item.type === "series" &&
+      item.isLive === false &&
+      (item.categories.includes("OnDemand") ||
+        item.categories.includes("VOD")),
+  );
+}
+
+/** Live TV browse pool — no movie/series FAST clutter. */
+export function getLiveTvChannels() {
+  return getAllChannels().filter(isLiveTvEligible);
 }
 
 export function getChannelBySlug(slug: string): CatalogItem | undefined {
@@ -224,6 +293,7 @@ export function getChannelBySlug(slug: string): CatalogItem | undefined {
     CURATED_PUBLIC_SPORTS,
     CURATED_PUBLIC_MOVIES,
     CURATED_SERIES_SEEDS,
+    CURATED_VOD_SERIES,
     playableWrestling,
     playableSports,
     playableKids,

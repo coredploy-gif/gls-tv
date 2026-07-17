@@ -2,13 +2,23 @@ import { BrowseNav } from "@/components/BrowseNav";
 import { ContentRow } from "@/components/ContentRow";
 import { TitleCard } from "@/components/TitleCard";
 import { getByType } from "@/data/catalog";
-import { getAsiaSeries, getSeriesChannels } from "@/lib/channels";
+import { getAsiaSeries, getSeriesChannels, getLiveSeriesChannels } from "@/lib/channels";
 import { CURATED_SERIES_SEEDS } from "@/data/curated-public-fast";
+import {
+  CURATED_VOD_SERIES,
+  VOD_SERIES_GENRES,
+  getVodSeriesByGenre,
+} from "@/data/curated-vod-series";
 import { KoreanDramaGuide } from "@/components/KoreanDramaGuide";
 
 export default function SeriesPage() {
-  const classic = getByType("series");
+  const classic = getByType("series").filter(
+    (item) => !item.id.startsWith("vod-series-"),
+  );
+  const vodAll = CURATED_VOD_SERIES;
+  const vodFeatured = vodAll.filter((i) => i.featured);
   const seeded = CURATED_SERIES_SEEDS;
+  const liveSeries = getLiveSeriesChannels();
   const seriesChannels = getSeriesChannels();
   const asia = getAsiaSeries();
   const korea = asia.filter(
@@ -37,11 +47,39 @@ export default function SeriesPage() {
             Series
           </h1>
           <p className="mt-3 max-w-2xl text-gls-muted">
-            Asian drama & entertainment linear channels (Korea, India, China,
-            Japan…) plus public-domain anthologies. Open feeds only — not Netflix
-            K-drama catalogs.
+            On-demand VOD shelves first — pause and rewind. Live 24/7 drama
+            channels are listed below. Open / public-domain feeds only.
           </p>
         </div>
+
+        {vodFeatured.length > 0 && (
+          <ContentRow
+            title="On demand · featured (pause & rewind)"
+            items={vodFeatured}
+            limit={12}
+          />
+        )}
+
+        {VOD_SERIES_GENRES.map((genre) => {
+          const items = getVodSeriesByGenre(genre);
+          if (!items.length) return null;
+          return (
+            <ContentRow
+              key={genre}
+              title={`${genre} · on demand`}
+              items={items}
+              limit={12}
+            />
+          );
+        })}
+
+        {vodAll.length > 0 && (
+          <ContentRow
+            title="All on-demand series"
+            items={vodAll}
+            limit={18}
+          />
+        )}
 
         <KoreanDramaGuide />
 
@@ -71,26 +109,38 @@ export default function SeriesPage() {
           />
         )}
 
-        <ContentRow title="Featured series channels" items={seeded} limit={12} />
         <ContentRow
-          title="Series & drama channels"
+          title="Featured 24/7 series channels (live)"
+          items={seeded}
+          limit={12}
+        />
+        <ContentRow
+          title="All 24/7 series channels (from Live TV)"
+          items={liveSeries}
+          limit={18}
+          viewMoreHref="/series/more"
+        />
+        <ContentRow
+          title="Series & drama catalogue"
           items={seriesChannels}
           limit={12}
           viewMoreHref="/series/more"
         />
 
-        <div className="px-4 pt-6 sm:px-8 lg:px-12">
-          <h2 className="mb-4 text-xl font-semibold text-white">
-            Public anthologies
-          </h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {classic.map((item) => (
-              <div key={item.id} className="w-full [&_a]:w-full">
-                <TitleCard item={item} />
-              </div>
-            ))}
+        {classic.length > 0 && (
+          <div className="px-4 pt-6 sm:px-8 lg:px-12">
+            <h2 className="mb-4 text-xl font-semibold text-white">
+              Public anthologies (on demand)
+            </h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+              {classic.map((item) => (
+                <div key={item.id} className="w-full [&_a]:w-full">
+                  <TitleCard item={item} />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </main>
   );

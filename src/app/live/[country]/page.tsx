@@ -6,7 +6,7 @@ import {
   getLiveByCountry,
   getLiveCategoriesForCountry,
 } from "@/data/catalog";
-import { getUsChannels } from "@/lib/channels";
+import { getUsChannels, isLiveTvEligible } from "@/lib/channels";
 import { groupByCategory } from "@/lib/iptv";
 
 type Props = { params: Promise<{ country: string }> };
@@ -16,8 +16,9 @@ export default async function LiveCountryPage({ params }: Props) {
   const country = getCountry(code);
   if (!country) notFound();
 
-  const iptvUs = code === "us" ? getUsChannels() : [];
-  const seedChannels = getLiveByCountry(code);
+  const iptvUs =
+    code === "us" ? getUsChannels().filter(isLiveTvEligible) : [];
+  const seedChannels = getLiveByCountry(code).filter(isLiveTvEligible);
   const channels = code === "us" ? [...iptvUs, ...seedChannels] : seedChannels;
 
   const categoryMap = groupByCategory(channels);
@@ -48,7 +49,14 @@ export default async function LiveCountryPage({ params }: Props) {
               {country.name}
             </h1>
             <p className="mt-1 text-sm text-gls-muted">
-              {channels.length} channels
+              {channels.length} channels · 24/7 movies &amp; series live under{" "}
+              <Link href="/movies" className="text-white underline-offset-2 hover:underline">
+                Movies
+              </Link>{" "}
+              and{" "}
+              <Link href="/series" className="text-white underline-offset-2 hover:underline">
+                Series
+              </Link>
             </p>
           </div>
         </div>
@@ -88,14 +96,14 @@ export default async function LiveCountryPage({ params }: Props) {
                   alt=""
                   className="h-full w-full object-contain p-6 transition duration-500 group-hover:scale-105"
                 />
-                <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded bg-gls-red px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">
+                <span className="absolute left-2 top-2 rounded bg-gls-red px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">
                   Live
                 </span>
               </div>
               <div className="p-3">
                 <h3 className="font-semibold text-white">{ch.title}</h3>
                 <p className="mt-1 line-clamp-2 text-xs text-gls-muted">
-                  {ch.categories.join(" · ")}
+                  {ch.description}
                 </p>
               </div>
             </Link>
