@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient, isEadminEmail } from "@/lib/eadmin";
 import {
-  probeMediaLinkReachability,
   validateMediaLinkUrl,
 } from "@/lib/media-links";
+import { probeMediaLinkReachability } from "@/lib/media-links-probe";
 
 async function requireAdmin() {
   const supabase = await createClient();

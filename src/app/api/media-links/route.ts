@@ -3,9 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getAccountEntitlement } from "@/lib/membership/account";
 import {
   normalizeMediaLinkCategory,
-  probeMediaLinkReachability,
   validateMediaLinkUrl,
 } from "@/lib/media-links";
+import { probeMediaLinkReachability } from "@/lib/media-links-probe";
 import { consumeRateLimit, clientIp } from "@/lib/rate-limit";
 import type { NextRequest } from "next/server";
 
