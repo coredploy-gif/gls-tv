@@ -280,6 +280,12 @@ export function ManualBillingAdmin({
 
   const nav = (
     <div className="flex flex-wrap gap-2">
+      <Link
+        href="/admin/finance/membership"
+        className="rounded-md border border-gls-red/30 bg-gls-red/10 px-3 py-2 text-xs font-bold uppercase tracking-wide text-red-100 hover:text-white"
+      >
+        Funnel
+      </Link>
       {[
         ["payments", "Queue"],
         ["daybook", "Daybook"],

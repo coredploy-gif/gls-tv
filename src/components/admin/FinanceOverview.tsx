@@ -72,6 +72,7 @@ export function FinanceOverview() {
   ];
   const links = [
     ["/admin/finance/payments", "Payment queue", `${s.pending} need workflow`],
+    ["/admin/finance/membership", "User funnel", "Trials, subscribers & growth"],
     ["/admin/finance/members", "Member ledger", "GLS references & reactivation"],
     ["/admin/finance/reconciliation", "Reconciliation", "GLS paid vs Yoco links"],
     ["/admin/finance/reports", "Reports", "Revenue, plans, CSV export"],
