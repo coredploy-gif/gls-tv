@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { siteUrl } from "@/lib/site-url";
 
 export const runtime = "nodejs";
 
@@ -8,8 +9,7 @@ export async function POST(req: NextRequest) {
   const email = String(body.email || "").trim().toLowerCase();
   if (email.includes("@")) {
     const auth = await createClient();
-    const origin =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || req.nextUrl.origin;
+    const origin = siteUrl(req.nextUrl.origin);
     await auth.auth.resetPasswordForEmail(email, {
       redirectTo: `${origin}/account/recover`,
     });

@@ -46,15 +46,6 @@ function NavLink({
   );
 }
 
-function MobileLink({ href, label, active, children }: { href: string; label: string; active: boolean; children: React.ReactNode }) {
-  return (
-    <Link href={href} className={`gls-mobile-nav-link ${active ? "is-active" : ""}`} aria-current={active ? "page" : undefined}>
-      {children}
-      <span>{label}</span>
-    </Link>
-  );
-}
-
 export function BrowseNav() {
   const pathname = usePathname();
   const { isAdmin } = useAuth();
@@ -134,7 +125,7 @@ export function BrowseNav() {
           <ProfileAvatarMenu />
         </div>
       </div>
-      <nav className="flex gap-4 overflow-x-auto px-4 pb-3 lg:hidden">
+      <nav className="flex gap-4 overflow-x-auto px-4 pb-3 lg:hidden" aria-label="Browse categories">
         {BROWSE_NAV.map((link) => {
           const active =
             pathname === link.href ||
@@ -148,20 +139,6 @@ export function BrowseNav() {
             />
           );
         })}
-      </nav>
-      <nav className="gls-mobile-nav lg:hidden" aria-label="Primary navigation">
-        <MobileLink href="/browse" label="Home" active={pathname === "/browse"}>
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>
-        </MobileLink>
-        <MobileLink href="/search" label="Find" active={pathname.startsWith("/search")}>
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden><circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" /><path d="m16 16 4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
-        </MobileLink>
-        <MobileLink href="/my-list" label="My List" active={pathname.startsWith("/my-list") || pathname.startsWith("/playlists")}>
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-3-7 3V5a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>
-        </MobileLink>
-        <MobileLink href="/profiles" label="Profile" active={pathname.startsWith("/profiles")}>
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden><circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8" /><path d="M4.5 21a7.5 7.5 0 0 1 15 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
-        </MobileLink>
       </nav>
     </header>
   );

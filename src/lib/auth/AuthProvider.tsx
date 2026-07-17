@@ -105,9 +105,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUpWithPassword = useCallback(
     async (email: string, password: string) => {
+      const origin = (
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        (typeof window !== "undefined" ? window.location.origin : "") ||
+        "http://127.0.0.1:3010"
+      ).replace(/\/$/, "");
       const { error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
+        options: {
+          emailRedirectTo: `${origin}/auth/callback`,
+        },
       });
       return error?.message ?? null;
     },

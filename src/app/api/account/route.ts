@@ -9,6 +9,7 @@ import {
 } from "@/lib/membership/viewer-sessions";
 import { adultLimitForPlan } from "@/lib/membership/plans";
 import { kidsLimitForPlan } from "@/lib/membership/viewer-sessions";
+import { authCallbackUrl } from "@/lib/site-url";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -156,7 +157,10 @@ export async function PATCH(req: NextRequest) {
     }
     const verified = await auth.auth.signInWithPassword({ email: user.email, password: currentPassword });
     if (verified.error) return NextResponse.json({ error: "Current password is incorrect" }, { status: 403 });
-    const { error } = await auth.auth.updateUser({ email });
+    const { error } = await auth.auth.updateUser(
+      { email },
+      { emailRedirectTo: authCallbackUrl(req.nextUrl.origin) },
+    );
     return error
       ? NextResponse.json({ error: "Email change could not be requested" }, { status: 400 })
       : NextResponse.json({ ok: true, confirmationRequired: true });

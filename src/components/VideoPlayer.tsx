@@ -20,6 +20,7 @@ import { isBrokenTraceOrigin, isTraceChannel } from "@/lib/trace-mirrors";
 import { isLinearPayCategory } from "@/lib/linear-pay";
 import { useAppCopy } from "@/lib/useAppCopy";
 import { PlayerChrome } from "@/components/PlayerChrome";
+import { isSafariLike } from "@/lib/remote-playback";
 
 type VideoPlayerProps = {
   item: CatalogItem;
@@ -488,8 +489,12 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
         const Hls = (await import("hls.js")).default as HlsCtor;
         if (cancelled) return;
 
-        if (!Hls.isSupported()) {
-          if (el.canPlayType("application/vnd.apple.mpegurl")) {
+        // Safari / iOS: native HLS enables AirPlay; hls.js MSE does not.
+        const nativeHls = el.canPlayType("application/vnd.apple.mpegurl");
+        const preferNative = Boolean(nativeHls) && isSafariLike();
+
+        if (preferNative || !Hls.isSupported()) {
+          if (nativeHls) {
             el.src = url;
             setStatus(item.isLive ? "Live" : "Ready");
             void el
@@ -498,8 +503,10 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
               .catch(() => setStatus("Tap play to start"));
             return;
           }
-          setError("Playback is not supported on this device.");
-          return;
+          if (!Hls.isSupported()) {
+            setError("Playback is not supported on this device.");
+            return;
+          }
         }
 
         // Fast start: low tier + short buffer, then deepen after playing.
@@ -1103,7 +1110,14 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
             isLive={Boolean(item.isLive)}
             title={item.title}
             format={source?.format}
-            forceVisible={statusBusy}
+            castUrl={
+              source
+                ? // Prefer the upstream URL for TV/VLC; /api/hls is browser-session only.
+                  /^https?:\/\//i.test(source.url)
+                  ? source.url
+                  : playUrlFor(source, mode)
+                : null
+            }
           />
         </>
       )}

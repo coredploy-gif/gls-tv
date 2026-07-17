@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import type { GlsPlanId } from "@/lib/membership/plans";
 import { GLS_PLANS } from "@/lib/membership/plans";
+import { siteUrl as canonicalSiteUrl } from "@/lib/site-url";
 
 export function getStripe(): Stripe | null {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -45,9 +46,5 @@ export function planFromAmountZarCents(cents: number): GlsPlanId | null {
 }
 
 export function siteUrl() {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    "http://localhost:3000"
-  ).replace(/\/$/, "");
+  return canonicalSiteUrl(process.env.NEXT_PUBLIC_APP_URL || undefined);
 }
