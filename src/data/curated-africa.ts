@@ -660,4 +660,39 @@ export const CURATED_AFRICA: CatalogItem[] = [
     featured: false,
     sources: [...TRACE_URBAN],
   },
+  {
+    id: "curated-rtnc-drc",
+    slug: "rtnc-drc",
+    title: "RTNC",
+    type: "live",
+    description:
+      "Radio Télévision Nationale Congolaise · national public broadcaster · Kinshasa, DRC. Official rtnc.cd/direct HLS.",
+    countries: ["world"],
+    categories: [
+      "News",
+      "General",
+      "Africa",
+      "Curated",
+      "Playable",
+      "Verified",
+      "Public",
+    ],
+    languages: ["French", "Lingala", "Swahili"],
+    poster:
+      "https://images.unsplash.com/photo-1522868514708-6a4f9f31edb1?auto=format&fit=crop&w=1600&h=2400&q=92",
+    backdrop:
+      "https://images.unsplash.com/photo-1522868514708-6a4f9f31edb1?auto=format&fit=crop&w=3840&h=2160&q=92",
+    license: "fta_public",
+    isLive: true,
+    featured: false,
+    sources: [
+      {
+        url: "https://rtnc.cd/live/rtnclive.m3u8",
+        quality: "Auto",
+        format: "hls",
+        priority: 10,
+        label: "rtnc-official",
+      },
+    ],
+  },
 ];

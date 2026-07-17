@@ -21,6 +21,8 @@ const MEDIA_HOST_SUFFIXES = [
   "amagi.tv",
   "streamtheworld.com",
   "streamguys1.com",
+  "fastcast4u.com",
+  "rtnc.cd",
   "zbc.co.zw",
   "bokradio.co.za",
   "mbc.mw",

@@ -115,7 +115,7 @@ export default function BrowsePage() {
 
         {africaRadioItems.length > 0 && (
           <ContentRow
-            title="🌍 Africa · Kenya, Nigeria, Ghana & Zimbabwe"
+            title="🌍 Africa · Kenya, Nigeria, Tanzania & more"
             items={africaRadioItems}
             limit={8}
             viewMoreHref="/radio"

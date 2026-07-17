@@ -12,6 +12,7 @@ const DEFAULT_LANGUAGES: Record<string, string[]> = {
   ng: ["English", "Pidgin"],
   gh: ["English", "Twi"],
   zw: ["English", "Shona", "Ndebele"],
+  tz: ["Swahili", "English"],
 };
 
 export function radioStation(

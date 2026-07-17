@@ -42,6 +42,9 @@ const ZBC_NATIONAL_FM = "https://mainradiostreaming.zbc.co.zw:8020/national.mp3"
 const ZBC_RADIO_ZIMBABWE =
   "https://backupradiostreaming.zbc.co.zw:8040/nhepfenuro.mp3";
 
+/** Clouds Media Group — official cloudsfm.co.tz / eu6.fastcast4u player (probed 2026-07). */
+const CLOUDS_FM_TZ = "http://eu6.fastcast4u.com:5306/";
+
 /**
  * Verified official / widely published African radio beyond SA + Malawi.
  * Only stations with HTTP 200 probes and official player pages.
@@ -245,6 +248,17 @@ export const CURATED_RADIO_AFRICA: CatalogItem[] = [
     ["ZBC", "Public"],
     ["Shona", "English"],
   ),
+  radioStation(
+    "radio-clouds-fm-tz",
+    "radio-clouds-fm-tz",
+    "Clouds FM",
+    "Clouds Media Group · Bongo Flava & urban hits · Dar es Salaam. Official cloudsfm.co.tz FastCast live stream.",
+    CLOUDS_FM_TZ,
+    ["tz"],
+    "mp4",
+    ["Clouds FM", "Bongo Flava"],
+    ["Swahili", "English"],
+  ),
 ];
 
 /** One flagship station per expanded-Africa country for home browse rows. */
@@ -253,4 +267,5 @@ export const AFRICA_RADIO_BROWSE_FLAGSHIPS: Record<string, string> = {
   ng: "radio-wazobia-lagos",
   gh: "radio-peace-fm-gh",
   zw: "radio-zbc-national-fm",
+  tz: "radio-clouds-fm-tz",
 };

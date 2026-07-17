@@ -13,10 +13,11 @@ export const RADIO_COUNTRY_META: Record<string, CountryMeta> = {
   ng: { code: "ng", name: "Nigeria", flag: "🇳🇬" },
   gh: { code: "gh", name: "Ghana", flag: "🇬🇭" },
   zw: { code: "zw", name: "Zimbabwe", flag: "🇿🇼" },
+  tz: { code: "tz", name: "Tanzania", flag: "🇹🇿" },
 };
 
 /** Display order for /radio country rows (SA + Malawi first, then expanded Africa). */
-export const RADIO_COUNTRY_ORDER = ["mw", "za", "ke", "ng", "gh", "zw"] as const;
+export const RADIO_COUNTRY_ORDER = ["mw", "za", "ke", "ng", "gh", "zw", "tz"] as const;
 
 export type RadioCountryCode = (typeof RADIO_COUNTRY_ORDER)[number];
 
@@ -51,7 +52,7 @@ export function getMalawiBrowseItems(): CatalogItem[] {
 /** One flagship per country for home browse (avoids duplicating the full /radio grid). */
 export function getAfricaRadioBrowseItems(): CatalogItem[] {
   const byId = new Map(CURATED_RADIO_AFRICA.map((station) => [station.id, station]));
-  return (["ke", "ng", "gh", "zw"] as const)
+  return (["ke", "ng", "gh", "zw", "tz"] as const)
     .map((code) => byId.get(AFRICA_RADIO_BROWSE_FLAGSHIPS[code] ?? ""))
     .filter((station): station is CatalogItem => Boolean(station));
 }
