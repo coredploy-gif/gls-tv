@@ -24,6 +24,10 @@ type AccountData = {
     activity: boolean;
     product: boolean;
     email_nonessential: boolean;
+    sound_chat: boolean;
+    sound_system: boolean;
+    sound_admin: boolean;
+    sound_billing: boolean;
   };
   deletion?: { status: string; execute_after: string } | null;
   sessions: {
@@ -327,6 +331,34 @@ export function AccountDashboard() {
             {key[0].toUpperCase() + key.slice(1)} notices
           </label>
         ))}
+        <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-gls-muted">
+          Notification sounds
+        </p>
+        <p className="mt-1 text-xs text-gls-muted">
+          Billing sounds stay on by default so payment reminders are hard to miss.
+        </p>
+        {(
+          [
+            ["sound_chat", "Chat messages"],
+            ["sound_system", "System notices"],
+            ["sound_admin", "Activity & sports"],
+            ["sound_billing", "Billing & payments"],
+          ] as const
+        ).map(([key, label]) => (
+          <label key={key} className="mt-3 flex items-center gap-2 text-sm text-gls-body">
+            <input
+              type="checkbox"
+              checked={data.preferences[key]}
+              onChange={(e) =>
+                setData({
+                  ...data,
+                  preferences: { ...data.preferences, [key]: e.target.checked },
+                })
+              }
+            />
+            {label}
+          </label>
+        ))}
         <button
           disabled={busy}
           className="mt-4 rounded border border-white/20 px-4 py-2 text-sm text-white"
@@ -337,6 +369,10 @@ export function AccountDashboard() {
               activity: data.preferences.activity,
               product: data.preferences.product,
               emailNonessential: false,
+              soundChat: data.preferences.sound_chat,
+              soundSystem: data.preferences.sound_system,
+              soundAdmin: data.preferences.sound_admin,
+              soundBilling: data.preferences.sound_billing,
             })
           }
         >

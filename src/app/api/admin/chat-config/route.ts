@@ -20,7 +20,7 @@ export async function GET() {
       welcome_title: "GLS Support",
       welcome_body:
         "Ask anything about GLS TV — we will search the knowledge base first.",
-      primary_color: "#ff4d7a",
+      primary_color: "#e50914",
       position: "bottom-right",
       show_kb_first: true,
       ask_human_label: "Talk to support",

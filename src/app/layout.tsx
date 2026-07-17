@@ -5,6 +5,7 @@ import { ActiveViewerProvider } from "@/lib/membership/active-viewer";
 import { LibraryProvider } from "@/lib/library";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { SupportChatWidget } from "@/components/SupportChatWidget";
+import { NotificationSoundProvider } from "@/components/NotificationSoundProvider";
 import { ReminderBanner } from "@/components/ReminderBanner";
 import { ManagedSystemLinks } from "@/components/ManagedSystemLinks";
 import { RemoteNavigation } from "@/components/RemoteNavigation";
@@ -73,6 +74,7 @@ export default function RootLayout({
     >
       <body className="gls-atmosphere min-h-full flex flex-col font-sans">
         <AuthProvider>
+          <NotificationSoundProvider>
           <ActiveViewerProvider>
             <LibraryProvider>
               <ServiceWorkerRegister />
@@ -85,6 +87,7 @@ export default function RootLayout({
               <SupportChatWidget />
             </LibraryProvider>
           </ActiveViewerProvider>
+          </NotificationSoundProvider>
         </AuthProvider>
       </body>
     </html>

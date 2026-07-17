@@ -832,6 +832,56 @@ body {
   animation: gls-admin-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.gls-chat-panel {
+  animation: gls-chat-panel-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.gls-chat-launcher {
+  animation: gls-chat-launcher-in 0.24s ease-out both;
+}
+
+.gls-chat-msg {
+  animation: gls-chat-msg-in 0.22s ease-out both;
+}
+
+.gls-chat-send:active:not(:disabled) {
+  transform: scale(0.96);
+  transition: transform 0.12s ease;
+}
+
+@keyframes gls-chat-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes gls-chat-launcher-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes gls-chat-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

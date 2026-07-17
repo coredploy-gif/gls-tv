@@ -10,6 +10,7 @@ import {
   saveReadIds,
   type AppNotification,
 } from "@/lib/notifications";
+import { notifyNotificationsUpdated } from "@/components/NotificationSoundProvider";
 
 export function NotificationBell() {
   const { viewer } = useActiveViewer();
@@ -38,6 +39,7 @@ export function NotificationBell() {
       setReadIds(merged);
       saveReadIds(viewerKey, merged);
       setDismissedIds(new Set(json.dismissedIds || []));
+      notifyNotificationsUpdated(json.items || []);
     } catch {
       setServerItems([]);
     }

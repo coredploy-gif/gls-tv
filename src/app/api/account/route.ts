@@ -72,6 +72,10 @@ export async function GET(req: NextRequest) {
       activity: true,
       product: true,
       email_nonessential: false,
+      sound_chat: true,
+      sound_system: true,
+      sound_admin: true,
+      sound_billing: true,
     },
     deletion: deletion.data,
     sessions: {
@@ -127,6 +131,10 @@ export async function PATCH(req: NextRequest) {
       activity: body.activity !== false,
       product: body.product !== false,
       email_nonessential: body.emailNonessential === true,
+      sound_chat: body.soundChat !== false,
+      sound_system: body.soundSystem !== false,
+      sound_admin: body.soundAdmin !== false,
+      sound_billing: body.soundBilling !== false,
       updated_at: new Date().toISOString(),
     };
     const { error } = await service.from("notification_preferences").upsert(row);
