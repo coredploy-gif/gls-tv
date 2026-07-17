@@ -1,3 +1,4 @@
+import type { CatalogItem, MediaSource } from "@/data/types";
 import { COPY_FALLBACKS } from "@/lib/copy";
 
 export type MediaLinkFormat =
@@ -75,6 +76,84 @@ export const MEDIA_LINK_CATEGORIES = [
 ] as const;
 
 export type MediaLinkCategory = (typeof MEDIA_LINK_CATEGORIES)[number];
+
+/**
+ * Playable sources for My Links / staff picks.
+ * HLS mirrors imported playlist channels: try the origin first, then the
+ * authenticated same-origin relay keyed by mediaLinkId (skips catalogue host
+ * allowlisting after DB ownership checks in /api/hls).
+ */
+export function mediaLinkPlaySources(link: {
+  id: string;
+  url: string;
+  format: MediaLinkFormat;
+}): MediaSource[] {
+  const format: "hls" | "mp4" =
+    link.format === "mp4" || link.format === "webm" ? "mp4" : "hls";
+  if (format !== "hls") {
+    return [{ url: link.url, quality: "Auto", format }];
+  }
+  return [
+    {
+      url: link.url,
+      quality: "Auto",
+      format,
+      label: "browser-direct",
+    },
+    {
+      url: `/api/hls?mediaLinkId=${encodeURIComponent(link.id)}`,
+      quality: "Auto",
+      format,
+      label: "secure-relay",
+    },
+  ];
+}
+
+export function userMediaLinkToCatalog(link: UserMediaLink): CatalogItem {
+  return {
+    id: `media-${link.id}`,
+    slug: `media-${link.id}`,
+    title: link.title,
+    type: link.format === "hls" ? "live" : "movie",
+    description: `${link.format.toUpperCase()} · My Links`,
+    countries: ["world"],
+    categories: ["My Links", link.category, "Playable"],
+    languages: ["English"],
+    poster:
+      link.thumbnail_url ||
+      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&h=2400&q=80",
+    backdrop:
+      link.thumbnail_url ||
+      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=3840&h=2160&q=80",
+    license: "open_stream",
+    isLive: link.format === "hls",
+    featured: false,
+    sources: mediaLinkPlaySources(link),
+  };
+}
+
+export function adminMediaLinkToCatalog(link: AdminMediaLink): CatalogItem {
+  return {
+    id: `staff-${link.id}`,
+    slug: `staff-${link.id}`,
+    title: link.title,
+    type: link.format === "hls" ? "live" : "movie",
+    description: `${link.format.toUpperCase()} · Staff pick`,
+    countries: ["world"],
+    categories: ["Staff picks", link.category, "Playable"],
+    languages: ["English"],
+    poster:
+      link.thumbnail_url ||
+      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&h=2400&q=80",
+    backdrop:
+      link.thumbnail_url ||
+      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=3840&h=2160&q=80",
+    license: "open_stream",
+    isLive: link.format === "hls",
+    featured: false,
+    sources: mediaLinkPlaySources(link),
+  };
+}
 
 export function normalizeMediaLinkCategory(raw?: string | null): string {
   const value = (raw || "").trim().slice(0, 60);

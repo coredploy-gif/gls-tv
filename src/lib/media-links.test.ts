@@ -6,6 +6,7 @@ import {
   isAppMediaPath,
   isEvodHost,
   isTrustedAppMediaUrl,
+  mediaLinkPlaySources,
   normalizeEvodUrl,
   normalizeMediaLinkCategory,
   resolveMediaEmbedUrl,
@@ -23,6 +24,29 @@ describe("media-links", () => {
     expect(v.ok).toBe(true);
     expect(v.format).toBe("hls");
     expect(v.title).toBe("BBC Food");
+  });
+
+  it("builds owned HLS sources with mediaLinkId secure relay", () => {
+    const url = "http://40.160.24.55/TSN_1/index.m3u8";
+    const sources = mediaLinkPlaySources({
+      id: "link-abc",
+      url,
+      format: "hls",
+    });
+    expect(sources).toEqual([
+      {
+        url,
+        quality: "Auto",
+        format: "hls",
+        label: "browser-direct",
+      },
+      {
+        url: "/api/hls?mediaLinkId=link-abc",
+        quality: "Auto",
+        format: "hls",
+        label: "secure-relay",
+      },
+    ]);
   });
 
   it("detects YouTube and builds embed", () => {

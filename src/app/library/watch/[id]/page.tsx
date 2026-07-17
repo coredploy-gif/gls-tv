@@ -3,7 +3,6 @@ import { notFound, redirect } from "next/navigation";
 import { BrowseNav } from "@/components/BrowseNav";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { WatchBackButton } from "@/components/WatchBackButton";
-import type { CatalogItem } from "@/data/types";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountEntitlement } from "@/lib/membership/account";
 import { EvodLaunchPlayer } from "@/components/EvodLaunchPlayer";
@@ -11,42 +10,12 @@ import {
   isMediaExternalSiteFormat,
   isMediaIframeFormat,
   resolveMediaEmbedUrl,
+  userMediaLinkToCatalog,
   type MediaLinkFormat,
   type UserMediaLink,
 } from "@/lib/media-links";
 
 type Props = { params: Promise<{ id: string }> };
-
-function toCatalog(link: UserMediaLink): CatalogItem {
-  const format =
-    link.format === "mp4" || link.format === "webm" ? "mp4" : "hls";
-  return {
-    id: `media-${link.id}`,
-    slug: `media-${link.id}`,
-    title: link.title,
-    type: link.format === "hls" ? "live" : "movie",
-    description: `${link.format.toUpperCase()} · My Links`,
-    countries: ["world"],
-    categories: ["My Links", link.category, "Playable"],
-    languages: ["English"],
-    poster:
-      link.thumbnail_url ||
-      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&h=2400&q=80",
-    backdrop:
-      link.thumbnail_url ||
-      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=3840&h=2160&q=80",
-    license: "open_stream",
-    isLive: link.format === "hls",
-    featured: false,
-    sources: [
-      {
-        url: link.url,
-        quality: "Auto",
-        format: format as "hls" | "mp4",
-      },
-    ],
-  };
-}
 
 function EmbedPlayer({
   format,
@@ -136,7 +105,7 @@ export default async function LibraryWatchPage({ params }: Props) {
             <p className="text-sm text-amber-200">eVOD URL missing for this link.</p>
           )
         ) : (
-          <VideoPlayer item={toCatalog(link)} />
+          <VideoPlayer item={userMediaLinkToCatalog(link)} />
         )}
 
         <p className="mt-4 text-sm text-gls-muted">

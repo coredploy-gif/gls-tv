@@ -51,15 +51,17 @@ function timedResponse(
   return response;
 }
 
+type OwnershipKind = "channelId" | "mediaLinkId";
+
 function proxyUrl(
   absolute: string,
-  channelId?: string | null,
+  ownership?: { kind: OwnershipKind; id: string } | null,
   sessionToken?: string | null,
 ) {
   const params = new URLSearchParams();
-  if (channelId) {
-    params.set("channelId", channelId);
-    const ticket = issueHlsTicket(channelId, absolute, sessionToken || null);
+  if (ownership?.id) {
+    params.set(ownership.kind, ownership.id);
+    const ticket = issueHlsTicket(ownership.id, absolute, sessionToken || null);
     if (ticket) {
       params.set("exp", String(ticket.expiresAt));
       params.set("sig", ticket.signature);
@@ -103,14 +105,20 @@ export async function GET(req: NextRequest) {
     timedResponse(response, startedAt, spans);
   const sessionToken = req.cookies.get(VIEWER_SESSION_COOKIE)?.value;
   const channelId = req.nextUrl.searchParams.get("channelId");
+  const mediaLinkId = req.nextUrl.searchParams.get("mediaLinkId");
+  const ownership: { kind: OwnershipKind; id: string } | null = channelId
+    ? { kind: "channelId", id: channelId }
+    : mediaLinkId
+      ? { kind: "mediaLinkId", id: mediaLinkId }
+      : null;
   const raw = req.nextUrl.searchParams.get("url");
   const signature = req.nextUrl.searchParams.get("sig");
   const expiresAt = Number(req.nextUrl.searchParams.get("exp"));
   const hasTicket = Boolean(signature || req.nextUrl.searchParams.has("exp"));
   const signedRequest =
-    Boolean(channelId && raw && signature) &&
+    Boolean(ownership && raw && signature) &&
     verifyHlsTicket(
-      channelId!,
+      ownership!.id,
       raw!,
       expiresAt,
       signature!,
@@ -217,6 +225,37 @@ export async function GET(req: NextRequest) {
       // Curated open FAST/FTA when stored origin is fragile/dead or overridden.
       // Arena pay-linear returns null from primaryPrivateHealUrl — left alone.
       persistedUrl = preferHeal && openHeal ? openHeal : rawStream;
+    } else if (mediaLinkId) {
+      // Owned My Links + published staff picks mirror playlist channelId:
+      // authenticate + DB ownership, then skip catalogue host allowlisting.
+      const { data: userLink } = await measured(
+        "media_link",
+        supabase
+          .from("user_media_links")
+          .select("url")
+          .eq("id", mediaLinkId)
+          .eq("user_id", user.id)
+          .maybeSingle(),
+      );
+      if (userLink?.url) {
+        persistedUrl = userLink.url.trim();
+      } else {
+        const { data: staffLink } = await measured(
+          "staff_link",
+          supabase
+            .from("admin_media_links")
+            .select("url")
+            .eq("id", mediaLinkId)
+            .eq("is_published", true)
+            .maybeSingle(),
+        );
+        if (!staffLink?.url) {
+          return respond(
+            NextResponse.json({ error: "Link not found" }, { status: 404 }),
+          );
+        }
+        persistedUrl = staffLink.url.trim();
+      }
     }
   }
 
@@ -224,7 +263,11 @@ export async function GET(req: NextRequest) {
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     req.headers.get("x-real-ip") ||
     "unknown";
-  if (!withinQuota(`${authenticatedUserId || channelId || "signed"}:${ip}`)) {
+  if (
+    !withinQuota(
+      `${authenticatedUserId || ownership?.id || "signed"}:${ip}`,
+    )
+  ) {
     return respond(
       NextResponse.json({ error: "Too many media requests" }, { status: 429 }),
     );
@@ -239,11 +282,11 @@ export async function GET(req: NextRequest) {
   let target: string;
   try {
     target = raw ? decodeURIComponent(raw) : persistedUrl!;
-    if (channelId) {
+    if (ownership) {
       // HLS manifests commonly hand segment, key, and variant requests to a
-      // different CDN hostname. A channelId is owner-scoped and authenticated
-      // above, so accept those derived public URLs instead of requiring every
-      // customer playlist CDN to be pre-listed in our built-in catalogue.
+      // different CDN hostname. channelId / mediaLinkId are owner-scoped and
+      // authenticated above, so accept those derived public URLs instead of
+      // requiring every customer playlist CDN to be pre-listed in our catalogue.
       // validatePublicUrl still blocks private/reserved network targets.
       await validatePublicUrl(target);
     } else {
@@ -261,7 +304,7 @@ export async function GET(req: NextRequest) {
         timeoutMs: 15_000,
         maxRedirects: 4,
         maxBytes: 32 * 1024 * 1024,
-        allowedHost: channelId ? undefined : isAllowedMediaHost,
+        allowedHost: ownership ? undefined : isAllowedMediaHost,
       }),
     );
     if (upstream.status >= 400) {
@@ -303,7 +346,7 @@ export async function GET(req: NextRequest) {
             manifest.toString("utf8"),
             upstream.finalUrl,
             (absoluteUrl) =>
-              proxyUrl(absoluteUrl, channelId, sessionToken || null),
+              proxyUrl(absoluteUrl, ownership, sessionToken || null),
           ),
           {
             headers: {
