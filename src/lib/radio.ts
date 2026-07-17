@@ -1,4 +1,5 @@
 import type { CatalogItem } from "@/data/types";
+import { CURATED_MALAWI_TV } from "@/data/curated-malawi-tv";
 import { CURATED_RADIO_MW } from "@/data/curated-radio-mw";
 import { CURATED_RADIO_ZA } from "@/data/curated-radio-za";
 
@@ -15,7 +16,9 @@ export function getRadioStationsByCountry(country: "za" | "mw"): CatalogItem[] {
 }
 
 export function getMalawiBrowseItems(): CatalogItem[] {
-  return getRadioStationsByCountry("mw");
+  return [...CURATED_MALAWI_TV, ...getRadioStationsByCountry("mw")].sort((a, b) =>
+    a.title.localeCompare(b.title),
+  );
 }
 
 export function getRadioStationBySlug(

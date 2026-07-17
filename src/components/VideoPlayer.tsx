@@ -227,8 +227,12 @@ function bufferedAhead(el: HTMLVideoElement): number {
 }
 
 function playUrlFor(source: MediaSource, mode: "direct" | "proxy") {
-  if (source.format !== "hls") return source.url;
-  return mode === "proxy" ? toProxiedHls(source.url) : source.url;
+  const relay =
+    source.format === "hls" || requiresProxy(source.url);
+  if (mode === "proxy" && relay) {
+    return toProxiedHls(source.url);
+  }
+  return source.url;
 }
 
 /**
@@ -460,8 +464,14 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
       el.load();
 
       if (source.format !== "hls") {
+        const url = playUrlFor(source, mode);
         const onNativeError = () => {
           if (cancelled) return;
+          if (mode === "direct" && requiresProxy(source.url)) {
+            setStatus("Trying relay…");
+            setMode("proxy");
+            return;
+          }
           if (sourceIndex + 1 < sources.length) {
             setStatus("Trying another source…");
             setMode("direct");
@@ -472,7 +482,7 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
         };
         el.addEventListener("error", onNativeError);
         detachMedia = () => el.removeEventListener("error", onNativeError);
-        el.src = source.url;
+        el.src = url;
         setStatus("Playing");
         try {
           await el.play();

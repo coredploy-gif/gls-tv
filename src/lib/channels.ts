@@ -17,6 +17,7 @@ import africaJson from "@/data/generated/africa.json";
 import asiaJson from "@/data/generated/asia.json";
 import overridesJson from "@/data/generated/channel-overrides.json";
 import { CURATED_AFRICA } from "@/data/curated-africa";
+import { CURATED_MALAWI_TV } from "@/data/curated-malawi-tv";
 import { CURATED_RADIO_ZA } from "@/data/curated-radio-za";
 import { CURATED_RADIO_MW } from "@/data/curated-radio-mw";
 import {
@@ -117,6 +118,7 @@ export function getVerifiedChannels() {
   return mergeUnique(
     top10,
     CURATED_AFRICA,
+    CURATED_MALAWI_TV,
     CURATED_RADIO_ZA,
     CURATED_RADIO_MW,
     CURATED_PUBLIC_SPORTS,
@@ -137,6 +139,7 @@ export function getAllChannels(): CatalogItem[] {
   return mergeUnique(
     top10,
     CURATED_AFRICA,
+    CURATED_MALAWI_TV,
     CURATED_RADIO_ZA,
     CURATED_RADIO_MW,
     CURATED_PUBLIC_SPORTS,
@@ -203,6 +206,7 @@ export function getChannelBySlug(slug: string): CatalogItem | undefined {
   const lists = [
     top10,
     CURATED_AFRICA,
+    CURATED_MALAWI_TV,
     CURATED_RADIO_ZA,
     CURATED_RADIO_MW,
     CURATED_PUBLIC_SPORTS,
