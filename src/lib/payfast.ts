@@ -173,3 +173,62 @@ export function parsePayfastFormBody(rawBody: string): {
   }
   return { data, ordered, paramString: pairs.join("&") };
 }
+
+/** Official PayFast ITN source ranges (developers.payfast.co.za). */
+const PAYFAST_ITN_CIDRS = [
+  "197.97.145.144/28",
+  "41.74.179.192/27",
+  "102.216.36.0/28",
+  "102.216.36.128/28",
+  "144.126.193.139/32",
+] as const;
+
+function ipv4ToInt(ip: string): number | null {
+  const parts = ip.trim().split(".");
+  if (parts.length !== 4) return null;
+  let n = 0;
+  for (const p of parts) {
+    const octet = Number(p);
+    if (!Number.isInteger(octet) || octet < 0 || octet > 255) return null;
+    n = (n << 8) + octet;
+  }
+  return n >>> 0;
+}
+
+function ipInCidr(ip: string, cidr: string): boolean {
+  const [base, bitsRaw] = cidr.split("/");
+  const ipN = ipv4ToInt(ip);
+  const baseN = ipv4ToInt(base || "");
+  if (ipN == null || baseN == null) return false;
+  const bits = Number(bitsRaw ?? 32);
+  if (!Number.isInteger(bits) || bits < 0 || bits > 32) return false;
+  if (bits === 0) return true;
+  const mask = bits === 32 ? 0xffffffff : (~0 << (32 - bits)) >>> 0;
+  return (ipN & mask) === (baseN & mask);
+}
+
+/** Client IP for ITN (honours first X-Forwarded-For hop on Vercel). */
+export function payfastRequestIp(req: {
+  headers: { get(name: string): string | null };
+}): string | null {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const first = forwarded.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  return req.headers.get("x-real-ip")?.trim() || null;
+}
+
+/**
+ * Optional ITN IP gate. Set PAYFAST_SKIP_IP_CHECK=true if a proxy strips the
+ * real source (signature + server validate still apply).
+ */
+export function isPayfastItnIpAllowed(ip: string | null): boolean {
+  const skip = (process.env.PAYFAST_SKIP_IP_CHECK || "")
+    .trim()
+    .toLowerCase();
+  if (skip === "1" || skip === "true" || skip === "yes") return true;
+  if (!ip) return payfastSandbox(); // sandbox ITNs can be flaky behind CDNs
+  return PAYFAST_ITN_CIDRS.some((cidr) => ipInCidr(ip, cidr));
+}
+

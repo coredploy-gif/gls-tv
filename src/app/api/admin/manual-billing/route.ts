@@ -444,6 +444,65 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  if (action === "sync_payfast") {
+    const paymentId = String(body.paymentId || "").trim();
+    let stuckQuery = service
+      .from("manual_payment_requests")
+      .select(
+        "id, payment_reference, pf_payment_id, payfast_status, status, user_id",
+      )
+      .eq("payment_method", "payfast")
+      .in("status", ["pending", "proof_submitted", "verifying"])
+      .ilike("payfast_status", "complete");
+    if (paymentId) stuckQuery = stuckQuery.eq("id", paymentId);
+    const { data: stuck, error: stuckError } = await stuckQuery.limit(50);
+    if (stuckError) {
+      return NextResponse.json({ error: stuckError.message }, { status: 500 });
+    }
+    if (!stuck?.length) {
+      return NextResponse.json({
+        ok: true,
+        activated: 0,
+        message:
+          "No PayFast rows with COMPLETE ITN waiting for activation. If a member paid, wait for ITN or approve with the PayFast transaction ID.",
+      });
+    }
+    let activated = 0;
+    const errors: string[] = [];
+    for (const row of stuck) {
+      const pfId = row.pf_payment_id || row.payment_reference;
+      const result = await activateManualPayment({
+        service,
+        paymentId: row.id,
+        adminEmail: admin.email || "admin",
+        externalTransactionId: `payfast:${pfId}`,
+        paymentMethod: "payfast",
+        adminNote: "Confirmed from PayFast COMPLETE status (admin sync)",
+      });
+      if (result.ok) activated += 1;
+      else if (!String(result.error || "").includes("already")) {
+        errors.push(`${row.payment_reference}: ${result.error}`);
+      } else {
+        activated += 1;
+      }
+    }
+    await writeAuditLog(service, {
+      actorEmail: admin.email,
+      actorUserId: admin.id,
+      action: "payfast_payment_sync",
+      entityType: "payment",
+      entityId: paymentId || "batch",
+      summary: `PayFast sync activated ${activated}/${stuck.length}`,
+      meta: { activated, errors },
+    });
+    return NextResponse.json({
+      ok: true,
+      activated,
+      scanned: stuck.length,
+      errors,
+    });
+  }
+
   if (action === "set_status") {
     const paymentId = String(body.paymentId || "");
     const status = String(body.status || "");

@@ -25,7 +25,7 @@ export async function GET() {
   const { data: paid } = await service
     .from("manual_payment_requests")
     .select(
-      "id, payment_reference, member_reference, amount_zar_cents, status, payment_method, yoco_link_id, external_transaction_id, updated_at, paid_at",
+      "id, payment_reference, member_reference, amount_zar_cents, status, payment_method, yoco_link_id, pf_payment_id, payfast_status, external_transaction_id, updated_at, paid_at",
     )
     .eq("status", "paid")
     .order("updated_at", { ascending: false })
@@ -48,12 +48,23 @@ export async function GET() {
         item.order_id === payment.id ||
         item.customer_reference === payment.payment_reference,
     );
-    let match: "matched" | "yoco_unpaid" | "missing_in_yoco" | "eft_or_manual" =
-      "eft_or_manual";
+    let match:
+      | "matched"
+      | "yoco_unpaid"
+      | "missing_in_yoco"
+      | "payfast_matched"
+      | "payfast_pending_id"
+      | "eft_or_manual" = "eft_or_manual";
     if (payment.payment_method === "yoco") {
       if (!link) match = "missing_in_yoco";
       else if (link.status === "paid") match = "matched";
       else match = "yoco_unpaid";
+    } else if (payment.payment_method === "payfast") {
+      match =
+        payment.pf_payment_id ||
+        String(payment.external_transaction_id || "").startsWith("payfast:")
+          ? "payfast_matched"
+          : "payfast_pending_id";
     }
     return {
       ...payment,
@@ -68,6 +79,9 @@ export async function GET() {
     matched: rows.filter((r) => r.match === "matched").length,
     missingInYoco: rows.filter((r) => r.match === "missing_in_yoco").length,
     yocoUnpaid: rows.filter((r) => r.match === "yoco_unpaid").length,
+    payfastMatched: rows.filter((r) => r.match === "payfast_matched").length,
+    payfastPendingId: rows.filter((r) => r.match === "payfast_pending_id")
+      .length,
     eftOrManual: rows.filter((r) => r.match === "eft_or_manual").length,
     yocoConfigured: yocoConfigured(),
     yocoError,

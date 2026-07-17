@@ -3,9 +3,11 @@ import { createServiceClient } from "@/lib/eadmin";
 import { activateManualPayment } from "@/lib/manual-billing";
 import {
   confirmPayfastItn,
+  isPayfastItnIpAllowed,
   parsePayfastFormBody,
   payfastConfigured,
   payfastCredentials,
+  payfastRequestIp,
   verifyPayfastItnSignature,
 } from "@/lib/payfast";
 
@@ -19,6 +21,11 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   if (!payfastConfigured()) {
     return new NextResponse("PayFast not configured", { status: 503 });
+  }
+
+  const sourceIp = payfastRequestIp(req);
+  if (!isPayfastItnIpAllowed(sourceIp)) {
+    return new NextResponse("Invalid source IP", { status: 403 });
   }
 
   const rawBody = await req.text();
@@ -62,6 +69,18 @@ export async function POST(req: NextRequest) {
     return new NextResponse("OK", { status: 200 });
   }
 
+  // Idempotent: already-paid rows still ACK so PayFast stops retrying.
+  let paidQuery = service
+    .from("manual_payment_requests")
+    .select("id, status")
+    .eq("status", "paid");
+  if (mPaymentId) paidQuery = paidQuery.eq("payment_reference", mPaymentId);
+  else paidQuery = paidQuery.eq("pf_payment_id", pfPaymentId);
+  const { data: alreadyPaid } = await paidQuery.maybeSingle();
+  if (alreadyPaid) {
+    return new NextResponse("OK", { status: 200 });
+  }
+
   let query = service
     .from("manual_payment_requests")
     .select(
@@ -84,7 +103,7 @@ export async function POST(req: NextRequest) {
       user_id: payment.user_id,
       event_type: "payfast_amount_mismatch",
       actor_email: "payfast-itn",
-      meta: { amountGross, expectedAmount, pfPaymentId, paymentStatus },
+      meta: { amountGross, expectedAmount, pfPaymentId, paymentStatus, sourceIp },
     });
     return new NextResponse("OK", { status: 200 });
   }
@@ -118,6 +137,7 @@ export async function POST(req: NextRequest) {
       paymentStatus,
       amountGross,
       mPaymentId,
+      sourceIp,
     },
   });
 

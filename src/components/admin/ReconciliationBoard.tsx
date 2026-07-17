@@ -20,6 +20,8 @@ type Payload = {
     matched: number;
     missingInYoco: number;
     yocoUnpaid: number;
+    payfastMatched?: number;
+    payfastPendingId?: number;
     eftOrManual: number;
     yocoConfigured: boolean;
     yocoError: string | null;
@@ -64,7 +66,7 @@ export function ReconciliationBoard() {
       <AdminPageHeader
         eyebrow="Finance"
         title="Reconciliation"
-        description="Match GLS paid memberships against recent Yoco payment links. EFT/manual rows stay separate."
+        description="Match GLS paid memberships against Yoco links and PayFast ITN IDs. EFT/manual rows stay separate."
       />
       <div className="mt-4 flex flex-wrap gap-3">
         <button type="button" className="gls-cta rounded px-4 py-2 text-sm" onClick={() => void load()}>
@@ -80,12 +82,14 @@ export function ReconciliationBoard() {
       </div>
       {status && <p className="mt-3 text-sm text-amber-200">{status}</p>}
       {s && (
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
           {[
             ["Paid (GLS)", s.paidCount],
             ["Yoco matched", s.matched],
             ["Missing in Yoco", s.missingInYoco],
             ["Yoco unpaid", s.yocoUnpaid],
+            ["PayFast matched", s.payfastMatched ?? 0],
+            ["PayFast no ID", s.payfastPendingId ?? 0],
             ["EFT / manual", s.eftOrManual],
           ].map(([label, value]) => (
             <div key={String(label)} className="gls-admin-card rounded-lg p-4">

@@ -302,6 +302,12 @@ export function ManualBillingAdmin({
               paymentId: selected.id,
             })
           }
+          syncPayfast={() =>
+            void action({
+              action: "sync_payfast",
+              ...(selected ? { paymentId: selected.id } : {}),
+            })
+          }
           setPaymentStatus={(next) =>
             selected &&
             void action({
@@ -425,6 +431,7 @@ function PaymentsView({
   setAdminNote,
   approve,
   syncYoco,
+  syncPayfast,
   setPaymentStatus,
   record,
 }: {
@@ -444,6 +451,7 @@ function PaymentsView({
   setAdminNote: (value: string) => void;
   approve: () => void;
   syncYoco: () => void;
+  syncPayfast: () => void;
   setPaymentStatus: (status: string) => void;
   record: {
     identity: string;
@@ -738,6 +746,16 @@ function PaymentsView({
                     Check Yoco status + auto-activate
                   </button>
                 )}
+                <button
+                  type="button"
+                  disabled={busy !== null}
+                  onClick={syncPayfast}
+                  className="w-full rounded-md border border-emerald-500/35 bg-emerald-500/10 px-5 py-2.5 text-sm font-semibold text-emerald-100 disabled:opacity-40"
+                >
+                  {selected.payment_method === "payfast"
+                    ? "Sync this PayFast COMPLETE → activate"
+                    : "Sync stuck PayFast COMPLETE → activate"}
+                </button>
                 <div className="grid gap-2 sm:grid-cols-3">
                   <button
                     type="button"
