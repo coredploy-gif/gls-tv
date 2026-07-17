@@ -85,7 +85,7 @@ export function ContentRow({
           type="button"
           aria-label="Previous"
           onClick={() => slide(-1)}
-          className="absolute left-1 top-1/2 z-20 hidden h-24 w-10 -translate-y-1/2 items-center justify-center rounded bg-black/60 text-2xl text-white opacity-0 backdrop-blur-sm transition group-hover/row:opacity-100 focus-visible:opacity-100 hover:bg-black/80 md:flex"
+          className="absolute left-1 top-1/2 z-20 hidden h-24 w-10 -translate-y-1/2 items-center justify-center rounded bg-black/60 text-2xl text-white opacity-0 backdrop-blur-sm transition group-hover/row:opacity-100 focus-visible:opacity-100 hover:bg-black/80 md:flex [@media(pointer:coarse)]:opacity-70"
         >
           ‹
         </button>
@@ -93,7 +93,7 @@ export function ContentRow({
           type="button"
           aria-label="Next"
           onClick={() => slide(1)}
-          className="absolute right-1 top-1/2 z-20 hidden h-24 w-10 -translate-y-1/2 items-center justify-center rounded bg-black/60 text-2xl text-white opacity-0 backdrop-blur-sm transition group-hover/row:opacity-100 focus-visible:opacity-100 hover:bg-black/80 md:flex"
+          className="absolute right-1 top-1/2 z-20 hidden h-24 w-10 -translate-y-1/2 items-center justify-center rounded bg-black/60 text-2xl text-white opacity-0 backdrop-blur-sm transition group-hover/row:opacity-100 focus-visible:opacity-100 hover:bg-black/80 md:flex [@media(pointer:coarse)]:opacity-70"
         >
           ›
         </button>

@@ -26,7 +26,7 @@ export function TitleCard({
       href={href || `/watch/${item.slug}`}
       className={`gls-tile group relative block shrink-0 ${TITLE_CARD_WIDTH}`}
     >
-      <div className="gls-poster-frame relative aspect-[2/3] overflow-hidden rounded-md bg-gls-elevated shadow-[0_8px_24px_rgba(0,0,0,0.55)] ring-1 ring-white/10 transition duration-300 group-hover:z-10 group-hover:scale-[1.06] group-hover:shadow-[0_16px_40px_rgba(0,0,0,0.55),0_0_28px_rgba(255,107,157,0.22)] group-hover:ring-gls-pink/45">
+      <div className="gls-poster-frame relative aspect-[2/3] overflow-hidden rounded-md bg-gls-elevated shadow-[0_8px_24px_rgba(0,0,0,0.55)] ring-1 ring-white/10 transition duration-300 group-hover:z-10 group-hover:scale-[1.06] group-hover:shadow-[0_16px_40px_rgba(0,0,0,0.55),0_0_28px_rgba(255,107,157,0.22)] group-hover:ring-gls-pink/45 group-focus-within:z-10 group-focus-within:scale-[1.06] group-focus-within:shadow-[0_16px_40px_rgba(0,0,0,0.55),0_0_28px_rgba(255,107,157,0.22)] group-focus-within:ring-gls-pink/45">
         <PosterArt item={item} priority={priority} />
 
         {item.isLive && (
@@ -85,8 +85,8 @@ export function TitleCard({
             {rank}
           </span>
         )}
-        <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/85 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
-        <div className="absolute inset-x-0 bottom-0 z-[2] translate-y-2 p-2.5 opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100">
+        <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/85 via-transparent to-transparent opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100" />
+        <div className="absolute inset-x-0 bottom-0 z-[2] translate-y-2 p-2.5 opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100">
           <p className="line-clamp-2 text-xs font-semibold text-white sm:text-sm">
             {item.title}
           </p>

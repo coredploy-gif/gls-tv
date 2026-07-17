@@ -1,7 +1,7 @@
 /* GLS TV — minimal PWA service worker (cache shell only; streams stay network). */
 // Increment this whenever the app shell changes. A stale HTML shell paired
 // with a newer Next.js client bundle causes hydration recovery loops.
-const CACHE = "gls-tv-shell-v4";
+const CACHE = "gls-tv-shell-v5";
 const PRECACHE = ["/", "/offline", "/browse", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", (event) => {

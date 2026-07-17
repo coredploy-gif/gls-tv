@@ -19,6 +19,7 @@ import {
 import { isBrokenTraceOrigin, isTraceChannel } from "@/lib/trace-mirrors";
 import { isLinearPayCategory } from "@/lib/linear-pay";
 import { useAppCopy } from "@/lib/useAppCopy";
+import { PlayerChrome } from "@/components/PlayerChrome";
 
 type VideoPlayerProps = {
   item: CatalogItem;
@@ -322,6 +323,14 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
       /* ignore */
     }
   }, [item.title, item.poster, item.isLive]);
+
+  // AirPlay / remote playback: allow wireless targets on Safari & Chromium
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.setAttribute("x-webkit-airplay", "allow");
+    el.disableRemotePlayback = false;
+  }, [item.id]);
 
   // Warm next mirror in background (manifest only)
   useEffect(() => {
@@ -974,19 +983,23 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
     );
   }
 
+  const statusBusy =
+    /buffer|starting|reconnect|recover|smooth|switch|getting ready|tap play/i.test(
+      status,
+    );
+
   return (
-    <div className="relative aspect-video w-full overflow-hidden bg-black">
+    <div className="gls-player-stage relative aspect-video w-full overflow-hidden bg-black">
       <video
         ref={videoRef}
         className="h-full w-full bg-black"
-        controls
         autoPlay
         playsInline
         preload="auto"
       />
 
       {error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/85 p-6 text-center">
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/85 p-6 text-center">
           <p className="text-lg font-semibold text-white">{error}</p>
           {(isHardGeo(item) || /geo|region|south africa/i.test(error)) && (
             <p className="max-w-md text-sm text-white/70">
@@ -1048,38 +1061,51 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
       )}
 
       {!error && (
-        <div className="absolute left-4 top-4 flex flex-wrap items-center gap-2">
-          {/buffer|starting|reconnect|recover|smooth|switch/i.test(status) && (
-            <span className="gls-buffer-ring !h-7 !w-7 border-2" aria-hidden />
-          )}
-          <span className="inline-flex items-center gap-1.5 rounded bg-black/70 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-white ring-1 ring-white/15">
-            {item.isLive && !behindLive && (
-              <span className="gls-live-dot h-1.5 w-1.5 rounded-full bg-gls-red" />
+        <>
+          <div
+            className={`gls-player-status absolute left-4 top-4 z-[15] flex flex-wrap items-center gap-2 transition-opacity duration-300 ${
+              statusBusy ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
+          >
+            {statusBusy && (
+              <span className="gls-buffer-ring !h-7 !w-7 border-2" aria-hidden />
             )}
-            {status}
-            {(privatePlaylist || aheadSec >= 5) && (
-              <span className="normal-case tracking-normal text-emerald-300/90">
-                · {aheadSec}s
-                {privatePlaylist ? " / 60s buffer target" : " ahead"}
-              </span>
-            )}
-            {item.categories.includes("Geo") && (
-              <span className="normal-case tracking-normal text-amber-200/80">
-                · regional availability
-              </span>
-            )}
-          </span>
+            <span className="inline-flex items-center gap-1.5 rounded bg-black/70 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-white ring-1 ring-white/15">
+              {item.isLive && !behindLive && (
+                <span className="gls-live-dot h-1.5 w-1.5 rounded-full bg-gls-red" />
+              )}
+              {status}
+              {(privatePlaylist || aheadSec >= 5) && (
+                <span className="normal-case tracking-normal text-emerald-300/90">
+                  · {aheadSec}s
+                  {privatePlaylist ? " / 60s buffer target" : " ahead"}
+                </span>
+              )}
+              {item.categories.includes("Geo") && (
+                <span className="normal-case tracking-normal text-amber-200/80">
+                  · regional availability
+                </span>
+              )}
+            </span>
+          </div>
           {item.isLive && behindLive && (
             <button
               type="button"
               onClick={goLive}
-              className="rounded bg-gls-red px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg transition hover:brightness-110"
+              className="absolute left-4 top-14 z-[15] rounded bg-gls-red px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Back to live
               {lagSec > 0 ? ` · ${lagSec}s` : ""}
             </button>
           )}
-        </div>
+          <PlayerChrome
+            videoRef={videoRef}
+            isLive={Boolean(item.isLive)}
+            title={item.title}
+            format={source?.format}
+            forceVisible={statusBusy}
+          />
+        </>
       )}
     </div>
   );

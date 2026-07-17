@@ -72,10 +72,18 @@ body {
   overflow-x: hidden;
 }
 
-/* Keep keyboard navigation as intentional as the pointer experience. */
+/* Keep keyboard / D-pad focus as intentional as the pointer experience. */
 :focus-visible {
   outline: 2px solid var(--gls-pink-soft);
   outline-offset: 4px;
+}
+
+/* Stronger focus ring for living-room / TV remotes */
+@media (pointer: coarse) {
+  :focus-visible {
+    outline-width: 3px;
+    outline-offset: 6px;
+  }
 }
 
 ::selection {
@@ -208,12 +216,18 @@ body {
 }
 
 .gls-tile:hover,
-.gls-tile:focus-within {
+.gls-tile:focus-within,
+.gls-tile:focus-visible {
   transform: scale(1.08);
   z-index: 5;
   box-shadow:
     0 18px 40px rgba(0, 0, 0, 0.65),
     0 0 28px rgba(255, 107, 157, 0.15);
+}
+
+.gls-tile:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.92);
+  outline-offset: 4px;
 }
 
 @keyframes gls-fade-up {
@@ -476,6 +490,16 @@ body {
   transform: scaleX(1);
 }
 
+.gls-nav-link:focus-visible {
+  color: #fff;
+  opacity: 1;
+  outline-offset: 6px;
+}
+
+.gls-nav-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
 .gls-nav-link.is-active {
   color: #fff;
   opacity: 1;
@@ -532,11 +556,113 @@ body {
 }
 
 .gls-mobile-nav-link svg { width: 1.25rem; height: 1.25rem; }
-.gls-mobile-nav-link:hover { color: white; }
+.gls-mobile-nav-link:hover,
+.gls-mobile-nav-link:focus-visible { color: white; }
 .gls-mobile-nav-link.is-active {
   color: var(--gls-pink-soft);
   background: linear-gradient(145deg, rgba(255, 107, 157, 0.18), rgba(255, 107, 157, 0.04));
   box-shadow: inset 0 0 0 1px rgba(255, 143, 181, 0.16);
+}
+
+/* Large / TV viewports: keep a persistent bottom rail for D-pad (not phone-only) */
+@media (min-width: 1024px) and (pointer: coarse) {
+  .gls-mobile-nav {
+    display: grid;
+  }
+}
+
+/* —— Custom video player chrome (auto-hide) —— */
+.gls-player-stage:fullscreen,
+.gls-player-stage:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+  aspect-ratio: auto;
+  background: #000;
+}
+
+.gls-player-chrome {
+  pointer-events: none;
+  transition: opacity 280ms ease, visibility 280ms ease;
+}
+
+.gls-player-chrome.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.gls-player-chrome.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.gls-player-chrome.is-visible .gls-player-center,
+.gls-player-chrome.is-visible .gls-player-bar,
+.gls-player-chrome.is-visible .gls-player-btn {
+  pointer-events: auto;
+}
+
+.gls-player-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  height: 4.5rem;
+  width: 4.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  transform: translate(-50%, -50%);
+  transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.gls-player-center:hover,
+.gls-player-center:focus-visible {
+  background: rgba(229, 9, 20, 0.85);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+}
+
+.gls-player-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  padding: 1.25rem 1rem 1rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.55) 55%, transparent 100%);
+}
+
+.gls-player-btn {
+  border-radius: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.45);
+  padding: 0.45rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.gls-player-btn:hover,
+.gls-player-btn:focus-visible {
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(229, 9, 20, 0.75);
+}
+
+.gls-player-scrub {
+  flex: 1;
+  height: 0.35rem;
+  cursor: pointer;
+  accent-color: var(--gls-red);
+}
+
+.gls-player-status {
+  transition: opacity 300ms ease;
 }
 
 .gls-skeleton {

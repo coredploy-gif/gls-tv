@@ -1,12 +1,16 @@
 {
+  "id": "/",
   "name": "GLS TV",
   "short_name": "GLS TV",
   "description": "Cinematic live TV, series and movies.",
   "start_url": "/profiles",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "any",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
+  "categories": ["entertainment", "video"],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -25,6 +29,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }

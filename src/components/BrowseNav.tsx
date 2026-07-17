@@ -111,13 +111,13 @@ export function BrowseNav() {
           )}
           <Link
             href="/playlists"
-            className="gls-glass hidden rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-gls-violet transition hover:text-white hover:brightness-125 sm:inline-flex"
+            className="gls-glass hidden rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-gls-violet transition hover:text-white hover:brightness-125 focus-visible:text-white sm:inline-flex"
           >
             + M3U
           </Link>
           <Link
             href="/search"
-            className="rounded-full p-2 text-gls-teal transition hover:bg-gls-teal/15 hover:text-[#9aeee6]"
+            className="rounded-full p-2 text-gls-teal transition hover:bg-gls-teal/15 hover:text-[#9aeee6] focus-visible:bg-gls-teal/15 focus-visible:text-[#9aeee6]"
             aria-label="Search"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
