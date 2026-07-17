@@ -1,3 +1,6 @@
+import net from "node:net";
+import { isReservedAddress } from "@/lib/secure-url";
+
 const MEDIA_HOST_SUFFIXES = [
   "mangomolo.com",
   "sabcplus.com",
@@ -37,4 +40,23 @@ export function isAllowedMediaHost(hostname: string) {
   return [...MEDIA_HOST_SUFFIXES, ...configured].some(
     (suffix) => hostname === suffix || hostname.endsWith(`.${suffix}`),
   );
+}
+
+/** Literal public IP hostnames (IPv4/IPv6) — private/reserved still blocked. */
+export function isPublicIpHostname(hostname: string) {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (!net.isIP(host)) return false;
+  return !isReservedAddress(host);
+}
+
+/**
+ * Single-stream HLS entry URLs (…/index.m3u8). Multi-channel lists are usually .m3u.
+ * Preview of these may skip the catalogue host allowlist; SSRF still uses validatePublicUrl.
+ */
+export function isLikelySingleStreamHlsUrl(raw: string) {
+  try {
+    return new URL(raw).pathname.toLowerCase().endsWith(".m3u8");
+  } catch {
+    return false;
+  }
 }

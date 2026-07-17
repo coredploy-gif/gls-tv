@@ -49,6 +49,15 @@ describe("media-links", () => {
     ]);
   });
 
+  it("accepts public-IP HTTP HLS for My Links / Staff picks validation", () => {
+    const url = "http://40.160.24.55/TSN_5/index.m3u8";
+    expect(detectPlayableFormat(url)).toBe("hls");
+    const v = validateMediaLinkUrl(url, "TSN 5");
+    expect(v.ok).toBe(true);
+    expect(v.format).toBe("hls");
+    expect(v.title).toBe("TSN 5");
+  });
+
   it("detects YouTube and builds embed", () => {
     const v = validateMediaLinkUrl(
       "https://www.youtube.com/watch?v=dQw4w9WgXcQ",

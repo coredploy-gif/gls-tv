@@ -4,7 +4,11 @@ import { createServiceClient, normalizeSlug } from "@/lib/eadmin";
 import { parseM3uDetailed } from "@/lib/iptv";
 import { secureFetchBuffered, validatePublicUrl } from "@/lib/secure-url";
 import { writeAuditLog } from "@/lib/admin/audit";
-import { isAllowedMediaHost } from "@/lib/media-hosts";
+import {
+  isAllowedMediaHost,
+  isLikelySingleStreamHlsUrl,
+  isPublicIpHostname,
+} from "@/lib/media-hosts";
 import {
   getAdminAccess,
   hasAdminPermission,
@@ -30,9 +34,10 @@ function allowedSource(hostname: string) {
   const listHost = [...DEFAULT_SOURCE_HOSTS, ...configured].some(
     (host) => hostname === host || hostname.endsWith(`.${host}`),
   );
-  // Single-stream HLS (jmp2 → Roku, Pluto, etc.) uses the media CDN allowlist;
-  // multi-channel M3U lists stay on the GitHub / configured list hosts above.
-  return listHost || isAllowedMediaHost(hostname);
+  // Single-stream HLS (jmp2 → Roku, Pluto, public-IP .m3u8) uses media CDN
+  // allowlist or public IP literals; multi-channel M3U lists stay on GitHub /
+  // configured list hosts. Private/reserved IPs remain blocked by validatePublicUrl.
+  return listHost || isAllowedMediaHost(hostname) || isPublicIpHostname(hostname);
 }
 
 function signingKey() {
@@ -73,12 +78,16 @@ async function gate() {
 }
 
 async function fetchAndParse(url: string) {
+  // Single .m3u8 streams (incl. public-IP HLS): skip catalogue host allowlist
+  // like owned mediaLinkId plays — validatePublicUrl still blocks SSRF targets.
+  // Multi-channel .m3u lists keep the source-host allowlist.
+  const singleHls = isLikelySingleStreamHlsUrl(url);
   const fetched = await secureFetchBuffered(url, {
     maxBytes: 4 * 1024 * 1024,
     timeoutMs: 20_000,
     // jmp2.uk → aka-live*.delivery.roku.com (and similar FAST chains)
     maxRedirects: 5,
-    allowedHost: allowedSource,
+    allowedHost: singleHls ? undefined : allowedSource,
     headers: {
       Accept: "application/vnd.apple.mpegurl,audio/x-mpegurl,text/plain,*/*",
       "User-Agent": "GLS-TV/1.0 (admin-m3u-preview)",
@@ -89,7 +98,7 @@ async function fetchAndParse(url: string) {
   return parseM3uDetailed(text, {
     baseUrl: fetched.finalUrl,
     maxChannels: 2000,
-    // Keep the pasted entry URL (jmp2/pluto) stable after CDN redirects.
+    // Keep the pasted entry URL (jmp2/pluto/public-IP) stable after CDN redirects.
     singleStreamUrl: url,
   });
 }
@@ -126,16 +135,23 @@ export async function POST(req: Request) {
           { status: 400 },
         );
       }
+      const singleHls =
+        parsed.stats.kind === "hls-master" || parsed.stats.kind === "hls-media";
       return NextResponse.json({
         token: sign(url),
         stats: parsed.stats,
+        singleStream: singleHls,
         channels: parsed.channels.slice(0, 100).map((channel, index) => ({
           index,
           title: channel.title,
           group: channel.categories[0] || "General",
           tvgId: channel.tvgId,
+          // Admin-only: needed for “Save as Staff picks” without catalog MFA.
+          url: channel.sources[0]?.url || url,
         })),
-        note: "Preview only. Publishing requires mapping each selection to an existing catalog slug.",
+        note: singleHls
+          ? "Single HLS stream. Prefer Save as Staff picks (My Links) for members — catalog publish maps to licensed tiles and needs MFA (AAL2)."
+          : "Preview only. Catalog publish maps selections to existing licensed catalog slugs (requires catalog permission + MFA). For individual member streams, use Save as Staff picks instead.",
       });
     } catch {
       return NextResponse.json(
@@ -150,7 +166,10 @@ export async function POST(req: Request) {
   }
   if (!hasAdminPermission(access.admin, "catalog.publish") || !requireAal2(access.admin)) {
     return NextResponse.json(
-      { error: "Catalog publishing requires the catalog permission and verified MFA (AAL2)." },
+      {
+        error:
+          "Catalog publishing requires the catalog permission and verified MFA (AAL2). For individual streams members can use, choose Save as Staff picks instead (My Links → Staff picks) — that path does not need catalog MFA.",
+      },
       { status: 403 },
     );
   }
