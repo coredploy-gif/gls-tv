@@ -27,9 +27,12 @@ function allowedSource(hostname: string) {
     .split(",")
     .map((host) => host.trim().toLowerCase())
     .filter(Boolean);
-  return [...DEFAULT_SOURCE_HOSTS, ...configured].some(
+  const listHost = [...DEFAULT_SOURCE_HOSTS, ...configured].some(
     (host) => hostname === host || hostname.endsWith(`.${host}`),
   );
+  // Single-stream HLS (jmp2 → Roku, Pluto, etc.) uses the media CDN allowlist;
+  // multi-channel M3U lists stay on the GitHub / configured list hosts above.
+  return listHost || isAllowedMediaHost(hostname);
 }
 
 function signingKey() {
@@ -73,10 +76,11 @@ async function fetchAndParse(url: string) {
   const fetched = await secureFetchBuffered(url, {
     maxBytes: 4 * 1024 * 1024,
     timeoutMs: 20_000,
-    maxRedirects: 3,
+    // jmp2.uk → aka-live*.delivery.roku.com (and similar FAST chains)
+    maxRedirects: 5,
     allowedHost: allowedSource,
     headers: {
-      Accept: "application/vnd.apple.mpegurl,audio/x-mpegurl,text/plain",
+      Accept: "application/vnd.apple.mpegurl,audio/x-mpegurl,text/plain,*/*",
       "User-Agent": "GLS-TV/1.0 (admin-m3u-preview)",
     },
   });
@@ -85,6 +89,8 @@ async function fetchAndParse(url: string) {
   return parseM3uDetailed(text, {
     baseUrl: fetched.finalUrl,
     maxChannels: 2000,
+    // Keep the pasted entry URL (jmp2/pluto) stable after CDN redirects.
+    singleStreamUrl: url,
   });
 }
 

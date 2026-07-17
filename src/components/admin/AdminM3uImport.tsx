@@ -66,8 +66,9 @@ export function AdminM3uImport() {
       <div>
         <h2 className="text-lg font-semibold text-white">Import approved M3U channel list</h2>
         <p className="mt-1 text-sm text-gls-muted">
-          Separate from single-stream seeds. Sources must be on the server allowlist;
-          previewing never publishes. Each selected channel must map to an existing
+          Separate from Staff picks. Accepts approved multi-channel M3U lists and
+          single HLS streams on the media host allowlist (e.g. jmp2.uk → Roku).
+          Previewing never publishes. Each selected channel must map to an existing
           catalog slug.
         </p>
       </div>

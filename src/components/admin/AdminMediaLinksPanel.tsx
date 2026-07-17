@@ -45,24 +45,48 @@ export function AdminMediaLinksPanel() {
   const liveCheck =
     url.trim().length > 8 ? validateMediaLinkUrl(url, title) : null;
 
-  const openPreview = (e: React.FormEvent) => {
+  const openPreview = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus(null);
+    setPreview(null);
     const v = validateMediaLinkUrl(url, title);
     if (!v.ok || !v.format || !v.title) {
       setStatus(v.error || "Invalid URL");
-      setPreview(null);
       return;
     }
-    setPreview({
-      url: url.trim(),
-      title: v.title,
-      category: category.trim() || "Featured",
-      notes: notes.trim(),
-      format: v.format,
-      thumbnailUrl: v.thumbnailUrl,
-      embedUrl: v.embedUrl,
-    });
+    setBusy(true);
+    try {
+      const res = await fetch("/api/admin/media-links", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: url.trim(),
+          title: v.title,
+          category: category.trim() || "Featured",
+          notes: notes.trim(),
+          preview_only: true,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Preview failed");
+      }
+      const p = data.preview as PreviewState & { probe?: string };
+      setPreview({
+        url: p.url,
+        title: p.title,
+        category: p.category,
+        notes: p.notes || "",
+        format: p.format,
+        thumbnailUrl: p.thumbnailUrl,
+        embedUrl: p.embedUrl,
+      });
+      setStatus(p.probe ? `Preview OK · ${p.probe}` : "Preview OK");
+    } catch (cause) {
+      setStatus(cause instanceof Error ? cause.message : "Preview failed");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const save = async (publish: boolean) => {
@@ -216,7 +240,7 @@ export function AdminMediaLinksPanel() {
           disabled={busy || !liveCheck?.ok}
           className="rounded-lg border border-white/20 px-5 py-2.5 text-sm text-white disabled:opacity-40 sm:col-span-2 sm:w-fit"
         >
-          Preview before publish
+          {busy && !preview ? "Checking…" : "Preview before publish"}
         </button>
       </form>
 

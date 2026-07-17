@@ -58,6 +58,8 @@ export async function POST(req: Request) {
     notes?: string;
     is_published?: boolean;
     skip_probe?: boolean;
+    /** Validate + reachability only — no DB write (Staff picks Preview). */
+    preview_only?: boolean;
   };
   try {
     body = await req.json();
@@ -87,6 +89,26 @@ export async function POST(req: Request) {
       );
     }
     if (probe.format) resolvedFormat = probe.format;
+
+    if (body.preview_only) {
+      return NextResponse.json({
+        preview: {
+          url,
+          title: validation.title,
+          format: resolvedFormat,
+          category: (body.category || "Featured").trim().slice(0, 60) || "Featured",
+          notes: (body.notes || "").trim().slice(0, 500),
+          thumbnailUrl: validation.thumbnailUrl,
+          embedUrl: validation.embedUrl,
+          probe: probe.detail || "Reachable",
+        },
+      });
+    }
+  } else if (body.preview_only) {
+    return NextResponse.json(
+      { error: "Preview requires a reachability probe" },
+      { status: 400 },
+    );
   }
 
   // New saves are drafts unless explicitly published via confirm step.
