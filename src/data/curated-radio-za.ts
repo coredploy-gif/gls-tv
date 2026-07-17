@@ -1,5 +1,6 @@
 import type { CatalogItem } from "@/data/types";
 import { radioStation } from "@/data/curated-radio-shared";
+import { CURATED_RADIO_ZA_ISLAM } from "@/data/curated-religion-za";
 
 /** StreamTheWorld redirect endpoints — official SABC / Primedia live audio. */
 const STW = (station: string) =>
@@ -128,4 +129,5 @@ export const CURATED_RADIO_ZA: CatalogItem[] = [
     "hls",
     ["Community", "Afrikaans"],
   ),
+  ...CURATED_RADIO_ZA_ISLAM,
 ];

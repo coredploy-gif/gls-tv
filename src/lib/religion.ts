@@ -64,6 +64,8 @@ const ISLAM_BROWSE_PRIORITY = [
   "iqraa-arabic",
   "holy-quran-radio-saudi",
   "islam-channel-urdu",
+  "radio-islam-sa",
+  "channel-islam-international",
 ];
 
 const GOSPEL_BROWSE_PRIORITY = [

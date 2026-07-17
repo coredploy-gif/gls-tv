@@ -1,4 +1,5 @@
 import type { CatalogItem } from "@/data/types";
+import { CURATED_RELIGION_ZA_ISLAM } from "@/data/curated-religion-za";
 
 const MAKKAH_POSTER =
   "https://images.unsplash.com/photo-1591604129939-f1efa4a5a7f2?auto=format&fit=crop&w=600&h=900&q=80";
@@ -234,6 +235,7 @@ export const CURATED_RELIGION_ISLAM: CatalogItem[] = [
       },
     ],
   },
+  ...CURATED_RELIGION_ZA_ISLAM,
 ];
 
 /** Gospel / Christian channels — also discovered via catalog + Africa curated heals. */

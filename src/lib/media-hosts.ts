@@ -42,6 +42,10 @@ const MEDIA_HOST_SUFFIXES = [
   "fasttvcdn.com",
   "kwikmotion.com",
   "simplestreamcdn.com",
+  // South African Islamic radio (official station / iono.fm streams)
+  "my-control-panel.com",
+  "radioislam.co.za",
+  "iono.fm",
 ];
 
 export function isAllowedMediaHost(hostname: string) {
