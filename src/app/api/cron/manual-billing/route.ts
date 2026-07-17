@@ -40,7 +40,7 @@ async function run(req: NextRequest) {
   const { data: expiredSubs } = await service
     .from("subscriptions")
     .select("user_id, current_period_end, provider, plan")
-    .in("provider", ["manual", "yoco"])
+    .in("provider", ["manual", "yoco", "payfast"])
     .eq("status", "active")
     .lt("current_period_end", now)
     .limit(500);

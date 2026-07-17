@@ -85,6 +85,7 @@ type Settings = {
   trading_name: string;
   support_email: string | null;
   yoco_enabled: boolean;
+  payfast_enabled: boolean;
   eft_enabled: boolean;
   bank_name: string | null;
   account_holder: string | null;
@@ -110,7 +111,7 @@ const TITLES: Record<AdminView, { eyebrow: string; title: string; desc: string }
   payments: {
     eyebrow: "Finance desk",
     title: "Payment queue",
-    desc: "Match Yoco or bank transactions, verify references, activate 30 days, and issue receipts.",
+    desc: "Match PayFast, Yoco or bank transactions, verify references, activate 30 days, and issue receipts.",
   },
   members: {
     eyebrow: "Finance desk",
@@ -389,6 +390,8 @@ export function ManualBillingAdmin({
         <SettingsView
           settings={settingsForm}
           yocoConfigured={Boolean(data?.yocoConfigured)}
+          payfastConfigured={Boolean(data?.payfastConfigured)}
+          payfastSandbox={Boolean(data?.payfastSandbox)}
           setSettings={setSettingsForm}
           busy={busy}
           save={() =>
@@ -556,6 +559,7 @@ function PaymentsView({
               onChange={(e) => record.setMethod(e.target.value)}
             >
               <option value="eft">EFT</option>
+              <option value="payfast">PayFast</option>
               <option value="yoco">Yoco</option>
               <option value="cash">Cash</option>
               <option value="other">Other</option>
@@ -569,7 +573,7 @@ function PaymentsView({
               className="gls-admin-input mt-1"
               value={record.transactionId}
               onChange={(e) => record.setTransactionId(e.target.value)}
-              placeholder="Bank/Yoco ID"
+              placeholder="Bank/PayFast/Yoco ID"
             />
           </label>
           <button
@@ -577,7 +581,9 @@ function PaymentsView({
             disabled={
               !record.identity ||
               busy !== null ||
-              ((record.method === "eft" || record.method === "yoco") &&
+              ((record.method === "eft" ||
+                record.method === "yoco" ||
+                record.method === "payfast") &&
                 !record.transactionId.trim())
             }
             onClick={record.submit}
@@ -686,6 +692,7 @@ function PaymentsView({
                       onChange={(e) => setPaymentMethod(e.target.value)}
                     >
                       <option value="eft">EFT</option>
+                      <option value="payfast">PayFast</option>
                       <option value="yoco">Yoco</option>
                       <option value="cash">Cash</option>
                       <option value="other">Other</option>
@@ -693,7 +700,7 @@ function PaymentsView({
                   </label>
                   <label>
                     <span className="text-[10px] uppercase tracking-wider text-gls-muted">
-                      Bank/Yoco transaction ID
+                      External transaction ID
                     </span>
                     <input
                       className="gls-admin-input mt-1"
@@ -1107,12 +1114,16 @@ function ReceiptsView({
 function SettingsView({
   settings,
   yocoConfigured,
+  payfastConfigured,
+  payfastSandbox,
   setSettings,
   busy,
   save,
 }: {
   settings: Settings;
   yocoConfigured: boolean;
+  payfastConfigured: boolean;
+  payfastSandbox: boolean;
   setSettings: (settings: Settings) => void;
   busy: string | null;
   save: () => void;
@@ -1188,6 +1199,28 @@ function SettingsView({
           </p>
           <label className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-white/10 px-3 py-3">
             <span>
+              <span className="block text-sm font-semibold text-white">
+                PayFast
+              </span>
+              <span className="text-[11px] text-gls-muted">
+                {payfastConfigured
+                  ? payfastSandbox
+                    ? "Configured (sandbox)"
+                    : "Configured (live)"
+                  : "Add PAYFAST_MERCHANT_ID + KEY on server"}
+              </span>
+            </span>
+            <input
+              type="checkbox"
+              checked={settings.payfast_enabled !== false}
+              onChange={(e) =>
+                setSettings({ ...settings, payfast_enabled: e.target.checked })
+              }
+              className="h-4 w-4 accent-pink-500"
+            />
+          </label>
+          <label className="mt-2 flex items-center justify-between gap-3 rounded-lg border border-white/10 px-3 py-3">
+            <span>
               <span className="block text-sm font-semibold text-white">Yoco</span>
               <span className="text-[11px] text-gls-muted">
                 {yocoConfigured
@@ -1224,9 +1257,9 @@ function SettingsView({
         <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-5 text-sm text-amber-100">
           <p className="font-semibold">Launch safety</p>
           <p className="mt-2 text-xs leading-relaxed text-amber-100/80">
-            Verify every bank/Yoco transaction in the provider statement before
-            approval. The transaction ID is unique and prevents duplicate
-            activation.
+            Verify bank transactions before manual approval. PayFast ITN
+            activates automatically when signature + amount match. Status
+            updates are in-app notifications only (no email until Resend).
           </p>
         </div>
       </aside>

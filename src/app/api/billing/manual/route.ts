@@ -9,9 +9,11 @@ import {
   isManualPlan,
   manualPlanCents,
   paymentReferenceFor,
+  payfastConfigured,
   yocoConfigured,
   type ManualPaymentMethod,
 } from "@/lib/manual-billing";
+import { buildPayfastCheckout } from "@/lib/payfast";
 import { isFeatureEnabled } from "@/lib/operations/feature-flags";
 
 export const runtime = "nodejs";
@@ -25,6 +27,40 @@ async function session() {
   return user;
 }
 
+function payfastReady(settings: { payfast_enabled: boolean }) {
+  return settings.payfast_enabled && payfastConfigured();
+}
+
+function yocoReady(settings: { yoco_enabled: boolean }) {
+  return settings.yoco_enabled && yocoConfigured();
+}
+
+function checkoutPayload(
+  payment: Record<string, unknown>,
+  settings: Awaited<ReturnType<typeof getManualPaymentSettings>>,
+  member: { email: string | null; displayName: string | null },
+  origin: string | null,
+) {
+  if (!payfastReady(settings)) return null;
+  if (
+    ["paid", "canceled", "expired", "refunded"].includes(
+      String(payment.status || ""),
+    )
+  ) {
+    return null;
+  }
+  return buildPayfastCheckout({
+    paymentId: String(payment.id),
+    paymentReference: String(payment.payment_reference),
+    amountCents: Number(payment.amount_zar_cents) || 0,
+    itemName: `${settings.trading_name} ${String(payment.plan)} · 30 days`,
+    email: member.email,
+    nameFirst: member.displayName?.split(/\s+/)[0] || null,
+    nameLast: member.displayName?.split(/\s+/).slice(1).join(" ") || null,
+    origin,
+  });
+}
+
 export async function GET(req: NextRequest) {
   const user = await session();
   if (!user)
@@ -36,6 +72,9 @@ export async function GET(req: NextRequest) {
   const paymentId = req.nextUrl.searchParams.get("id");
   const member = await ensureMemberReference(service, user);
   const settings = await getManualPaymentSettings(service);
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+    req.nextUrl.origin;
 
   let query = service
     .from("manual_payment_requests")
@@ -55,6 +94,10 @@ export async function GET(req: NextRequest) {
         payment.yoco_payment_url && settings.yoco_enabled
           ? await createPaymentQr(payment.yoco_payment_url)
           : null,
+      payfast:
+        !["paid", "canceled", "expired", "refunded"].includes(payment.status)
+          ? checkoutPayload(payment, settings, member, origin)
+          : null,
     })),
   );
 
@@ -71,7 +114,8 @@ export async function GET(req: NextRequest) {
     member,
     settings: {
       ...settings,
-      yoco_ready: settings.yoco_enabled && yocoConfigured(),
+      yoco_ready: yocoReady(settings),
+      payfast_ready: payfastReady(settings),
     },
     payments: rows,
     payment: paymentId ? rows[0] || null : null,
@@ -95,6 +139,10 @@ export async function POST(req: NextRequest) {
 
   const body = (await req.json()) as Record<string, unknown>;
   const action = String(body.action || "create");
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+    req.headers.get("origin") ||
+    req.nextUrl.origin;
 
   if (action === "create") {
     const plan = String(body.plan || "");
@@ -109,11 +157,15 @@ export async function POST(req: NextRequest) {
     const requestedMethod = String(
       body.paymentMethod || "unselected",
     ) as ManualPaymentMethod;
-    const paymentMethod: ManualPaymentMethod = [
+    const allowedMethods: ManualPaymentMethod[] = [
       "unselected",
       "yoco",
+      "payfast",
       "eft",
-    ].includes(requestedMethod)
+    ];
+    const paymentMethod: ManualPaymentMethod = allowedMethods.includes(
+      requestedMethod,
+    )
       ? requestedMethod
       : "unselected";
 
@@ -137,11 +189,17 @@ export async function POST(req: NextRequest) {
 
     let yocoWarning: string | null = null;
     let current = payment;
-    if (
-      settings.yoco_enabled &&
-      yocoConfigured() &&
-      paymentMethod !== "eft"
-    ) {
+    const preferPayfast =
+      paymentMethod === "payfast" ||
+      (paymentMethod === "unselected" &&
+        payfastReady(settings) &&
+        !yocoReady(settings));
+    const preferYoco =
+      !preferPayfast &&
+      paymentMethod !== "eft" &&
+      yocoReady(settings);
+
+    if (preferYoco) {
       try {
         const link = await createYocoPaymentLink({
           amountCents,
@@ -167,9 +225,20 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         yocoWarning =
           err instanceof Error
-            ? `Yoco is temporarily unavailable: ${err.message}. Use EFT.`
-            : "Yoco is temporarily unavailable. Use EFT.";
+            ? `Yoco is temporarily unavailable: ${err.message}. Use PayFast or EFT.`
+            : "Yoco is temporarily unavailable. Use PayFast or EFT.";
       }
+    } else if (preferPayfast && payfastReady(settings)) {
+      const { data: updated } = await service
+        .from("manual_payment_requests")
+        .update({
+          payment_method: "payfast",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", payment.id)
+        .select("*")
+        .single();
+      if (updated) current = updated;
     }
 
     await Promise.all([
@@ -193,6 +262,8 @@ export async function POST(req: NextRequest) {
       }),
     ]);
 
+    const payfast = checkoutPayload(current, settings, member, origin);
+
     return NextResponse.json({
       ok: true,
       payment: {
@@ -200,8 +271,13 @@ export async function POST(req: NextRequest) {
         qrCode: current.yoco_payment_url
           ? await createPaymentQr(current.yoco_payment_url)
           : null,
+        payfast,
       },
-      settings,
+      settings: {
+        ...settings,
+        yoco_ready: yocoReady(settings),
+        payfast_ready: payfastReady(settings),
+      },
       warning: yocoWarning,
       url: `/pricing/pay/${payment.id}`,
     });
@@ -220,6 +296,75 @@ export async function POST(req: NextRequest) {
   if (!payment)
     return NextResponse.json({ error: "Payment not found" }, { status: 404 });
 
+  if (action === "start_payfast") {
+    const settings = await getManualPaymentSettings(service);
+    if (!payfastReady(settings)) {
+      return NextResponse.json(
+        { error: "PayFast is not available right now" },
+        { status: 503 },
+      );
+    }
+    if (["paid", "refunded", "canceled", "expired"].includes(payment.status)) {
+      return NextResponse.json(
+        { error: "This payment can no longer be started" },
+        { status: 409 },
+      );
+    }
+    const member = await ensureMemberReference(service, user);
+    const now = new Date().toISOString();
+    const { data: updated, error } = await service
+      .from("manual_payment_requests")
+      .update({
+        payment_method: "payfast",
+        status: payment.status === "pending" ? "verifying" : payment.status,
+        updated_at: now,
+      })
+      .eq("id", paymentId)
+      .eq("user_id", user.id)
+      .select("*")
+      .single();
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 500 });
+
+    const payfast = buildPayfastCheckout({
+      paymentId,
+      paymentReference: payment.payment_reference,
+      amountCents: payment.amount_zar_cents,
+      itemName: `${settings.trading_name} ${payment.plan} · 30 days`,
+      email: member.email,
+      nameFirst: member.displayName?.split(/\s+/)[0] || null,
+      nameLast: member.displayName?.split(/\s+/).slice(1).join(" ") || null,
+      origin,
+    });
+    if (!payfast) {
+      return NextResponse.json(
+        { error: "PayFast is not configured" },
+        { status: 503 },
+      );
+    }
+
+    await Promise.all([
+      service.from("manual_payment_events").insert({
+        payment_request_id: paymentId,
+        user_id: user.id,
+        event_type: "payfast_checkout_started",
+        actor_email: user.email,
+      }),
+      service.from("user_reminders").insert({
+        user_id: user.id,
+        kind: "system",
+        title: "Payment verifying",
+        body: `Complete card payment on PayFast for ${payment.payment_reference}. Status updates appear in your account notifications (no email until Resend is set up).`,
+        href: `/pricing/pay/${paymentId}`,
+        severity: "info",
+        dedupe_key: `payfast-started-${paymentId}`,
+        created_by: "billing",
+      }),
+    ]);
+
+    return NextResponse.json({ ok: true, payment: updated, payfast });
+  }
+
   if (action === "submit_proof") {
     if (["paid", "refunded", "canceled"].includes(payment.status)) {
       return NextResponse.json(
@@ -228,9 +373,9 @@ export async function POST(req: NextRequest) {
       );
     }
     const method = String(body.paymentMethod || payment.payment_method);
-    if (!["yoco", "eft"].includes(method)) {
+    if (!["yoco", "eft", "payfast"].includes(method)) {
       return NextResponse.json(
-        { error: "Choose Yoco or EFT" },
+        { error: "Choose PayFast, Yoco, or EFT" },
         { status: 400 },
       );
     }
@@ -274,7 +419,7 @@ export async function POST(req: NextRequest) {
         user_id: user.id,
         kind: "system",
         title: "Payment received for verification",
-        body: `We are checking ${payment.payment_reference}. You will be notified after activation.`,
+        body: `We are checking ${payment.payment_reference}. Watch the notification bell — activation updates are in-app only for now.`,
         href: `/pricing/pay/${paymentId}`,
         severity: "info",
         dedupe_key: `payment-submitted-${paymentId}`,

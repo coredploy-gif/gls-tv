@@ -16,6 +16,7 @@ export type ManualPaymentStatus =
 export type ManualPaymentMethod =
   | "unselected"
   | "yoco"
+  | "payfast"
   | "eft"
   | "cash"
   | "other";
@@ -44,6 +45,8 @@ export function paymentReferenceFor(memberReference: string) {
 export function yocoConfigured() {
   return Boolean(process.env.YOCO_SECRET_KEY?.trim());
 }
+
+export { payfastConfigured } from "@/lib/payfast";
 
 export async function createPaymentQr(value: string | null | undefined) {
   if (!value) return null;
@@ -189,6 +192,7 @@ export async function getManualPaymentSettings(service: SupabaseClient) {
     trading_name: data?.trading_name || "GLS TV",
     support_email: data?.support_email || null,
     yoco_enabled: data?.yoco_enabled !== false,
+    payfast_enabled: data?.payfast_enabled !== false,
     eft_enabled: data?.eft_enabled !== false,
     bank_name: data?.bank_name || null,
     account_holder: data?.account_holder || null,

@@ -3,7 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { GlsLogo } from "@/components/GlsLogo";
+
+type PayfastCheckout = {
+  actionUrl: string;
+  fields: Record<string, string>;
+};
 
 type Payment = {
   id: string;
@@ -15,6 +21,7 @@ type Payment = {
   status: string;
   yoco_payment_url: string | null;
   qrCode: string | null;
+  payfast: PayfastCheckout | null;
   proof_reference: string | null;
   submitted_at: string | null;
   membership_ends_at: string | null;
@@ -26,6 +33,8 @@ type Settings = {
   support_email: string | null;
   yoco_enabled: boolean;
   yoco_ready: boolean;
+  payfast_enabled: boolean;
+  payfast_ready: boolean;
   eft_enabled: boolean;
   bank_name: string | null;
   account_holder: string | null;
@@ -40,6 +49,8 @@ type Receipt = {
   receipt_number: string;
   payment_request_id: string;
 };
+
+type CheckoutMethod = "payfast" | "yoco" | "eft";
 
 const STATUS_STEPS = [
   "pending",
@@ -62,11 +73,40 @@ function statusLabel(status: string) {
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
+function defaultMethod(settings: Settings, payment: Payment): CheckoutMethod {
+  if (payment.payment_method === "eft") return "eft";
+  if (payment.payment_method === "yoco" && settings.yoco_ready) return "yoco";
+  if (payment.payment_method === "payfast" && settings.payfast_ready)
+    return "payfast";
+  if (settings.payfast_ready && !settings.yoco_ready) return "payfast";
+  if (settings.yoco_ready) return "yoco";
+  if (settings.payfast_ready) return "payfast";
+  return "eft";
+}
+
+function postToPayfast(checkout: PayfastCheckout) {
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = checkout.actionUrl;
+  form.style.display = "none";
+  for (const [name, value] of Object.entries(checkout.fields)) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  }
+  document.body.appendChild(form);
+  form.submit();
+}
+
 export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
+  const searchParams = useSearchParams();
+  const payfastReturn = searchParams.get("payfast");
   const [payment, setPayment] = useState<Payment | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
-  const [method, setMethod] = useState<"yoco" | "eft">("yoco");
+  const [method, setMethod] = useState<CheckoutMethod>("eft");
   const [proofReference, setProofReference] = useState("");
   const [proofNote, setProofNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -83,21 +123,45 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
       setError(json.error || "Could not load payment");
       return;
     }
-    setPayment(json.payment || null);
-    setSettings(json.settings || null);
+    const nextPayment = (json.payment || null) as Payment | null;
+    const nextSettings = (json.settings || null) as Settings | null;
+    setPayment(nextPayment);
+    setSettings(nextSettings);
     setReceipts(json.receipts || []);
-    if (json.payment?.payment_method === "eft") setMethod("eft");
-    if (!json.settings?.yoco_ready && json.settings?.eft_enabled) setMethod("eft");
+    if (nextPayment && nextSettings) {
+      setMethod((prev) => {
+        if (
+          (prev === "payfast" && nextSettings.payfast_ready) ||
+          (prev === "yoco" && nextSettings.yoco_ready) ||
+          (prev === "eft" && nextSettings.eft_enabled)
+        ) {
+          return prev;
+        }
+        return defaultMethod(nextSettings, nextPayment);
+      });
+    }
   }, [paymentId]);
 
   useEffect(() => {
     const initial = setTimeout(() => void load(), 0);
-    const timer = setInterval(() => void load(), 20_000);
+    const timer = setInterval(() => void load(), 12_000);
     return () => {
       clearTimeout(initial);
       clearInterval(timer);
     };
   }, [load]);
+
+  useEffect(() => {
+    if (payfastReturn === "return") {
+      setMessage(
+        "Returned from PayFast. We’re confirming payment — membership unlocks automatically and you’ll see it in account notifications.",
+      );
+    } else if (payfastReturn === "cancel") {
+      setMessage(
+        "PayFast checkout was canceled. You can try again or pay by EFT with the exact reference.",
+      );
+    }
+  }, [payfastReturn]);
 
   const receipt = useMemo(
     () => receipts.find((r) => r.payment_request_id === paymentId),
@@ -109,6 +173,25 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
     await navigator.clipboard.writeText(value);
     setCopied(label);
     setTimeout(() => setCopied(null), 1400);
+  };
+
+  const startPayfast = async () => {
+    if (!payment) return;
+    setBusy(true);
+    setError(null);
+    setMessage(null);
+    const res = await fetch("/api/billing/manual", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "start_payfast", paymentId }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.payfast) {
+      setBusy(false);
+      setError(json.error || "Could not start PayFast checkout");
+      return;
+    }
+    postToPayfast(json.payfast as PayfastCheckout);
   };
 
   const submit = async () => {
@@ -133,7 +216,9 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
       setError(json.error || "Could not submit payment");
       return;
     }
-    setMessage("Submitted. We’ll notify you as soon as access is activated.");
+    setMessage(
+      "Submitted. Watch the notification bell — verification updates are in-app only for now.",
+    );
     void load();
   };
 
@@ -170,6 +255,9 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
           payment.status as (typeof STATUS_STEPS)[number],
         ),
       );
+  const showPayfast = settings.payfast_ready;
+  const showYoco = settings.yoco_enabled && settings.yoco_ready;
+  const showEft = settings.eft_enabled;
 
   return (
     <main className="min-h-screen bg-gls-black px-4 py-8 text-white sm:px-6">
@@ -324,8 +412,21 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                 </div>
               ) : (
                 <>
-                  <div className="mt-8 flex rounded-xl border border-white/10 bg-black/40 p-1">
-                    {settings.yoco_enabled && (
+                  <div className="mt-8 flex flex-wrap rounded-xl border border-white/10 bg-black/40 p-1">
+                    {showPayfast && (
+                      <button
+                        type="button"
+                        onClick={() => setMethod("payfast")}
+                        className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+                          method === "payfast"
+                            ? "bg-white text-black"
+                            : "text-gls-muted hover:text-white"
+                        }`}
+                      >
+                        Card (PayFast)
+                      </button>
+                    )}
+                    {showYoco && (
                       <button
                         type="button"
                         onClick={() => setMethod("yoco")}
@@ -339,7 +440,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                         Yoco / QR
                       </button>
                     )}
-                    {settings.eft_enabled && (
+                    {showEft && (
                       <button
                         type="button"
                         onClick={() => setMethod("eft")}
@@ -354,7 +455,35 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                     )}
                   </div>
 
-                  {method === "yoco" && payment.yoco_payment_url ? (
+                  {method === "payfast" && showPayfast ? (
+                    <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+                      <p className="font-semibold text-white">
+                        Pay with card via PayFast
+                      </p>
+                      <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-gls-body">
+                        <li>Tap pay — you leave GLS for PayFast’s secure page.</li>
+                        <li>Complete the card payment, then return here.</li>
+                        <li>
+                          We unlock membership when PayFast confirms (watch the
+                          notification bell).
+                        </li>
+                      </ol>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void startPayfast()}
+                        className="gls-cta mt-5 w-full rounded-md px-5 py-3 text-sm disabled:opacity-40"
+                      >
+                        {busy
+                          ? "Opening PayFast…"
+                          : `Pay R${(payment.amount_zar_cents / 100).toFixed(0)} with PayFast`}
+                      </button>
+                      <p className="mt-3 text-xs text-gls-muted">
+                        Reference {payment.payment_reference} is attached
+                        automatically. Status updates are in-app only for now.
+                      </p>
+                    </div>
+                  ) : method === "yoco" && payment.yoco_payment_url ? (
                     <div className="mt-5 flex flex-col items-center rounded-xl border border-white/10 bg-white/[0.03] p-5 text-center">
                       {payment.qrCode && (
                         <div className="rounded-2xl bg-white p-3 shadow-2xl">
@@ -385,8 +514,13 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                   ) : (
                     <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-5">
                       <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-gls-pink-soft">
-                        EFT details
+                        EFT steps
                       </p>
+                      <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-gls-body">
+                        <li>Copy the exact payment reference above.</li>
+                        <li>Transfer the exact amount to the account below.</li>
+                        <li>Submit your bank reference for verification.</li>
+                      </ol>
                       {settings.bank_name &&
                       settings.account_holder &&
                       settings.account_number ? (
@@ -415,50 +549,54 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                         </dl>
                       ) : (
                         <p className="mt-3 text-sm text-amber-100">
-                          EFT details are being configured. Use Yoco or contact
-                          support.
+                          EFT details are being configured. Use PayFast/Yoco or
+                          contact support.
                         </p>
                       )}
                     </div>
                   )}
 
-                  <div className="mt-6 rounded-xl border border-white/10 bg-black/30 p-5">
-                    <p className="font-semibold text-white">
-                      Already paid? Submit for verification
-                    </p>
-                    <p className="mt-1 text-xs text-gls-muted">
-                      We verify against Yoco or the bank statement—never from a
-                      screenshot alone.
-                    </p>
-                    <input
-                      className="gls-admin-input mt-4"
-                      value={proofReference}
-                      onChange={(e) => setProofReference(e.target.value)}
-                      placeholder={
-                        method === "eft"
-                          ? "Bank transaction / proof reference"
-                          : "Yoco transaction reference (optional)"
-                      }
-                    />
-                    <textarea
-                      className="gls-admin-input mt-2 min-h-[80px]"
-                      value={proofNote}
-                      onChange={(e) => setProofNote(e.target.value)}
-                      placeholder="Payment note (optional)"
-                    />
-                    <button
-                      type="button"
-                      disabled={busy}
-                      onClick={() => void submit()}
-                      className="mt-3 w-full rounded-md border border-gls-pink/40 bg-gls-pink/10 px-5 py-3 text-sm font-semibold text-white hover:bg-gls-pink/20 disabled:opacity-40"
-                    >
-                      {busy ? "Submitting…" : "I’ve paid — submit for verification"}
-                    </button>
-                    {message && (
-                      <p className="mt-3 text-sm text-emerald-200">{message}</p>
-                    )}
-                    {error && <p className="mt-3 text-sm text-red-200">{error}</p>}
-                  </div>
+                  {method !== "payfast" && (
+                    <div className="mt-6 rounded-xl border border-white/10 bg-black/30 p-5">
+                      <p className="font-semibold text-white">
+                        Already paid? Submit for verification
+                      </p>
+                      <p className="mt-1 text-xs text-gls-muted">
+                        We verify against the provider or bank statement. Updates
+                        appear in account notifications (in-app).
+                      </p>
+                      <input
+                        className="gls-admin-input mt-4"
+                        value={proofReference}
+                        onChange={(e) => setProofReference(e.target.value)}
+                        placeholder={
+                          method === "eft"
+                            ? "Bank transaction / proof reference"
+                            : "Transaction reference (optional)"
+                        }
+                      />
+                      <textarea
+                        className="gls-admin-input mt-2 min-h-[80px]"
+                        value={proofNote}
+                        onChange={(e) => setProofNote(e.target.value)}
+                        placeholder="Payment note (optional)"
+                      />
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void submit()}
+                        className="mt-3 w-full rounded-md border border-gls-pink/40 bg-gls-pink/10 px-5 py-3 text-sm font-semibold text-white hover:bg-gls-pink/20 disabled:opacity-40"
+                      >
+                        {busy
+                          ? "Submitting…"
+                          : "I’ve paid — submit for verification"}
+                      </button>
+                    </div>
+                  )}
+                  {message && (
+                    <p className="mt-3 text-sm text-emerald-200">{message}</p>
+                  )}
+                  {error && <p className="mt-3 text-sm text-red-200">{error}</p>}
                 </>
               )}
             </div>
@@ -486,8 +624,9 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
               <p className="mt-3 text-sm leading-relaxed text-gls-body">
                 {paid
                   ? "Verified and activated. Your receipt is ready."
-                  : payment.status === "proof_submitted"
-                    ? "Your payment is in the admin verification queue."
+                  : payment.status === "proof_submitted" ||
+                      payment.status === "verifying"
+                    ? "Your payment is being confirmed. Watch the notification bell for unlock."
                     : settings.payment_note}
               </p>
               {!paid && (
@@ -509,19 +648,21 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gls-pink/15 text-xs text-gls-pink-soft">
                     1
                   </span>
-                  Pay with Yoco or EFT using the exact reference.
+                  {showPayfast
+                    ? "Pay with card via PayFast, or use EFT with the exact reference."
+                    : "Pay with Yoco or EFT using the exact reference."}
                 </li>
                 <li className="flex gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gls-pink/15 text-xs text-gls-pink-soft">
                     2
                   </span>
-                  Submit your transaction reference for verification.
+                  Return here (PayFast) or submit your bank reference (EFT).
                 </li>
                 <li className="flex gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gls-pink/15 text-xs text-gls-pink-soft">
                     3
                   </span>
-                  We activate 30 days and issue a payment receipt.
+                  We activate 30 days and notify you in-app (notification bell).
                 </li>
               </ol>
             </div>

@@ -30,7 +30,7 @@ function safeMethod(
   value: unknown,
 ): Exclude<ManualPaymentMethod, "unselected"> {
   const method = String(value || "eft");
-  return ["yoco", "eft", "cash", "other"].includes(method)
+  return ["yoco", "payfast", "eft", "cash", "other"].includes(method)
     ? (method as Exclude<ManualPaymentMethod, "unselected">)
     : "eft";
 }
@@ -298,6 +298,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       settings: await getManualPaymentSettings(service),
       yocoConfigured: Boolean(process.env.YOCO_SECRET_KEY?.trim()),
+      payfastConfigured: Boolean(
+        process.env.PAYFAST_MERCHANT_ID?.trim() &&
+          process.env.PAYFAST_MERCHANT_KEY?.trim(),
+      ),
+      payfastSandbox:
+        (process.env.PAYFAST_SANDBOX || "true").trim().toLowerCase() !==
+          "false" &&
+        (process.env.PAYFAST_SANDBOX || "true").trim() !== "0",
     });
   }
 
@@ -328,9 +336,9 @@ export async function POST(req: NextRequest) {
     const method = safeMethod(body.paymentMethod);
     if (!paymentId)
       return NextResponse.json({ error: "paymentId required" }, { status: 400 });
-    if ((method === "eft" || method === "yoco") && !transactionId) {
+    if ((method === "eft" || method === "yoco" || method === "payfast") && !transactionId) {
       return NextResponse.json(
-        { error: "Bank/Yoco transaction ID required before approval" },
+        { error: "Bank/Yoco/PayFast transaction ID required before approval" },
         { status: 400 },
       );
     }
@@ -523,7 +531,12 @@ export async function POST(req: NextRequest) {
     }
     const transactionId = String(body.transactionId || "").trim() || null;
     const recordedMethod = safeMethod(body.paymentMethod);
-    if ((recordedMethod === "eft" || recordedMethod === "yoco") && !transactionId) {
+    if (
+      (recordedMethod === "eft" ||
+        recordedMethod === "yoco" ||
+        recordedMethod === "payfast") &&
+      !transactionId
+    ) {
       return NextResponse.json(
         { error: "Bank/Yoco transaction ID required" },
         { status: 400 },
@@ -662,6 +675,7 @@ export async function POST(req: NextRequest) {
       "trading_name",
       "support_email",
       "yoco_enabled",
+      "payfast_enabled",
       "eft_enabled",
       "bank_name",
       "account_holder",
@@ -678,7 +692,9 @@ export async function POST(req: NextRequest) {
     for (const key of allowed) {
       if (body[key] == null) continue;
       patch[key] =
-        key === "yoco_enabled" || key === "eft_enabled"
+        key === "yoco_enabled" ||
+        key === "payfast_enabled" ||
+        key === "eft_enabled"
           ? Boolean(body[key])
           : String(body[key]).trim().slice(0, key.includes("note") ? 1500 : 250) ||
             null;
