@@ -2,13 +2,17 @@
 
 import { useEffect } from "react";
 import {
+  directionalNavKey,
+  enableTvNavigation,
+  isActivateKey,
+  isDirectionalNavKey,
   isTvLikeDevice,
   readTvOverrideFromSearch,
   subscribeTvLikeDevice,
 } from "@/lib/tv-detect";
 
 const SELECTOR =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), [data-tv-focus]';
 
 function isFocusable(el: Element | null): el is HTMLElement {
   return Boolean(el && (el as HTMLElement).matches?.(SELECTOR));
@@ -21,34 +25,67 @@ function isTvModeActive(): boolean {
 }
 
 function syncTvDocumentMode(active: boolean) {
-  const root = document.documentElement;
-  if (active) {
-    root.dataset.tv = "1";
-    root.setAttribute("data-tv", "1");
-  } else {
-    delete root.dataset.tv;
-    root.removeAttribute("data-tv");
+  if (active) enableTvNavigation();
+  else {
+    // Keep session preference if user already entered TV nav via D-pad.
+    if (!isTvModeActive()) {
+      document.documentElement.removeAttribute("data-tv");
+      document.documentElement.classList.remove("gls-tv-nav");
+      delete document.documentElement.dataset.tv;
+    }
   }
 }
 
-/** Spatial D-pad / arrow-key navigation for TV remotes and keyboards. */
+function focusTarget(el: HTMLElement) {
+  if (el === document.activeElement) return;
+  el.focus({ preventScroll: false });
+  el.scrollIntoView({
+    block: "nearest",
+    inline: "nearest",
+    behavior: "smooth",
+  });
+}
+
+function firstBrowseTarget(): HTMLElement | null {
+  return (
+    document.querySelector<HTMLElement>(
+      ".gls-tile, [data-tv-focus], .gls-nav-link, .gls-player-center, .gls-cta",
+    ) || document.querySelector<HTMLElement>(SELECTOR)
+  );
+}
+
+function closestFocusable(from: Element | null): HTMLElement | null {
+  if (!from) return null;
+  const hit = (from as HTMLElement).closest?.(SELECTOR);
+  return hit instanceof HTMLElement ? hit : null;
+}
+
+/**
+ * Spatial D-pad navigation + pointer→focus for Android TV browsers that
+ * draw a mouse cursor instead of sending Arrow keys (Netflix-style boxes).
+ */
 export function RemoteNavigation() {
   useEffect(() => {
-    const applyTvMode = () => syncTvDocumentMode(isTvModeActive());
+    const applyTvMode = () => {
+      if (isTvModeActive()) enableTvNavigation();
+    };
     applyTvMode();
     const unsubscribe = subscribeTvLikeDevice(applyTvMode);
 
-    // Land focus on a browse target so the first D-pad press isn't "lost".
     if (isTvModeActive() && !isFocusable(document.activeElement)) {
-      const first =
-        document.querySelector<HTMLElement>(
-          ".gls-tile, .gls-nav-link, .gls-player-center, .gls-cta",
-        ) || document.querySelector<HTMLElement>(SELECTOR);
-      first?.focus({ preventScroll: true });
+      firstBrowseTarget()?.focus({ preventScroll: true });
     }
 
+    let lastPointerFocusAt = 0;
+
     const onKeyDown = (event: KeyboardEvent) => {
-      // Android TV / browser Back → leave overlays or go back in history.
+      const dir = directionalNavKey(event);
+
+      // First D-pad press on a desktop-like UA → lock into TV box navigation.
+      if (dir || isDirectionalNavKey(event)) {
+        enableTvNavigation();
+      }
+
       const isBack =
         event.key === "Escape" ||
         event.key === "BrowserBack" ||
@@ -78,23 +115,35 @@ export function RemoteNavigation() {
         return;
       }
 
-      if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+      // DPAD_CENTER / Enter on focused control
+      if (isActivateKey(event) && isTvModeActive()) {
+        const active = document.activeElement as HTMLElement | null;
+        if (
+          active &&
+          isFocusable(active) &&
+          !active.matches("input, textarea, select, [contenteditable=true]")
+        ) {
+          // Links/buttons activate natively on Enter; ensure Space / Select work.
+          if (event.key === " " || event.key === "Select" || event.keyCode === 23) {
+            event.preventDefault();
+            active.click();
+          }
+        }
         return;
       }
+
+      if (!dir) return;
+
       const active = document.activeElement as HTMLElement | null;
       if (active?.matches("input, textarea, select, [contenteditable=true]")) {
         return;
       }
 
-      // First arrow press with no focus: land on a primary browse target
       if (!isFocusable(active) || active === document.body) {
-        const first =
-          document.querySelector<HTMLElement>(
-            ".gls-tile, .gls-nav-link, .gls-player-center, .gls-cta",
-          ) || document.querySelector<HTMLElement>(SELECTOR);
+        const first = firstBrowseTarget();
         if (first) {
           event.preventDefault();
-          first.focus({ preventScroll: false });
+          focusTarget(first);
         }
         return;
       }
@@ -112,7 +161,9 @@ export function RemoteNavigation() {
             return false;
           }
           const style = getComputedStyle(element);
-          if (style.visibility === "hidden" || style.display === "none") return false;
+          if (style.visibility === "hidden" || style.display === "none") {
+            return false;
+          }
           const tab = element.getAttribute("tabindex");
           if (tab === "-1") return false;
           return true;
@@ -125,37 +176,77 @@ export function RemoteNavigation() {
           const dx = rect.left + rect.width / 2 - ox;
           const dy = rect.top + rect.height / 2 - oy;
           const forward =
-            (event.key === "ArrowRight" && dx > 8) ||
-            (event.key === "ArrowLeft" && dx < -8) ||
-            (event.key === "ArrowDown" && dy > 8) ||
-            (event.key === "ArrowUp" && dy < -8);
+            (dir === "ArrowRight" && dx > 8) ||
+            (dir === "ArrowLeft" && dx < -8) ||
+            (dir === "ArrowDown" && dy > 8) ||
+            (dir === "ArrowUp" && dy < -8);
           const primary =
-            event.key === "ArrowLeft" || event.key === "ArrowRight"
+            dir === "ArrowLeft" || dir === "ArrowRight"
               ? Math.abs(dx)
               : Math.abs(dy);
           const secondary =
-            event.key === "ArrowLeft" || event.key === "ArrowRight"
+            dir === "ArrowLeft" || dir === "ArrowRight"
               ? Math.abs(dy)
               : Math.abs(dx);
-          return { element, forward, score: primary + secondary * 2.2 };
+          // Prefer same-row tiles in horizontal rows (Netflix carousels).
+          const rowBias =
+            dir === "ArrowLeft" || dir === "ArrowRight"
+              ? secondary * 3.2
+              : secondary * 1.6;
+          return { element, forward, score: primary + rowBias };
         })
         .filter((candidate) => candidate.forward)
         .sort((a, b) => a.score - b.score);
+
       if (candidates[0]) {
         event.preventDefault();
-        candidates[0].element.focus({ preventScroll: false });
-        candidates[0].element.scrollIntoView({
-          block: "nearest",
-          inline: "nearest",
-          behavior: "smooth",
-        });
+        event.stopPropagation();
+        focusTarget(candidates[0].element);
       }
     };
-    document.addEventListener("keydown", onKeyDown);
+
+    /**
+     * Android TV Chrome often moves a mouse pointer. Treat the tile under
+     * the pointer as the focused box so navigation feels Netflix-like even
+     * when the OS still draws a cursor.
+     */
+    const onPointerMove = (event: PointerEvent) => {
+      if (!isTvModeActive()) return;
+      // Ignore fine trackpad spam on desktop when ?tv=1 is used for testing —
+      // still OK; we want box focus.
+      const now = performance.now();
+      if (now - lastPointerFocusAt < 48) return;
+      lastPointerFocusAt = now;
+
+      const under = document.elementFromPoint(event.clientX, event.clientY);
+      const target = closestFocusable(under);
+      if (!target) return;
+      if (target.matches("input, textarea, select, [contenteditable=true]")) {
+        return;
+      }
+      if (target === document.activeElement) return;
+      target.focus({ preventScroll: true });
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!isTvModeActive()) return;
+      const target = closestFocusable(event.target as Element | null);
+      if (target) target.focus({ preventScroll: true });
+    };
+
+    document.addEventListener("keydown", onKeyDown, true);
+    document.addEventListener("pointermove", onPointerMove, {
+      passive: true,
+      capture: true,
+    });
+    document.addEventListener("pointerdown", onPointerDown, true);
+
     return () => {
       unsubscribe();
       syncTvDocumentMode(false);
-      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("keydown", onKeyDown, true);
+      document.removeEventListener("pointermove", onPointerMove, true);
+      document.removeEventListener("pointerdown", onPointerDown, true);
     };
   }, []);
   return null;

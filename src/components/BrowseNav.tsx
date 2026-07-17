@@ -31,6 +31,7 @@ function NavLink({
   return (
     <Link
       href={href}
+      data-tv-focus
       className={`gls-nav-link whitespace-nowrap text-sm ${
         active ? "is-active" : ""
       } ${className}`}
