@@ -7,13 +7,14 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import {
   MEDIA_FORMAT_META,
   MEDIA_LINK_CATEGORIES,
-  USER_MEDIA_DISCLAIMER,
   normalizeMediaLinkCategory,
   type AdminMediaLink,
   type MediaLinkFormat,
   type UserMediaLink,
   validateMediaLinkUrl,
 } from "@/lib/media-links";
+import { PUBLIC_KUNG_FU_PICKS } from "@/lib/public-kung-fu-picks";
+import { useAppCopy } from "@/lib/useAppCopy";
 
 type ApiResponse = {
   links?: UserMediaLink[];
@@ -185,6 +186,7 @@ function LinkCard({
 
 export function MediaLibrary() {
   const { user, loading: authLoading } = useAuth();
+  const copy = useAppCopy();
   const [links, setLinks] = useState<UserMediaLink[]>([]);
   const [featured, setFeatured] = useState<AdminMediaLink[]>([]);
   const [entitled, setEntitled] = useState(false);
@@ -456,7 +458,7 @@ export function MediaLibrary() {
           <p className="mt-3 max-w-2xl text-base text-gls-body">
             Import guaranteed-playable member-facing links: HLS (.m3u8), YouTube,
             Vimeo, MP4, WebM. Use a clear title — avoid raw hash names. Organize into
-            folders like Movies, Sports, and News. These stay in your library,
+            folders like Movies, Kung Fu, Sports, and News. These stay in your library,
             separate from the licensed GLS catalog. Full IPTV playlists still go to{" "}
             <Link href="/playlists" className="text-white underline-offset-2 hover:underline">
               My Playlists
@@ -524,7 +526,9 @@ export function MediaLibrary() {
                     <strong>{MEDIA_FORMAT_META[preview.format!].label}</strong>
                     {preview.title ? ` · ${preview.title}` : ""}
                     <span className="block text-xs text-gls-mint/80">
-                      We’ll also check reachability when you save.
+                      {preview.provisional
+                        ? "No file extension detected — we’ll confirm video Content-Type when you save."
+                        : "We’ll also check reachability when you save."}
                     </span>
                   </>
                 ) : (
@@ -533,8 +537,38 @@ export function MediaLibrary() {
               </div>
             )}
 
+            <div className="rounded-xl border border-white/10 bg-black/30 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
+                Public Kung Fu picks
+              </p>
+              <p className="mt-1 text-xs text-gls-muted">
+                One-click fills a legally free PD / museum / official cultural
+                clip into the form (Kung Fu folder). Not Bruce / Jackie / Jet
+                theatrical features — those aren&apos;t free to seed.
+              </p>
+              <ul className="mt-3 space-y-2">
+                {PUBLIC_KUNG_FU_PICKS.map((pick) => (
+                  <li key={pick.url}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUrl(pick.url);
+                        setTitle(pick.title);
+                        setCategory(pick.category);
+                        setError(null);
+                        setSuccess(null);
+                      }}
+                      className="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-left text-sm text-white/90 transition hover:border-gls-red/50 hover:bg-white/10"
+                    >
+                      {pick.title}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
             <div className="rounded-xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-50">
-              {USER_MEDIA_DISCLAIMER}
+              {copy("links.disclaimer")}
             </div>
 
             <button
@@ -591,6 +625,29 @@ export function MediaLibrary() {
                   ),
                 )}
               </ul>
+              <p className="mt-3 text-xs text-gls-muted">
+                Local smoke test: use{" "}
+                <strong className="text-white/90">Try sample MP4</strong> (same
+                origin{" "}
+                <code className="text-white/80">/media/sample.mp4</code>
+                ). Served from{" "}
+                <code className="text-white/80">public/media/</code> — import is
+                allowed without probing private networks. Absolute http(s) URLs
+                only for other hosts.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  const sampleUrl = `${window.location.origin}/media/sample.mp4`;
+                  setUrl(sampleUrl);
+                  if (!title.trim()) setTitle("Sample MP4");
+                  setError(null);
+                  setSuccess(null);
+                }}
+                className="mt-3 inline-flex h-9 items-center justify-center rounded-lg border border-white/20 bg-white/5 px-3 text-xs font-semibold text-white transition hover:border-white/35 hover:bg-white/10"
+              >
+                Try sample MP4
+              </button>
             </div>
           </div>
         </div>
@@ -679,8 +736,8 @@ export function MediaLibrary() {
             <div>
               <h2 className="text-xl font-semibold text-white">Your library</h2>
               <p className="text-sm text-gls-muted">
-                Organize into Movies, Sports, News, and more — only you can see
-                these.
+                Organize into Movies, Kung Fu, Sports, News, and more — only you
+                can see these.
               </p>
             </div>
           </div>

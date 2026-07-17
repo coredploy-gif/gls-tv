@@ -124,6 +124,19 @@ const NAV: NavItem[] = [
     ),
   },
   {
+    href: "/admin/content",
+    label: "App copy",
+    icon: (
+      <path
+        d="M5 6h14v4H5V6Zm0 8h9v4H5v-4Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+    ),
+  },
+  {
     href: "/admin/chat",
     label: "Live chat",
     icon: (

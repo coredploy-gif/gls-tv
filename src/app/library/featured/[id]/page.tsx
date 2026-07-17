@@ -6,7 +6,11 @@ import { WatchBackButton } from "@/components/WatchBackButton";
 import type { CatalogItem } from "@/data/types";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountEntitlement } from "@/lib/membership/account";
-import type { AdminMediaLink, MediaLinkFormat } from "@/lib/media-links";
+import {
+  resolveMediaEmbedUrl,
+  type AdminMediaLink,
+  type MediaLinkFormat,
+} from "@/lib/media-links";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -89,6 +93,7 @@ export default async function FeaturedMediaWatchPage({ params }: Props) {
 
   if (!row) notFound();
   const link = row as AdminMediaLink;
+  const embedUrl = resolveMediaEmbedUrl(link);
 
   return (
     <main className="min-h-screen bg-gls-black pb-24 pt-20">
@@ -107,10 +112,10 @@ export default async function FeaturedMediaWatchPage({ params }: Props) {
         </div>
 
         {link.format === "youtube" || link.format === "vimeo" ? (
-          link.embed_url ? (
+          embedUrl ? (
             <EmbedPlayer
               format={link.format}
-              embedUrl={link.embed_url}
+              embedUrl={embedUrl}
               title={link.title}
             />
           ) : (

@@ -1,6 +1,25 @@
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
+
+/**
+ * YouTube embed iframes often redirect or nest to apex youtube.com and
+ * www.google.com (consent / account). Those must be listed explicitly —
+ * `www.youtube.com` does not match `youtube.com` in CSP host sources.
+ * Wildcards do not match the apex host either.
+ */
+const mediaEmbedFrameSrc = [
+  "'self'",
+  "https://www.youtube.com",
+  "https://youtube.com",
+  "https://*.youtube.com",
+  "https://www.youtube-nocookie.com",
+  "https://youtube-nocookie.com",
+  "https://*.youtube-nocookie.com",
+  "https://www.google.com",
+  "https://player.vimeo.com",
+].join(" ");
+
 // Omit upgrade-insecure-requests in local HTTP/Turbopack — it can force
 // RSC/HMR fetches onto https://127.0.0.1 and corrupt Flight payloads
 // (resolveModelChunk → enqueueModel on null).
@@ -16,6 +35,8 @@ const contentSecurityPolicy = [
   "font-src 'self' data:",
   "media-src 'self' blob: https: http:",
   "worker-src 'self' blob:",
+  // YouTube / Vimeo My Links embeds; same-origin for /games iframes.
+  `frame-src ${mediaEmbedFrameSrc}`,
   // Dev: allow ws: for Turbopack HMR; http: for local API/proxy debugging.
   `connect-src 'self' https: wss:${isDev ? " ws: http:" : ""}`,
   ...(isDev ? [] : ["upgrade-insecure-requests"]),
@@ -32,9 +53,28 @@ const embeddedGameContentSecurityPolicy = [
   "font-src 'self' data:",
   "media-src 'self' blob: https: http:",
   "worker-src 'self' blob:",
+  "frame-src 'self'",
   `connect-src 'self' https: wss:${isDev ? " ws: http:" : ""}`,
   ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
+
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  {
+    key: "Referrer-Policy",
+    value: "strict-origin-when-cross-origin",
+  },
+  {
+    key: "Permissions-Policy",
+    // Allow fullscreen inside YouTube/Vimeo embeds; keep sensors locked down.
+    value:
+      'camera=(), microphone=(), geolocation=(), fullscreen=(self "https://www.youtube.com" "https://www.youtube-nocookie.com" "https://player.vimeo.com")',
+  },
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=31536000; includeSubDomains",
+  },
+];
 
 const nextConfig: NextConfig = {
   images: {
@@ -50,49 +90,39 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
-    return [
+    const siteHeaders = [
+      ...securityHeaders,
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "Content-Security-Policy", value: contentSecurityPolicy },
+    ];
+    const gameShellHeaders = [
+      ...securityHeaders,
+      { key: "X-Frame-Options", value: "SAMEORIGIN" },
       {
-        source: "/:path*",
-        headers: [
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "X-Frame-Options", value: "DENY" },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
-          },
-          { key: "Content-Security-Policy", value: contentSecurityPolicy },
-          {
-            key: "Strict-Transport-Security",
-            value: "max-age=31536000; includeSubDomains",
-          },
-        ],
+        key: "Content-Security-Policy",
+        value: embeddedGameContentSecurityPolicy,
       },
+    ];
+
+    return [
+      // Static game HTML only — single CSP with frame-ancestors 'self'.
       {
         source: "/games/:gameId/index.html",
-        headers: [
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "X-Frame-Options", value: "SAMEORIGIN" },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
-          },
-          {
-            key: "Content-Security-Policy",
-            value: embeddedGameContentSecurityPolicy,
-          },
-          {
-            key: "Strict-Transport-Security",
-            value: "max-age=31536000; includeSubDomains",
-          },
-        ],
+        headers: gameShellHeaders,
+      },
+      // App Router game pages (hub + detail) use the site CSP.
+      {
+        source: "/games",
+        headers: siteHeaders,
+      },
+      {
+        source: "/games/:slug",
+        headers: siteHeaders,
+      },
+      // Everything else except /games/* (covered above).
+      {
+        source: "/((?!games/).*)",
+        headers: siteHeaders,
       },
       {
         source: "/sw.js",

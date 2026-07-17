@@ -6,7 +6,11 @@ import { WatchBackButton } from "@/components/WatchBackButton";
 import type { CatalogItem } from "@/data/types";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountEntitlement } from "@/lib/membership/account";
-import type { MediaLinkFormat, UserMediaLink } from "@/lib/media-links";
+import {
+  resolveMediaEmbedUrl,
+  type MediaLinkFormat,
+  type UserMediaLink,
+} from "@/lib/media-links";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -87,6 +91,7 @@ export default async function LibraryWatchPage({ params }: Props) {
 
   if (!row) notFound();
   const link = row as UserMediaLink;
+  const embedUrl = resolveMediaEmbedUrl(link);
 
   // Fire-and-forget recently watched stamp (RLS-scoped).
   void supabase
@@ -112,10 +117,10 @@ export default async function LibraryWatchPage({ params }: Props) {
         </div>
 
         {link.format === "youtube" || link.format === "vimeo" ? (
-          link.embed_url ? (
+          embedUrl ? (
             <EmbedPlayer
               format={link.format}
-              embedUrl={link.embed_url}
+              embedUrl={embedUrl}
               title={link.title}
             />
           ) : (

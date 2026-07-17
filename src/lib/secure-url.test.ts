@@ -4,6 +4,7 @@ import {
   isReservedAddress,
   pinnedLookup,
   readStreamBuffered,
+  validatePublicUrl,
 } from "./secure-url";
 
 describe("secure URL address checks", () => {
@@ -25,6 +26,18 @@ describe("secure URL address checks", () => {
       expect(isReservedAddress(address)).toBe(false);
     },
   );
+
+  it("blocks probing arbitrary private IP URLs", async () => {
+    await expect(
+      validatePublicUrl("http://10.0.0.5/secret.mp4"),
+    ).rejects.toThrow(/Private or reserved network targets are blocked/);
+    await expect(
+      validatePublicUrl("http://169.254.169.254/latest/meta-data"),
+    ).rejects.toThrow(/Private or reserved network targets are blocked/);
+    await expect(
+      validatePublicUrl("http://127.0.0.1/media/sample.mp4"),
+    ).rejects.toThrow(/Private or reserved network targets are blocked/);
+  });
 
   it("stops buffering when a streamed response exceeds its byte limit", async () => {
     const stream = Readable.from([Buffer.alloc(8), Buffer.alloc(8)]);

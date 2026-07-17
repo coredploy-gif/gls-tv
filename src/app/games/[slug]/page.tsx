@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BrowseNav } from "@/components/BrowseNav";
 import { GamePlayer } from "@/components/GamePlayer";
-import { AUDIENCE_META, PACK_META, getGame } from "@/lib/games";
+import { AUDIENCE_META, PACK_META, getGame, padSchemeFor } from "@/lib/games";
 
 export default async function GameDetailPage({
   params,
@@ -14,6 +14,7 @@ export default async function GameDetailPage({
   if (!game) notFound();
   const audience = AUDIENCE_META[game.audience];
   const pack = game.pack ? PACK_META[game.pack] : null;
+  const scheme = padSchemeFor(game);
 
   return (
     <main className="min-h-screen bg-gls-black pb-24">
@@ -37,6 +38,11 @@ export default async function GameDetailPage({
               {pack.label}
             </span>
           )}
+          {scheme !== "none" && (
+            <span className="inline-flex rounded-sm border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-200">
+              Touch pad
+            </span>
+          )}
         </div>
         <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
           {game.title}
@@ -48,6 +54,8 @@ export default async function GameDetailPage({
             src={game.path}
             title={game.title}
             howToPlay={game.howToPlay}
+            padScheme={scheme}
+            accent={game.accent}
           />
         </div>
       </div>

@@ -1,35 +1,33 @@
 export type GameAudience = "kids" | "all" | "challenge";
 
-
-
 export type GamePack = "brick";
 
-
+/** On-screen pad profile for phone/tablet (maps to keyboard events in the iframe). */
+export type GamePadScheme =
+  | "none"
+  | "dpad"
+  | "brick"
+  | "lr"
+  | "lr-fire"
+  | "action"
+  | "paddle-v";
 
 export type GlsGame = {
-
   id: string;
-
   title: string;
-
   blurb: string;
-
   path: string;
-
   accent: string;
-
   /** UI grouping on /games */
-
   audience: GameAudience;
-
   /** Optional pack for themed hub sections */
-
   pack?: GamePack;
-
   /** Short control tips shown on the detail / player page */
-
   howToPlay?: string[];
-
+  /** Override pad scheme; otherwise inferred from id */
+  padScheme?: GamePadScheme;
+  /** Search tags */
+  tags?: string[];
 };
 
 
@@ -671,9 +669,66 @@ export function gamesByAudience(audience: GameAudience) {
 
 
 export function gamesByPack(pack: GamePack) {
-
   return GLS_GAMES.filter((g) => g.pack === pack);
+}
 
+const PAD_BY_ID: Record<string, GamePadScheme> = {
+  "neon-snake": "dpad",
+  "pulse-2048": "dpad",
+  "brick-stack": "brick",
+  "pixel-race": "lr",
+  "spike-drop": "lr",
+  "block-tank": "lr-fire",
+  "orbit-runner": "action",
+  "flutter-dash": "action",
+  "paddle-duel": "paddle-v",
+};
+
+export function padSchemeFor(game: GlsGame): GamePadScheme {
+  return game.padScheme ?? PAD_BY_ID[game.id] ?? "none";
+}
+
+export function needsVirtualPad(game: GlsGame): boolean {
+  return padSchemeFor(game) !== "none";
+}
+
+/** True when the game is playable with tap/pad without a physical keyboard. */
+export function isPhoneFriendly(game: GlsGame): boolean {
+  // Touch-native kids games + anything with a pad scheme or existing in-game buttons
+  if (game.audience === "kids") return true;
+  if (needsVirtualPad(game)) return true;
+  // Remaining “everyone” tap titles
+  return [
+    "brick-pair",
+    "brick-break",
+    "mole-smash",
+    "reaction-rush",
+    "number-blitz",
+    "star-scoop",
+    "tone-echo",
+    "sweet-match",
+    "balloon-burst",
+    "slide-puzzle",
+  ].includes(game.id);
+}
+
+export function searchGames(query: string): GlsGame[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return [...GLS_GAMES];
+  return GLS_GAMES.filter((g) => {
+    const hay = [
+      g.title,
+      g.blurb,
+      g.id,
+      g.audience,
+      g.pack || "",
+      ...(g.tags || []),
+      ...(g.howToPlay || []),
+    ]
+      .join(" ")
+      .toLowerCase();
+    return hay.includes(q);
+  });
 }
 
 

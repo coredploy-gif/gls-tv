@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { useAppCopy } from "@/lib/useAppCopy";
 
 type Mode = "signin" | "signup";
 
@@ -65,6 +66,7 @@ export function AuthPanel({
   const searchParams = useSearchParams();
   const { signInWithPassword, signUpWithPassword, user, loading, signOut } =
     useAuth();
+  const copy = useAppCopy();
   const [mode, setMode] = useState<Mode>(
     searchParams.get("mode") === "signup" ? "signup" : "signin",
   );
@@ -129,7 +131,7 @@ export function AuthPanel({
     if (mode === "signup") {
       if (!signupsAllowed) {
         setBusy(false);
-        setError(signupFreezeMsg || "Signups are temporarily paused.");
+        setError(signupFreezeMsg || copy("auth.error.signups_paused"));
         return;
       }
       const status = await fetch("/api/auth/signup-status", { cache: "no-store" })
@@ -137,7 +139,7 @@ export function AuthPanel({
         .catch(() => ({ allowed: true }));
       if (status.allowed === false) {
         setBusy(false);
-        setError(status.message || "Signups are temporarily paused.");
+        setError(status.message || copy("auth.error.signups_paused"));
         return;
       }
     }
@@ -148,20 +150,16 @@ export function AuthPanel({
     if (err) {
       const lower = err.toLowerCase();
       if (lower.includes("leak") || lower.includes("pwned") || lower.includes("breach")) {
-        setError(
-          "That password appears in a known data breach. Choose a different, stronger password.",
-        );
+        setError(copy("auth.error.breached_password"));
       } else if (lower.includes("invalid login") || lower.includes("invalid credentials")) {
-        setError("Email or password is incorrect. Use Show to check your password, then try again.");
+        setError(copy("auth.error.invalid_credentials"));
       } else {
         setError(err);
       }
       return;
     }
     if (mode === "signup") {
-      setInfo(
-        "Check your email for a verification link, then sign in. You’ll pick who’s watching next. One free 14-day trial per device.",
-      );
+      setInfo(copy("auth.info.verify_email"));
       setMode("signin");
       return;
     }

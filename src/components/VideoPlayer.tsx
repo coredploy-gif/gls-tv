@@ -18,6 +18,7 @@ import {
 } from "@/lib/channel-heal";
 import { isBrokenTraceOrigin, isTraceChannel } from "@/lib/trace-mirrors";
 import { isLinearPayCategory } from "@/lib/linear-pay";
+import { useAppCopy } from "@/lib/useAppCopy";
 
 type VideoPlayerProps = {
   item: CatalogItem;
@@ -237,6 +238,7 @@ function playUrlFor(source: MediaSource, mode: "direct" | "proxy") {
  * - pause keeps playhead; buffer keeps filling; Back to live on demand
  */
 export function VideoPlayer({ item }: VideoPlayerProps) {
+  const copy = useAppCopy();
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<HlsType | null>(null);
   const standbyRef = useRef<HlsType | null>(null);
@@ -988,8 +990,7 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
           <p className="text-lg font-semibold text-white">{error}</p>
           {(isHardGeo(item) || /geo|region|south africa/i.test(error)) && (
             <p className="max-w-md text-sm text-white/70">
-              This channel may be subject to regional or rights restrictions.
-              Try one of the available news alternatives below.
+              {copy("player.geo_restricted")}
             </p>
           )}
           <div className="flex flex-wrap justify-center gap-2">

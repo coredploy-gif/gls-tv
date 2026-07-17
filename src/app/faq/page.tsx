@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { BrowseNav } from "@/components/BrowseNav";
 import { GlsLogo } from "@/components/GlsLogo";
+import { t } from "@/lib/copy";
+import { getCopyMap } from "@/lib/copy-server";
 
 export const metadata: Metadata = {
   title: "FAQ · GLS TV",
@@ -199,9 +201,16 @@ const SECTIONS: { id: string; title: string; items: Qa[] }[] = [
             <strong className="text-white">My Playlists</strong> is for M3U
             channel lists and single .m3u8 streams.{" "}
             <strong className="text-white">My Links</strong> is for
-            guaranteed-playable personal URLs: HLS, YouTube, Vimeo, MP4, and
-            WebM, organised into folders like Movies, Sports, and News. Neither
-            is part of the licensed GLS catalogue.
+            guaranteed-playable personal URLs: HLS, YouTube, Vimeo, MP4 /
+            M4V / MOV, and WebM (query strings after the extension are fine;
+            extensionless direct files work when the server returns{" "}
+            <code className="text-white/80">video/*</code>). Organised into
+            folders like Movies, Kung Fu, Sports, and News. Neither is part of
+            the licensed GLS catalogue.             For a local smoke test, open My Links and
+            use <strong className="text-white">Try sample MP4</strong> — it
+            fills your current origin&apos;s{" "}
+            <code className="text-white/80">/media/sample.mp4</code> (same-app
+            static file; no private-network block).
           </>
         ),
       },
@@ -369,19 +378,20 @@ const SECTIONS: { id: string; title: string; items: Qa[] }[] = [
   },
 ];
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const copy = await getCopyMap();
+
   return (
     <main className="min-h-screen bg-gls-black pb-24 pt-24 text-gls-body">
       <BrowseNav />
       <article className="mx-auto max-w-3xl px-4 sm:px-8">
         <GlsLogo size="sm" href="/" />
         <p className="mt-8 text-xs font-semibold uppercase tracking-[0.28em] text-gls-red">
-          Help centre
+          {t("faq.hero.eyebrow", copy)}
         </p>
         <h1 className="gls-display mt-2 text-5xl text-white sm:text-6xl">FAQ</h1>
         <p className="mt-3 max-w-2xl text-base text-gls-body">
-          Straight answers about membership, playback, regions, and why GLS
-          doesn’t ship a VPN. Local-first streaming — not geo-bypass.
+          {t("faq.hero.lead", copy)}
         </p>
 
         <nav
@@ -429,11 +439,11 @@ export default function FaqPage() {
         </div>
 
         <aside className="mt-14 rounded-xl border border-amber-400/25 bg-amber-400/10 px-5 py-4 text-sm text-amber-50">
-          <p className="font-semibold text-white">Region reminder</p>
+          <p className="font-semibold text-white">
+            {t("faq.aside.region_title", copy)}
+          </p>
           <p className="mt-2 text-amber-50/90">
-            If a stream is blocked on your network, GLS will not provide a VPN
-            to get around it. Try another title, or the official service for
-            that content in your country.
+            {t("faq.aside.region_body", copy)}
           </p>
         </aside>
 

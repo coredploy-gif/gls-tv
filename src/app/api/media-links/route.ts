@@ -86,7 +86,10 @@ export async function POST(req: NextRequest) {
   }
 
   const url = (body.url || "").trim();
-  const probe = await probeMediaLinkReachability(url, validation.format);
+  const probe = await probeMediaLinkReachability(url, validation.format, {
+    provisional: validation.provisional === true,
+    requestOrigin: req.nextUrl.origin,
+  });
   if (!probe.ok) {
     return NextResponse.json(
       {
@@ -97,6 +100,8 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
+
+  const resolvedFormat = probe.format || validation.format;
 
   const { count } = await supabase
     .from("user_media_links")
@@ -113,14 +118,17 @@ export async function POST(req: NextRequest) {
     user_id: user.id,
     url,
     title: validation.title!,
-    format: validation.format,
+    format: resolvedFormat,
     status: probe.status,
     thumbnail_url: validation.thumbnailUrl || null,
     category: normalizeMediaLinkCategory(body.category),
     embed_url: validation.embedUrl || null,
     video_id: validation.videoId || null,
     last_checked_at: new Date().toISOString(),
-    metadata: { probe: probe.detail || null },
+    metadata: {
+      probe: probe.detail || null,
+      provisional: validation.provisional === true,
+    },
   };
 
   const { data, error } = await supabase

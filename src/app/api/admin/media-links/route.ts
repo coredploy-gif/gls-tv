@@ -74,14 +74,19 @@ export async function POST(req: Request) {
   }
 
   const url = (body.url || "").trim();
+  let resolvedFormat = validation.format;
   if (!body.skip_probe) {
-    const probe = await probeMediaLinkReachability(url, validation.format);
+    const probe = await probeMediaLinkReachability(url, validation.format, {
+      provisional: validation.provisional === true,
+      requestOrigin: new URL(req.url).origin,
+    });
     if (!probe.ok) {
       return NextResponse.json(
         { error: probe.detail || "URL is not reachable" },
         { status: 400 },
       );
     }
+    if (probe.format) resolvedFormat = probe.format;
   }
 
   // New saves are drafts unless explicitly published via confirm step.
@@ -94,7 +99,7 @@ export async function POST(req: Request) {
         created_by: user.id,
         url,
         title: validation.title!,
-        format: validation.format,
+        format: resolvedFormat,
         category: (body.category || "Featured").trim().slice(0, 60) || "Featured",
         thumbnail_url: validation.thumbnailUrl || null,
         embed_url: validation.embedUrl || null,
