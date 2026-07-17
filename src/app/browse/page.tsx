@@ -8,7 +8,7 @@ import { TOP10, getPopularFirst, getUkTop } from "@/data/top10";
 import { VERIFIED_LIVE } from "@/data/verified";
 import { getAllChannels } from "@/lib/channels";
 import { getRelatedChannels } from "@/lib/hubs";
-import { getMalawiBrowseItems } from "@/lib/radio";
+import { getMalawiBrowseItems, getAfricaRadioBrowseItems } from "@/lib/radio";
 import { isTraceChannel } from "@/lib/trace-mirrors";
 
 export default function BrowsePage() {
@@ -76,6 +76,7 @@ export default function BrowsePage() {
   );
 
   const malawiItems = getMalawiBrowseItems();
+  const africaRadioItems = getAfricaRadioBrowseItems();
 
   return (
     <main className="min-h-screen bg-gls-black pb-20">
@@ -106,6 +107,15 @@ export default function BrowsePage() {
             title="🇲🇼 Malawi · MBC"
             items={malawiItems}
             limit={12}
+            viewMoreHref="/radio"
+          />
+        )}
+
+        {africaRadioItems.length > 0 && (
+          <ContentRow
+            title="🌍 Africa · Kenya, Nigeria & more"
+            items={africaRadioItems}
+            limit={8}
             viewMoreHref="/radio"
           />
         )}

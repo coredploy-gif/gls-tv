@@ -20,6 +20,8 @@ const MEDIA_HOST_SUFFIXES = [
   "wurl.tv",
   "amagi.tv",
   "streamtheworld.com",
+  "streamguys1.com",
+  "zbc.co.zw",
   "bokradio.co.za",
   "mbc.mw",
   "securenetsystems.net",

@@ -4,7 +4,7 @@ import { RadioHub } from "@/components/RadioHub";
 export const metadata = {
   title: "Radio · GLS TV",
   description:
-    "Listen to curated South African radio — SABC, Primedia, and community stations on GLS TV.",
+    "Listen to curated African radio — SABC, MBC, Capital FM, Wazobia, Peace FM, ZBC, and more on GLS TV.",
 };
 
 export default function RadioPage() {

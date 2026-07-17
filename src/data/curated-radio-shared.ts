@@ -5,6 +5,15 @@ export const RADIO_POSTER =
 export const RADIO_BACKDROP =
   "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=3840&h=2160&q=80";
 
+const DEFAULT_LANGUAGES: Record<string, string[]> = {
+  mw: ["English", "Chichewa"],
+  za: ["English", "Afrikaans"],
+  ke: ["English", "Swahili"],
+  ng: ["English", "Pidgin"],
+  gh: ["English", "Twi"],
+  zw: ["English", "Shona", "Ndebele"],
+};
+
 export function radioStation(
   id: string,
   slug: string,
@@ -14,7 +23,10 @@ export function radioStation(
   countries: string[],
   format: "hls" | "mp4" = "mp4",
   tags: string[] = [],
+  languages?: string[],
 ): CatalogItem {
+  const countryLang =
+    countries.map((code) => DEFAULT_LANGUAGES[code]).find(Boolean) ?? ["English"];
   return {
     id,
     slug,
@@ -23,7 +35,7 @@ export function radioStation(
     description,
     countries,
     categories: ["Radio", "Music", "Curated", "Playable", ...tags],
-    languages: countries.includes("mw") ? ["English", "Chichewa"] : ["English"],
+    languages: languages ?? countryLang,
     poster: RADIO_POSTER,
     backdrop: RADIO_BACKDROP,
     license: "open_stream",

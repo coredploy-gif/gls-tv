@@ -4,12 +4,19 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { CatalogItem } from "@/data/types";
 import { ContentRow } from "@/components/ContentRow";
-import { getRadioStations } from "@/lib/radio";
+import {
+  RADIO_COUNTRY_META,
+  RADIO_COUNTRY_ORDER,
+  getRadioCountryGroups,
+  getRadioStations,
+} from "@/lib/radio";
 
 const FILTERS = [
   { id: "all", label: "All stations" },
-  { id: "za", label: "South Africa" },
-  { id: "mw", label: "Malawi" },
+  ...RADIO_COUNTRY_ORDER.map((code) => ({
+    id: code,
+    label: `${RADIO_COUNTRY_META[code].flag} ${RADIO_COUNTRY_META[code].name}`,
+  })),
   { id: "sabc", label: "SABC" },
   { id: "primedia", label: "Primedia" },
   { id: "community", label: "Community" },
@@ -19,8 +26,9 @@ type FilterId = (typeof FILTERS)[number]["id"];
 
 function matchesFilter(station: CatalogItem, filter: FilterId): boolean {
   if (filter === "all") return true;
-  if (filter === "za") return station.countries.includes("za");
-  if (filter === "mw") return station.countries.includes("mw");
+  if (filter in RADIO_COUNTRY_META) {
+    return station.countries.includes(filter);
+  }
   if (filter === "sabc") {
     return station.categories.some((c) => /sabc/i.test(c));
   }
@@ -32,6 +40,7 @@ function matchesFilter(station: CatalogItem, filter: FilterId): boolean {
 
 export function RadioHub() {
   const stations = getRadioStations();
+  const countryGroups = getRadioCountryGroups();
   const [filter, setFilter] = useState<FilterId>("all");
   const [q, setQ] = useState("");
 
@@ -43,19 +52,33 @@ export function RadioHub() {
       return (
         station.title.toLowerCase().includes(needle) ||
         station.description.toLowerCase().includes(needle) ||
-        station.categories.some((c) => c.toLowerCase().includes(needle))
+        station.categories.some((c) => c.toLowerCase().includes(needle)) ||
+        station.countries.some(
+          (code) =>
+            RADIO_COUNTRY_META[code]?.name.toLowerCase().includes(needle) ??
+            code.includes(needle),
+        )
       );
     });
   }, [stations, filter, q]);
 
   const sabc = filtered.filter((s) => matchesFilter(s, "sabc"));
-  const malawi = filtered.filter((s) => s.countries.includes("mw"));
-  const southAfrica = filtered.filter(
-    (s) => s.countries.includes("za") && !matchesFilter(s, "sabc"),
+  const southAfricaNonSabc = filtered.filter(
+    (s) =>
+      s.countries.includes("za") &&
+      !matchesFilter(s, "sabc") &&
+      (filter === "all" || filter === "za"),
   );
-  const other = filtered.filter(
-    (s) => !s.countries.includes("mw") && !matchesFilter(s, "sabc") && !s.countries.includes("za"),
-  );
+
+  const countryRows = countryGroups
+    .map(({ country, stations: groupStations }) => ({
+      country,
+      items: groupStations.filter((s) => filtered.includes(s)),
+    }))
+    .filter((row) => row.items.length > 0);
+
+  const showCountryLayout =
+    filter === "all" && !q.trim() && countryRows.length > 0;
 
   return (
     <div className="relative overflow-hidden">
@@ -70,15 +93,15 @@ export function RadioHub() {
       <div className="relative mx-auto max-w-[1400px] px-4 pt-28 sm:px-8 lg:px-12 lg:pt-24">
         <div className="max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-[0.28em] text-gls-pink/80">
-            South Africa
+            Africa
           </p>
           <h1 className="gls-display mt-2 text-4xl text-white sm:text-5xl">
             Radio
           </h1>
           <p className="mt-4 text-base leading-relaxed text-white/65">
-            Curated legal live streams from official broadcasters — SABC, Primedia,
-            MBC, Zodiak, and community stations. Tap a station to listen in the GLS
-            player.
+            Curated legal live streams from official broadcasters — SABC, MBC,
+            Capital FM, Wazobia, Peace FM, ZBC, and more. Tap a station to listen
+            in the GLS player.
           </p>
         </div>
 
@@ -126,15 +149,19 @@ export function RadioHub() {
                 Clear filters
               </button>
             </div>
-          ) : filter === "all" && !q.trim() ? (
+          ) : showCountryLayout ? (
             <>
-              {malawi.length > 0 && (
+              {countryRows.map(({ country, items }) => (
                 <ContentRow
-                  title="🇲🇼 Malawi"
-                  items={malawi}
+                  key={country.code}
+                  title={`${country.flag} ${country.name}`}
+                  items={items}
                   limit={24}
                 />
-              )}
+              ))}
+            </>
+          ) : filter === "za" && !q.trim() ? (
+            <>
               {sabc.length > 0 && (
                 <ContentRow
                   title="SABC national & regional"
@@ -142,17 +169,10 @@ export function RadioHub() {
                   limit={24}
                 />
               )}
-              {southAfrica.length > 0 && (
+              {southAfricaNonSabc.length > 0 && (
                 <ContentRow
                   title="More South African radio"
-                  items={southAfrica}
-                  limit={24}
-                />
-              )}
-              {other.length > 0 && (
-                <ContentRow
-                  title="More stations"
-                  items={other}
+                  items={southAfricaNonSabc}
                   limit={24}
                 />
               )}
@@ -163,9 +183,9 @@ export function RadioHub() {
         </div>
 
         <p className="mt-12 max-w-3xl text-sm leading-relaxed text-white/45">
-          Streams are sourced from official broadcaster endpoints (StreamTheWorld /
-          station CDNs). If a station changes its stream URL, staff can refresh it
-          via{" "}
+          Streams are sourced from official broadcaster endpoints (StreamTheWorld,
+          StreamGuys / Atunwa, station CDNs). If a station changes its stream URL,
+          staff can refresh it via{" "}
           <Link href="/admin/links" className="text-gls-pink/80 hover:underline">
             Admin → Links
           </Link>{" "}

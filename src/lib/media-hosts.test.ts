@@ -13,6 +13,14 @@ describe("isAllowedMediaHost", () => {
     expect(isAllowedMediaHost("aka-live.delivery.roku.com")).toBe(true);
   });
 
+  it("allows African broadcaster CDNs", () => {
+    expect(isAllowedMediaHost("atunwadigital.streamguys1.com")).toBe(true);
+    expect(isAllowedMediaHost("wazobiafmlagos951-atunwadigital.streamguys1.com")).toBe(
+      true,
+    );
+    expect(isAllowedMediaHost("mainradiostreaming.zbc.co.zw")).toBe(true);
+  });
+
   it("rejects unrelated hosts", () => {
     expect(isAllowedMediaHost("evil.example")).toBe(false);
     expect(isAllowedMediaHost("github.com")).toBe(false);

@@ -1,24 +1,56 @@
-import type { CatalogItem } from "@/data/types";
+import type { CatalogItem, CountryMeta } from "@/data/types";
 import { CURATED_MALAWI_TV } from "@/data/curated-malawi-tv";
+import { CURATED_RADIO_AFRICA } from "@/data/curated-radio-africa";
 import { CURATED_RADIO_MW } from "@/data/curated-radio-mw";
 import { CURATED_RADIO_ZA } from "@/data/curated-radio-za";
 
-export const CURATED_RADIO: CatalogItem[] = [...CURATED_RADIO_ZA, ...CURATED_RADIO_MW];
+export const RADIO_COUNTRY_META: Record<string, CountryMeta> = {
+  mw: { code: "mw", name: "Malawi", flag: "🇲🇼" },
+  za: { code: "za", name: "South Africa", flag: "🇿🇦" },
+  ke: { code: "ke", name: "Kenya", flag: "🇰🇪" },
+  ng: { code: "ng", name: "Nigeria", flag: "🇳🇬" },
+  gh: { code: "gh", name: "Ghana", flag: "🇬🇭" },
+  zw: { code: "zw", name: "Zimbabwe", flag: "🇿🇼" },
+};
+
+/** Display order for /radio country rows (SA + Malawi first, then expanded Africa). */
+export const RADIO_COUNTRY_ORDER = ["mw", "za", "ke", "ng", "gh", "zw"] as const;
+
+export type RadioCountryCode = (typeof RADIO_COUNTRY_ORDER)[number];
+
+export const CURATED_RADIO: CatalogItem[] = [
+  ...CURATED_RADIO_ZA,
+  ...CURATED_RADIO_MW,
+  ...CURATED_RADIO_AFRICA,
+];
 
 export function getRadioStations(): CatalogItem[] {
   return [...CURATED_RADIO].sort((a, b) => a.title.localeCompare(b.title));
 }
 
-export function getRadioStationsByCountry(country: "za" | "mw"): CatalogItem[] {
+export function getRadioStationsByCountry(country: RadioCountryCode): CatalogItem[] {
   return CURATED_RADIO.filter((station) => station.countries.includes(country)).sort(
     (a, b) => a.title.localeCompare(b.title),
   );
+}
+
+export function getRadioCountryGroups(): { country: CountryMeta; stations: CatalogItem[] }[] {
+  return RADIO_COUNTRY_ORDER.map((code) => ({
+    country: RADIO_COUNTRY_META[code],
+    stations: getRadioStationsByCountry(code),
+  })).filter((group) => group.stations.length > 0);
 }
 
 export function getMalawiBrowseItems(): CatalogItem[] {
   return [...CURATED_MALAWI_TV, ...getRadioStationsByCountry("mw")].sort((a, b) =>
     a.title.localeCompare(b.title),
   );
+}
+
+/** Kenya, Nigeria, Ghana, Zimbabwe — for a lightweight home browse row. */
+export function getAfricaRadioBrowseItems(): CatalogItem[] {
+  return CURATED_RADIO_AFRICA.slice()
+    .sort((a, b) => a.title.localeCompare(b.title));
 }
 
 export function getRadioStationBySlug(
