@@ -6,6 +6,7 @@ import {
   listYocoPaymentLinks,
   yocoConfigured,
 } from "@/lib/manual-billing";
+import { fetchReconcileSummary } from "@/lib/finance/admin-queries";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -80,6 +81,31 @@ async function run(req: NextRequest) {
     } catch {
       /* Yoco outage must not block expiry maintenance */
     }
+  }
+
+  let payfastActivated = 0;
+  try {
+    const { data: stuckPayfast } = await service
+      .from("manual_payment_requests")
+      .select("id, pf_payment_id, payment_reference")
+      .eq("payment_method", "payfast")
+      .in("status", ["pending", "proof_submitted", "verifying"])
+      .ilike("payfast_status", "complete")
+      .limit(50);
+    for (const row of stuckPayfast || []) {
+      const pfId = row.pf_payment_id || row.payment_reference;
+      const result = await activateManualPayment({
+        service,
+        paymentId: row.id,
+        adminEmail: "cron-payfast-sync",
+        externalTransactionId: `payfast:${pfId}`,
+        paymentMethod: "payfast",
+        adminNote: "Automatically activated from PayFast COMPLETE status (cron)",
+      });
+      if (result.ok) payfastActivated += 1;
+    }
+  } catch {
+    /* PayFast sync must not block dunning maintenance */
   }
 
   let membershipsExpired = 0;
@@ -219,7 +245,15 @@ async function run(req: NextRequest) {
     }
   }
 
-  const summary = `requests=${expiredRequests?.length || 0} memberships=${membershipsExpired} yoco=${yocoActivated} dunningRemind=${dunningReminded} dunningPause=${dunningPaused}`;
+  let reconcileSummary: Record<string, unknown> = {};
+  try {
+    const reconcile = await fetchReconcileSummary(service);
+    reconcileSummary = reconcile.summary;
+  } catch {
+    reconcileSummary = { error: "reconcile_failed" };
+  }
+
+  const summary = `requests=${expiredRequests?.length || 0} memberships=${membershipsExpired} yoco=${yocoActivated} payfast=${payfastActivated} dunningRemind=${dunningReminded} dunningPause=${dunningPaused} reconcileIssues=${reconcileSummary.issueCount ?? "?"}`;
   await recordCronRun(
     service,
     "manual-billing",
@@ -229,8 +263,10 @@ async function run(req: NextRequest) {
       requestsExpired: expiredRequests?.length || 0,
       membershipsExpired,
       yocoActivated,
+      payfastActivated,
       dunningReminded,
       dunningPaused,
+      reconcile: reconcileSummary,
     },
     startedAt,
   );
@@ -240,8 +276,10 @@ async function run(req: NextRequest) {
     requestsExpired: expiredRequests?.length || 0,
     membershipsExpired,
     yocoActivated,
+    payfastActivated,
     dunningReminded,
     dunningPaused,
+    reconcile: reconcileSummary,
   });
 }
 

@@ -5,7 +5,16 @@ import { useCallback, useEffect, useState } from "react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { GLS_PLANS } from "@/lib/membership/plans";
 
-type AdminView = "payments" | "members" | "reports" | "receipts" | "settings";
+type AdminView =
+  | "payments"
+  | "members"
+  | "reports"
+  | "receipts"
+  | "settings"
+  | "daybook"
+  | "ar-aging"
+  | "statement"
+  | "reconcile";
 
 type Payment = {
   id: string;
@@ -143,6 +152,26 @@ const TITLES: Record<AdminView, { eyebrow: string; title: string; desc: string }
     title: "Payment settings",
     desc: "Configure Yoco visibility, EFT details, trading name, support, and receipt copy.",
   },
+  daybook: {
+    eyebrow: "Finance desk",
+    title: "Cash daybook",
+    desc: "Ledger credits and debits by day — filter by date range for bank reconciliation.",
+  },
+  "ar-aging": {
+    eyebrow: "Finance desk",
+    title: "AR aging",
+    desc: "Outstanding / past-due / paused debit balances by dunning day bucket (0–2, 3–4, 5+).",
+  },
+  statement: {
+    eyebrow: "Finance desk",
+    title: "Member statement",
+    desc: "Per-member ledger, receipts, and open outstanding for support or disputes.",
+  },
+  reconcile: {
+    eyebrow: "Finance desk",
+    title: "Reconcile",
+    desc: "Paid rows missing ledger entries, amount mismatches, and stuck PayFast COMPLETE activations.",
+  },
 };
 
 function money(cents: number) {
@@ -173,13 +202,19 @@ function formatBillingDate(value: string | null | undefined) {
 export function ManualBillingAdmin({
   view,
   initialMember = "",
+  initialFrom = "",
+  initialTo = "",
 }: {
   view: AdminView;
   initialMember?: string;
+  initialFrom?: string;
+  initialTo?: string;
 }) {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(view === "statement" ? initialMember : "");
   const [status, setStatus] = useState("all");
+  const [fromDate, setFromDate] = useState(initialFrom);
+  const [toDate, setToDate] = useState(initialTo);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -196,6 +231,9 @@ export function ManualBillingAdmin({
   const load = useCallback(async () => {
     setError(null);
     const params = new URLSearchParams({ view, q, status });
+    if (fromDate) params.set("from", fromDate);
+    if (toDate) params.set("to", toDate);
+    if (view === "statement" && q) params.set("member", q);
     const res = await fetch(`/api/admin/manual-billing?${params}`, {
       cache: "no-store",
     });
@@ -206,7 +244,7 @@ export function ManualBillingAdmin({
     }
     setData(json);
     if (view === "settings") setSettingsForm(json.settings || null);
-  }, [view, q, status]);
+  }, [view, q, status, fromDate, toDate]);
 
   useEffect(() => {
     const timer = setTimeout(() => void load(), 0);
@@ -244,6 +282,10 @@ export function ManualBillingAdmin({
     <div className="flex flex-wrap gap-2">
       {[
         ["payments", "Queue"],
+        ["daybook", "Daybook"],
+        ["ar-aging", "AR aging"],
+        ["statement", "Statement"],
+        ["reconcile", "Reconcile"],
         ["members", "Members"],
         ["reports", "Reports"],
         ["receipts", "Receipts"],
@@ -381,6 +423,34 @@ export function ManualBillingAdmin({
       )}
       {view === "reports" && (
         <ReportsView reports={(data || null) as unknown as Reports | null} />
+      )}
+      {view === "daybook" && (
+        <DaybookView
+          data={data}
+          fromDate={fromDate}
+          toDate={toDate}
+          setFromDate={setFromDate}
+          setToDate={setToDate}
+          onReload={() => void load()}
+        />
+      )}
+      {view === "ar-aging" && <ArAgingView data={data} />}
+      {view === "statement" && (
+        <StatementView
+          data={data}
+          q={q}
+          setQ={setQ}
+          onSearch={() => void load()}
+        />
+      )}
+      {view === "reconcile" && (
+        <ReconcileView
+          data={data}
+          onSyncPayfast={() =>
+            void action({ action: "sync_payfast" })
+          }
+          busy={busy}
+        />
       )}
       {view === "receipts" && (
         <ReceiptsView
@@ -957,6 +1027,18 @@ function ReportsView({ reports }: { reports: Reports | null }) {
     1,
     ...(reports?.monthly || []).map((row) => row.cents),
   );
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  const monthEnd = new Date(monthStart);
+  monthEnd.setMonth(monthEnd.getMonth() + 1);
+  monthEnd.setDate(0);
+  const exportBookkeeper = () => {
+    const from = monthStart.toISOString().slice(0, 10);
+    const to = monthEnd.toISOString().slice(0, 10);
+    window.location.assign(
+      `/api/admin/finance-export?type=bookkeeper&from=${from}&to=${to}`,
+    );
+  };
   const exportCsv = () => {
     if (!reports) return;
     const lines = [
@@ -1002,7 +1084,14 @@ function ReportsView({ reports }: { reports: Reports | null }) {
   const s = reports.summary;
   return (
     <>
-      <div className="mt-8 flex justify-end">
+      <div className="mt-8 flex flex-wrap justify-end gap-2">
+        <button
+          type="button"
+          onClick={exportBookkeeper}
+          className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs font-bold uppercase tracking-wide text-emerald-100 hover:text-white"
+        >
+          Bookkeeper CSV (month)
+        </button>
         <button
           type="button"
           onClick={exportCsv}
@@ -1201,6 +1290,315 @@ function ReceiptsView({
             ))}
           </tbody>
         </table>
+      </div>
+    </>
+  );
+}
+
+function DaybookView({
+  data,
+  fromDate,
+  toDate,
+  setFromDate,
+  setToDate,
+  onReload,
+}: {
+  data: Record<string, unknown> | null;
+  fromDate: string;
+  toDate: string;
+  setFromDate: (v: string) => void;
+  setToDate: (v: string) => void;
+  onReload: () => void;
+}) {
+  const days = (data?.days || []) as Array<{
+    date: string;
+    creditTotal: number;
+    debitTotal: number;
+    netByAccount: Record<string, number>;
+    entries: Array<{
+      id: string;
+      entry_at: string;
+      account: string;
+      direction: string;
+      amount_zar_cents: number;
+      payment_reference: string | null;
+      description: string | null;
+    }>;
+  }>;
+  return (
+    <>
+      <div className="mt-8 flex flex-wrap items-end gap-3">
+        <label>
+          <span className="text-[10px] uppercase tracking-wider text-gls-muted">From</span>
+          <input
+            type="date"
+            className="gls-admin-input mt-1 block"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+          />
+        </label>
+        <label>
+          <span className="text-[10px] uppercase tracking-wider text-gls-muted">To</span>
+          <input
+            type="date"
+            className="gls-admin-input mt-1 block"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+          />
+        </label>
+        <button type="button" onClick={onReload} className="gls-cta rounded-md px-4 py-2 text-sm">
+          Apply
+        </button>
+      </div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        {[
+          ["Credits", money(Number(data?.creditTotal || 0))],
+          ["Debits", money(Number(data?.debitTotal || 0))],
+          ["Net revenue", money(Number(data?.creditTotal || 0) - Number(data?.debitTotal || 0))],
+        ].map(([label, value]) => (
+          <div key={String(label)} className="gls-admin-card rounded-xl p-4">
+            <p className="text-[10px] uppercase tracking-wider text-gls-muted">{label}</p>
+            <p className="mt-1 text-2xl font-semibold text-white">{value}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 space-y-4">
+        {days.map((day) => (
+          <section key={day.date} className="gls-admin-card rounded-xl p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="font-semibold text-white">{day.date}</p>
+              <p className="text-sm text-gls-body">
+                +{money(day.creditTotal)} · −{money(day.debitTotal)}
+              </p>
+            </div>
+            <div className="mt-3 space-y-1 text-xs">
+              {day.entries.slice(0, 20).map((entry) => (
+                <div
+                  key={entry.id}
+                  className="flex flex-wrap justify-between gap-2 rounded border border-white/[0.06] px-3 py-2"
+                >
+                  <span className="text-gls-body">
+                    {entry.account} · {entry.direction} · {entry.payment_reference || "—"}
+                  </span>
+                  <span className={entry.direction === "credit" ? "text-emerald-200" : "text-red-200"}>
+                    {money(entry.amount_zar_cents)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+        {!days.length && (
+          <p className="text-sm text-gls-muted">No ledger entries in this date range.</p>
+        )}
+      </div>
+    </>
+  );
+}
+
+function ArAgingView({ data }: { data: Record<string, unknown> | null }) {
+  const summary = (data?.summary || {}) as Record<string, number>;
+  const buckets = (data?.buckets || {}) as Record<
+    string,
+    Array<{
+      member_reference: string;
+      email: string | null;
+      payment_reference: string;
+      amount_zar_cents: number;
+      days_open: number;
+      debit_status: string | null;
+    }>
+  >;
+  return (
+    <>
+      <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          ["Open outstanding", summary.totalOpen || 0],
+          ["Total AR", money(summary.totalCents || 0)],
+          ["Past due subs", summary.pastDue || 0],
+          ["Paused subs", summary.paused || 0],
+        ].map(([label, value]) => (
+          <div key={String(label)} className="gls-admin-card rounded-xl p-4">
+            <p className="text-[10px] uppercase tracking-wider text-gls-muted">{label}</p>
+            <p className="mt-1 text-2xl font-semibold text-white">{value}</p>
+          </div>
+        ))}
+      </div>
+      {(["0-2", "3-4", "5+"] as const).map((bucket) => (
+        <section key={bucket} className="gls-admin-card mt-6 rounded-xl p-5">
+          <p className="text-sm font-semibold text-white">
+            {bucket} days · {(buckets[bucket] || []).length} open
+          </p>
+          <div className="mt-3 space-y-2">
+            {(buckets[bucket] || []).map((row) => (
+              <div
+                key={row.payment_reference}
+                className="flex flex-wrap items-center justify-between gap-3 rounded border border-white/[0.06] px-3 py-2 text-sm"
+              >
+                <div>
+                  <p className="text-white">{row.email || row.member_reference}</p>
+                  <p className="font-mono text-[10px] text-gls-pink-soft">
+                    {row.payment_reference} · day {row.days_open}
+                    {row.debit_status ? ` · ${row.debit_status}` : ""}
+                  </p>
+                </div>
+                <p className="font-semibold text-amber-200">{money(row.amount_zar_cents)}</p>
+              </div>
+            ))}
+            {!(buckets[bucket] || []).length && (
+              <p className="text-xs text-gls-muted">None in this bucket.</p>
+            )}
+          </div>
+        </section>
+      ))}
+    </>
+  );
+}
+
+function StatementView({
+  data,
+  q,
+  setQ,
+  onSearch,
+}: {
+  data: Record<string, unknown> | null;
+  q: string;
+  setQ: (v: string) => void;
+  onSearch: () => void;
+}) {
+  const profile = data?.profile as
+    | { email?: string; member_reference?: string; plan?: string }
+    | undefined;
+  const summary = (data?.summary || {}) as Record<string, number>;
+  const ledger = (data?.ledger || []) as Array<{
+    id: string;
+    entry_at: string;
+    account: string;
+    direction: string;
+    amount_zar_cents: number;
+    payment_reference: string | null;
+    source_event: string;
+  }>;
+  const receipts = (data?.receipts || []) as Receipt[];
+  return (
+    <>
+      <div className="mt-8 flex flex-wrap gap-2">
+        <input
+          className="gls-admin-input max-w-xl flex-1"
+          placeholder="Member email or GLS reference"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
+        <button type="button" onClick={onSearch} className="gls-cta rounded-md px-4 py-2 text-sm">
+          Load statement
+        </button>
+      </div>
+      {profile && (
+        <>
+          <div className="mt-5 gls-admin-card rounded-xl p-5">
+            <p className="text-white font-semibold">{profile.email}</p>
+            <p className="mt-1 font-mono text-xs text-gls-pink-soft">{profile.member_reference}</p>
+            <p className="mt-2 text-sm text-gls-body">
+              Paid {money(summary.paidTotalCents || 0)} · {summary.receiptCount || 0} receipts ·{" "}
+              {summary.openOutstanding || 0} open outstanding
+            </p>
+          </div>
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <section className="gls-admin-card rounded-xl p-5">
+              <p className="text-xs font-bold uppercase tracking-wider text-gls-gold">Ledger</p>
+              <div className="mt-3 space-y-2 text-sm">
+                {ledger.map((entry) => (
+                  <div key={entry.id} className="flex justify-between gap-2 border-b border-white/[0.05] pb-2">
+                    <span className="text-gls-body">
+                      {String(entry.entry_at).slice(0, 10)} · {entry.account} · {entry.source_event}
+                    </span>
+                    <span className="text-white">{money(entry.amount_zar_cents)}</span>
+                  </div>
+                ))}
+                {!ledger.length && <p className="text-gls-muted">No ledger entries yet.</p>}
+              </div>
+            </section>
+            <section className="gls-admin-card rounded-xl p-5">
+              <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">Receipts</p>
+              <div className="mt-3 space-y-2 text-sm">
+                {receipts.map((receipt) => (
+                  <div key={receipt.id} className="flex justify-between gap-2 border-b border-white/[0.05] pb-2">
+                    <span className="text-gls-body">{receipt.receipt_number}</span>
+                    <span className="text-emerald-200">{money(receipt.amount_zar_cents)}</span>
+                  </div>
+                ))}
+                {!receipts.length && <p className="text-gls-muted">No receipts.</p>}
+              </div>
+            </section>
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
+function ReconcileView({
+  data,
+  onSyncPayfast,
+  busy,
+}: {
+  data: Record<string, unknown> | null;
+  onSyncPayfast: () => void;
+  busy: string | null;
+}) {
+  const summary = (data?.summary || {}) as Record<string, number>;
+  const issues = (data?.issues || []) as Array<{
+    paymentId: string;
+    issue: string;
+    detail: string;
+  }>;
+  return (
+    <>
+      <div className="mt-8 flex flex-wrap gap-3">
+        <button
+          type="button"
+          disabled={busy !== null}
+          onClick={onSyncPayfast}
+          className="gls-cta rounded-md px-4 py-2 text-sm disabled:opacity-40"
+        >
+          Sync PayFast COMPLETE → activate
+        </button>
+      </div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          ["Issues", summary.issueCount || 0],
+          ["Missing ledger", summary.missingLedger || 0],
+          ["Amount mismatch", summary.amountMismatch || 0],
+          ["PayFast stuck", summary.payfastStuck || 0],
+        ].map(([label, value]) => (
+          <div key={String(label)} className="gls-admin-card rounded-xl p-4">
+            <p className="text-[10px] uppercase tracking-wider text-gls-muted">{label}</p>
+            <p className="mt-1 text-2xl font-semibold text-white">{value}</p>
+          </div>
+        ))}
+      </div>
+      <div className="gls-admin-card mt-6 overflow-x-auto rounded-xl">
+        <table className="w-full min-w-[640px] text-left text-sm">
+          <thead className="border-b border-white/10 text-[10px] uppercase tracking-wider text-gls-muted">
+            <tr>
+              <th className="px-4 py-3">Payment</th>
+              <th className="px-4 py-3">Issue</th>
+              <th className="px-4 py-3">Detail</th>
+            </tr>
+          </thead>
+          <tbody>
+            {issues.map((row) => (
+              <tr key={`${row.paymentId}-${row.issue}`} className="border-t border-white/[0.05]">
+                <td className="px-4 py-3 font-mono text-xs">{row.paymentId.slice(0, 8)}…</td>
+                <td className="px-4 py-3 text-amber-200">{row.issue}</td>
+                <td className="px-4 py-3 text-gls-body">{row.detail}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {!issues.length && (
+          <p className="px-4 py-6 text-sm text-gls-muted">No reconcile mismatches detected.</p>
+        )}
       </div>
     </>
   );

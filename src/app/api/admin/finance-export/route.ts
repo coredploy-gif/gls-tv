@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAdminAccess, hasAdminPermission } from "@/lib/admin/access";
 import { createServiceClient } from "@/lib/eadmin";
 import { csvRow } from "@/lib/finance/csv";
+import {
+  BOOKKEEPER_CSV_HEADERS,
+  bookkeeperCsvRow,
+  splitOutstandingAmount,
+} from "@/lib/finance/ledger";
 import { writeAuditLog } from "@/lib/admin/audit";
 
 export async function GET(req: NextRequest) {
@@ -12,7 +17,7 @@ export async function GET(req: NextRequest) {
   const service = createServiceClient();
   if (!service) return NextResponse.json({ error: "Finance service unavailable" }, { status: 503 });
   const params = req.nextUrl.searchParams;
-  const type = params.get("type") === "payments" ? "payments" : "receipts";
+  const type = params.get("type") || "receipts";
   const page = Math.max(1, Number(params.get("page") || 1));
   const pageSize = Math.min(1000, Math.max(1, Number(params.get("pageSize") || 250)));
   const from = params.get("from");
@@ -20,6 +25,72 @@ export async function GET(req: NextRequest) {
   const status = params.get("status");
   const rangeStart = (page - 1) * pageSize;
   const rangeEnd = rangeStart + pageSize - 1;
+
+  if (type === "bookkeeper") {
+    let query = service
+      .from("payment_receipts")
+      .select(
+        "receipt_number, member_reference, payment_reference, plan, amount_zar_cents, paid_at, issued_at, payment_request_id",
+        { count: "exact" },
+      )
+      .is("refunded_at", null)
+      .order("paid_at", { ascending: true })
+      .order("id", { ascending: true });
+    if (from) query = query.gte("paid_at", `${from}T00:00:00.000Z`);
+    if (to) query = query.lt("paid_at", `${to}T23:59:59.999Z`);
+    const { data: receipts, count, error } = await query.range(rangeStart, rangeEnd);
+    if (error) return NextResponse.json({ error: "Export failed" }, { status: 500 });
+
+    const paymentIds = [...new Set((receipts || []).map((r) => r.payment_request_id).filter(Boolean))];
+    const { data: payments } = paymentIds.length
+      ? await service
+          .from("manual_payment_requests")
+          .select("id, pf_payment_id, billing_kind, dunning_fee_cents, amount_zar_cents")
+          .in("id", paymentIds)
+      : { data: [] };
+    const paymentMap = new Map((payments || []).map((p) => [p.id, p]));
+
+    const rows = (receipts || []).map((receipt) => {
+      const payment = paymentMap.get(receipt.payment_request_id);
+      const feeCents =
+        payment?.dunning_fee_cents ??
+        (payment?.billing_kind === "outstanding"
+          ? splitOutstandingAmount(
+              payment.amount_zar_cents || receipt.amount_zar_cents,
+              payment.dunning_fee_cents,
+            ).feeCents
+          : 0);
+      return bookkeeperCsvRow({
+        paidAt: receipt.paid_at || receipt.issued_at,
+        paymentReference: receipt.payment_reference,
+        memberReference: receipt.member_reference,
+        plan: receipt.plan,
+        amountZarCents: receipt.amount_zar_cents,
+        feeCents,
+        pfPaymentId: payment?.pf_payment_id || null,
+        billingKind: payment?.billing_kind || "once",
+        receiptNumber: receipt.receipt_number,
+      });
+    });
+
+    const csv = [csvRow([...BOOKKEEPER_CSV_HEADERS]), ...rows.map((row) => csvRow(row))].join("\r\n");
+    await writeAuditLog(service, {
+      actorEmail: access.user.email,
+      actorUserId: access.user.id,
+      action: "finance.export",
+      entityType: "bookkeeper",
+      summary: `Exported ${rows.length} bookkeeper rows`,
+      meta: { type, page, pageSize, from, to, rowCount: rows.length },
+    });
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="gls-bookkeeper-${from || "all"}-${to || "all"}-p${page}.csv"`,
+        "X-Total-Count": String(count || 0),
+        "Cache-Control": "no-store",
+      },
+    });
+  }
 
   if (type === "payments") {
     let query = service

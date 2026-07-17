@@ -16,6 +16,12 @@ import {
   hasAdminPermission,
   requireAal2,
 } from "@/lib/admin/access";
+import {
+  fetchArAging,
+  fetchDaybook,
+  fetchMemberStatement,
+  fetchReconcileSummary,
+} from "@/lib/finance/admin-queries";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -61,6 +67,57 @@ export async function GET(req: NextRequest) {
   const view = req.nextUrl.searchParams.get("view") || "queue";
   const q = (req.nextUrl.searchParams.get("q") || "").trim().toLowerCase();
   const status = req.nextUrl.searchParams.get("status") || "all";
+  const from = req.nextUrl.searchParams.get("from");
+  const to = req.nextUrl.searchParams.get("to");
+  const member = (req.nextUrl.searchParams.get("member") || "").trim();
+
+  if (view === "daybook") {
+    try {
+      return NextResponse.json(await fetchDaybook(service, from, to));
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : "Daybook failed" },
+        { status: 500 },
+      );
+    }
+  }
+
+  if (view === "ar-aging") {
+    try {
+      return NextResponse.json(await fetchArAging(service));
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : "AR aging failed" },
+        { status: 500 },
+      );
+    }
+  }
+
+  if (view === "statement") {
+    try {
+      return NextResponse.json(
+        await fetchMemberStatement(service, member || q),
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Statement failed";
+      return NextResponse.json(
+        { error: message },
+        { status: message.includes("required") ? 400 : 500 },
+      );
+    }
+  }
+
+  if (view === "reconcile") {
+    try {
+      return NextResponse.json(await fetchReconcileSummary(service));
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : "Reconcile failed" },
+        { status: 500 },
+      );
+    }
+  }
 
   if (view === "queue" || view === "payments") {
     let query = service

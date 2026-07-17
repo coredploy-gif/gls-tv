@@ -7,6 +7,10 @@ const VIEWS = [
   "reports",
   "receipts",
   "settings",
+  "daybook",
+  "ar-aging",
+  "statement",
+  "reconcile",
 ] as const;
 
 export default async function ManualFinancePage({
@@ -14,15 +18,17 @@ export default async function ManualFinancePage({
   searchParams,
 }: {
   params: Promise<{ view: string }>;
-  searchParams: Promise<{ member?: string }>;
+  searchParams: Promise<{ member?: string; from?: string; to?: string }>;
 }) {
   const { view } = await params;
-  const { member } = await searchParams;
+  const { member, from, to } = await searchParams;
   if (!VIEWS.includes(view as (typeof VIEWS)[number])) notFound();
   return (
     <ManualBillingAdmin
       view={view as (typeof VIEWS)[number]}
-      initialMember={view === "payments" ? member : undefined}
+      initialMember={view === "payments" || view === "statement" ? member : undefined}
+      initialFrom={from}
+      initialTo={to}
     />
   );
 }
