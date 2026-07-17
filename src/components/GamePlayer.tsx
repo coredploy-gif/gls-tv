@@ -295,7 +295,7 @@ export function GamePlayer({
       title={title}
       src={src}
       allow="fullscreen"
-      className="h-full min-h-0 w-full flex-1 bg-black"
+      className="block h-full w-full border-0 bg-black"
     />
   );
 
@@ -303,31 +303,33 @@ export function GamePlayer({
     return (
       <div
         ref={shellRef}
-        className="fixed inset-0 z-[100] flex flex-col bg-gls-black"
+        className="fixed inset-0 z-[100] flex h-dvh max-h-dvh flex-col overflow-hidden bg-gls-black"
         role="dialog"
         aria-modal="true"
         aria-label={`${title} — expanded play`}
       >
-        {/* Top chrome — always visible in FS */}
-        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-black/90 px-3 py-2 backdrop-blur-md safe-area-pt">
+        {/* Top chrome — always visible in FS, never overlays the stage */}
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-black/90 px-3 py-1.5 backdrop-blur-md pt-[max(0.375rem,env(safe-area-inset-top))]">
           <p className="min-w-0 truncate text-sm font-bold text-white">{title}</p>
           {toolbar}
         </div>
 
+        {/* Column: stage takes remaining height; pad docks below without overlap */}
         <div className="relative flex min-h-0 flex-1 flex-col lg:flex-row">
-          {/* Stage */}
           <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-black">
-            <div className="min-h-0 flex-1">{iframe}</div>
-            {/* Pad docked under stage — visible on phone in expanded/FS */}
+            {/* Stage constrains iframe — game scales to fit inside */}
+            <div className="relative min-h-0 flex-1">
+              <div className="absolute inset-0">{iframe}</div>
+            </div>
             {showPad && (
-              <div className="relative z-10 shrink-0 border-t border-white/10 bg-black/95 px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+              <div className="relative z-10 shrink-0 border-t border-white/10 bg-black/95 px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:px-3 sm:py-2">
                 {pad}
               </div>
             )}
           </div>
 
           {sideOpen && (
-            <div className="absolute inset-x-0 bottom-0 top-auto z-20 max-h-[45%] overflow-y-auto border-t border-white/10 bg-gls-black/95 p-3 sm:inset-y-0 sm:left-auto sm:right-0 sm:top-0 sm:max-h-none sm:w-[300px] sm:border-l sm:border-t-0">
+            <div className="absolute inset-x-0 bottom-0 top-auto z-20 max-h-[40%] overflow-y-auto border-t border-white/10 bg-gls-black/95 p-3 sm:inset-y-0 sm:left-auto sm:right-0 sm:top-0 sm:max-h-none sm:w-[300px] sm:border-l sm:border-t-0">
               <div className="space-y-3">
                 {leaderboardPanel}
                 {howToPanel}
@@ -347,7 +349,9 @@ export function GamePlayer({
             <div className="relative flex justify-end border-b border-white/10 bg-black/80 px-3 py-2">
               {toolbar}
             </div>
-            <div className="aspect-[4/5] w-full sm:aspect-[5/4]">{iframe}</div>
+            <div className="aspect-[4/5] w-full sm:aspect-[5/4]">
+              <div className="h-full w-full">{iframe}</div>
+            </div>
             {showPad && (
               <div className="border-t border-white/10 bg-black/90 px-3 py-3">
                 {pad}

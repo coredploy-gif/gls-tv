@@ -12,26 +12,58 @@
         background: radial-gradient(ellipse at top, #122818, var(--bg) 55%);
         color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif;
       }
-      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
-      .frame { width: min(420px, 100%); }
-      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
+      .wrap {
+        height: 100%; display: flex; align-items: center; justify-content: center;
+        padding: 8px; box-sizing: border-box;
+      }
+      .frame {
+        display: flex; flex-direction: column; width: min(420px, 100%);
+        height: 100%; max-height: 100%; min-height: 0;
+      }
+      .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; flex-shrink: 0; }
       h1 { margin: 0; font-size: 1.1rem; letter-spacing: 0.02em; }
       .meta { text-align: right; font-variant-numeric: tabular-nums; font-size: 0.85rem; }
       .meta b { color: var(--accent); font-size: 1.15rem; }
+      .levels {
+        display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; flex-shrink: 0;
+      }
+      .levels button {
+        min-width: 36px; padding: 6px 10px; font-size: 0.8rem; border-radius: 8px;
+        background: rgba(94,226,154,0.18); color: var(--ink); border: 1px solid rgba(94,226,154,0.35);
+        cursor: pointer; font-weight: 700;
+      }
+      .levels button.active { background: var(--accent); color: #052013; }
+      .levels button.locked { opacity: 0.35; cursor: not-allowed; background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
+      .stage {
+        /* basis 0 + frame height:100% so the board gets leftover space (not collapse) */
+        flex: 1 1 0; min-height: 0; width: 100%;
+        container-type: size; display: grid; place-items: center;
+      }
       canvas {
-        width: 100%; aspect-ratio: 10/18; display: block; border-radius: 12px;
+        display: block; border-radius: 12px;
+        width: min(100cqw, calc(100cqh * 12 / 22));
+        height: min(100cqh, calc(100cqw * 22 / 12));
+        max-width: 100%; max-height: 100%;
         background: var(--lcd); border: 1px solid rgba(94,226,154,.35);
         image-rendering: pixelated;
       }
-      .actions { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+      .actions { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; flex-shrink: 0; }
       button {
         border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700;
         cursor: pointer; background: var(--accent); color: #052013;
       }
       button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--ink); }
-      .pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+      .pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; flex-shrink: 0; }
       .pad button { padding: 12px 8px; font-size: 0.85rem; }
-      .hint { margin-top: 8px; font-size: 0.75rem; color: rgba(216,245,224,.55); text-align: center; }
+      .hint { margin-top: 6px; font-size: 0.75rem; color: rgba(216,245,224,.55); text-align: center; flex-shrink: 0; }
+      /* Host shell supplies GameVirtualPad — free vertical space for the board */
+      html.in-frame .pad,
+      html.in-frame .hint { display: none; }
+      html.in-frame .actions { margin-top: 6px; }
+      html.in-frame button { padding: 8px 12px; font-size: 0.85rem; }
+      html.in-frame h1 { font-size: 0.95rem; }
+      html.in-frame .bar { margin-bottom: 4px; }
+      html.in-frame .levels button { padding: 5px 8px; font-size: 0.75rem; }
     </style>
   </head>
   <body>
@@ -39,9 +71,12 @@
       <div class="frame">
         <div class="bar">
           <h1>Brick Stack</h1>
-          <div class="meta">Score <b id="score">0</b><br />Lines <span id="lines">0</span></div>
+          <div class="meta">Lv <b id="lv">1</b> · <span id="goalMeta">0/8</span><br />Score <b id="score">0</b> · Lines <span id="lines">0</span></div>
         </div>
-        <canvas id="c" width="200" height="360"></canvas>
+        <div class="levels" id="levels"></div>
+        <div class="stage">
+          <canvas id="c" width="192" height="352"></canvas>
+        </div>
         <div class="actions">
           <button type="button" id="restart">Restart</button>
           <button type="button" class="ghost" id="mute">Mute</button>
@@ -55,13 +90,24 @@
           <button type="button" id="right">▶</button>
           <button type="button" id="pause">Pause</button>
         </div>
-        <p class="hint">Arrows / WASD · Space soft drop · Enter hard drop</p>
+        <p class="hint">Arrows / WASD · Space soft drop · Enter hard drop · clear lines to beat the level</p>
       </div>
     </div>
     <script>
+      if (window.self !== window.top) document.documentElement.classList.add("in-frame");
       const canvas = document.getElementById("c");
       const ctx = canvas.getContext("2d");
-      const COLS = 10, ROWS = 18, CELL = 20;
+      const COLS = 12, ROWS = 22, CELL = 16;
+      const GAME_ID = "brick-stack";
+      const UNLOCK_KEY = "gls-unlock-" + GAME_ID;
+      const LEVELS = [
+        { goal: 8, baseDrop: 1100, minDrop: 380, ramp: 22 },
+        { goal: 10, baseDrop: 980, minDrop: 320, ramp: 24 },
+        { goal: 12, baseDrop: 880, minDrop: 260, ramp: 26 },
+        { goal: 14, baseDrop: 780, minDrop: 200, ramp: 28 },
+        { goal: 16, baseDrop: 700, minDrop: 160, ramp: 30 },
+        { goal: 18, baseDrop: 620, minDrop: 130, ramp: 32 },
+      ];
       const SHAPES = {
         I: [[1,1,1,1]],
         O: [[1,1],[1,1]],
@@ -74,8 +120,22 @@
       const COLORS = { I:"#5ee29a", O:"#f5c842", T:"#7ec8ff", S:"#4ade80", Z:"#ff8a65", J:"#ff7ab8", L:"#fbbf24" };
       const KEYS = Object.keys(SHAPES);
 
-      let grid, piece, score, lines, running, paused, dropMs, lastDrop, bestSubmitted, muted;
-      let audioCtx;
+      let grid, piece, score, lines, levelLines, running, paused, dropMs, lastDrop, bestSubmitted, muted, won;
+      let levelIndex = 0, audioCtx;
+
+      function getUnlocked() {
+        try {
+          const n = parseInt(localStorage.getItem(UNLOCK_KEY) || "1", 10);
+          return Math.max(1, Math.min(LEVELS.length, isNaN(n) ? 1 : n));
+        } catch (_) { return 1; }
+      }
+
+      function setUnlocked(maxLevel1Based) {
+        try {
+          const cur = getUnlocked();
+          if (maxLevel1Based > cur) localStorage.setItem(UNLOCK_KEY, String(Math.min(LEVELS.length, maxLevel1Based)));
+        } catch (_) {}
+      }
 
       function ensureAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -101,11 +161,38 @@
       function postScore(force) {
         if (!force && score <= bestSubmitted) return;
         bestSubmitted = Math.max(bestSubmitted, score);
-        parent.postMessage({ type: "gls-game-score", gameId: "brick-stack", score, force: !!force }, "*");
+        parent.postMessage({ type: "gls-game-score", gameId: GAME_ID, score, force: !!force }, "*");
       }
 
       function emptyGrid() {
         return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+      }
+
+      function updateMeta() {
+        const L = LEVELS[levelIndex];
+        document.getElementById("score").textContent = String(score);
+        document.getElementById("lines").textContent = String(lines);
+        document.getElementById("lv").textContent = String(levelIndex + 1);
+        document.getElementById("goalMeta").textContent = levelLines + "/" + L.goal;
+      }
+
+      function renderLevelButtons() {
+        const box = document.getElementById("levels");
+        const unlocked = getUnlocked();
+        box.innerHTML = "";
+        LEVELS.forEach((_, i) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.textContent = String(i + 1);
+          if (i + 1 > unlocked) b.classList.add("locked");
+          if (i === levelIndex) b.classList.add("active");
+          b.onclick = () => {
+            if (i + 1 > getUnlocked()) return;
+            levelIndex = i;
+            reset();
+          };
+          box.appendChild(b);
+        });
       }
 
       function spawn() {
@@ -148,7 +235,22 @@
         }
         beep(180, 0.05, "square", 0.04);
         clearLines();
-        spawn();
+        if (running && !won) spawn();
+      }
+
+      function refreshDropSpeed() {
+        const L = LEVELS[levelIndex];
+        dropMs = Math.max(L.minDrop, L.baseDrop - levelLines * L.ramp);
+      }
+
+      function completeLevel() {
+        won = true;
+        running = false;
+        setUnlocked(levelIndex + 2);
+        renderLevelButtons();
+        beep(520, 0.18, "triangle", 0.09);
+        beep(660, 0.22, "triangle", 0.08);
+        postScore(true);
       }
 
       function clearLines() {
@@ -163,39 +265,40 @@
         }
         if (cleared) {
           const pts = [0, 100, 250, 500, 800][cleared] || 800;
-          score += pts;
+          score += pts * (levelIndex + 1);
           lines += cleared;
-          dropMs = Math.max(120, 700 - lines * 18);
-          document.getElementById("score").textContent = String(score);
-          document.getElementById("lines").textContent = String(lines);
+          levelLines += cleared;
+          refreshDropSpeed();
+          updateMeta();
           beep(420 + cleared * 80, 0.12, "triangle", 0.08);
           postScore(false);
+          if (levelLines >= LEVELS[levelIndex].goal) completeLevel();
         }
       }
 
       function softDrop() {
-        if (!running || paused) return;
+        if (!running || paused || won) return;
         if (!collides(piece.x, piece.y + 1, piece.shape)) {
           piece.y++;
           score += 1;
-          document.getElementById("score").textContent = String(score);
+          updateMeta();
           beep(90, 0.02, "square", 0.02);
         } else lock();
       }
 
       function hardDrop() {
-        if (!running || paused) return;
+        if (!running || paused || won) return;
         while (!collides(piece.x, piece.y + 1, piece.shape)) {
           piece.y++;
           score += 2;
         }
-        document.getElementById("score").textContent = String(score);
+        updateMeta();
         beep(140, 0.08, "square", 0.05);
         lock();
       }
 
       function move(dx) {
-        if (!running || paused) return;
+        if (!running || paused || won) return;
         if (!collides(piece.x + dx, piece.y, piece.shape)) {
           piece.x += dx;
           beep(220, 0.025, "square", 0.03);
@@ -203,7 +306,7 @@
       }
 
       function tryRotate() {
-        if (!running || paused) return;
+        if (!running || paused || won) return;
         const next = rotate(piece.shape);
         const kicks = [0, -1, 1, -2, 2];
         for (const k of kicks) {
@@ -220,12 +323,14 @@
         grid = emptyGrid();
         score = 0;
         lines = 0;
-        dropMs = 700;
+        levelLines = 0;
         bestSubmitted = 0;
         running = true;
         paused = false;
-        document.getElementById("score").textContent = "0";
-        document.getElementById("lines").textContent = "0";
+        won = false;
+        refreshDropSpeed();
+        updateMeta();
+        renderLevelButtons();
         spawn();
         lastDrop = performance.now();
         requestAnimationFrame(loop);
@@ -235,7 +340,7 @@
         ctx.fillStyle = color;
         ctx.fillRect(x * CELL + 1, y * CELL + 1, CELL - 2, CELL - 2);
         ctx.fillStyle = "rgba(255,255,255,.12)";
-        ctx.fillRect(x * CELL + 2, y * CELL + 2, CELL - 6, 3);
+        ctx.fillRect(x * CELL + 2, y * CELL + 2, CELL - 5, 2);
       }
 
       function draw() {
@@ -260,23 +365,25 @@
             }
           }
         }
-        if (!running || paused) {
+        if (!running || paused || won) {
           ctx.fillStyle = "rgba(0,0,0,.55)";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.fillStyle = "#fff";
-          ctx.font = "bold 22px Segoe UI, sans-serif";
+          ctx.font = "bold 18px Segoe UI, sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText(paused ? "Paused" : "Game over", canvas.width / 2, canvas.height / 2 - 8);
-          if (!running) {
-            ctx.fillStyle = "#5ee29a";
-            ctx.font = "15px Segoe UI, sans-serif";
-            ctx.fillText("Score " + score, canvas.width / 2, canvas.height / 2 + 20);
+          const msg = won ? "Level clear!" : paused ? "Paused" : "Game over";
+          ctx.fillText(msg, canvas.width / 2, canvas.height / 2 - 8);
+          ctx.fillStyle = "#5ee29a";
+          ctx.font = "13px Segoe UI, sans-serif";
+          ctx.fillText("Score " + score, canvas.width / 2, canvas.height / 2 + 18);
+          if (won && levelIndex + 1 < LEVELS.length) {
+            ctx.fillText("Level " + (levelIndex + 2) + " unlocked", canvas.width / 2, canvas.height / 2 + 36);
           }
         }
       }
 
       function loop(ts) {
-        if (running && !paused && ts - lastDrop >= dropMs) {
+        if (running && !paused && !won && ts - lastDrop >= dropMs) {
           lastDrop = ts;
           if (!collides(piece.x, piece.y + 1, piece.shape)) piece.y++;
           else lock();

@@ -9,7 +9,7 @@ type Props = {
   accent?: string;
   /** Show on desktop too */
   forceDesktop?: boolean;
-  /** Immersive / expanded shell — always show pad */
+  /** Immersive / expanded shell — always show pad, use compact layout */
   expanded?: boolean;
 };
 
@@ -54,6 +54,7 @@ function PadBtn({
   className = "",
   wide,
   repeat,
+  compact,
 }: {
   label: string;
   aria: string;
@@ -64,16 +65,23 @@ function PadBtn({
   wide?: boolean;
   /** Hold-to-repeat (soft drop / continuous move) */
   repeat?: boolean;
+  compact?: boolean;
 }) {
   const held = useRef(false);
+
+  const size = compact
+    ? wide
+      ? "min-h-9 min-w-[3.25rem] px-2.5 text-xs"
+      : "h-10 w-10 text-sm"
+    : wide
+      ? "min-h-12 min-w-[4.5rem] px-4 text-sm"
+      : "h-14 w-14 text-sm";
 
   return (
     <button
       type="button"
       aria-label={aria}
-      className={`select-none touch-manipulation rounded-xl border border-white/25 bg-black/70 text-sm font-bold text-white shadow-lg backdrop-blur-sm active:scale-95 active:bg-gls-red/80 ${
-        wide ? "min-h-12 min-w-[4.5rem] px-4" : "h-14 w-14"
-      } ${className}`}
+      className={`select-none touch-manipulation rounded-xl border border-white/25 bg-black/70 font-bold text-white shadow-lg backdrop-blur-sm active:scale-95 active:bg-gls-red/80 ${size} ${className}`}
       onPointerDown={(e) => {
         e.preventDefault();
         (e.currentTarget as HTMLButtonElement).setPointerCapture?.(e.pointerId);
@@ -119,6 +127,7 @@ export function GameVirtualPad({
   expanded,
 }: Props) {
   const repeatTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const compact = !!expanded;
 
   const clearRepeat = useCallback(() => {
     if (repeatTimer.current) {
@@ -155,17 +164,26 @@ export function GameVirtualPad({
 
   if (scheme === "none") return null;
 
+  const gap = compact ? "gap-1" : "gap-1.5";
+
   const dpad = (
-    <div className="grid grid-cols-3 gap-1.5">
-      <span />
-      <PadBtn label="▲" aria="Up" onPress={() => send("ArrowUp", "ArrowUp")} />
+    <div className={`grid grid-cols-3 ${gap}`}>
       <span />
       <PadBtn
+        compact={compact}
+        label="▲"
+        aria="Up"
+        onPress={() => send("ArrowUp", "ArrowUp")}
+      />
+      <span />
+      <PadBtn
+        compact={compact}
         label="◀"
         aria="Left"
         onPress={() => send("ArrowLeft", "ArrowLeft")}
       />
       <PadBtn
+        compact={compact}
         label="▼"
         aria="Down"
         onPress={() => send("ArrowDown", "ArrowDown")}
@@ -174,6 +192,7 @@ export function GameVirtualPad({
         onHoldEnd={() => endRepeat("ArrowDown", "ArrowDown")}
       />
       <PadBtn
+        compact={compact}
         label="▶"
         aria="Right"
         onPress={() => send("ArrowRight", "ArrowRight")}
@@ -187,14 +206,16 @@ export function GameVirtualPad({
     body = dpad;
   } else if (scheme === "lr") {
     body = (
-      <div className="flex gap-3">
+      <div className={`flex ${compact ? "gap-2" : "gap-3"}`}>
         <PadBtn
+          compact={compact}
           wide
           label="◀ Left"
           aria="Left"
           onPress={() => send("ArrowLeft", "ArrowLeft")}
         />
         <PadBtn
+          compact={compact}
           wide
           label="Right ▶"
           aria="Right"
@@ -204,14 +225,18 @@ export function GameVirtualPad({
     );
   } else if (scheme === "lr-fire") {
     body = (
-      <div className="flex flex-wrap items-center justify-center gap-3">
+      <div
+        className={`flex flex-wrap items-center justify-center ${compact ? "gap-2" : "gap-3"}`}
+      >
         <PadBtn
+          compact={compact}
           wide
           label="◀"
           aria="Left"
           onPress={() => send("ArrowLeft", "ArrowLeft")}
         />
         <PadBtn
+          compact={compact}
           wide
           label="Fire"
           aria="Fire"
@@ -219,6 +244,7 @@ export function GameVirtualPad({
           className="bg-gls-red/50"
         />
         <PadBtn
+          compact={compact}
           wide
           label="▶"
           aria="Right"
@@ -226,20 +252,46 @@ export function GameVirtualPad({
         />
       </div>
     );
-  } else if (scheme === "brick") {
+  } else if (scheme === "snake") {
+    // Brick-like dock: dpad + Pause side-by-side
     body = (
-      <div className="flex flex-wrap items-end justify-center gap-4">
+      <div
+        className={`flex flex-wrap items-end justify-center ${compact ? "gap-2" : "gap-4"}`}
+      >
         {dpad}
-        <div className="flex flex-col gap-1.5">
+        <PadBtn
+          compact={compact}
+          wide
+          label="Pause"
+          aria="Pause"
+          onPress={() => send("p", "KeyP")}
+          className={
+            compact
+              ? "min-h-[5.25rem] self-stretch"
+              : "min-h-[7.25rem] self-stretch"
+          }
+        />
+      </div>
+    );
+  } else if (scheme === "brick") {
+    // Compact: dpad + 2×2 actions side-by-side (avoids stacking 4 tall buttons)
+    body = (
+      <div
+        className={`flex flex-wrap items-end justify-center ${compact ? "gap-2" : "gap-4"}`}
+      >
+        {dpad}
+        <div className={`grid grid-cols-2 ${gap}`}>
           <PadBtn
+            compact={compact}
             wide
             label="Rotate"
             aria="Rotate"
             onPress={() => send("ArrowUp", "ArrowUp")}
           />
           <PadBtn
+            compact={compact}
             wide
-            label="Soft drop"
+            label="Soft"
             aria="Soft drop"
             onPress={() => send("ArrowDown", "ArrowDown")}
             repeat
@@ -247,13 +299,15 @@ export function GameVirtualPad({
             onHoldEnd={() => endRepeat("ArrowDown", "ArrowDown")}
           />
           <PadBtn
+            compact={compact}
             wide
-            label="Hard drop"
+            label="Drop"
             aria="Hard drop"
             onPress={() => send("Enter", "Enter")}
             className="bg-gls-red/50"
           />
           <PadBtn
+            compact={compact}
             wide
             label="Pause"
             aria="Pause"
@@ -265,17 +319,19 @@ export function GameVirtualPad({
   } else if (scheme === "action") {
     body = (
       <PadBtn
+        compact={compact}
         wide
         label="Action / Flap"
         aria="Action"
         onPress={() => send(" ", "Space")}
-        className="min-h-16 min-w-[10rem] bg-gls-red/55 text-base"
+        className={`bg-gls-red/55 ${compact ? "min-h-11 min-w-[8rem] text-sm" : "min-h-16 min-w-[10rem] text-base"}`}
       />
     );
   } else if (scheme === "paddle-v") {
     body = (
-      <div className="flex flex-col gap-2">
+      <div className={`flex flex-col ${compact ? "gap-1" : "gap-2"}`}>
         <PadBtn
+          compact={compact}
           wide
           label="▲ Up"
           aria="Up"
@@ -285,6 +341,7 @@ export function GameVirtualPad({
           onHoldEnd={() => endRepeat("ArrowUp", "ArrowUp")}
         />
         <PadBtn
+          compact={compact}
           wide
           label="▼ Down"
           aria="Down"
@@ -304,9 +361,11 @@ export function GameVirtualPad({
       }`}
       style={{ WebkitUserSelect: "none", userSelect: "none" }}
     >
-      <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
-        Touch controls
-      </p>
+      {!compact && (
+        <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
+          Touch controls
+        </p>
+      )}
       <div className="flex justify-center">{body}</div>
     </div>
   );

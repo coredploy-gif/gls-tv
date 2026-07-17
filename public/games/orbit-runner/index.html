@@ -52,7 +52,7 @@
 
       function spawn() {
         const h = 40 + Math.random() * 90;
-        const gap = 120 + Math.random() * 60;
+        const gap = 140 + Math.random() * 60;
         const top = 30 + Math.random() * (canvas.height - gap - 60);
         rocks.push({ x: canvas.width + 20, top, gap, h, scored: false });
       }
@@ -76,9 +76,9 @@
               document.getElementById("score").textContent = String(score);
               postScore(false);
             }
-            const inX = 120 + 14 > r.x && 120 - 14 < r.x + 36;
-            const hitTop = shipY - 12 < r.top;
-            const hitBot = shipY + 12 > r.top + r.gap;
+            const inX = 120 + 11 > r.x && 120 - 11 < r.x + 36;
+            const hitTop = shipY - 10 < r.top;
+            const hitBot = shipY + 10 > r.top + r.gap;
             if (inX && (hitTop || hitBot)) {
               alive = false;
               postScore(true);
@@ -107,7 +107,7 @@
         }
         ctx.fillStyle = "#ff8ec8";
         ctx.beginPath();
-        ctx.arc(120, shipY, 14, 0, Math.PI * 2);
+        ctx.arc(120, shipY, 11, 0, Math.PI * 2);
         ctx.fill();
         if (!alive) {
           ctx.fillStyle = "rgba(0,0,0,0.45)";

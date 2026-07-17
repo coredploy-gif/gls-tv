@@ -6,6 +6,7 @@ export type GamePack = "brick";
 export type GamePadScheme =
   | "none"
   | "dpad"
+  | "snake"
   | "brick"
   | "lr"
   | "lr-fire"
@@ -172,9 +173,11 @@ export const GLS_GAMES: GlsGame[] = [
 
     howToPlay: [
 
-      "Arrow keys or swipe to steer.",
+      "Arrow keys, swipe, or the on-screen pad to steer.",
 
       "Eat food to grow — don’t hit walls or yourself.",
+
+      "P or Space pauses. Clear the level goal to unlock the next.",
 
     ],
 
@@ -368,7 +371,7 @@ export const GLS_GAMES: GlsGame[] = [
 
     title: "Brick Break",
 
-    blurb: "Precision paddle aim — clear rows, launch the next wave.",
+    blurb: "Precision paddle aim — clear each level’s bricks to unlock the next.",
 
     path: "/games/brick-break/index.html",
 
@@ -382,9 +385,9 @@ export const GLS_GAMES: GlsGame[] = [
 
       "Move the paddle with pointer / touch.",
 
-      "Tap or click to launch the ball — clear every brick to start the next wave.",
+      "Tap or click to launch the ball — clear every brick to beat the level.",
 
-      "Don’t let the ball fall past the paddle.",
+      "Level 1 starts slow; later levels get faster. Don’t let the ball fall.",
 
     ],
 
@@ -673,7 +676,7 @@ export function gamesByPack(pack: GamePack) {
 }
 
 const PAD_BY_ID: Record<string, GamePadScheme> = {
-  "neon-snake": "dpad",
+  "neon-snake": "snake",
   "pulse-2048": "dpad",
   "brick-stack": "brick",
   "pixel-race": "lr",

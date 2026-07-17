@@ -6,109 +6,526 @@
     <title>Neon Snake</title>
     <style>
       html, body { margin: 0; height: 100%; background: #05070a; overflow: hidden; font-family: "Segoe UI", system-ui, sans-serif; color: #e8fff2; }
-      .wrap { height: 100%; display: grid; place-items: center; padding: 12px; }
-      .frame { width: min(560px, 100%); }
-      .bar { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
+      .wrap {
+        height: 100%; display: flex; align-items: center; justify-content: center;
+        padding: 8px; box-sizing: border-box;
+      }
+      .frame {
+        display: flex; flex-direction: column; width: min(560px, 100%);
+        height: 100%; max-height: 100%; min-height: 0;
+      }
+      .bar { display: flex; justify-content: space-between; margin-bottom: 6px; align-items: center; flex-shrink: 0; gap: 8px; }
       h1 { margin: 0; font-size: 1.1rem; }
-      canvas { width: 100%; aspect-ratio: 1; background: #0a1210; border-radius: 14px; border: 1px solid rgba(94,226,154,0.35); display: block; touch-action: none; }
-      button { margin-top: 10px; border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700; background: #5ee29a; color: #052013; cursor: pointer; }
+      .meta { text-align: right; font-variant-numeric: tabular-nums; font-size: 0.85rem; }
+      .meta b { color: #5ee29a; }
+      .levels {
+        display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; flex-shrink: 0;
+      }
+      .levels button {
+        margin: 0; min-width: 36px; padding: 6px 10px; font-size: 0.8rem; border-radius: 8px;
+        background: rgba(94,226,154,0.18); color: #e8fff2; border: 1px solid rgba(94,226,154,0.35);
+      }
+      .levels button.active { background: #5ee29a; color: #052013; }
+      .levels button.locked { opacity: 0.35; cursor: not-allowed; background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
+      .stage {
+        /* basis 0 + frame height:100% so the board gets leftover space (not collapse) */
+        flex: 1 1 0; min-height: 0; width: 100%;
+        container-type: size; display: grid; place-items: center;
+      }
+      canvas {
+        display: block; border-radius: 14px; touch-action: none;
+        width: min(100cqw, 100cqh);
+        height: min(100cqw, 100cqh);
+        max-width: 100%; max-height: 100%;
+        background: #0a1210; border: 1px solid rgba(94,226,154,0.35);
+      }
+      .actions { flex-shrink: 0; }
+      button { margin-top: 8px; border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700; background: #5ee29a; color: #052013; cursor: pointer; }
       .ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #e8fff2; margin-left: 8px; }
+      .hint { margin: 4px 0 0; font-size: 0.75rem; color: rgba(232,255,242,0.55); flex-shrink: 0; }
+      html.in-frame h1 { font-size: 0.95rem; }
+      html.in-frame button { padding: 8px 12px; font-size: 0.85rem; }
+      html.in-frame .levels button { padding: 5px 8px; font-size: 0.75rem; }
     </style>
   </head>
   <body>
     <div class="wrap">
       <div class="frame">
-        <div class="bar"><h1>Neon Snake</h1><div>Score <b id="score">0</b></div></div>
-        <canvas id="c" width="480" height="480"></canvas>
-        <div>
+        <div class="bar">
+          <h1>Neon Snake</h1>
+          <div class="meta">Lv <b id="lv">1</b> · Goal <b id="goal">0</b>/<span id="need">5</span><br />Score <b id="score">0</b></div>
+        </div>
+        <div class="levels" id="levels"></div>
+        <div class="stage">
+          <canvas id="c" width="480" height="480"></canvas>
+        </div>
+        <p class="hint" id="hint">Pick a level · arrows / swipe · P / Space pause</p>
+        <div class="actions">
           <button type="button" id="restart">Restart</button>
           <button type="button" class="ghost" id="submit">Submit score</button>
         </div>
       </div>
     </div>
     <script>
+      if (window.self !== window.top) document.documentElement.classList.add("in-frame");
       const canvas = document.getElementById("c");
       const ctx = canvas.getContext("2d");
-      const CELL = 20;
+      const CELL = 12;
       const COLS = canvas.width / CELL;
       const ROWS = canvas.height / CELL;
-      let snake, dir, pending, food, score, alive, timer, bestSubmitted = 0;
+      const GAME_ID = "neon-snake";
+      const UNLOCK_KEY = "gls-unlock-" + GAME_ID;
 
-      function randFood() {
-        while (true) {
-          const p = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
-          if (!snake.some((s) => s.x === p.x && s.y === p.y)) return p;
+      /** Level defs: wrap, edge walls, brick layouts, hidden food, speed, goal eats */
+      const LEVELS = [
+        { name: "Garden", wrap: true, edge: false, startMs: 220, minMs: 140, goal: 5, bricks: [], hiddenChance: 0, hint: "Walls wrap · easy warm-up" },
+        { name: "Meadow", wrap: true, edge: false, startMs: 200, minMs: 120, goal: 7, bricks: "scatter3", hiddenChance: 0, hint: "A few bricks — still wraps" },
+        { name: "Thicket", wrap: true, edge: false, startMs: 180, minMs: 110, goal: 8, bricks: "cross", hiddenChance: 0, hint: "Cross barriers · wrap on" },
+        { name: "Hedge", wrap: true, edge: false, startMs: 170, minMs: 100, goal: 9, bricks: "lanes", hiddenChance: 0, hint: "Lane walls · wrap on" },
+        { name: "Yard", wrap: false, edge: true, startMs: 160, minMs: 95, goal: 8, bricks: [], hiddenChance: 0, hint: "Brick edges · no wrap" },
+        { name: "Maze", wrap: false, edge: true, startMs: 150, minMs: 90, goal: 10, bricks: "maze", hiddenChance: 0, hint: "Edges + inner maze" },
+        { name: "Peek", wrap: false, edge: true, startMs: 145, minMs: 85, goal: 10, bricks: "pockets", hiddenChance: 0.55, hint: "Food may hide behind peek bricks" },
+        { name: "Burrow", wrap: false, edge: true, startMs: 135, minMs: 80, goal: 12, bricks: "burrow", hiddenChance: 0.7, hint: "Tight tunnels · hidden marbles" },
+        { name: "Viper", wrap: false, edge: true, startMs: 125, minMs: 70, goal: 14, bricks: "dense", hiddenChance: 0.45, hint: "Fast · dense bricks" },
+        { name: "Neon King", wrap: false, edge: true, startMs: 115, minMs: 60, goal: 16, bricks: "king", hiddenChance: 0.6, hint: "Final challenge" },
+      ];
+
+      let snake, dir, pending, food, score, alive, timer, bestSubmitted = 0;
+      let levelIndex = 0, eaten = 0, tickMs = 220, bricks, peekBricks, won = false, paused = false;
+
+      function getUnlocked() {
+        try {
+          const n = parseInt(localStorage.getItem(UNLOCK_KEY) || "1", 10);
+          return Math.max(1, Math.min(LEVELS.length, isNaN(n) ? 1 : n));
+        } catch (_) { return 1; }
+      }
+
+      function setUnlocked(maxLevel1Based) {
+        try {
+          const cur = getUnlocked();
+          if (maxLevel1Based > cur) localStorage.setItem(UNLOCK_KEY, String(Math.min(LEVELS.length, maxLevel1Based)));
+        } catch (_) {}
+      }
+
+      function occupied(x, y) {
+        if (bricks.some((b) => b.x === x && b.y === y)) return true;
+        if (peekBricks.some((b) => b.x === x && b.y === y)) return true;
+        if (snake && snake.some((s) => s.x === x && s.y === y)) return true;
+        return false;
+      }
+
+      function addRect(list, x0, y0, x1, y1) {
+        for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+          if (x > 0 && y > 0 && x < COLS - 1 && y < ROWS - 1) list.push({ x, y });
         }
       }
 
-      function reset() {
-        snake = [{ x: 8, y: 10 }, { x: 7, y: 10 }, { x: 6, y: 10 }];
+      function uniqueCells(list) {
+        const seen = new Set();
+        return list.filter((c) => {
+          const k = c.x + "," + c.y;
+          if (seen.has(k)) return false;
+          seen.add(k);
+          return true;
+        });
+      }
+
+      function buildBricks(def) {
+        const L = LEVELS[levelIndex];
+        let list = [];
+        if (L.edge) {
+          for (let x = 0; x < COLS; x++) { list.push({ x, y: 0 }); list.push({ x, y: ROWS - 1 }); }
+          for (let y = 1; y < ROWS - 1; y++) { list.push({ x: 0, y }); list.push({ x: COLS - 1, y }); }
+        }
+        const kind = def.bricks;
+        if (kind === "scatter3") {
+          [[12, 12], [28, 18], [18, 28]].forEach(([x, y]) => list.push({ x, y }));
+        } else if (kind === "cross") {
+          for (let i = 10; i <= 29; i++) { list.push({ x: 20, y: i }); list.push({ x: i, y: 20 }); }
+        } else if (kind === "lanes") {
+          for (let y = 5; y < ROWS - 5; y++) {
+            if (y % 8 < 5) { list.push({ x: 13, y }); list.push({ x: 26, y }); }
+          }
+        } else if (kind === "maze") {
+          addRect(list, 8, 8, 8, 28);
+          addRect(list, 8, 8, 28, 8);
+          addRect(list, 31, 12, 31, 32);
+          addRect(list, 12, 31, 31, 31);
+          addRect(list, 16, 16, 24, 16);
+        } else if (kind === "pockets") {
+          addRect(list, 10, 10, 18, 10);
+          addRect(list, 10, 10, 10, 18);
+          addRect(list, 22, 22, 30, 22);
+          addRect(list, 30, 14, 30, 22);
+          addRect(list, 6, 26, 14, 26);
+        } else if (kind === "burrow") {
+          for (let x = 6; x < 34; x += 6) addRect(list, x, 6, x, 33);
+          for (let y = 8; y < 34; y += 7) {
+            for (let x = 7; x < 34; x++) {
+              if (x % 6 === 0) continue;
+              if (x % 12 === 3 || x % 12 === 9) continue; // gaps
+              list.push({ x, y });
+            }
+          }
+        } else if (kind === "dense") {
+          for (let i = 0; i < 28; i++) {
+            list.push({ x: 4 + ((i * 7) % 32), y: 4 + ((i * 11) % 32) });
+          }
+          addRect(list, 15, 10, 25, 10);
+          addRect(list, 15, 29, 25, 29);
+        } else if (kind === "king") {
+          addRect(list, 5, 5, 5, 34);
+          addRect(list, 34, 5, 34, 34);
+          addRect(list, 10, 12, 30, 12);
+          addRect(list, 10, 27, 30, 27);
+          addRect(list, 20, 12, 20, 27);
+          [[12, 18], [28, 22], [16, 22], [24, 18]].forEach(([x, y]) => list.push({ x, y }));
+        } else if (Array.isArray(kind)) {
+          list = list.concat(kind);
+        }
+        // keep spawn corridor clear
+        list = uniqueCells(list).filter((b) => !(b.y === 20 && b.x >= 8 && b.x <= 18));
+        return list;
+      }
+
+      function randEmpty(preferNearBrick) {
+        for (let tries = 0; tries < 400; tries++) {
+          const p = { x: (Math.random() * COLS) | 0, y: (Math.random() * ROWS) | 0 };
+          if (occupied(p.x, p.y)) continue;
+          if (food && food.x === p.x && food.y === p.y) continue;
+          if (preferNearBrick) {
+            const near = bricks.some((b) => Math.abs(b.x - p.x) + Math.abs(b.y - p.y) === 1);
+            if (!near && tries < 200) continue;
+          }
+          return p;
+        }
+        for (let y = 1; y < ROWS - 1; y++) for (let x = 1; x < COLS - 1; x++) {
+          if (!occupied(x, y)) return { x, y };
+        }
+        return { x: 20, y: 20 };
+      }
+
+      function placeFood() {
+        const L = LEVELS[levelIndex];
+        const hide = Math.random() < (L.hiddenChance || 0);
+        food = randEmpty(hide);
+        food.hidden = false;
+        // remove old peeks
+        peekBricks = peekBricks.filter((p) => p.keep);
+        if (hide) {
+          // place a peek cover on an adjacent empty cell toward snake approach, or on food if we use cover-on-food
+          const dirs = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
+          let placed = false;
+          for (const d of dirs.sort(() => Math.random() - 0.5)) {
+            const cx = food.x + d.x, cy = food.y + d.y;
+            if (cx < 0 || cy < 0 || cx >= COLS || cy >= ROWS) continue;
+            if (occupied(cx, cy)) continue;
+            peekBricks.push({ x: cx, y: cy, foodLink: true, pulse: 0 });
+            food.hidden = true;
+            placed = true;
+            break;
+          }
+          if (!placed) {
+            // cover sits on food; biting the peek clears it and reveals marble
+            peekBricks.push({ x: food.x, y: food.y, coversFood: true, pulse: 0 });
+            food.hidden = true;
+          }
+        }
+      }
+
+      function renderLevelButtons() {
+        const box = document.getElementById("levels");
+        const unlocked = getUnlocked();
+        box.innerHTML = "";
+        LEVELS.forEach((L, i) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.textContent = String(i + 1);
+          b.title = L.name + (i + 1 > unlocked ? " (locked)" : "");
+          if (i + 1 > unlocked) b.classList.add("locked");
+          if (i === levelIndex) b.classList.add("active");
+          b.onclick = () => {
+            if (i + 1 > getUnlocked()) return;
+            levelIndex = i;
+            reset(true);
+          };
+          box.appendChild(b);
+        });
+      }
+
+      function applySpeed() {
+        const L = LEVELS[levelIndex];
+        const t = eaten / Math.max(1, L.goal);
+        tickMs = Math.round(L.startMs + (L.minMs - L.startMs) * Math.min(1, t));
+        clearInterval(timer);
+        if (alive && !won && !paused) timer = setInterval(tick, tickMs);
+      }
+
+      function setPaused(next) {
+        if (!alive || won) return;
+        paused = !!next;
+        clearInterval(timer);
+        if (!paused) timer = setInterval(tick, tickMs);
+        draw();
+      }
+
+      function reset(fromSelect) {
+        const L = LEVELS[levelIndex];
+        bricks = buildBricks(L);
+        peekBricks = [];
+        snake = [{ x: 14, y: 20 }, { x: 13, y: 20 }, { x: 12, y: 20 }, { x: 11, y: 20 }];
         dir = { x: 1, y: 0 };
         pending = dir;
-        food = randFood();
         score = 0;
+        eaten = 0;
         bestSubmitted = 0;
         alive = true;
+        won = false;
+        paused = false;
+        tickMs = L.startMs;
         document.getElementById("score").textContent = "0";
+        document.getElementById("lv").textContent = String(levelIndex + 1);
+        document.getElementById("goal").textContent = "0";
+        document.getElementById("need").textContent = String(L.goal);
+        document.getElementById("hint").textContent = L.hint;
+        placeFood();
+        renderLevelButtons();
         clearInterval(timer);
-        timer = setInterval(tick, 110);
+        timer = setInterval(tick, tickMs);
         draw();
       }
 
       function postScore(force) {
         if (!force && score <= bestSubmitted) return;
         bestSubmitted = Math.max(bestSubmitted, score);
-        parent.postMessage({ type: "gls-game-score", gameId: "neon-snake", score, force: !!force }, "*");
+        parent.postMessage({ type: "gls-game-score", gameId: GAME_ID, score, force: !!force }, "*");
+      }
+
+      function completeLevel() {
+        won = true;
+        alive = false;
+        clearInterval(timer);
+        setUnlocked(levelIndex + 2);
+        renderLevelButtons();
+        postScore(true);
+        document.getElementById("hint").textContent =
+          levelIndex + 1 < LEVELS.length
+            ? "Level clear! Level " + (levelIndex + 2) + " unlocked."
+            : "All levels clear!";
+        draw();
+      }
+
+      function hitPeek(x, y) {
+        const i = peekBricks.findIndex((p) => p.x === x && p.y === y);
+        if (i < 0) return false;
+        const p = peekBricks[i];
+        peekBricks.splice(i, 1);
+        if (p.coversFood && food) food.hidden = false;
+        return true;
       }
 
       function tick() {
-        if (!alive) return;
+        if (!alive || won || paused) return;
         dir = pending;
-        const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-        if (head.x < 0 || head.y < 0 || head.x >= COLS || head.y >= ROWS || snake.some((s) => s.x === head.x && s.y === head.y)) {
-          alive = false;
-          postScore(true);
-          draw();
-          return;
+        let head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+        const L = LEVELS[levelIndex];
+
+        if (L.wrap && !L.edge) {
+          if (head.x < 0) head.x = COLS - 1;
+          if (head.x >= COLS) head.x = 0;
+          if (head.y < 0) head.y = ROWS - 1;
+          if (head.y >= ROWS) head.y = 0;
+        } else {
+          if (head.x < 0 || head.y < 0 || head.x >= COLS || head.y >= ROWS) {
+            alive = false; postScore(true); draw(); return;
+          }
         }
+
+        if (bricks.some((b) => b.x === head.x && b.y === head.y)) {
+          alive = false; postScore(true); draw(); return;
+        }
+
+        // peek bricks: bite clears them (path to hidden marble)
+        if (peekBricks.some((p) => p.x === head.x && p.y === head.y)) {
+          hitPeek(head.x, head.y);
+          // stay in place this tick after clearing (don't move into cell yet) — actually allow move onto cleared cell
+        }
+
+        if (snake.some((s) => s.x === head.x && s.y === head.y)) {
+          alive = false; postScore(true); draw(); return;
+        }
+
         snake.unshift(head);
-        if (head.x === food.x && head.y === food.y) {
-          score += 10;
+        const eating = food && head.x === food.x && head.y === food.y && !peekBricks.some((p) => p.coversFood && p.x === food.x && p.y === food.y);
+        if (eating) {
+          score += 10 + levelIndex * 2;
+          eaten++;
           document.getElementById("score").textContent = String(score);
-          food = randFood();
+          document.getElementById("goal").textContent = String(eaten);
           postScore(false);
+          if (eaten >= L.goal) {
+            completeLevel();
+            return;
+          }
+          placeFood();
+          applySpeed();
         } else snake.pop();
+
+        // pulse peeks
+        peekBricks.forEach((p) => { p.pulse = (p.pulse || 0) + 1; });
         draw();
+      }
+
+      function cellCenter(c) {
+        return { x: c.x * CELL + CELL / 2, y: c.y * CELL + CELL / 2 };
+      }
+
+      function drawBrick(b, peek) {
+        const x = b.x * CELL, y = b.y * CELL;
+        if (peek) {
+          const a = 0.35 + 0.25 * Math.sin((b.pulse || 0) * 0.35);
+          ctx.fillStyle = "rgba(180,140,80," + a + ")";
+          ctx.fillRect(x + 1, y + 1, CELL - 2, CELL - 2);
+          ctx.strokeStyle = "rgba(245,200,66,0.7)";
+          ctx.strokeRect(x + 1.5, y + 1.5, CELL - 3, CELL - 3);
+          // marble peek
+          if (food && ((b.coversFood) || (Math.abs(food.x - b.x) + Math.abs(food.y - b.y) === 1 && food.hidden))) {
+            ctx.beginPath();
+            ctx.fillStyle = "rgba(255,180,210,0.55)";
+            ctx.arc(x + CELL / 2, y + CELL / 2, CELL * 0.22, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else {
+          ctx.fillStyle = "#3d4a42";
+          ctx.fillRect(x + 0.5, y + 0.5, CELL - 1, CELL - 1);
+          ctx.fillStyle = "#2a332e";
+          ctx.fillRect(x + 2, y + 2, CELL - 4, CELL - 4);
+          ctx.fillStyle = "rgba(255,255,255,0.08)";
+          ctx.fillRect(x + 2, y + 2, CELL - 4, 2);
+        }
+      }
+
+      function drawMarble(f) {
+        if (!f) return;
+        if (f.hidden && peekBricks.some((p) => p.coversFood && p.x === f.x && p.y === f.y)) return;
+        const c = cellCenter(f);
+        const g = ctx.createRadialGradient(c.x - 1.5, c.y - 1.5, 1, c.x, c.y, CELL * 0.38);
+        g.addColorStop(0, "#ffe6f2");
+        g.addColorStop(0.45, "#ff8ec8");
+        g.addColorStop(1, "#c44a88");
+        ctx.beginPath();
+        ctx.fillStyle = g;
+        ctx.arc(c.x, c.y, CELL * 0.36, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.arc(c.x - 1.5, c.y - 1.8, CELL * 0.1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawSnake() {
+        if (!snake || !snake.length) return;
+        // body segments — small green snake
+        for (let i = snake.length - 1; i >= 1; i--) {
+          const s = snake[i];
+          const c = cellCenter(s);
+          const t = i / snake.length;
+          ctx.beginPath();
+          ctx.fillStyle = t > 0.7 ? "#2d8a4a" : "#3cb86a";
+          ctx.arc(c.x, c.y, CELL * 0.38, 0, Math.PI * 2);
+          ctx.fill();
+          // scale hint
+          ctx.beginPath();
+          ctx.strokeStyle = "rgba(20,80,40,0.35)";
+          ctx.lineWidth = 1;
+          ctx.arc(c.x, c.y, CELL * 0.22, 0.2, Math.PI + 0.2);
+          ctx.stroke();
+        }
+        // head
+        const h = snake[0];
+        const hc = cellCenter(h);
+        const ang = Math.atan2(dir.y, dir.x);
+        ctx.save();
+        ctx.translate(hc.x, hc.y);
+        ctx.rotate(ang);
+        // head oval
+        ctx.beginPath();
+        ctx.fillStyle = "#4ade80";
+        ctx.ellipse(0, 0, CELL * 0.48, CELL * 0.36, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.fillStyle = "#2f9e56";
+        ctx.ellipse(CELL * 0.08, 0, CELL * 0.28, CELL * 0.28, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // eyes
+        ctx.fillStyle = "#fff";
+        ctx.beginPath(); ctx.arc(CELL * 0.12, -CELL * 0.14, CELL * 0.11, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(CELL * 0.12, CELL * 0.14, CELL * 0.11, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#0a1a10";
+        ctx.beginPath(); ctx.arc(CELL * 0.16, -CELL * 0.14, CELL * 0.05, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(CELL * 0.16, CELL * 0.14, CELL * 0.05, 0, Math.PI * 2); ctx.fill();
+        // tongue toward food when close
+        if (food) {
+          ctx.strokeStyle = "#ff4d6d";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(CELL * 0.45, 0);
+          ctx.lineTo(CELL * 0.72, -CELL * 0.08);
+          ctx.moveTo(CELL * 0.45, 0);
+          ctx.lineTo(CELL * 0.72, CELL * 0.08);
+          ctx.stroke();
+        }
+        ctx.restore();
       }
 
       function draw() {
         ctx.fillStyle = "#07110e";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#5ee29a";
-        ctx.shadowColor = "#5ee29a";
-        ctx.shadowBlur = 12;
-        snake.forEach((s, i) => {
-          ctx.globalAlpha = i === 0 ? 1 : 0.75;
-          ctx.fillRect(s.x * CELL + 1, s.y * CELL + 1, CELL - 2, CELL - 2);
-        });
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = "#ff8ec8";
-        ctx.shadowColor = "#ff8ec8";
-        ctx.fillRect(food.x * CELL + 2, food.y * CELL + 2, CELL - 4, CELL - 4);
-        ctx.shadowBlur = 0;
-        if (!alive) {
+        // subtle grid
+        ctx.strokeStyle = "rgba(94,226,154,0.04)";
+        ctx.lineWidth = 1;
+        for (let x = 0; x <= COLS; x++) {
+          ctx.beginPath(); ctx.moveTo(x * CELL, 0); ctx.lineTo(x * CELL, canvas.height); ctx.stroke();
+        }
+        for (let y = 0; y <= ROWS; y++) {
+          ctx.beginPath(); ctx.moveTo(0, y * CELL); ctx.lineTo(canvas.width, y * CELL); ctx.stroke();
+        }
+
+        bricks.forEach((b) => drawBrick(b, false));
+        peekBricks.forEach((b) => drawBrick(b, true));
+        drawMarble(food);
+        drawSnake();
+
+        if (paused && alive && !won) {
           ctx.fillStyle = "rgba(0,0,0,0.45)";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.fillStyle = "#fff";
-          ctx.font = "bold 28px Segoe UI";
+          ctx.font = "bold 24px Segoe UI, sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText("Game over · " + score, canvas.width / 2, canvas.height / 2);
+          ctx.fillText("Paused", canvas.width / 2, canvas.height / 2);
+        } else if (!alive || won) {
+          ctx.fillStyle = "rgba(0,0,0,0.5)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 24px Segoe UI, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(won ? "Level clear!" : "Game over", canvas.width / 2, canvas.height / 2 - 8);
+          ctx.fillStyle = "#5ee29a";
+          ctx.font = "16px Segoe UI, sans-serif";
+          ctx.fillText("Score " + score, canvas.width / 2, canvas.height / 2 + 22);
         }
       }
 
-      const map = { ArrowUp: { x: 0, y: -1 }, ArrowDown: { x: 0, y: 1 }, ArrowLeft: { x: -1, y: 0 }, ArrowRight: { x: 1, y: 0 } };
+      const map = { ArrowUp: { x: 0, y: -1 }, ArrowDown: { x: 0, y: 1 }, ArrowLeft: { x: -1, y: 0 }, ArrowRight: { x: 1, y: 0 }, w: { x: 0, y: -1 }, s: { x: 0, y: 1 }, a: { x: -1, y: 0 }, d: { x: 1, y: 0 } };
       window.addEventListener("keydown", (e) => {
-        const n = map[e.key];
+        const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+        if (k === "p" || k === " ") {
+          e.preventDefault();
+          setPaused(!paused);
+          return;
+        }
+        if (paused) return;
+        const n = map[e.key] || map[e.key.toLowerCase()];
         if (!n) return;
         e.preventDefault();
         if (n.x === -dir.x && n.y === -dir.y) return;
@@ -126,9 +543,9 @@
         pending = n;
       }, { passive: true });
 
-      document.getElementById("restart").onclick = reset;
+      document.getElementById("restart").onclick = () => reset(true);
       document.getElementById("submit").onclick = () => postScore(true);
-      reset();
+      reset(true);
     </script>
   </body>
 </html>

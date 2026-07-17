@@ -61,7 +61,7 @@
       }
 
       function reset() {
-        bird = { x: 72, y: H / 2, vy: 0, r: 14 };
+        bird = { x: 72, y: H / 2, vy: 0, r: 11 };
         pipes = [];
         score = 0;
         dead = false;
@@ -73,7 +73,7 @@
       }
 
       function spawnPipe(x) {
-        const gap = 118;
+        const gap = 128;
         const top = 60 + Math.random() * (H - 200 - gap);
         pipes.push({ x, w: 52, top, gap, scored: false });
       }
@@ -135,13 +135,13 @@
         ctx.fill();
         ctx.fillStyle = "#1a1a1a";
         ctx.beginPath();
-        ctx.arc(bird.x + 5, bird.y - 3, 2.5, 0, Math.PI * 2);
+        ctx.arc(bird.x + 4, bird.y - 2, 2, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = "#ff6b35";
         ctx.beginPath();
         ctx.moveTo(bird.x + bird.r - 2, bird.y);
-        ctx.lineTo(bird.x + bird.r + 10, bird.y + 3);
-        ctx.lineTo(bird.x + bird.r - 2, bird.y + 6);
+        ctx.lineTo(bird.x + bird.r + 7, bird.y + 2);
+        ctx.lineTo(bird.x + bird.r - 2, bird.y + 5);
         ctx.fill();
         if (!running) {
           ctx.fillStyle = "rgba(0,0,0,.45)";

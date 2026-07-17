@@ -125,7 +125,7 @@
         if (recent.length && recent.every((c) => c.lane === lane)) {
           lane = (lane + 1 + ((Math.random() * (LANES - 1)) | 0)) % LANES;
         }
-        cars.push({ lane, y: -36, w: 22, h: 32 });
+        cars.push({ lane, y: -28, w: 16, h: 24 });
       }
 
       function update(dt) {
@@ -142,9 +142,9 @@
           const px = laneCenter(playerLane);
           const cx = laneCenter(car.lane);
           if (
-            Math.abs(px - cx) < 18 &&
-            car.y + car.h > py - 14 &&
-            car.y < py + 14
+            Math.abs(px - cx) < 14 &&
+            car.y + car.h > py - 12 &&
+            car.y < py + 12
           ) {
             running = false;
             beep(90, 0.4, "sawtooth", 0.09);
@@ -169,13 +169,13 @@
 
       function drawCar(x, y, color, mirror) {
         ctx.fillStyle = color;
-        ctx.fillRect(x - 11, y - 16, 22, 32);
+        ctx.fillRect(x - 8, y - 12, 16, 24);
         ctx.fillStyle = "#1a1a1e";
-        ctx.fillRect(x - 7, y - 8, 14, 10);
+        ctx.fillRect(x - 5, y - 6, 10, 8);
         ctx.fillStyle = "#fff";
-        const ly = mirror ? y + 10 : y - 12;
-        ctx.fillRect(x - 9, ly, 5, 4);
-        ctx.fillRect(x + 4, ly, 5, 4);
+        const ly = mirror ? y + 7 : y - 9;
+        ctx.fillRect(x - 7, ly, 4, 3);
+        ctx.fillRect(x + 3, ly, 4, 3);
       }
 
       function draw() {

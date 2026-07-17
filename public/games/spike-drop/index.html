@@ -72,14 +72,14 @@
 
       function reset() {
         player = {
-          x: W / 2, y: 80, r: 18, vx: 0, vy: 0,
+          x: W / 2, y: 80, r: 10, vx: 0, vy: 0,
           emoji: EMOJIS[(Math.random() * EMOJIS.length) | 0],
         };
         platforms = [];
         let y = 160;
         platforms.push({ x: W / 2 - 50, y, w: 100, h: 14, spiked: false, scored: false });
         for (let i = 0; i < 10; i++) {
-          y += 55 + Math.random() * 25;
+          y += 62 + Math.random() * 28;
           platforms.push(makePlatform(y, i < 1));
         }
         score = 0;
@@ -138,7 +138,7 @@
 
         const last = platforms[platforms.length - 1];
         while (last && last.y < player.y + H) {
-          const ny = platforms[platforms.length - 1].y + 55 + Math.random() * 30;
+          const ny = platforms[platforms.length - 1].y + 62 + Math.random() * 32;
           platforms.push(makePlatform(ny, false));
         }
         while (platforms.length && platforms[0].y < camY - 80) platforms.shift();
@@ -155,7 +155,7 @@
         for (let i = 0; i < n; i++) {
           const sx = p.x + i * step;
           ctx.moveTo(sx, p.y);
-          ctx.lineTo(sx + step / 2, p.y - 16);
+          ctx.lineTo(sx + step / 2, p.y - 10);
           ctx.lineTo(sx + step, p.y);
         }
         ctx.fill();
@@ -193,7 +193,7 @@
         }
 
         const py = player.y - camY;
-        ctx.font = "32px Segoe UI Emoji, Apple Color Emoji, sans-serif";
+        ctx.font = "18px Segoe UI Emoji, Apple Color Emoji, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(player.emoji, player.x, py);
