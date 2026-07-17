@@ -7,6 +7,10 @@ const isDev = process.env.NODE_ENV === "development";
  * www.google.com (consent / account). Those must be listed explicitly —
  * `www.youtube.com` does not match `youtube.com` in CSP host sources.
  * Wildcards do not match the apex host either.
+ *
+ * eVOD (watch.evod.co.za) is listed for completeness if framing is ever
+ * allowed; today the site sends X-Frame-Options: SAMEORIGIN so My Links
+ * launches it externally instead of iframe.
  */
 const mediaEmbedFrameSrc = [
   "'self'",
@@ -18,6 +22,8 @@ const mediaEmbedFrameSrc = [
   "https://*.youtube-nocookie.com",
   "https://www.google.com",
   "https://player.vimeo.com",
+  "https://watch.evod.co.za",
+  "https://*.evod.co.za",
 ].join(" ");
 
 // Omit upgrade-insecure-requests in local HTTP/Turbopack — it can force
@@ -35,7 +41,8 @@ const contentSecurityPolicy = [
   "font-src 'self' data:",
   "media-src 'self' blob: https: http:",
   "worker-src 'self' blob:",
-  // YouTube / Vimeo My Links embeds; same-origin for /games iframes.
+  // YouTube / Vimeo My Links embeds; eVOD allowlisted (external launch if XFO blocks);
+  // same-origin for /games iframes.
   `frame-src ${mediaEmbedFrameSrc}`,
   // Dev: allow ws: for Turbopack HMR; http: for local API/proxy debugging.
   `connect-src 'self' https: wss:${isDev ? " ws: http:" : ""}`,

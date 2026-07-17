@@ -6,7 +6,10 @@ import { WatchBackButton } from "@/components/WatchBackButton";
 import type { CatalogItem } from "@/data/types";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountEntitlement } from "@/lib/membership/account";
+import { EvodLaunchPlayer } from "@/components/EvodLaunchPlayer";
 import {
+  isMediaExternalSiteFormat,
+  isMediaIframeFormat,
   resolveMediaEmbedUrl,
   type AdminMediaLink,
   type MediaLinkFormat,
@@ -111,7 +114,7 @@ export default async function FeaturedMediaWatchPage({ params }: Props) {
           </div>
         </div>
 
-        {link.format === "youtube" || link.format === "vimeo" ? (
+        {isMediaIframeFormat(link.format) ? (
           embedUrl ? (
             <EmbedPlayer
               format={link.format}
@@ -120,6 +123,12 @@ export default async function FeaturedMediaWatchPage({ params }: Props) {
             />
           ) : (
             <p className="text-sm text-amber-200">Embed URL missing for this link.</p>
+          )
+        ) : isMediaExternalSiteFormat(link.format) ? (
+          embedUrl ? (
+            <EvodLaunchPlayer url={embedUrl} title={link.title} />
+          ) : (
+            <p className="text-sm text-amber-200">eVOD URL missing for this link.</p>
           )
         ) : (
           <VideoPlayer item={toCatalog(link)} />

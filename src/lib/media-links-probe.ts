@@ -199,7 +199,7 @@ export async function probeMediaLinkReachability(
   format: MediaLinkFormat,
   options?: MediaLinkProbeOptions,
 ): Promise<MediaLinkProbeResult> {
-  if (format === "youtube" || format === "vimeo") {
+  if (format === "youtube" || format === "vimeo" || format === "evod") {
     return { ok: true, status: "active", detail: "Embed format verified" };
   }
 

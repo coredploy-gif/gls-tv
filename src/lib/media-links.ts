@@ -1,6 +1,25 @@
 import { COPY_FALLBACKS } from "@/lib/copy";
 
-export type MediaLinkFormat = "hls" | "youtube" | "vimeo" | "mp4" | "webm";
+export type MediaLinkFormat =
+  | "hls"
+  | "youtube"
+  | "vimeo"
+  | "evod"
+  | "mp4"
+  | "webm";
+
+/** YouTube / Vimeo — play inside our watch-page iframe. */
+export function isMediaIframeFormat(format: MediaLinkFormat): boolean {
+  return format === "youtube" || format === "vimeo";
+}
+
+/**
+ * Official sites that refuse cross-origin framing (e.g. eVOD XFO SAMEORIGIN).
+ * Watch UI launches them on the publisher’s origin instead of VideoPlayer.
+ */
+export function isMediaExternalSiteFormat(format: MediaLinkFormat): boolean {
+  return format === "evod";
+}
 
 export type MediaLinkStatus = "active" | "checking" | "dead" | "error";
 
@@ -108,6 +127,32 @@ function isYouTubeHost(hostname: string): boolean {
     host.endsWith(".youtube.com") ||
     host.endsWith(".youtube-nocookie.com")
   );
+}
+
+/** Official eMedia eVOD OTT (e.tv / eExtra live + catch-up). */
+export function isEvodHost(hostname: string): boolean {
+  const host = hostname.toLowerCase().replace(/^www\./, "").replace(/\.$/, "");
+  return host === "evod.co.za" || host.endsWith(".evod.co.za");
+}
+
+/**
+ * Canonical HTTPS eVOD URL for storage / “open on eVOD”.
+ * Marketing apex → watch.evod.co.za; path/query on watch.* preserved.
+ */
+export function normalizeEvodUrl(url: string): string | null {
+  try {
+    const u = new URL(url.trim());
+    if (!/^https?:$/i.test(u.protocol) || !isEvodHost(u.hostname)) return null;
+    const host = u.hostname.toLowerCase().replace(/^www\./, "");
+    if (host === "evod.co.za") {
+      return "https://watch.evod.co.za/";
+    }
+    u.protocol = "https:";
+    u.hostname = u.hostname.toLowerCase();
+    return u.toString();
+  } catch {
+    return null;
+  }
 }
 
 export function extractYouTubeId(url: string): string | null {
@@ -244,9 +289,10 @@ export function detectPlayableFormat(url: string): MediaLinkFormat | null {
   } catch {
     return null;
   }
-  // Embed hosts always win over generic video extensions in the path.
+  // Embed / official OTT hosts always win over generic video extensions in the path.
   if (extractYouTubeId(url)) return "youtube";
   if (VIMEO_RE.test(url)) return "vimeo";
+  if (isEvodHost(u.hostname)) return "evod";
 
   const fromPath = formatFromPathname(u.pathname);
   if (fromPath) return fromPath;
@@ -267,6 +313,20 @@ export function titleFromMediaUrl(url: string, format: MediaLinkFormat): string 
   if (format === "vimeo") {
     const id = extractVimeoId(url);
     return id ? `Vimeo · ${id}` : "Vimeo video";
+  }
+  if (format === "evod") {
+    try {
+      const path = new URL(url).pathname.replace(/\/+$/, "");
+      if (path && path !== "") {
+        const leaf = path.split("/").filter(Boolean).pop();
+        if (leaf && leaf.length > 1) {
+          return `eVOD · ${leaf.replace(/[+_-]+/g, " ").slice(0, 60)}`;
+        }
+      }
+    } catch {
+      /* fall through */
+    }
+    return "eVOD · e.tv / eExtra";
   }
   try {
     const leaf =
@@ -295,6 +355,9 @@ export function embedUrlFor(
     const id = extractVimeoId(url);
     return id ? `https://player.vimeo.com/video/${id}` : undefined;
   }
+  if (format === "evod") {
+    return normalizeEvodUrl(url) || undefined;
+  }
   return undefined;
 }
 
@@ -302,6 +365,7 @@ export function embedUrlFor(
  * Always rebuild YouTube/Vimeo to canonical embed URLs.
  * Never trust a stored watch URL (or odd host) as iframe src — that trips
  * XFO / CSP and shows Chrome's "This content is blocked" interstitial.
+ * eVOD returns the official watch URL (external launch — site sends XFO SAMEORIGIN).
  */
 export function resolveMediaEmbedUrl(link: {
   format: MediaLinkFormat;
@@ -322,6 +386,13 @@ export function resolveMediaEmbedUrl(link: {
       extractVimeoId(link.embed_url || "") ||
       extractVimeoId(link.url);
     return id ? `https://player.vimeo.com/video/${id}` : null;
+  }
+  if (link.format === "evod") {
+    return (
+      normalizeEvodUrl(link.embed_url || "") ||
+      normalizeEvodUrl(link.url) ||
+      null
+    );
   }
   const stored = (link.embed_url || "").trim();
   return stored || null;
@@ -432,7 +503,7 @@ export function validateMediaLinkUrl(
       return {
         ok: false,
         error:
-          "Supported: .m3u8 (HLS), .mp4 / .m4v / .mov, .webm, YouTube, or Vimeo. Extensionless links are OK if the server returns video/*.",
+          "Supported: .m3u8 (HLS), .mp4 / .m4v / .mov, .webm, YouTube, Vimeo, or eVOD (watch.evod.co.za). Extensionless links are OK if the server returns video/*.",
       };
     }
     // No extension / hint — provisional MP4; server probe must confirm video.
@@ -483,6 +554,11 @@ export const MEDIA_FORMAT_META: Record<
     label: "Vimeo",
     hint: "Public vimeo.com videos",
     accent: "#1ab7ea",
+  },
+  evod: {
+    label: "eVOD",
+    hint: "Official watch.evod.co.za (e.tv / eExtra) — opens on eVOD",
+    accent: "#e85d04",
   },
   mp4: {
     label: "MP4",

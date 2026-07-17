@@ -4,7 +4,9 @@ import {
   extractYouTubeId,
   formatFromContentType,
   isAppMediaPath,
+  isEvodHost,
   isTrustedAppMediaUrl,
+  normalizeEvodUrl,
   normalizeMediaLinkCategory,
   resolveMediaEmbedUrl,
   titleFromMediaUrl,
@@ -107,6 +109,37 @@ describe("media-links", () => {
         "https://www.youtube.com/watch?v=dQw4w9WgXcQ&foo=bar.mp4",
       ),
     ).toBe("youtube");
+  });
+
+  it("detects eVOD / watch.evod.co.za and normalizes launch URL", () => {
+    expect(isEvodHost("watch.evod.co.za")).toBe(true);
+    expect(isEvodHost("www.evod.co.za")).toBe(true);
+    expect(isEvodHost("evod.co.za")).toBe(true);
+    expect(isEvodHost("evil-evod.co.za")).toBe(false);
+
+    expect(detectPlayableFormat("https://watch.evod.co.za/")).toBe("evod");
+    expect(detectPlayableFormat("https://watch.evod.co.za/live")).toBe("evod");
+    expect(normalizeEvodUrl("http://www.evod.co.za/")).toBe(
+      "https://watch.evod.co.za/",
+    );
+    expect(normalizeEvodUrl("https://watch.evod.co.za/foo?x=1")).toBe(
+      "https://watch.evod.co.za/foo?x=1",
+    );
+
+    const v = validateMediaLinkUrl("https://watch.evod.co.za/", "eExtra");
+    expect(v.ok).toBe(true);
+    expect(v.format).toBe("evod");
+    expect(v.title).toBe("eExtra");
+    expect(v.embedUrl).toBe("https://watch.evod.co.za/");
+    expect(v.provisional).toBeUndefined();
+
+    expect(
+      resolveMediaEmbedUrl({
+        format: "evod",
+        url: "https://www.evod.co.za/",
+        embed_url: null,
+      }),
+    ).toBe("https://watch.evod.co.za/");
   });
 
   it("maps Content-Type to formats", () => {
