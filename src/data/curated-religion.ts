@@ -27,10 +27,11 @@ const QURAN_NET_SA = "http://m.live.net.sa:1935/live/quran/playlist.m3u8";
 const SUNNAH_NET_SA = "http://m.live.net.sa:1935/live/sunnah/playlist.m3u8";
 
 /**
- * Verified Islamic / religion channels (HTTP 200 probed 2026-07-18).
+ * Verified Islamic channels (HTTP 200 probed 2026-07-18).
  * Official Saudi Makkah/Madinah, Iqraa teaching, and Holy Quran Radio only.
+ * SA Radio Islam additions from parallel agents should use categories: Religion, Islam.
  */
-export const CURATED_RELIGION: CatalogItem[] = [
+export const CURATED_RELIGION_ISLAM: CatalogItem[] = [
   {
     id: "curated-quran-kareem-makkah",
     slug: "al-quran-al-kareem-tv",
@@ -233,4 +234,16 @@ export const CURATED_RELIGION: CatalogItem[] = [
       },
     ],
   },
+];
+
+/** Gospel / Christian channels — also discovered via catalog + Africa curated heals. */
+export const CURATED_RELIGION_GOSPEL: CatalogItem[] = [];
+
+/** Hindu devotional — empty until verified official public HLS streams are added. */
+export const CURATED_RELIGION_HINDU: CatalogItem[] = [];
+
+export const CURATED_RELIGION: CatalogItem[] = [
+  ...CURATED_RELIGION_ISLAM,
+  ...CURATED_RELIGION_GOSPEL,
+  ...CURATED_RELIGION_HINDU,
 ];

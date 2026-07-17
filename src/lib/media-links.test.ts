@@ -278,6 +278,9 @@ describe("media-links", () => {
   });
 
   it("normalizes known folders and keeps custom labels", () => {
+    expect(normalizeMediaLinkCategory("islam")).toBe("Islam");
+    expect(normalizeMediaLinkCategory("gospel")).toBe("Gospel");
+    expect(normalizeMediaLinkCategory("hindu")).toBe("Hindu");
     expect(normalizeMediaLinkCategory("movies")).toBe("Movies");
     expect(normalizeMediaLinkCategory("kung fu")).toBe("Kung Fu");
     expect(normalizeMediaLinkCategory("  News  ")).toBe("News");

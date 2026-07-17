@@ -23,6 +23,10 @@ import { CURATED_RADIO_ZA } from "@/data/curated-radio-za";
 import { CURATED_RADIO_MW } from "@/data/curated-radio-mw";
 import { CURATED_RELIGION } from "@/data/curated-religion";
 import {
+  buildReligionPool,
+  getReligionFolderForItem,
+} from "@/lib/religion";
+import {
   CURATED_PUBLIC_MOVIES,
   CURATED_PUBLIC_SPORTS,
   CURATED_SERIES_SEEDS,
@@ -320,7 +324,10 @@ export function getAfricaChannels() {
 }
 
 export function getReligionChannels() {
-  return mergeUnique(CURATED_RELIGION);
+  const catalogMatches = getAllChannels().filter(
+    (item) => getReligionFolderForItem(item) !== null,
+  );
+  return buildReligionPool(catalogMatches);
 }
 
 export function getAsiaChannels() {

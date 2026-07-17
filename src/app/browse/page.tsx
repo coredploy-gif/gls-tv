@@ -6,7 +6,7 @@ import { LastChannelResume } from "@/components/LastChannelResume";
 import { getByType } from "@/data/catalog";
 import { TOP10, getPopularFirst, getUkTop } from "@/data/top10";
 import { VERIFIED_LIVE } from "@/data/verified";
-import { getAllChannels } from "@/lib/channels";
+import { getAllChannels, getReligionChannels } from "@/lib/channels";
 import { getRelatedChannels } from "@/lib/hubs";
 import { getMalawiBrowseItems, getAfricaRadioBrowseItems } from "@/lib/radio";
 import { getReligionBrowseItems } from "@/lib/religion";
@@ -78,7 +78,7 @@ export default function BrowsePage() {
 
   const malawiItems = getMalawiBrowseItems();
   const africaRadioItems = getAfricaRadioBrowseItems();
-  const religionItems = getReligionBrowseItems();
+  const religionItems = getReligionBrowseItems(getReligionChannels());
 
   return (
     <main className="min-h-screen bg-gls-black pb-20">
@@ -124,7 +124,7 @@ export default function BrowsePage() {
 
         {religionItems.length > 0 && (
           <ContentRow
-            title="☪️ Religion · Makkah, Madinah & more"
+            title="🙏 Religion · Islam, Gospel & more"
             items={religionItems}
             limit={8}
             viewMoreHref="/religion"

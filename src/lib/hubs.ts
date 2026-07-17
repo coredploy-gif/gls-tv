@@ -142,10 +142,12 @@ export const HUBS: HubDef[] = [
     key: "religion",
     title: "Religion",
     href: "/religion",
-    blurb: "Makkah, Madinah, Quran, Sunnah, and Islamic teaching channels.",
+    blurb: "Islam, Gospel, and Hindu faith channels — browse by folder.",
     match: (i) =>
-      i.categories.some((c) => /^religion$|^islam$|^religious$/i.test(c)) ||
-      /quran|sunnah|makkah|madinah|iqraa|islam channel|hope channel|redemption|gospel ministry/i.test(
+      i.categories.some((c) =>
+        /^religion$|^islam$|^gospel$|^hindu$|^religious$|^christian$/i.test(c),
+      ) ||
+      /quran|sunnah|makkah|madinah|iqraa|islam channel|hope channel|redemption|trace gospel|gospel ministry|aastha|sanskar/i.test(
         `${i.title} ${i.categories.join(" ")}`,
       ),
     top10: getReligionChannels()

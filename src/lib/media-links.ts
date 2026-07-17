@@ -1,5 +1,6 @@
 import type { CatalogItem, MediaSource } from "@/data/types";
 import { COPY_FALLBACKS } from "@/lib/copy";
+import { normalizeReligionSubfolderTag } from "@/lib/religion";
 
 export type MediaLinkFormat =
   | "hls"
@@ -71,6 +72,9 @@ export const MEDIA_LINK_CATEGORIES = [
   "Kids",
   "Food",
   "Religion",
+  "Islam",
+  "Gospel",
+  "Hindu",
   "Series",
   "Other",
   "Uncategorized",
@@ -159,6 +163,10 @@ export function adminMediaLinkToCatalog(link: AdminMediaLink): CatalogItem {
 export function normalizeMediaLinkCategory(raw?: string | null): string {
   const value = (raw || "").trim().slice(0, 60);
   if (!value) return "Uncategorized";
+  const religionTag = normalizeReligionSubfolderTag(value);
+  if (religionTag) {
+    return religionTag.charAt(0).toUpperCase() + religionTag.slice(1);
+  }
   const match = MEDIA_LINK_CATEGORIES.find(
     (c) => c.toLowerCase() === value.toLowerCase(),
   );

@@ -428,7 +428,7 @@ export const CATALOG: CatalogItem[] = [
     type: "live",
     description: "Faith and lifestyle programming for African audiences.",
     countries: ["za"],
-    categories: ["Religion", "Lifestyle"],
+    categories: ["Religion", "Gospel", "Lifestyle"],
     languages: ["English"],
     poster:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
@@ -497,7 +497,7 @@ export const CATALOG: CatalogItem[] = [
     type: "live",
     description: "Gospel and ministry programming.",
     countries: ["za"],
-    categories: ["Religion"],
+    categories: ["Religion", "Gospel"],
     languages: ["English"],
     poster:
       "https://images.unsplash.com/photo-1438232993691-bcf2a1a83b99?auto=format&fit=crop&w=600&q=80",
