@@ -1,6 +1,8 @@
 import type { CatalogItem, CountryMeta } from "@/data/types";
-import { CURATED_MALAWI_TV } from "@/data/curated-malawi-tv";
-import { CURATED_RADIO_AFRICA } from "@/data/curated-radio-africa";
+import {
+  AFRICA_RADIO_BROWSE_FLAGSHIPS,
+  CURATED_RADIO_AFRICA,
+} from "@/data/curated-radio-africa";
 import { CURATED_RADIO_MW } from "@/data/curated-radio-mw";
 import { CURATED_RADIO_ZA } from "@/data/curated-radio-za";
 
@@ -41,16 +43,17 @@ export function getRadioCountryGroups(): { country: CountryMeta; stations: Catal
   })).filter((group) => group.stations.length > 0);
 }
 
+/** Malawi radio only — MBC TV hidden while BozzTV CDN is offline. */
 export function getMalawiBrowseItems(): CatalogItem[] {
-  return [...CURATED_MALAWI_TV, ...getRadioStationsByCountry("mw")].sort((a, b) =>
-    a.title.localeCompare(b.title),
-  );
+  return getRadioStationsByCountry("mw");
 }
 
-/** Kenya, Nigeria, Ghana, Zimbabwe — for a lightweight home browse row. */
+/** One flagship per country for home browse (avoids duplicating the full /radio grid). */
 export function getAfricaRadioBrowseItems(): CatalogItem[] {
-  return CURATED_RADIO_AFRICA.slice()
-    .sort((a, b) => a.title.localeCompare(b.title));
+  const byId = new Map(CURATED_RADIO_AFRICA.map((station) => [station.id, station]));
+  return (["ke", "ng", "gh", "zw"] as const)
+    .map((code) => byId.get(AFRICA_RADIO_BROWSE_FLAGSHIPS[code] ?? ""))
+    .filter((station): station is CatalogItem => Boolean(station));
 }
 
 export function getRadioStationBySlug(

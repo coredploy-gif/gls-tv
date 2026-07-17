@@ -1,9 +1,9 @@
 import type { CatalogItem } from "@/data/types";
 
-/** Official HLS from mbc.mw/live/tv1.html (probed 2026-07). */
+/** Official HLS from mbc.mw/live/tv1.html (BozzTV CDN — 404 as of 2026-07-18 probe). */
 const MBC_TV_1 =
   "https://glb.bozztv.com/glb/ssh101/kwacha/index.m3u8";
-/** Official HLS from mbc.mw/live/tv2.html (probed 2026-07). */
+/** Official HLS from mbc.mw/live/tv2.html (BozzTV CDN — 404 as of 2026-07-18 probe). */
 const MBC_TV_2 =
   "https://ssh101-fl.bozztv.com/ssh101/mbctv2mw/index.m3u8";
 
@@ -13,10 +13,10 @@ const MBC_BACKDROP =
   "https://images.unsplash.com/photo-1522868514708-6a4f9f31edb1?auto=format&fit=crop&w=3840&h=2160&q=80";
 
 /**
- * Official MBC linear TV — URLs published on mbc.mw/live (BozzTV CDN).
- * CDN may be intermittent; GLS uses /api/hls with MBC Referer when needed.
+ * MBC linear TV seeds — kept for staff/admin reference while BozzTV CDN is down.
+ * Not exported to browse or channel catalog until streams return HTTP 200.
  */
-export const CURATED_MALAWI_TV: CatalogItem[] = [
+const MALAWI_TV_OFFLINE: CatalogItem[] = [
   {
     id: "curated-mbc-tv-1",
     slug: "mbc-tv-1",
@@ -84,3 +84,8 @@ export const CURATED_MALAWI_TV: CatalogItem[] = [
     ],
   },
 ];
+
+/** Hidden while BozzTV HLS endpoints return 404 — re-export when CDN heals. */
+export const MALAWI_TV_OFFLINE_SEEDS = MALAWI_TV_OFFLINE;
+
+export const CURATED_MALAWI_TV: CatalogItem[] = [];

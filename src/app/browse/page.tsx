@@ -106,7 +106,7 @@ export default function BrowsePage() {
 
         {malawiItems.length > 0 && (
           <ContentRow
-            title="🇲🇼 Malawi · MBC"
+            title="🇲🇼 Malawi · MBC Radio"
             items={malawiItems}
             limit={12}
             viewMoreHref="/radio"
@@ -115,7 +115,7 @@ export default function BrowsePage() {
 
         {africaRadioItems.length > 0 && (
           <ContentRow
-            title="🌍 Africa · Kenya, Nigeria & more"
+            title="🌍 Africa · Kenya, Nigeria, Ghana & Zimbabwe"
             items={africaRadioItems}
             limit={8}
             viewMoreHref="/radio"

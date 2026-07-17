@@ -99,9 +99,9 @@ export function RadioHub() {
             Radio
           </h1>
           <p className="mt-4 text-base leading-relaxed text-white/65">
-            Curated legal live streams from official broadcasters — SABC, MBC,
-            Capital FM, Wazobia, Peace FM, ZBC, and more. Tap a station to listen
-            in the GLS player.
+            Curated legal live streams from official broadcasters — SABC, MBC
+            Radio, Kiss FM, Radio Citizen, Wazobia, Peace FM, ZBC, and more.
+            Browse by country or search below.
           </p>
         </div>
 
