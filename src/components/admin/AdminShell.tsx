@@ -11,11 +11,25 @@ import {
 import { GlsLogo } from "@/components/GlsLogo";
 import { ADMIN_NAV_COLORS } from "@/lib/nav-theme";
 
+type NavChild = {
+  href: string;
+  label: string;
+};
+
 type NavItem = {
   href: string;
   label: string;
   icon: ReactNode;
+  children?: NavChild[];
 };
+
+const FINANCE_NAV: NavChild[] = [
+  { href: "/admin/finance/membership", label: "Membership" },
+  { href: "/admin/finance/daybook", label: "Daybook" },
+  { href: "/admin/finance/ar-aging", label: "AR aging" },
+  { href: "/admin/finance/statement", label: "Statement" },
+  { href: "/admin/finance/reconcile", label: "Reconcile" },
+];
 
 const NAV: NavItem[] = [
   {
@@ -48,6 +62,7 @@ const NAV: NavItem[] = [
   {
     href: "/admin/finance",
     label: "Finance",
+    children: FINANCE_NAV,
     icon: (
       <>
         <rect
@@ -250,6 +265,29 @@ function NavIcon({
   );
 }
 
+function navChildActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function resolveActiveNav(pathname: string): { href: string; label: string } {
+  const finance = NAV.find((n) => n.href === "/admin/finance");
+  if (finance?.children) {
+    const child = [...finance.children]
+      .sort((a, b) => b.href.length - a.href.length)
+      .find((c) => navChildActive(pathname, c.href));
+    if (child) return child;
+  }
+
+  const match = [...NAV]
+    .sort((a, b) => b.href.length - a.href.length)
+    .find(
+      (n) =>
+        pathname === n.href ||
+        (n.href !== "/admin" && pathname.startsWith(n.href)),
+    );
+  return match || NAV[0];
+}
+
 function NavLinks({
   pathname,
   collapsed,
@@ -259,35 +297,76 @@ function NavLinks({
   collapsed: boolean;
   onNavigate?: () => void;
 }) {
+  const financeExpanded = pathname.startsWith("/admin/finance");
+
   return (
     <>
       {NAV.map((item) => {
+        const childActive = item.children?.some((c) =>
+          navChildActive(pathname, c.href),
+        );
         const active =
           pathname === item.href ||
-          (item.href !== "/admin" && pathname.startsWith(item.href));
+          childActive ||
+          (!item.children &&
+            item.href !== "/admin" &&
+            pathname.startsWith(item.href));
         const color = ADMIN_NAV_COLORS[item.href] || "#ff6b9d";
+        const showChildren =
+          !collapsed && item.children && item.children.length > 0 && financeExpanded;
+
         return (
-          <Link
-            key={item.href}
-            href={item.href}
-            title={item.label}
-            onClick={onNavigate}
-            className={`group/nav flex items-center gap-3 rounded-xl px-2 py-2.5 text-sm transition duration-200 ${
-              active
-                ? "gls-admin-nav-active"
-                : "text-gls-muted hover:bg-white/[0.04] hover:text-white"
-            }`}
-            style={
-              {
-                ["--nav-icon"]: color,
-              } as CSSProperties
-            }
-          >
-            <NavIcon color={color}>{item.icon}</NavIcon>
-            {!collapsed && (
-              <span className="truncate font-medium">{item.label}</span>
+          <div key={item.href} className="space-y-0.5">
+            <Link
+              href={item.href}
+              title={item.label}
+              onClick={onNavigate}
+              className={`group/nav flex items-center gap-3 rounded-xl px-2 py-2.5 text-sm transition duration-200 ${
+                active
+                  ? "gls-admin-nav-active"
+                  : "text-gls-muted hover:bg-white/[0.04] hover:text-white"
+              }`}
+              style={
+                {
+                  ["--nav-icon"]: color,
+                } as CSSProperties
+              }
+            >
+              <NavIcon color={color}>{item.icon}</NavIcon>
+              {!collapsed && (
+                <span className="truncate font-medium">{item.label}</span>
+              )}
+            </Link>
+            {showChildren && (
+              <div className="ml-3 space-y-0.5 border-l border-white/[0.08] pl-2">
+                {item.children!.map((child) => {
+                  const childIsActive = navChildActive(pathname, child.href);
+                  return (
+                    <Link
+                      key={child.href}
+                      href={child.href}
+                      title={child.label}
+                      onClick={onNavigate}
+                      className={`block rounded-lg px-2.5 py-2 text-xs transition duration-200 ${
+                        childIsActive
+                          ? "bg-white/[0.08] font-semibold text-white"
+                          : "text-gls-muted hover:bg-white/[0.04] hover:text-white"
+                      }`}
+                      style={
+                        childIsActive
+                          ? ({
+                              boxShadow: `inset 2px 0 0 ${color}`,
+                            } as CSSProperties)
+                          : undefined
+                      }
+                    >
+                      {child.label}
+                    </Link>
+                  );
+                })}
+              </div>
             )}
-          </Link>
+          </div>
         );
       })}
     </>
@@ -345,14 +424,7 @@ export function AdminShell({
     });
   };
 
-  const activeItem =
-    [...NAV]
-      .sort((a, b) => b.href.length - a.href.length)
-      .find(
-        (n) =>
-          pathname === n.href ||
-          (n.href !== "/admin" && pathname.startsWith(n.href)),
-      ) || NAV[0];
+  const activeItem = resolveActiveNav(pathname);
   const pageColor = ADMIN_NAV_COLORS[activeItem.href] || "#ff6b9d";
 
   const sidebarBody = (opts: {
