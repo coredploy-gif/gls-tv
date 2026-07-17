@@ -70,6 +70,7 @@ export const MEDIA_LINK_CATEGORIES = [
   "Music",
   "Kids",
   "Food",
+  "Religion",
   "Series",
   "Other",
   "Uncategorized",

@@ -36,6 +36,12 @@ const MEDIA_HOST_SUFFIXES = [
   "tubi.video",
   // Wowza Cloud hosts already present in playable-* packs (TeleArena, racing, etc.)
   "streamlock.net",
+  // Saudi / Islamic official CDNs (Globecast mirrors already covered by akamaized.net)
+  "live.net.sa",
+  "streambrothers.com",
+  "fasttvcdn.com",
+  "kwikmotion.com",
+  "simplestreamcdn.com",
 ];
 
 export function isAllowedMediaHost(hostname: string) {

@@ -21,6 +21,7 @@ import { CURATED_MALAWI_TV } from "@/data/curated-malawi-tv";
 import { CURATED_RADIO_AFRICA } from "@/data/curated-radio-africa";
 import { CURATED_RADIO_ZA } from "@/data/curated-radio-za";
 import { CURATED_RADIO_MW } from "@/data/curated-radio-mw";
+import { CURATED_RELIGION } from "@/data/curated-religion";
 import {
   CURATED_PUBLIC_MOVIES,
   CURATED_PUBLIC_SPORTS,
@@ -123,6 +124,7 @@ export function getVerifiedChannels() {
     CURATED_RADIO_ZA,
     CURATED_RADIO_MW,
     CURATED_RADIO_AFRICA,
+    CURATED_RELIGION,
     CURATED_PUBLIC_SPORTS,
     CURATED_PUBLIC_MOVIES,
     CURATED_SERIES_SEEDS,
@@ -145,6 +147,7 @@ export function getAllChannels(): CatalogItem[] {
     CURATED_RADIO_ZA,
     CURATED_RADIO_MW,
     CURATED_RADIO_AFRICA,
+    CURATED_RELIGION,
     CURATED_PUBLIC_SPORTS,
     CURATED_PUBLIC_MOVIES,
     CURATED_SERIES_SEEDS,
@@ -213,6 +216,7 @@ export function getChannelBySlug(slug: string): CatalogItem | undefined {
     CURATED_RADIO_ZA,
     CURATED_RADIO_MW,
     CURATED_RADIO_AFRICA,
+    CURATED_RELIGION,
     CURATED_PUBLIC_SPORTS,
     CURATED_PUBLIC_MOVIES,
     CURATED_SERIES_SEEDS,
@@ -313,6 +317,10 @@ export function getFoodChannels() {
 
 export function getAfricaChannels() {
   return mergeUnique(CURATED_AFRICA, playableAfrica, africaChannels);
+}
+
+export function getReligionChannels() {
+  return mergeUnique(CURATED_RELIGION);
 }
 
 export function getAsiaChannels() {

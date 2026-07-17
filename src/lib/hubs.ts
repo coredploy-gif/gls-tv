@@ -9,6 +9,7 @@ import {
   getAfricaChannels,
   getAsiaChannels,
   getAsiaSeries,
+  getReligionChannels,
 } from "@/lib/channels";
 
 export type HubKey =
@@ -16,6 +17,7 @@ export type HubKey =
   | "kids"
   | "news"
   | "food"
+  | "religion"
   | "live"
   | "africa"
   | "asia";
@@ -137,6 +139,23 @@ export const HUBS: HubDef[] = [
     top10: [...TOP10.food],
   },
   {
+    key: "religion",
+    title: "Religion",
+    href: "/religion",
+    blurb: "Makkah, Madinah, Quran, Sunnah, and Islamic teaching channels.",
+    match: (i) =>
+      i.categories.some((c) => /^religion$|^islam$|^religious$/i.test(c)) ||
+      /quran|sunnah|makkah|madinah|iqraa|islam channel|hope channel|redemption|gospel ministry/i.test(
+        `${i.title} ${i.categories.join(" ")}`,
+      ),
+    top10: getReligionChannels()
+      .filter(
+        (c) =>
+          c.categories.includes("Curated") || c.categories.includes("Playable"),
+      )
+      .slice(0, 10),
+  },
+  {
     key: "africa",
     title: "Africa",
     href: "/africa",
@@ -202,6 +221,10 @@ export function getHubChannels(key: HubKey): CatalogItem[] {
   if (key === "food") {
     const hub = getHub(key);
     return mergeBySlug(hub.top10, getFoodChannels(), ALL.filter(hub.match));
+  }
+  if (key === "religion") {
+    const hub = getHub(key);
+    return mergeBySlug(hub.top10, getReligionChannels(), ALL.filter(hub.match));
   }
   if (key === "africa") {
     const hub = getHub(key);
@@ -279,7 +302,7 @@ export function hubKeyForItem(item: CatalogItem): HubKey | null {
     item.countries.some((c) => AFRICA_CODES.has(c))
   )
     return "africa";
-  for (const key of ["kids", "sports", "news", "food"] as const) {
+  for (const key of ["kids", "sports", "news", "food", "religion"] as const) {
     if (getHub(key).match(item)) return key;
   }
   if (item.type === "live") return "live";

@@ -9,6 +9,7 @@ import { VERIFIED_LIVE } from "@/data/verified";
 import { getAllChannels } from "@/lib/channels";
 import { getRelatedChannels } from "@/lib/hubs";
 import { getMalawiBrowseItems, getAfricaRadioBrowseItems } from "@/lib/radio";
+import { getReligionBrowseItems } from "@/lib/religion";
 import { isTraceChannel } from "@/lib/trace-mirrors";
 
 export default function BrowsePage() {
@@ -77,6 +78,7 @@ export default function BrowsePage() {
 
   const malawiItems = getMalawiBrowseItems();
   const africaRadioItems = getAfricaRadioBrowseItems();
+  const religionItems = getReligionBrowseItems();
 
   return (
     <main className="min-h-screen bg-gls-black pb-20">
@@ -117,6 +119,15 @@ export default function BrowsePage() {
             items={africaRadioItems}
             limit={8}
             viewMoreHref="/radio"
+          />
+        )}
+
+        {religionItems.length > 0 && (
+          <ContentRow
+            title="☪️ Religion · Makkah, Madinah & more"
+            items={religionItems}
+            limit={8}
+            viewMoreHref="/religion"
           />
         )}
 
