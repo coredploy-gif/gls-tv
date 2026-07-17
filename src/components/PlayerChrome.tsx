@@ -236,22 +236,36 @@ export function PlayerChrome({
 
     const remote = (el as HTMLVideoElement & { remote?: RemotePlayback }).remote;
     if (!remote || typeof remote.watchAvailability !== "function") return;
-    let cancel: (() => void) | undefined;
+    let watchId: number | undefined;
+    let cancelled = false;
     try {
-      const result = remote.watchAvailability((available) => {
-        setCanCast(available || castCapability(el) !== "unavailable");
-      });
-      if (result && typeof (result as Promise<() => void>).then === "function") {
-        void (result as Promise<() => void>).then((fn) => {
-          cancel = fn;
+      void remote
+        .watchAvailability((available) => {
+          setCanCast(available || castCapability(el) !== "unavailable");
+        })
+        .then((id) => {
+          if (cancelled) {
+            try {
+              remote.cancelWatchAvailability(id);
+            } catch {
+              /* ignore */
+            }
+            return;
+          }
+          watchId = id;
         });
-      } else if (typeof result === "function") {
-        cancel = result as () => void;
-      }
     } catch {
       /* watchAvailability unsupported */
     }
-    return () => cancel?.();
+    return () => {
+      cancelled = true;
+      if (watchId === undefined) return;
+      try {
+        remote.cancelWatchAvailability(watchId);
+      } catch {
+        /* ignore */
+      }
+    };
   }, [format, videoRef]);
 
   useEffect(() => () => clearIdle(), [clearIdle]);
