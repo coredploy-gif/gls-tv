@@ -45,7 +45,7 @@ export function isTvLikeDevice(): boolean {
 
   const ua = navigator.userAgent || "";
   if (
-    /Android\s*TV|SMART-TV|SmartTV|AFT[A-Z]|AppleTV|BRAVIA|CrKey|GoogleTV|TV Stick|Fire TV|MiBOX|HbbTV|Web0S|Tizen|Google.?TV|Chromecast/i.test(
+    /Android\s*TV|SMART-TV|SmartTV|AFT[A-Z]|AppleTV|BRAVIA|CrKey|GoogleTV|TV Stick|Fire TV|MiBOX|HbbTV|Web0S|Tizen|Google.?TV|Chromecast|GLSTV-AndroidTV/i.test(
       ua,
     )
   ) {

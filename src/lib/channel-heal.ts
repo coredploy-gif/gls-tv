@@ -5,6 +5,8 @@ import {
   isBrokenTraceOrigin,
   isTraceChannel,
   primaryTraceHealUrl,
+  TRACE_URBAN_FALLBACK_TAG,
+  usesTraceUrbanFallback,
 } from "@/lib/trace-mirrors";
 
 /**
@@ -305,6 +307,9 @@ export function healPrivatePlaylistSources(
   if (isTraceChannel(slug, title)) {
     next = healTraceSources(slug, title, next);
     tags.push("Healed", "Playable");
+    if (usesTraceUrbanFallback(slug, title)) {
+      tags.push(TRACE_URBAN_FALLBACK_TAG);
+    }
   }
 
   // 2) Curated slug overrides (India news, beIN→XTRA, Trace Sport, etc.)
@@ -367,6 +372,9 @@ export function healChannelSources(
   if (isTraceChannel(item.slug, item.title)) {
     sources = healTraceSources(item.slug, item.title, sources);
     tags.push("Healed", "Playable");
+    if (usesTraceUrbanFallback(item.slug, item.title)) {
+      tags.push(TRACE_URBAN_FALLBACK_TAG);
+    }
   }
 
   // 2) Curated slug overrides (same pack used for private playlists / africa.json)

@@ -86,10 +86,10 @@ function statusLabel(status: string) {
 
 function defaultMethod(settings: Settings, payment: Payment): CheckoutMethod {
   if (payment.payment_method === "eft") return "eft";
-  if (payment.payment_method === "yoco" && settings.yoco_ready) return "yoco";
-  if (settings.payfast_ready) return "payfast";
   if (payment.payment_method === "payfast" && settings.payfast_ready)
     return "payfast";
+  if (settings.payfast_ready) return "payfast";
+  if (payment.payment_method === "yoco" && settings.yoco_ready) return "yoco";
   if (settings.yoco_ready) return "yoco";
   return "eft";
 }
@@ -475,7 +475,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                             : "text-gls-muted hover:text-white"
                         } disabled:cursor-not-allowed disabled:opacity-40`}
                       >
-                        Yoco / QR
+                        QR link (legacy)
                       </button>
                     )}
                     {showEft && (
@@ -603,7 +603,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                         <div className="rounded-2xl bg-white p-3 shadow-2xl">
                           <Image
                             src={payment.qrCode}
-                            alt="Scan to pay with Yoco"
+                            alt="Scan to pay with payment link"
                             width={220}
                             height={220}
                             unoptimized
@@ -611,7 +611,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                         </div>
                       )}
                       <p className="mt-4 font-semibold text-white">
-                        Scan or open secure Yoco payment
+                        Scan or open secure payment link
                       </p>
                       <p className="mt-1 text-xs text-gls-muted">
                         The amount and GLS reference are attached to this request.
@@ -622,7 +622,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                         rel="noreferrer"
                         className="gls-cta mt-4 w-full rounded-md px-5 py-3 text-sm"
                       >
-                        Pay R{(payment.amount_zar_cents / 100).toFixed(0)} with Yoco
+                        Pay R{(payment.amount_zar_cents / 100).toFixed(0)} via payment link
                       </a>
                     </div>
                   ) : (
@@ -663,7 +663,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                         </dl>
                       ) : (
                         <p className="mt-3 text-sm text-amber-100">
-                          EFT details are being configured. Use PayFast/Yoco or
+                          EFT details are being configured. Use PayFast or
                           contact support.
                         </p>
                       )}
@@ -764,7 +764,7 @@ export function ManualPaymentCheckout({ paymentId }: { paymentId: string }) {
                   </span>
                   {showPayfast
                     ? "Set up a PayFast debit order, or pay once by EFT with the exact reference."
-                    : "Pay with Yoco or EFT using the exact reference."}
+                    : "Pay with PayFast or EFT using the exact reference."}
                 </li>
                 <li className="flex gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gls-pink/15 text-xs text-gls-pink-soft">

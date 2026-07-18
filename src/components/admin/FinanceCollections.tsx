@@ -123,7 +123,7 @@ export function FinanceCollections() {
       <AdminPageHeader
         eyebrow="Finance"
         title="Collections & renewals"
-        description="Dormant legacy Stripe collections view. The launch flow uses manual 30-day Yoco/EFT renewals."
+        description="Dormant legacy Stripe collections view. The launch flow uses PayFast debit and verified EFT."
       />
       {msg && <p className="mt-4 text-sm text-gls-body">{msg}</p>}
       <div className="mt-8 grid gap-4 lg:grid-cols-2">

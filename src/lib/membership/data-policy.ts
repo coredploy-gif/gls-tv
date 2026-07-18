@@ -1,6 +1,6 @@
 /**
  * What GLS TV collects from members (keep lean).
- * GLS TV uses manual 30-day renewals through Yoco payment links or verified EFT.
+ * GLS TV uses PayFast (card/debit) or verified EFT for membership payments.
  */
 
 export const MEMBER_DATA_COLLECT = {
@@ -19,7 +19,7 @@ export const MEMBER_DATA_COLLECT = {
   billing: [
     "GLS member and payment reference",
     "Chosen 30-day plan and amount",
-    "Yoco payment-link identifiers/status or EFT transaction reference",
+    "PayFast payment identifiers/status or EFT transaction reference",
     "Payment proof note, verification result, receipt and refund record",
   ],
   /** Anti-abuse for one free trial per device */
@@ -42,7 +42,7 @@ export const MEMBER_FLOW_COPY = {
   trialFirst:
     "Register with email → verify → 14-day free trial → Who’s watching → watch.",
   renewLater:
-    "Before trial ends (or anytime), choose a 30-day R45 / R55 / R65 membership and pay through a Yoco payment link or verified EFT. There is no automatic debit.",
+    "Before trial ends (or anytime), choose a 30-day R45 / R55 / R65 membership and pay through PayFast (card debit) or verified EFT.",
   adminExempt:
     "Owner admin accounts bypass trial clocks and device locks.",
 } as const;

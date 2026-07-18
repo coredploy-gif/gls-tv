@@ -9,8 +9,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Session, User } from "@supabase/supabase-js";
+import type { Provider, Session, User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import { safeNextPath } from "@/lib/auth/safe-next";
+
+export type OAuthProvider = Extract<Provider, "google" | "apple">;
 
 type AuthContextValue = {
   user: User | null;
@@ -23,6 +26,12 @@ type AuthContextValue = {
     email: string,
     password: string,
   ) => Promise<string | null>;
+  signInWithOAuth: (
+    provider: OAuthProvider,
+    options?: { next?: string },
+  ) => Promise<string | null>;
+  signInWithGoogle: (options?: { next?: string }) => Promise<string | null>;
+  signInWithApple: (options?: { next?: string }) => Promise<string | null>;
   signOut: () => Promise<void>;
 };
 
@@ -122,6 +131,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [supabase],
   );
 
+  const signInWithOAuth = useCallback(
+    async (provider: OAuthProvider, options?: { next?: string }) => {
+      const origin = (
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        (typeof window !== "undefined" ? window.location.origin : "") ||
+        "http://127.0.0.1:3010"
+      ).replace(/\/$/, "");
+      const next = safeNextPath(options?.next);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        },
+      });
+      return error?.message ?? null;
+    },
+    [supabase],
+  );
+
+  const signInWithGoogle = useCallback(
+    (options?: { next?: string }) => signInWithOAuth("google", options),
+    [signInWithOAuth],
+  );
+
+  const signInWithApple = useCallback(
+    (options?: { next?: string }) => signInWithOAuth("apple", options),
+    [signInWithOAuth],
+  );
+
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
   }, [supabase]);
@@ -135,9 +173,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       adminLoading,
       signInWithPassword,
       signUpWithPassword,
+      signInWithOAuth,
+      signInWithGoogle,
+      signInWithApple,
       signOut,
     }),
-    [session, loading, isAdmin, adminLoading, signInWithPassword, signUpWithPassword, signOut],
+    [
+      session,
+      loading,
+      isAdmin,
+      adminLoading,
+      signInWithPassword,
+      signUpWithPassword,
+      signInWithOAuth,
+      signInWithGoogle,
+      signInWithApple,
+      signOut,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

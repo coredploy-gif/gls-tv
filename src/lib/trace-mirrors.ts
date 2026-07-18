@@ -3,7 +3,17 @@ import type { MediaSource } from "@/data/types";
 /**
  * Trace+ origin (`channels.trace.plus`) is frequently SSL/geo blocked (esp. ZA).
  * Prefer open Amagi FAST mirrors — same approach as curated Africa Trace tiles.
+ *
+ * Regional Trace music (Africa / Southern Africa / Gospel / Mziki / …) often has
+ * no open dedicated FAST feed. Those heal onto Trace Urban Amagi — surface
+ * `TraceUrbanFallback` so the UI can say so instead of a silent swap.
  */
+
+export const TRACE_URBAN_FALLBACK_NOTICE =
+  "Switching to Trace Urban — regional feed unavailable";
+
+/** Category tag merged onto healed regional Trace entries. */
+export const TRACE_URBAN_FALLBACK_TAG = "TraceUrbanFallback";
 
 const TRACE_URBAN: MediaSource[] = [
   // Prefer CORS-friendly Amagi hosts for browser direct play.
@@ -109,6 +119,10 @@ export function isBrokenTraceOrigin(url: string): boolean {
   return /channels\.trace\.plus|trace\.tv\/|encrypted\.m3u8\?ads/i.test(url);
 }
 
+export function isTraceUrbanMirrorUrl(url: string): boolean {
+  return /traceurban|trace-urban|trace[\s_-]*urban/i.test(url);
+}
+
 type TraceFlavor =
   | "urban"
   | "latina"
@@ -129,6 +143,83 @@ function flavorFor(slug: string, title?: string | null): TraceFlavor {
   if (/urban|africa|mziki|naija|kitoko|mboa|muzika|ngoma|ivoire|teranga/.test(hay))
     return "urban";
   return "generic";
+}
+
+/**
+ * Canonical open Trace Urban FAST (International / France / plain Urban).
+ * Regional Urban Africa / Southern Africa / Gospel / Africa music → not canonical
+ * (they heal onto Urban as a sister feed).
+ */
+export function isCanonicalTraceUrban(
+  slug: string,
+  title?: string | null,
+): boolean {
+  if (!isTraceChannel(slug, title)) return false;
+  const hay = `${slug} ${title || ""}`.toLowerCase();
+  if (
+    /gospel|latina|brazuca|sport|ayiti|caribbean|mziki|naija|ivoire|kitoko|mboa|muzika|ngoma|teranga|toca|jama|afrikora|vanilla/.test(
+      hay,
+    )
+  ) {
+    return false;
+  }
+  // Trace Africa (no "urban") is a different linear — not Urban FAST.
+  if (/\bafrica\b/.test(hay) && !/urban/.test(hay)) return false;
+  // Urban Southern Africa / Urban SA / Urban Africa → regional, Urban is sister.
+  if (
+    /urban/.test(hay) &&
+    (/southern|southernafrica|urban[\s_-]?sa\b|[\s_-]sa\b/.test(hay) ||
+      /\bafrica\b/.test(hay))
+  ) {
+    return false;
+  }
+  return /urban/.test(hay) || /^trace-urban/.test(slug.toLowerCase());
+}
+
+/**
+ * True when the best open heal for this Trace title is Trace Urban Amagi
+ * because a dedicated regional feed is not available as open FAST.
+ */
+export function usesTraceUrbanFallback(
+  slug: string,
+  title?: string | null,
+): boolean {
+  if (!isTraceChannel(slug, title)) return false;
+  const flavor = flavorFor(slug, title);
+  if (
+    flavor === "latina" ||
+    flavor === "brazuca" ||
+    flavor === "sport" ||
+    flavor === "uk"
+  ) {
+    return false;
+  }
+  if (isCanonicalTraceUrban(slug, title)) return false;
+  return true;
+}
+
+export function hasTraceUrbanFallbackTag(
+  categories: string[] | null | undefined,
+): boolean {
+  return Boolean(
+    categories?.some((c) => c === TRACE_URBAN_FALLBACK_TAG),
+  );
+}
+
+/** Absolute https stream that looks like a usable own/regional feed (not Urban Amagi). */
+function isPreferableOwnTraceSource(url: string): boolean {
+  if (!/^https?:\/\//i.test(url)) return false;
+  if (isBrokenTraceOrigin(url)) return false;
+  if (isTraceUrbanMirrorUrl(url)) return false;
+  // Skip hosts we already treat as sticky / geo-fragile in channel-heal.
+  if (
+    /blocked\.grouptag|streamvidex|qzz\.io|live20\.bozztv\.com|nghk\.ai|sinalmycn\.com|lb\.dstvmultimedia\.com/i.test(
+      url,
+    )
+  ) {
+    return false;
+  }
+  return true;
 }
 
 /** Working Amagi FAST mirrors for a Trace catalogue entry. */
@@ -163,7 +254,10 @@ export function primaryTraceHealUrl(
 }
 
 /**
- * Put Amagi Trace mirrors first; demote dead Trace+ CDN URLs to last resort.
+ * Put the best Trace feed first:
+ * - Prefer a working own/regional https source when present
+ * - Else Amagi flavor mirrors (Urban for regional music / Gospel)
+ * - Demote dead Trace+ CDN URLs to last resort
  */
 export function healTraceSources(
   slug: string,
@@ -183,16 +277,28 @@ export function healTraceSources(
     });
   };
 
-  for (const m of traceHealMirrors(slug, title)) push(m, 0);
-
-  const good: MediaSource[] = [];
+  const urbanFallback = usesTraceUrbanFallback(slug, title);
+  const ownGood: MediaSource[] = [];
+  const otherGood: MediaSource[] = [];
   const bad: MediaSource[] = [];
+
   for (const s of sources) {
     if (isBrokenTraceOrigin(s.url)) bad.push(s);
-    else good.push(s);
+    else if (urbanFallback && isPreferableOwnTraceSource(s.url)) ownGood.push(s);
+    else otherGood.push(s);
   }
-  for (const s of good) push(s, 40);
-  for (const s of bad) push({ ...s, label: s.label || "trace-plus-fallback" }, 800);
+
+  // Regional Trace: keep a healthy own feed ahead of Urban sister mirrors.
+  if (urbanFallback) {
+    for (const s of ownGood) push(s, 0);
+    for (const m of traceHealMirrors(slug, title)) push(m, 10);
+    for (const s of otherGood) push(s, 40);
+  } else {
+    for (const m of traceHealMirrors(slug, title)) push(m, 0);
+    for (const s of [...ownGood, ...otherGood]) push(s, 40);
+  }
+  for (const s of bad)
+    push({ ...s, label: s.label || "trace-plus-fallback" }, 800);
 
   return out;
 }

@@ -20,10 +20,10 @@ service worker, and icon are active.
 - Supabase contains the manual billing tables, member references, payment
 requests, payment events, receipts, reminders, audit log, and cron run log.
 - Members can choose a plan, receive a unique member/payment reference, pay
-through a Yoco payment link/QR or EFT, submit proof, and view a receipt.
+through PayFast (card debit) or EFT, submit proof when needed, and view a receipt.
 - Admin has payment queue, member search, reports, receipts, refunds, payment
 settings, daily operations, reminders, and audit pages.
-- Manual/Yoco memberships are 30 days with no automatic debit.
+- Memberships are 30-day periods via PayFast debit or verified EFT.
 - The 15 July launch-security database migration is applied in production:
 privileged profile writes and channel RPCs are restricted, advised FK indexes
 exist, and manual payment activation is atomic/idempotent.
@@ -167,13 +167,13 @@ private-network protection.
 
 ### 6. Replace all customer-facing Stripe-era copy and dormant finance flows
 
-The launch copy now describes Yoco/EFT manual 30-day renewal. Dormant legacy
+The launch copy now describes PayFast debit and verified EFT. Dormant legacy
 Stripe administration remains in the repository but is clearly labelled and
 must stay unused for launch.
 
-- [x] Rewrite Legal and data-policy copy for Yoco payment links and manual EFT.
-- [x] Remove statements that a card will be debited automatically.
-- [x] Update past-due/reminder wording to “renew with Yoco or EFT”.
+- [x] Rewrite Legal and data-policy copy for PayFast and manual EFT.
+- [x] Describe PayFast debit-order billing accurately (cancel anytime).
+- [x] Update past-due/reminder wording to “renew with PayFast or EFT”.
 - [x] Clearly label dormant Stripe-only admin pages and actions.
 - [ ] Confirm pricing, checkout, receipts, reminders, support replies, and legal
   ```
@@ -186,11 +186,11 @@ Versioned policy sections are published in code. Owner identity, monitored
 contact details, response time, legal review, and acceptance evidence remain.
 
 - [x] Terms of Service.
-- [x] Privacy Policy covering Supabase, Vercel, Yoco, device identifiers, IP
+- [x] Privacy Policy covering Supabase, Vercel, PayFast, device identifiers, IP
   ```
   hashing, support messages, retention, and user deletion requests.
   ```
-- [x] Refund and cancellation policy explaining how Yoco/EFT refunds are
+- [x] Refund and cancellation policy explaining how PayFast/EFT refunds are
   ```
   externally completed and recorded. Owner response time remains unset.
   ```
@@ -243,29 +243,34 @@ compatibility does not mean Hobby permits a paid commercial service.
 
 ## What the owner must provide and configure
 
-### A. Yoco
+### A. PayFast (primary)
 
-- [ ] Complete Yoco merchant identity/onboarding and confirm the account may be
+- [ ] Complete PayFast merchant identity/onboarding and confirm the account may be
   ```
   used for this product.
   ```
 - [ ] Add and verify the payout bank account.
-- [ ] Obtain a live Yoco secret key; do not use a test key in production.
-- [ ] Add `YOCO_SECRET_KEY` to Vercel Production only, then redeploy.
-- [ ] In `/admin/finance/settings`, enable Yoco and confirm the page reports that
+- [ ] Obtain live PayFast Merchant ID, Merchant Key, and Salt Passphrase.
+- [ ] Add `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, and `PAYFAST_PASSPHRASE`
   ```
-  Yoco is configured.
+  to Vercel Production; set `PAYFAST_SANDBOX=false` for live; then redeploy.
   ```
-- [ ] Make one small real payment from another device/account.
-- [ ] Confirm the QR/link amount and reference, Yoco status, admin activation,
+- [ ] In `/admin/finance/settings`, enable PayFast and confirm credentials show as
+  ```
+  configured.
+  ```
+- [ ] Make one small real debit-order / card payment from another device/account.
+- [ ] Confirm amount and reference, PayFast ITN, admin activation (if needed),
   ```
   receipt, membership end date, and payout settlement.
   ```
-- [ ] Refund that test payment in Yoco and confirm the GLS refund record matches.
+- [ ] Refund that test payment in PayFast and confirm the GLS refund record matches.
 
-Yoco activation currently uses admin sync and a daily poll of the latest 100
-payment links. For instant, higher-volume activation, add a signed Yoco webhook
-after validating the current Yoco API/webhook contract.
+PayFast activation uses ITN at `/api/payfast/itn` plus an admin sync for stuck
+COMPLETE rows. Keep ITN notify URL and passphrase aligned with the PayFast dashboard.
+
+Optional legacy payment-link API (`YOCO_*`) remains in code for old open requests
+only — leave disabled for new members.
 
 ### B. EFT/bank details
 
@@ -297,11 +302,11 @@ Before enabling EFT:
 ### C. Business, tax, and records
 
 - [ ] Decide the legal seller/trader name shown to customers.
-- [ ] Confirm with Yoco and the bank whether a sole proprietor/personal account
+- [ ] Confirm with PayFast and the bank whether a sole proprietor/personal account
   ```
   is acceptable for this activity.
   ```
-- [ ] Keep monthly exports of receipts, refunds, Yoco settlements, and bank
+- [ ] Keep monthly exports of receipts, refunds, PayFast settlements, and bank
   ```
   statements.
   ```
@@ -330,7 +335,7 @@ email and hours below.
   ```
 - [ ] Keep recovery codes and ownership access for GitHub, Vercel, Supabase,
   ```
-  Yoco, the bank, domain registrar, and support email in a password manager.
+  PayFast, the bank, domain registrar, and support email in a password manager.
   ```
 - [ ] Ensure at least one trusted backup operator can handle outages/payments.
 
@@ -348,8 +353,9 @@ and Production/Preview/Development scopes of these names remain owner checks.
 - [ ] `CRON_SECRET` = a strong random secret
 - [ ] `EADMIN_EMAILS` = exact comma-separated admin emails
 - [ ] `TMDB_API_KEY` if TMDB-backed metadata remains enabled and licensed
-- [ ] `YOCO_SECRET_KEY` when Yoco is enabled
-- [ ] `YOCO_WEBHOOK_SECRET` for `/api/yoco/webhook` (HMAC) when using event-driven activation
+- [ ] `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE`
+- [ ] `PAYFAST_SANDBOX=false` for live production
+- [ ] Optional legacy only: `YOCO_SECRET_KEY` / `YOCO_WEBHOOK_SECRET` (keep off for launch)
 - [ ] `GLS_STREAM_PROXY` only if a lawful, trusted proxy is required
 
 Leave Stripe variables unset while Stripe is dormant. If Stripe is reintroduced,
@@ -364,7 +370,7 @@ After any environment change, redeploy and test the affected server route.
 
 - [ ] Add Content-Security-Policy and Strict-Transport-Security headers after
   ```
-  testing all stream, image, Supabase, and Yoco origins.
+  testing all stream, image, Supabase, and PayFast origins.
   ```
 - [ ] Add error monitoring and alerts for API 5xx responses, failed crons,
   ```
@@ -425,7 +431,7 @@ non-optimal RLS expressions, and duplicate permissive policies.
   ```
   set premium access without a receipt, or create a receipt without access.
   ```
-- [ ] Add a reconciliation view comparing GLS receipts, Yoco transactions, and
+- [ ] Add a reconciliation view comparing GLS receipts, PayFast transactions, and
   ```
   bank deposits.
   ```
@@ -433,19 +439,16 @@ non-optimal RLS expressions, and duplicate permissive policies.
   ```
   revenue.
   ```
-- [ ] Store processor fees and settlement IDs if Yoco supplies them.
+- [ ] Store processor fees and settlement IDs if PayFast supplies them.
 - [x] Add an explicit owner action for actual refund completion; “Record refund”
   ```
-  currently records GLS state but does not send money through bank/Yoco.
+  currently records GLS state but does not send money through bank/PayFast.
   ```
 - [ ] Decide whether refunded membership ends immediately or remains active; test
   ```
   the chosen rule.
   ```
-- [ ] Add webhook-driven Yoco activation when volume requires near-real-time
-  ```
-  access.
-  ```
+- [ ] Confirm PayFast ITN reliability and admin sync for stuck COMPLETE rows.
 
 ### Product and customer experience
 
@@ -478,11 +481,11 @@ trial:
 - [ ] Create/select a viewer profile and play representative live/VOD content.
 - [ ] Choose each plan and confirm the amount is R45/R55/R65.
 - [ ] Create a payment request and confirm unique member/payment references.
-- [ ] Test Yoco QR/link on a separate phone.
+- [ ] Test PayFast debit-order checkout on a separate phone.
 - [ ] Test EFT details and proof submission.
 - [ ] Confirm the admin can search by email, member reference, payment reference,
   ```
-  bank/Yoco transaction ID, and status.
+  bank/PayFast transaction ID, and status.
   ```
 - [ ] Confirm duplicate transaction IDs and duplicate approvals are rejected.
 - [ ] Approve a payment and verify 30 days are added from the later of now or the
@@ -511,7 +514,7 @@ trial:
 - [ ] Confirm Vercel build and runtime logs have no unexplained errors.
 - [ ] Confirm all environment variables and Supabase redirect URLs.
 - [ ] Confirm database migrations and both Supabase advisors.
-- [ ] Confirm Yoco and EFT can be disabled quickly from Finance Settings.
+- [ ] Confirm PayFast and EFT can be disabled quickly from Finance Settings.
 - [ ] Run the end-to-end test above.
 - [ ] Check the top channels from the target network.
 - [ ] Publish support hours and policies.
@@ -526,7 +529,7 @@ trial:
   reminders.
   ```
 - [ ] Open `/admin/finance/payments`; match settled transactions before approval.
-- [ ] Sync Yoco payments when customers need access before the daily cron.
+- [ ] Sync PayFast COMPLETE rows when customers need access before ITN settles.
 - [ ] Respond to rejected/unmatched payments with a specific reason.
 - [ ] Check support tickets and urgent in-app reminders.
 - [ ] Check Vercel and Supabase errors.
@@ -538,7 +541,7 @@ trial:
 
 Weekly:
 
-- [ ] Reconcile every GLS receipt against Yoco/bank activity.
+- [ ] Reconcile every GLS receipt against PayFast/bank activity.
 - [ ] Review pending, expired, rejected, duplicate, and refunded items.
 - [ ] Review admin audit logs and unusual sign-in/payment activity.
 - [ ] Test representative channels and remove unlawful/dead sources.
@@ -548,7 +551,7 @@ Monthly:
 
 - [ ] Reconcile gross revenue, fees, refunds, and net deposits.
 - [ ] Back up/export critical database and finance data.
-- [ ] Review access to GitHub, Vercel, Supabase, Yoco, bank, domain, and email.
+- [ ] Review access to GitHub, Vercel, Supabase, PayFast, bank, domain, and email.
 - [ ] Rotate credentials when staff/access changes or exposure is suspected.
 - [ ] Re-run Supabase Security/Performance Advisors and dependency scans.
 - [ ] Review policies, retention, tax records, support load, and plan pricing.
@@ -556,7 +559,7 @@ Monthly:
 ## Go/no-go rule
 
 Go to a small invite-only beta only when every P0 item is complete and one real
-Yoco or EFT payment has passed the full payment → activation → receipt →
+PayFast or EFT payment has passed the full payment → activation → receipt →
 reconciliation → refund test.
 
 Go to a wider public launch only after beta users complete the flow without

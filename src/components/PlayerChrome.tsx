@@ -8,10 +8,11 @@ import {
   type RefObject,
 } from "react";
 import {
+  absoluteStreamUrl,
   castFeedbackForResult,
   castLikelyWorks,
   promptCastOrAirPlay,
-  streamSupportsCast,
+  shouldShowCastControl,
 } from "@/lib/remote-playback";
 
 const IDLE_MS = 2800;
@@ -401,13 +402,16 @@ export function PlayerChrome({
 
   useEffect(() => {
     const el = videoRef.current;
-    if (!el || !streamSupportsCast(format)) {
+    const fetchable = absoluteStreamUrl(castUrl);
+    if (!el || !shouldShowCastControl(format, castUrl)) {
       setCanCast(false);
       return;
     }
 
     const syncCast = () => {
-      setCanCast(castLikelyWorks(el, format));
+      // Solid affordance: remote picker works OR we have a fetchable cast URL
+      // (live HLS MSE still shows Cast like radio, with copy-link fallback).
+      setCanCast(castLikelyWorks(el, format) || Boolean(fetchable));
     };
     syncCast();
 
@@ -476,17 +480,23 @@ export function PlayerChrome({
   const onCast = async () => {
     const el = videoRef.current;
     bump();
-    if (!streamSupportsCast(format)) {
+    if (!shouldShowCastControl(format, castUrl)) {
       showCastFeedback(
         "Cast isn’t available for this embed (e.g. YouTube). Open on a TV browser instead.",
       );
       return;
     }
     showCastFeedback("Looking for Cast / AirPlay devices…");
-    const result = await promptCastOrAirPlay(el);
+    const result = await promptCastOrAirPlay(el, { format, castUrl });
     const feedback = castFeedbackForResult(result, { format, castUrl });
     if (feedback) {
       showCastFeedback(feedback.message, feedback.copyUrl);
+    } else {
+      // User dismissed the picker — clear the “Looking for…” hint quietly.
+      clearCastHintTimer();
+      setCastHint(null);
+      setCastCopyUrl(null);
+      setCopyStatus("idle");
     }
   };
 
@@ -582,7 +592,7 @@ export function PlayerChrome({
           >
             {paused ? "Play" : "Pause"}
           </button>
-          {streamSupportsCast(format) && (
+          {shouldShowCastControl(format, castUrl) && (
             <button
               type="button"
               className="gls-player-btn"

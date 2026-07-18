@@ -98,7 +98,7 @@ export async function createYocoPaymentLink(input: {
       | null;
     if (!response.ok || !json?.id || !json.url) {
       throw new Error(
-        json?.detail || json?.message || `Yoco returned ${response.status}`,
+        json?.detail || json?.message || `Payment-link API returned ${response.status}`,
       );
     }
     return {
@@ -144,7 +144,7 @@ export async function listYocoPaymentLinks() {
       | null;
     if (!response.ok) {
       throw new Error(
-        json?.detail || json?.message || `Yoco returned ${response.status}`,
+        json?.detail || json?.message || `Payment-link API returned ${response.status}`,
       );
     }
     return json?.data || [];
@@ -191,7 +191,7 @@ export async function getManualPaymentSettings(service: SupabaseClient) {
     id: "default",
     trading_name: data?.trading_name || "GLS TV",
     support_email: data?.support_email || null,
-    yoco_enabled: data?.yoco_enabled !== false,
+    yoco_enabled: data?.yoco_enabled === true,
     payfast_enabled: data?.payfast_enabled !== false,
     eft_enabled: data?.eft_enabled !== false,
     bank_name: data?.bank_name || null,

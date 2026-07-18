@@ -32,8 +32,8 @@ export const FAQ_INDEX: FaqHit[] = [
   {
     id: "faq-payment",
     title: "How do I pay for GLS TV?",
-    summary: "PayFast card, Yoco, or verified EFT on the Plans page.",
-    body: "Choose a 30-day plan on Plans. We accept PayFast (card), Yoco, and verified EFT. Billing reminders appear in your account when renewal is due.",
+    summary: "PayFast card debit or verified EFT on the Plans page.",
+    body: "Choose a 30-day plan on Plans. We accept PayFast (card debit) and verified EFT. Billing reminders appear in your account when renewal is due.",
     source: "faq",
   },
   {

@@ -265,10 +265,11 @@ const SECTIONS: { id: string; title: string; items: Qa[] }[] = [
         q: "How do I pay?",
         a: (
           <>
-            Choose a plan, then pay with a Yoco payment link/QR or EFT using the
-            exact GLS reference. Access starts after verification. There is{" "}
-            <strong className="text-white">no automatic debit</strong> — you
-            renew each 30 days if you want to continue. Details:{" "}
+            Choose a plan, then pay with{" "}
+            <strong className="text-white">PayFast</strong> (card debit on a day
+            you choose) or EFT using the exact GLS reference. Access starts
+            after verification. You can cancel a debit order or stop renewing
+            anytime. Details:{" "}
             <Link href="/legal#payments" className="text-white underline">
               Payments policy
             </Link>
@@ -282,8 +283,8 @@ const SECTIONS: { id: string; title: string; items: Qa[] }[] = [
         a: (
           <>
             Contact support with your payment reference and reason. Approved
-            refunds go through Yoco or EFT externally — a status change in GLS
-            alone does not move money.
+            refunds go through PayFast or EFT externally — a status change in
+            GLS alone does not move money.
           </>
         ),
       },

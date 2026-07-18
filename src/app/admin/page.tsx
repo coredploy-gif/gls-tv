@@ -66,7 +66,7 @@ export default async function AdminOverviewPage() {
 
   const quick = [
     { href: "/admin/ops", label: "Start daily ops", desc: "Tickets, payments, streams" },
-    { href: "/admin/finance/payments", label: "Payment queue", desc: "Yoco / EFT verification" },
+    { href: "/admin/finance/payments", label: "Payment queue", desc: "PayFast / EFT verification" },
     { href: "/admin/finance/reminders", label: "Send reminders", desc: "In-app trial & billing nudges" },
     { href: "/admin/audit", label: "Audit trail", desc: "Who changed what" },
     { href: "/admin/finance/members", label: "Member ledger", desc: "References & reactivation" },

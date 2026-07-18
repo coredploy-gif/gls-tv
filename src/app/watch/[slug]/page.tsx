@@ -17,6 +17,10 @@ import {
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { rankSourcesForCountry, requestCountry } from "@/lib/geo-source-rank";
+import {
+  hasTraceUrbanFallbackTag,
+  TRACE_URBAN_FALLBACK_NOTICE,
+} from "@/lib/trace-mirrors";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -75,6 +79,14 @@ export default async function WatchPage({ params }: Props) {
               {item.title}
             </h1>
           </div>
+          {hasTraceUrbanFallbackTag(item.categories) && (
+            <p
+              className="mt-3 rounded border border-amber-400/35 bg-amber-500/15 px-3 py-2 text-sm font-medium text-amber-100"
+              role="status"
+            >
+              {item.description?.trim() || TRACE_URBAN_FALLBACK_NOTICE}
+            </p>
+          )}
           <WatchLibrarySync
             slug={item.slug}
             title={item.title}
@@ -88,9 +100,11 @@ export default async function WatchPage({ params }: Props) {
               <span className="text-gls-muted">{item.sources[0].quality}</span>
             )}
           </div>
-          <p className="mt-4 text-base leading-relaxed text-gls-body">
-            {item.description}
-          </p>
+          {!hasTraceUrbanFallbackTag(item.categories) && (
+            <p className="mt-4 text-base leading-relaxed text-gls-body">
+              {item.description}
+            </p>
+          )}
           <p className="mt-3 text-sm text-gls-muted">
             {item.categories.join(" · ")} ·{" "}
             {item.countries.map((c) => c.toUpperCase()).join(", ")}

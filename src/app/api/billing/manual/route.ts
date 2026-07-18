@@ -261,12 +261,11 @@ export async function POST(req: NextRequest) {
     let current = payment;
     const preferPayfast =
       paymentMethod === "payfast" ||
-      (paymentMethod === "unselected" &&
-        payfastReady(settings) &&
-        !yocoReady(settings));
+      (paymentMethod === "unselected" && payfastReady(settings));
     const preferYoco =
       !preferPayfast &&
       paymentMethod !== "eft" &&
+      (paymentMethod === "yoco" || paymentMethod === "unselected") &&
       yocoReady(settings);
 
     if (preferYoco) {
@@ -295,8 +294,8 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         yocoWarning =
           err instanceof Error
-            ? `Yoco is temporarily unavailable: ${err.message}. Use PayFast or EFT.`
-            : "Yoco is temporarily unavailable. Use PayFast or EFT.";
+            ? `Card-link provider is temporarily unavailable: ${err.message}. Use PayFast or EFT.`
+            : "Card-link provider is temporarily unavailable. Use PayFast or EFT.";
       }
     } else if (preferPayfast && payfastReady(settings)) {
       const { data: updated } = await service
@@ -460,7 +459,7 @@ export async function POST(req: NextRequest) {
     const method = String(body.paymentMethod || payment.payment_method);
     if (!["yoco", "eft", "payfast"].includes(method)) {
       return NextResponse.json(
-        { error: "Choose PayFast, Yoco, or EFT" },
+        { error: "Choose PayFast or EFT" },
         { status: 400 },
       );
     }

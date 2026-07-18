@@ -26,9 +26,9 @@ export default async function PricingPage({ searchParams }: Props) {
           <p className="gls-eyebrow">Simple membership</p>
           <h1 className="gls-display mt-3 text-5xl sm:text-6xl">Plans made for your household</h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-gls-body">
-            Start with 14 days on us, then renew in simple 30-day periods.
-            Pay securely with Yoco or use EFT with your unique GLS reference.
-            Every plan includes a dedicated Kids profile.
+            Start with 14 days on us, then continue with a simple membership.
+            Pay securely with PayFast (card debit) or use EFT with your unique
+            GLS reference. Every plan includes a dedicated Kids profile.
           </p>
         </div>
         {canceled && (
@@ -63,7 +63,7 @@ export default async function PricingPage({ searchParams }: Props) {
                 <li className="flex gap-2"><span className="text-gls-mint">✓</span>{p.adultProfiles} adult profiles</li>
                 <li className="flex gap-2"><span className="text-gls-mint">✓</span>Dedicated Kids profile</li>
                 <li className="flex gap-2"><span className="text-gls-mint">✓</span>Playlists and continue watching</li>
-                <li className="flex gap-2"><span className="text-gls-mint">✓</span>Yoco QR or EFT in ZAR</li>
+                <li className="flex gap-2"><span className="text-gls-mint">✓</span>PayFast or EFT in ZAR</li>
               </ul>
               <PricingCheckoutButton
                 planId={p.id}
@@ -80,8 +80,8 @@ export default async function PricingPage({ searchParams }: Props) {
         </div>
         <div className="mt-10 grid gap-3 border-t border-white/10 pt-6 text-sm text-gls-muted sm:grid-cols-3">
           <p><span className="font-semibold text-white">14-day trial</span><br />Try GLS TV before you pay.</p>
-          <p><span className="font-semibold text-white">No automatic debit</span><br />Renew only when you choose.</p>
-          <p><span className="font-semibold text-white">Simple local payment</span><br />Yoco payment link or verified EFT.</p>
+          <p><span className="font-semibold text-white">PayFast debit</span><br />Card debit on the day you choose, or pay by EFT.</p>
+          <p><span className="font-semibold text-white">Simple local payment</span><br />PayFast checkout or verified EFT.</p>
         </div>
       </div>
     </main>

@@ -73,13 +73,13 @@ async function run(req: NextRequest) {
           adminEmail: "yoco-sync",
           externalTransactionId: `yoco:${link.id}`,
           paymentMethod: "yoco",
-          adminNote: "Automatically confirmed from Yoco payment-link status",
+          adminNote: "Automatically confirmed from legacy payment-link status",
           paidAt: link.updated_at || null,
         });
         if (result.ok) yocoActivated += 1;
       }
     } catch {
-      /* Yoco outage must not block expiry maintenance */
+      /* Legacy payment-link outage must not block expiry maintenance */
     }
   }
 

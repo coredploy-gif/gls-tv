@@ -59,7 +59,7 @@ export function FinanceInvoices() {
       <AdminPageHeader
         eyebrow="Finance"
         title="Invoices"
-        description="Dormant legacy Stripe invoice view. Do not use for Yoco/EFT launch payments or refunds."
+        description="Dormant legacy Stripe invoice view. Do not use for PayFast/EFT launch payments or refunds."
       />
       <input
         className="gls-admin-input mt-8 max-w-md"

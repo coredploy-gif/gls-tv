@@ -7,7 +7,11 @@ import {
   sportsFamily,
 } from "@/lib/sports-packs";
 import { healChannelSources, isArenaPayLinear } from "@/lib/channel-heal";
-import { isTraceChannel } from "@/lib/trace-mirrors";
+import {
+  isTraceChannel,
+  TRACE_URBAN_FALLBACK_NOTICE,
+  TRACE_URBAN_FALLBACK_TAG,
+} from "@/lib/trace-mirrors";
 import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
 
 function browserClient() {
@@ -27,12 +31,17 @@ function applyHeal(item: CatalogItem, sources: MediaSource[]): CatalogItem {
     cleared ||
     tags.includes("LinearPay") ||
     tags.includes("Rights");
+  const urbanFallback = tags.includes(TRACE_URBAN_FALLBACK_TAG);
   return {
     ...item,
+    // Keep regional Trace card titles; only explain the Urban sister swap.
+    title: item.title,
     sources: healed,
     description: linearPay
       ? `${item.title} is a linear pay-TV sports channel. GLS lists it for discovery and onboarding — use the official licensed provider in your territory (no open pirate HLS).`
-      : item.description,
+      : urbanFallback
+        ? TRACE_URBAN_FALLBACK_NOTICE
+        : item.description,
     categories: [
       ...new Set([
         ...item.categories.filter(

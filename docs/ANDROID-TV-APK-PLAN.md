@@ -6,6 +6,16 @@ Related web work already in place: TV detect, D-pad `RemoteNavigation`, TV-only 
 
 ---
 
+## Scaffold status
+
+The **`android-tv/`** Kotlin Leanback WebView project is in-repo.
+
+- Package: `site.glstv.tv`
+- Open `android-tv/` in Android Studio → sync → Run on TV emulator / stick
+- Full build / sideload steps: [`android-tv/README.md`](../android-tv/README.md)
+
+---
+
 ## Goals
 
 | Goal | Owner |
@@ -83,16 +93,18 @@ You **cannot** bundle the Next.js SSR app inside the APK. Runtime is always: **s
 
 ---
 
-## Scaffold checklist (when implementing `android-tv/`)
+## Scaffold checklist (`android-tv/`)
 
-- [ ] Package id (e.g. `site.glstv.tv`)
-- [ ] `LEANBACK_LAUNCHER` activity + banner
-- [ ] WebView → production origin; cleartext blocked (HTTPS only)
-- [ ] Hardware Back → `WebView.goBack()` or finish activity
-- [ ] Optional: force `?tv=1` on first load
-- [ ] Release signing + `assembleRelease`
+Living todo list: **[ANDROID-TV-TODO.md](./ANDROID-TV-TODO.md)**
+
+- [x] Package id `site.glstv.tv`
+- [x] `LEANBACK_LAUNCHER` activity + banner
+- [x] WebView → production origin; cleartext blocked (HTTPS only)
+- [x] Hardware Back → `WebView.goBack()` or finish activity
+- [x] Force `?tv=1` on load + UA suffix
+- [ ] Release signing + `assembleRelease` (needs Android Studio on build PC)
 - [ ] Sideload test on at least one Chromium Android TV stick
-- [ ] Document install steps for members (USB / ADB / link)
+- [x] Document install steps (`android-tv/README.md`)
 
 ---
 
@@ -109,4 +121,6 @@ You **cannot** bundle the Next.js SSR app inside the APK. Runtime is always: **s
 
 ## Next concrete step
 
-When ready to build: create `android-tv/` Kotlin TV project, load production URL, produce a signed sideload APK. Defer Play Store until sideload UX feels right.
+1. Open **`android-tv/`** in [Android Studio](https://developer.android.com/studio) and Run on a TV emulator/stick.  
+2. See **[ANDROID-TV-TODO.md](./ANDROID-TV-TODO.md)** for the full checklist.  
+Defer Play Store until sideload UX feels right.

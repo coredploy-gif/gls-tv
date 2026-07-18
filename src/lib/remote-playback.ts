@@ -4,7 +4,11 @@
  *
  * Important: hls.js / MSE attaches a blob: MediaSource URL. Chromium’s
  * Remote Playback API cannot hand that to Chromecast — prompt() often
- * resolves with no useful UI or fails quietly. Detect MSE and explain.
+ * AbortError / NotSupportedError. Detect MSE early and offer a fetchable
+ * playlist URL (copy-link) instead of a scary “canceled” message.
+ *
+ * Radio (progressive mp4/audio) uses a real https src → Cast picker works.
+ * Live TV (hls.js) needs the playlist/proxy URL passed separately as castUrl.
  */
 
 export type CastCapability =
@@ -26,6 +30,16 @@ type VideoWithWebkit = HTMLVideoElement & {
 
 type VideoWithRemote = HTMLVideoElement & { remote?: RemotePlayback };
 
+export type PromptCastOptions = {
+  /**
+   * Fetchable playlist / progressive URL (never a blob:). When MSE is
+   * active, we skip Remote Playback prompt and surface this for copy-link.
+   */
+  castUrl?: string | null;
+  /** Current source format — helps classify MSE live HLS vs native. */
+  format?: string;
+};
+
 function remoteOf(video: HTMLVideoElement): RemotePlayback | undefined {
   return (video as VideoWithRemote).remote;
 }
@@ -33,10 +47,24 @@ function remoteOf(video: HTMLVideoElement): RemotePlayback | undefined {
 /** True when playback is driven by MediaSource / hls.js (blob: currentSrc). */
 export function isMediaSourcePlayback(video: HTMLVideoElement | null): boolean {
   if (!video) return false;
+  if (video.srcObject) return true;
   const src = video.currentSrc || video.src || "";
   if (src.startsWith("blob:")) return true;
-  if (video.srcObject) return true;
+  if (src.startsWith("mediasource:") || src.startsWith("mse:")) return true;
   return false;
+}
+
+/**
+ * True when the element has no http(s)/same-origin src that Remotes can fetch.
+ * Empty src while hls.js is attaching counts as non-castable.
+ */
+export function videoHasCastableSrc(video: HTMLVideoElement | null): boolean {
+  if (!video) return false;
+  if (isMediaSourcePlayback(video)) return false;
+  const src = video.currentSrc || video.src || "";
+  if (!src) return false;
+  if (src.startsWith("blob:") || src.startsWith("mediasource:")) return false;
+  return /^https?:\/\//i.test(src) || src.startsWith("/");
 }
 
 export function isSafariLike(): boolean {
@@ -77,16 +105,80 @@ export function castLikelyWorks(
   if (isMediaSourcePlayback(video) && !canPlayNativeHls(video)) {
     return false;
   }
+  if (!videoHasCastableSrc(video) && !canPlayNativeHls(video)) {
+    return false;
+  }
   return castCapability(video) !== "unavailable";
+}
+
+/**
+ * Show the Cast control when Remote Playback may work, or when we have a
+ * fetchable castUrl fallback (matches radio discoverability for live HLS).
+ */
+export function shouldShowCastControl(
+  format: string | undefined,
+  castUrl?: string | null,
+): boolean {
+  if (streamSupportsCast(format)) return true;
+  return Boolean(absoluteStreamUrl(castUrl ?? null));
+}
+
+/**
+ * Prefer a fetchable playlist/progressive URL for Cast / copy-link.
+ * Never returns blob:. Prefers public upstream HTTPS (Chromecast/VLC) over
+ * a session-cookie `/api/hls` proxy URL when both exist.
+ */
+export function resolveCastUrl(
+  playUrl: string | null | undefined,
+  upstreamUrl?: string | null,
+): string | null {
+  const fromUpstream = absoluteStreamUrl(upstreamUrl ?? null);
+  const fromPlay = absoluteStreamUrl(playUrl ?? null);
+
+  const isPublicHttp = (u: string | null) =>
+    Boolean(u && /^https?:\/\//i.test(u) && !u.includes("/api/hls"));
+
+  if (isPublicHttp(fromUpstream)) return fromUpstream;
+  if (isPublicHttp(fromPlay)) return fromPlay;
+  if (fromPlay && !fromPlay.startsWith("blob:")) return fromPlay;
+  if (fromUpstream && !fromUpstream.startsWith("blob:")) return fromUpstream;
+  return null;
+}
+
+/**
+ * MSE live HLS (or empty src mid-attach) cannot be handed to Chromecast.
+ * Native HLS / progressive http(s) can.
+ */
+export function isMseCastBlocked(
+  video: HTMLVideoElement | null,
+  format?: string,
+): boolean {
+  if (!video) return false;
+  if (canPlayNativeHls(video) && isSafariLike() && !isMediaSourcePlayback(video)) {
+    return false;
+  }
+  if (isMediaSourcePlayback(video) && !canPlayNativeHls(video)) return true;
+  // hls.js path before blob attaches, or after emptied — still not castable
+  // via Remote Playback on Chromium.
+  if (
+    (format === "hls" || format === "dash") &&
+    !videoHasCastableSrc(video) &&
+    !canPlayNativeHls(video)
+  ) {
+    return true;
+  }
+  return false;
 }
 
 export async function promptCastOrAirPlay(
   video: HTMLVideoElement | null,
+  opts?: PromptCastOptions,
 ): Promise<CastPromptResult> {
   if (!video) return "unavailable";
 
-  // MSE blob sources cannot be sent to Chromecast / most remotes.
-  if (isMediaSourcePlayback(video) && !canPlayNativeHls(video)) {
+  // MSE blob / hls.js sources cannot be sent to Chromecast / most remotes.
+  // Skip prompt() entirely — it often AbortError → looked like “canceled”.
+  if (isMseCastBlocked(video, opts?.format)) {
     return "mse-blocked";
   }
 
@@ -107,7 +199,10 @@ export async function promptCastOrAirPlay(
         name === "InvalidStateError" ||
         name === "NotFoundError"
       ) {
-        return isMediaSourcePlayback(video) ? "mse-blocked" : "unavailable";
+        return isMseCastBlocked(video, opts?.format) ||
+          isMediaSourcePlayback(video)
+          ? "mse-blocked"
+          : "unavailable";
       }
       return "error";
     }
@@ -122,6 +217,11 @@ export async function promptCastOrAirPlay(
     }
   }
 
+  // No picker API — still useful if we have a copyable stream URL.
+  if (absoluteStreamUrl(opts?.castUrl ?? null)) {
+    return streamSupportsCast(opts?.format) ? "mse-blocked" : "unavailable";
+  }
+
   return "unavailable";
 }
 
@@ -132,9 +232,14 @@ export function streamSupportsCast(format: string | undefined): boolean {
 
 export function absoluteStreamUrl(url: string | undefined | null): string | null {
   if (!url) return null;
+  if (url.startsWith("blob:") || url.startsWith("mediasource:")) return null;
   try {
     if (/^https?:\/\//i.test(url)) return url;
-    if (typeof window === "undefined") return null;
+    if (typeof window === "undefined") {
+      // Relative paths need a document base; keep as-is for SSR callers
+      // that only need a non-blob placeholder (PlayerChrome is client-only).
+      return url.startsWith("/") ? url : null;
+    }
     return new URL(url, window.location.href).href;
   } catch {
     return null;
@@ -148,8 +253,8 @@ export type CastFeedback = {
 };
 
 /**
- * User-facing copy after a Cast click. Always returns a message unless the
- * OS picker opened successfully (caller may still show a brief “Opening…”).
+ * User-facing copy after a Cast click. Returns null when the user dismissed
+ * the picker (no scary “canceled”). Otherwise always explains next steps.
  */
 export function castFeedbackForResult(
   result: CastPromptResult,
@@ -165,27 +270,29 @@ export function castFeedbackForResult(
     };
   }
 
+  // User closed the picker — stay quiet (radio-like: no error toast).
   if (result === "cancelled") {
-    return { message: "Cast cancelled." };
+    return null;
   }
 
   if (result === "mse-blocked") {
     if (isSafariLike()) {
       return {
         message:
-          "This stream is playing via a browser buffer that AirPlay can’t use. On iPhone/iPad, try Control Center → AirPlay, or open this page in Safari.",
+          "This live stream is playing in the browser buffer, so AirPlay can’t take it directly. Try Control Center → AirPlay, open this page in Safari, or copy the stream link below.",
         copyUrl,
       };
     }
     return {
-      message:
-        "Chromecast can’t receive this live HLS stream from the player (buffered in-browser). Use Chrome’s menu → Cast… to cast the tab, open GLS TV on your TV browser, or copy the stream link below.",
+      message: copyUrl
+        ? "Chromecast can’t take this live HLS stream from the in-browser player. Copy the stream link for VLC/TV apps, use Chrome’s menu → Cast… (cast the tab), or open GLS TV on your TV’s browser."
+        : "Chromecast can’t take this live HLS stream from the in-browser player. Use Chrome’s menu → Cast… to cast the tab, or open GLS TV on your TV’s browser.",
       copyUrl,
     };
   }
 
   if (result === "unavailable") {
-    if (!streamSupportsCast(opts?.format)) {
+    if (!streamSupportsCast(opts?.format) && !copyUrl) {
       return {
         message:
           "Cast isn’t available for this embed (e.g. YouTube). Open the channel on a TV browser instead.",
@@ -194,13 +301,14 @@ export function castFeedbackForResult(
     if (isSafariLike()) {
       return {
         message:
-          "AirPlay isn’t available here. Use the video’s AirPlay control or Control Center, or open this page on your Apple TV.",
+          "No AirPlay device found. Use the video’s AirPlay control or Control Center, or open this page on your Apple TV.",
         copyUrl,
       };
     }
     return {
-      message:
-        "Cast isn’t available in this browser. On Android/desktop Chrome use the browser Cast menu, or open GLS TV on your TV’s browser.",
+      message: copyUrl
+        ? "No Cast device found here. Use Chrome’s Cast menu, open GLS TV on your TV’s browser, or copy the stream link below."
+        : "No Cast device found here. On Android/desktop Chrome use the browser Cast menu, or open GLS TV on your TV’s browser.",
       copyUrl,
     };
   }

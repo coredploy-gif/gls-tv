@@ -21,12 +21,12 @@ function verifySignature(rawBody: string, signature: string | null) {
 }
 
 /**
- * Yoco payment-link webhook (event-driven activation).
+ * Legacy payment-link webhook (event-driven activation).
  * Falls back to cron sync_yoco when webhook secret is unset (non-prod).
  */
 export async function POST(req: NextRequest) {
   if (!yocoConfigured()) {
-    return NextResponse.json({ error: "Yoco not configured" }, { status: 503 });
+    return NextResponse.json({ error: "Legacy payment-link API not configured" }, { status: 503 });
   }
 
   const rawBody = await req.text();
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     adminEmail: "yoco-webhook",
     externalTransactionId: `yoco-webhook:${linkId || payment.id}`,
     paymentMethod: "yoco",
-    adminNote: "Activated from Yoco webhook",
+    adminNote: "Activated from legacy payment-link webhook",
     paidAt: typeof data.updated_at === "string" ? data.updated_at : null,
   });
 

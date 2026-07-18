@@ -81,9 +81,17 @@ function applyOverride(item: CatalogItem): CatalogItem {
     });
   }
 
+  // Keep regional Trace card titles — do not silently rename to Trace Urban.
+  const overrideTitle = o.title?.trim();
+  const keepTitle =
+    !overrideTitle ||
+    (/^trace[\s_-]*urban$/i.test(overrideTitle) &&
+      item.title.trim() &&
+      !/^trace[\s_-]*urban$/i.test(item.title.trim()));
+
   return {
     ...item,
-    title: o.title || item.title,
+    title: keepTitle ? item.title : overrideTitle || item.title,
     description: o.note || item.description,
     categories: [
       ...new Set([...(o.categories || item.categories), "Healed", "Playable"]),

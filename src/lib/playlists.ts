@@ -1,5 +1,9 @@
 import type { CatalogItem, MediaSource } from "@/data/types";
 import { healPrivatePlaylistSources } from "@/lib/channel-heal";
+import {
+  TRACE_URBAN_FALLBACK_NOTICE,
+  TRACE_URBAN_FALLBACK_TAG,
+} from "@/lib/trace-mirrors";
 
 export type UserPlaylistRow = {
   id: string;
@@ -78,13 +82,16 @@ export function channelRowToCatalog(
     row.title,
     baseSources,
   );
+  const urbanFallback = healTags.includes(TRACE_URBAN_FALLBACK_TAG);
 
   return {
     id: `user-${row.id}`,
     slug: row.slug,
     title: row.title,
     type: "live",
-    description: row.description || "Imported from your playlist",
+    description: urbanFallback
+      ? TRACE_URBAN_FALLBACK_NOTICE
+      : row.description || "Imported from your playlist",
     countries: row.countries?.length ? row.countries : ["world"],
     categories: [
       ...new Set([

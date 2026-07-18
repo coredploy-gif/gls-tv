@@ -397,7 +397,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "paymentId required" }, { status: 400 });
     if ((method === "eft" || method === "yoco" || method === "payfast") && !transactionId) {
       return NextResponse.json(
-        { error: "Bank/Yoco/PayFast transaction ID required before approval" },
+        { error: "Bank/PayFast transaction ID required before approval" },
         { status: 400 },
       );
     }
@@ -438,7 +438,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
     if (!payment?.yoco_link_id) {
       return NextResponse.json(
-        { error: "This request has no Yoco payment link" },
+        { error: "This request has no legacy payment-link ID" },
         { status: 400 },
       );
     }
@@ -452,7 +452,7 @@ export async function POST(req: NextRequest) {
       );
       if (!link) {
         return NextResponse.json(
-          { error: "Yoco link was not found in the latest 100 payments" },
+          { error: "Legacy payment link was not found in the latest 100 payments" },
           { status: 404 },
         );
       }
@@ -477,7 +477,7 @@ export async function POST(req: NextRequest) {
         adminEmail: admin.email || "admin",
         externalTransactionId: `yoco:${link.id}`,
         paymentMethod: "yoco",
-        adminNote: "Confirmed from Yoco payment-link status",
+        adminNote: "Confirmed from legacy payment-link status",
         paidAt: link.updated_at || null,
       });
       if (!result.ok)
@@ -488,7 +488,7 @@ export async function POST(req: NextRequest) {
         action: "yoco_payment_sync",
         entityType: "payment",
         entityId: paymentId,
-        summary: `Yoco confirmed ${payment.payment_reference}`,
+        summary: `Legacy link confirmed ${payment.payment_reference}`,
         meta: { yocoLinkId: link.id },
       });
       return NextResponse.json({ ...result, yocoStatus: link.status });
@@ -496,7 +496,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            error instanceof Error ? error.message : "Could not query Yoco",
+            error instanceof Error ? error.message : "Could not query legacy payment-link API",
         },
         { status: 502 },
       );
@@ -656,7 +656,7 @@ export async function POST(req: NextRequest) {
       !transactionId
     ) {
       return NextResponse.json(
-        { error: "Bank/Yoco transaction ID required" },
+        { error: "Bank/PayFast transaction ID required" },
         { status: 400 },
       );
     }
@@ -673,7 +673,7 @@ export async function POST(req: NextRequest) {
         external_transaction_id: transactionId,
         proof_reference: transactionId,
         submitted_at: new Date().toISOString(),
-        member_note: "Recorded from bank/Yoco reconciliation",
+        member_note: "Recorded from bank/PayFast reconciliation",
         admin_note:
           body.adminNote != null ? String(body.adminNote).slice(0, 1000) : null,
       })
@@ -712,12 +712,12 @@ export async function POST(req: NextRequest) {
     if (
       body.confirmExternalRefund !== true ||
       !refundReference ||
-      !["yoco", "eft"].includes(refundMethod)
+      !["payfast", "yoco", "eft"].includes(refundMethod)
     ) {
       return NextResponse.json(
         {
           error:
-            "Confirm the external Yoco/EFT refund and provide its reference before recording it.",
+            "Confirm the external PayFast/EFT refund and provide its reference before recording it.",
         },
         { status: 400 },
       );

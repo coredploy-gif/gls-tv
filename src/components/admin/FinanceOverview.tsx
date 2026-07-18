@@ -63,7 +63,7 @@ export function FinanceOverview() {
   }
   const s = data.summary;
   const cards = [
-    ["Revenue 30d", money(s.revenue30dZarCents), "Verified Yoco + EFT", "#5ee29a"],
+    ["Revenue 30d", money(s.revenue30dZarCents), "Verified PayFast + EFT", "#5ee29a"],
     ["Total revenue", money(s.totalRevenueZarCents), `${s.receiptCount} receipts`, "#ff6b9d"],
     ["Active members", String(s.activeMembers), `${s.uniquePayingMembers} paid`, "#7ec8ff"],
     ["Needs review", String(s.pending), "Payment queue", "#f5c542"],
@@ -74,10 +74,10 @@ export function FinanceOverview() {
     ["/admin/finance/payments", "Payment queue", `${s.pending} need workflow`],
     ["/admin/finance/membership", "User funnel", "Trials, subscribers & growth"],
     ["/admin/finance/members", "Member ledger", "GLS references & reactivation"],
-    ["/admin/finance/reconciliation", "Reconciliation", "GLS paid vs Yoco links"],
+    ["/admin/finance/reconciliation", "Reconciliation", "GLS paid vs PayFast / bank"],
     ["/admin/finance/reports", "Reports", "Revenue, plans, CSV export"],
     ["/admin/finance/receipts", "Receipts", "Print / PDF / refund trail"],
-    ["/admin/finance/settings", "Payment settings", "Yoco, EFT and receipt copy"],
+    ["/admin/finance/settings", "Payment settings", "PayFast, EFT and receipt copy"],
     ["/admin/finance/reminders", "Reminders", "Trial and renewal nudges"],
   ];
 
@@ -86,7 +86,7 @@ export function FinanceOverview() {
       <AdminPageHeader
         eyebrow="Revenue"
         title="Finance"
-        description="Launch billing in ZAR — Yoco/QR, verified EFT, member references, 30-day reactivation and receipts."
+        description="Launch billing in ZAR — PayFast debit, verified EFT, member references, 30-day reactivation and receipts."
         actions={
           <span className="gls-admin-pill bg-emerald-500/15 text-emerald-200">
             Manual billing live

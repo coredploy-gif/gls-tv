@@ -76,7 +76,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Owner role and verified MFA (AAL2) are required" }, { status: 403 });
     }
     const key = String(body.key || "");
-    if (!["payments", "playlist_imports", "hls_proxy", "catalog_publish", "signups"].includes(key)) {
+    if (
+      ![
+        "payments",
+        "playlist_imports",
+        "hls_proxy",
+        "catalog_publish",
+        "signups",
+        "oauth_google",
+        "oauth_apple",
+      ].includes(key)
+    ) {
       return NextResponse.json({ error: "Unknown feature" }, { status: 400 });
     }
     const enabled = body.enabled === true;

@@ -1,0 +1,14 @@
+# Android TV local / secrets — do not commit
+local.properties
+keystore.properties
+*.jks
+*.keystore
+.gradle/
+build/
+app/build/
+.idea/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/

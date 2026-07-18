@@ -1,12 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { AuthPanel } from "@/components/AuthPanel";
 import { AuthContactSection } from "@/components/AuthContactSection";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import { useIsTvLikeDevice } from "@/lib/useIsTvLikeDevice";
 
 export function AuthPageClient() {
   const tvLike = useIsTvLikeDevice();
+  const { user, loading } = useAuth();
+  const [authBusy, setAuthBusy] = useState(false);
+  const hideContact = tvLike || Boolean(user) || loading || authBusy;
 
   return (
     <>
@@ -18,8 +23,8 @@ export function AuthPageClient() {
           "Scan the QR code with your phone to sign in — then choose a profile and start watching."
         ) : (
           <>
-            After you sign in, choose a profile and start watching. Manage M3U
-            playlists anytime from{" "}
+            Use your email to sign in. Then choose a profile and start watching.
+            Manage M3U playlists anytime from{" "}
             <Link href="/playlists" className="text-white underline">
               My Playlists
             </Link>
@@ -28,9 +33,9 @@ export function AuthPageClient() {
         )}
       </p>
       <div className="mt-8">
-        <AuthPanel />
+        <AuthPanel onBusyChange={setAuthBusy} />
       </div>
-      {!tvLike && <AuthContactSection />}
+      {!hideContact && <AuthContactSection />}
     </>
   );
 }

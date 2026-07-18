@@ -345,7 +345,8 @@ export const CURATED_AFRICA: CatalogItem[] = [
     slug: "trace-urban-africa",
     title: "Trace Urban Africa",
     type: "live",
-    description: "Trace Urban · healed Amagi FAST mirrors (Trace+ CDN filtered on many networks).",
+    description:
+      "Switching to Trace Urban — regional feed unavailable (Trace+ Urban Africa CDN filtered).",
     countries: ["za", "world"],
     categories: [
       "Music",
@@ -355,6 +356,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
       "Popular",
       "Curated",
       "Healed",
+      "TraceUrbanFallback",
     ],
     languages: ["en", "fr"],
     poster:
@@ -372,7 +374,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
     title: "Trace Africa",
     type: "live",
     description:
-      "Trace Africa lineup · Amagi Urban + AfroBeats failover (Trace+ CDN blocked on many networks).",
+      "Switching to Trace Urban — regional feed unavailable (Trace+ Africa CDN blocked). AfroBeats failover retained.",
     countries: ["za", "world"],
     categories: [
       "Music",
@@ -382,6 +384,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
       "Popular",
       "Curated",
       "Healed",
+      "TraceUrbanFallback",
     ],
     languages: ["en", "fr"],
     poster:
@@ -449,7 +452,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
     title: "Trace Mziki",
     type: "live",
     description:
-      "Trace Mziki lineup · Amagi Urban + AfroBeats failover (Trace+ CDN blocked).",
+      "Switching to Trace Urban — regional feed unavailable (Trace+ CDN blocked). AfroBeats failover retained.",
     countries: ["ke", "tz", "ug", "world"],
     categories: [
       "Music",
@@ -459,6 +462,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
       "Popular",
       "Curated",
       "Healed",
+      "TraceUrbanFallback",
     ],
     languages: ["en", "sw"],
     poster:
@@ -500,7 +504,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
     title: "Trace Ayiti",
     type: "live",
     description:
-      "Trace Ayiti lineup · Brazuca + Urban Amagi failover (Trace+ CDN blocked).",
+      "Trace Ayiti lineup · Brazuca Amagi primary; Urban sister as last failover.",
     countries: ["world"],
     categories: [
       "Music",
@@ -525,7 +529,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
     title: "Trace Caribbean",
     type: "live",
     description:
-      "Trace Caribbean lineup · Brazuca + Urban Amagi failover (Trace+ CDN blocked).",
+      "Trace Caribbean lineup · Brazuca Amagi primary; Urban sister as last failover.",
     countries: ["world"],
     categories: [
       "Music",
@@ -552,7 +556,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
     title: "Trace Gospel",
     type: "live",
     description:
-      "Trace Gospel lineup · healed Amagi Urban failover (Trace+ Gospel CDN blocked).",
+      "Switching to Trace Urban — regional feed unavailable (Trace+ Gospel CDN blocked).",
     countries: ["world", "za"],
     categories: [
       "Religion",
@@ -564,6 +568,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
       "Popular",
       "Curated",
       "Healed",
+      "TraceUrbanFallback",
     ],
     languages: ["en"],
     poster:
@@ -581,7 +586,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
     title: "Trace Gospel Southern Africa",
     type: "live",
     description:
-      "Trace Gospel Southern Africa · healed Amagi Urban FAST (Trace+ GOSPEL_SA CDN blocked).",
+      "Switching to Trace Urban — regional feed unavailable (Trace+ GOSPEL_SA CDN blocked).",
     countries: ["za", "fr", "world"],
     categories: [
       "Religion",
@@ -593,6 +598,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
       "Popular",
       "Curated",
       "Healed",
+      "TraceUrbanFallback",
     ],
     languages: ["en", "fr"],
     poster:
@@ -610,7 +616,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
     title: "Trace Gospel Africa Franco",
     type: "live",
     description:
-      "Trace Gospel Africa Franco · healed Amagi Urban FAST (Trace+ GOSPEL_FR CDN blocked).",
+      "Switching to Trace Urban — regional feed unavailable (Trace+ GOSPEL_FR CDN blocked).",
     countries: ["fr", "za", "world"],
     categories: [
       "Religion",
@@ -621,6 +627,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
       "Verified",
       "Curated",
       "Healed",
+      "TraceUrbanFallback",
     ],
     languages: ["fr", "en"],
     poster:
@@ -638,7 +645,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
     title: "Trace Gospel Nigeria and East Africa",
     type: "live",
     description:
-      "Trace Gospel Nigeria & East Africa · healed Amagi Urban FAST (Trace+ GOSPEL_ROA CDN blocked).",
+      "Switching to Trace Urban — regional feed unavailable (Trace+ GOSPEL_ROA CDN blocked).",
     countries: ["ng", "fr", "za", "world"],
     categories: [
       "Religion",
@@ -649,6 +656,7 @@ export const CURATED_AFRICA: CatalogItem[] = [
       "Verified",
       "Curated",
       "Healed",
+      "TraceUrbanFallback",
     ],
     languages: ["en", "fr"],
     poster:

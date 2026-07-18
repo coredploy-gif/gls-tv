@@ -109,8 +109,15 @@ describe("owner-scoped playlist channels", () => {
     });
 
     expect(channel.sources[0]?.url).toContain("amagi.tv");
+    expect(channel.title).toBe("Trace Urban Southern Africa");
+    expect(channel.description).toMatch(/Switching to Trace Urban/i);
     expect(channel.categories).toEqual(
-      expect.arrayContaining(["Healed", "Playable", "My Playlist"]),
+      expect.arrayContaining([
+        "Healed",
+        "Playable",
+        "My Playlist",
+        "TraceUrbanFallback",
+      ]),
     );
   });
 

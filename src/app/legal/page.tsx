@@ -37,7 +37,9 @@ export default function LegalPage() {
           <p>
             The free trial lasts up to 14 days and is limited using account,
             device and network signals. Paid access is sold in 30-day periods.
-            There is no automatic debit: you choose whether to renew.
+            You can pay with a PayFast card debit order (on a day you choose)
+            or by verified EFT. You can cancel a debit order or stop renewing
+            at any time.
           </p>
 
           <h2 id="privacy" className="pt-4 text-xl font-semibold text-white">
@@ -45,11 +47,11 @@ export default function LegalPage() {
           </h2>
           <p>
             We process account email and authentication data through Supabase;
-            hosting, request logs and deployment data through Vercel; Yoco
-            payment-link identifiers and statuses; EFT references and proof
-            notes; viewer names and avatars; support messages; receipts; and
-            hashed device/IP signals used for trial abuse prevention. Raw IP
-            addresses may appear temporarily in infrastructure security logs.
+            hosting, request logs and deployment data through Vercel; PayFast
+            payment identifiers and statuses; EFT references and proof notes;
+            viewer names and avatars; support messages; receipts; and hashed
+            device/IP signals used for trial abuse prevention. Raw IP addresses
+            may appear temporarily in infrastructure security logs.
           </p>
           <p>
             We use this information to provide and secure the service, verify
@@ -70,18 +72,20 @@ export default function LegalPage() {
             Payments, cancellation and refunds
           </h2>
           <p>
-            Plans cost R45, R55 or R65 for 30 days. Payment is made manually
-            using a Yoco payment link or EFT with the exact GLS reference.
-            Access starts only after verification. GLS TV does not automatically
-            debit cards or bank accounts.
+            Plans cost R45, R55 or R65 for 30 days. Payment is made through
+            PayFast (card / debit order) or EFT with the exact GLS reference.
+            Access starts only after verification. If you set up a PayFast
+            debit order, your card is charged on the debit day you chose until
+            you cancel.
           </p>
           <p>
-            You can stop using the service at any time by not renewing. To ask
-            for a refund, contact support with the payment reference and reason.
-            Eligibility is assessed under applicable law and the circumstances
-            of the request. Approved refunds are returned externally through
-            Yoco or EFT; a GLS TV status change alone does not move money. Timing
-            depends on the payment provider and bank.
+            You can stop using the service at any time by cancelling a debit
+            order or by not renewing via EFT. To ask for a refund, contact
+            support with the payment reference and reason. Eligibility is
+            assessed under applicable law and the circumstances of the request.
+            Approved refunds are returned externally through PayFast or EFT; a
+            GLS TV status change alone does not move money. Timing depends on
+            the payment provider and bank.
           </p>
 
           <h2 id="acceptable-use" className="pt-4 text-xl font-semibold text-white">

@@ -122,7 +122,7 @@ export async function GET(req: NextRequest) {
       items.push({
         id: `trial-${account.trial_ends_at}`,
         title: days <= 2 ? "Trial ending soon" : `${days} days left on trial`,
-        body: "Renew for 30 days with PayFast (card), Yoco, or verified EFT to keep watching.",
+        body: "Renew for 30 days with PayFast (card debit) or verified EFT to keep watching.",
         href: "/pricing",
         createdAt: now - 120_000,
         kind: "billing",

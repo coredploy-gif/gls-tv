@@ -66,7 +66,7 @@ export function ReconciliationBoard() {
       <AdminPageHeader
         eyebrow="Finance"
         title="Reconciliation"
-        description="Match GLS paid memberships against Yoco links and PayFast ITN IDs. EFT/manual rows stay separate."
+        description="Match GLS paid memberships against PayFast ITN IDs (primary). Optional legacy card-link API rows are labelled when configured. EFT/manual rows stay separate."
       />
       <div className="mt-4 flex flex-wrap gap-3">
         <button type="button" className="gls-cta rounded px-4 py-2 text-sm" onClick={() => void load()}>
@@ -85,9 +85,9 @@ export function ReconciliationBoard() {
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
           {[
             ["Paid (GLS)", s.paidCount],
-            ["Yoco matched", s.matched],
-            ["Missing in Yoco", s.missingInYoco],
-            ["Yoco unpaid", s.yocoUnpaid],
+            ["Legacy link matched", s.matched],
+            ["Missing in legacy API", s.missingInYoco],
+            ["Legacy link unpaid", s.yocoUnpaid],
             ["PayFast matched", s.payfastMatched ?? 0],
             ["PayFast no ID", s.payfastPendingId ?? 0],
             ["EFT / manual", s.eftOrManual],
@@ -100,11 +100,14 @@ export function ReconciliationBoard() {
         </div>
       )}
       {s?.yocoError && (
-        <p className="mt-3 text-sm text-red-300">Yoco list error: {s.yocoError}</p>
+        <p className="mt-3 text-sm text-red-300">
+          Legacy card-link API error: {s.yocoError}
+        </p>
       )}
       {!s?.yocoConfigured && (
         <p className="mt-3 text-sm text-amber-200">
-          YOCO_SECRET_KEY is not set — only GLS-side rows are shown.
+          Optional legacy YOCO_SECRET_KEY is not set — PayFast/EFT rows still
+          show; legacy link matching is skipped.
         </p>
       )}
       <ul className="mt-6 max-h-[32rem] space-y-2 overflow-y-auto">
@@ -130,7 +133,7 @@ export function ReconciliationBoard() {
               }`}
             >
               {row.match.replaceAll("_", " ")}
-              {row.yoco_status ? ` · yoco:${row.yoco_status}` : ""}
+              {row.yoco_status ? ` · legacy:${row.yoco_status}` : ""}
             </span>
           </li>
         ))}

@@ -16,11 +16,11 @@ import {
   isPlutoFamily,
   needsDeepBuffer,
 } from "@/lib/channel-heal";
-import { isBrokenTraceOrigin, isTraceChannel } from "@/lib/trace-mirrors";
+import { isBrokenTraceOrigin, isTraceChannel, hasTraceUrbanFallbackTag } from "@/lib/trace-mirrors";
 import { isLinearPayCategory } from "@/lib/linear-pay";
 import { useAppCopy } from "@/lib/useAppCopy";
 import { PlayerChrome } from "@/components/PlayerChrome";
-import { isSafariLike } from "@/lib/remote-playback";
+import { isSafariLike, resolveCastUrl } from "@/lib/remote-playback";
 
 type VideoPlayerProps = {
   item: CatalogItem;
@@ -1079,8 +1079,15 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
 
       {!error && (
         <>
+          {hasTraceUrbanFallbackTag(item.categories) && (
+            <div className="absolute inset-x-0 top-0 z-[16] bg-amber-500/90 px-4 py-2 text-center text-xs font-semibold tracking-wide text-black sm:text-sm">
+              {copy("player.trace_urban_fallback")}
+            </div>
+          )}
           <div
-            className={`gls-player-status absolute left-4 top-4 z-[15] flex flex-wrap items-center gap-2 transition-opacity duration-300 ${
+            className={`gls-player-status absolute left-4 z-[15] flex flex-wrap items-center gap-2 transition-opacity duration-300 ${
+              hasTraceUrbanFallbackTag(item.categories) ? "top-12" : "top-4"
+            } ${
               statusBusy ? "opacity-100" : "pointer-events-none opacity-0"
             }`}
           >
@@ -1109,7 +1116,9 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
             <button
               type="button"
               onClick={goLive}
-              className="absolute left-4 top-14 z-[15] rounded bg-gls-red px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className={`absolute left-4 z-[15] rounded bg-gls-red px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+                hasTraceUrbanFallbackTag(item.categories) ? "top-24" : "top-14"
+              }`}
             >
               Back to live
               {lagSec > 0 ? ` · ${lagSec}s` : ""}
@@ -1122,10 +1131,10 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
             format={source?.format}
             castUrl={
               source
-                ? // Prefer the upstream URL for TV/VLC; /api/hls is browser-session only.
-                  /^https?:\/\//i.test(source.url)
-                  ? source.url
-                  : playUrlFor(source, mode)
+                ? // Fetchable playlist/progressive URL only — never the MSE blob.
+                  // Prefers public upstream HTTPS (Chromecast/VLC); falls back to
+                  // the player’s play URL (direct or /api/hls proxy).
+                  resolveCastUrl(playUrlFor(source, mode), source.url)
                 : null
             }
           />

@@ -256,7 +256,7 @@ export async function POST(req: NextRequest) {
           user_id: s.user_id,
           kind: "past_due",
           title: "Payment needs attention",
-          body: "Your GLS TV membership has ended. Renew for 30 days with Yoco or verified EFT to restore access.",
+          body: "Your GLS TV membership has ended. Renew for 30 days with PayFast or verified EFT to restore access.",
           href: "/pricing",
           severity: "urgent",
           dedupe_key: `past-due-${new Date().toISOString().slice(0, 10)}`,

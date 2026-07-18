@@ -8,7 +8,7 @@ export function FinancePlans() {
       <AdminPageHeader
         eyebrow="Finance"
         title="Plans"
-        description="Simple 30-day ZAR memberships. No automatic debit: members renew by Yoco/QR or verified EFT."
+        description="Simple 30-day ZAR memberships. Members pay with PayFast debit or verified EFT."
         actions={
           <Link
             href="/admin/finance/settings"
@@ -39,7 +39,7 @@ export function FinancePlans() {
             <ul className="mt-4 space-y-1.5 text-sm text-gls-body">
               <li>{plan.adultProfiles} adult profiles</li>
               <li>Kids profile included</li>
-              <li>Yoco payment link + QR when configured</li>
+              <li>PayFast card debit when configured</li>
               <li>EFT with unique GLS payment reference</li>
               <li>Receipt after verification</li>
             </ul>
@@ -57,7 +57,7 @@ export function FinancePlans() {
         <ol className="mt-3 list-decimal space-y-2 pl-5 leading-relaxed">
           <li>Member chooses a plan and receives a permanent member reference.</li>
           <li>A unique payment reference is created for that renewal.</li>
-          <li>They pay with Yoco/QR or EFT and submit for verification.</li>
+          <li>They pay with PayFast or EFT and submit for verification when needed.</li>
           <li>Admin verifies the provider statement and activates 30 days.</li>
           <li>The system issues a numbered non-VAT payment receipt.</li>
         </ol>

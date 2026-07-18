@@ -130,7 +130,7 @@ const TITLES: Record<AdminView, { eyebrow: string; title: string; desc: string }
   payments: {
     eyebrow: "Finance desk",
     title: "Payment queue",
-    desc: "Match PayFast, Yoco or bank transactions, verify references, activate 30 days, and issue receipts.",
+    desc: "Match PayFast or bank transactions, verify references, activate 30 days, and issue receipts.",
   },
   members: {
     eyebrow: "Finance desk",
@@ -150,7 +150,7 @@ const TITLES: Record<AdminView, { eyebrow: string; title: string; desc: string }
   settings: {
     eyebrow: "Finance desk",
     title: "Payment settings",
-    desc: "Configure Yoco visibility, EFT details, trading name, support, and receipt copy.",
+    desc: "Configure PayFast, EFT details, trading name, support, and receipt copy.",
   },
   daybook: {
     eyebrow: "Finance desk",
@@ -466,18 +466,21 @@ export function ManualBillingAdmin({
           busy={busy}
           refund={(receipt) => {
             const refundMethod = prompt(
-              `Only continue after money was returned outside GLS TV. Enter refund method for ${receipt.receipt_number}: yoco or eft`,
+              `Only continue after money was returned outside GLS TV. Enter refund method for ${receipt.receipt_number}: payfast or eft`,
             );
-            if (!refundMethod || !["yoco", "eft"].includes(refundMethod.toLowerCase()))
+            if (
+              !refundMethod ||
+              !["payfast", "eft", "yoco"].includes(refundMethod.toLowerCase())
+            )
               return;
             const refundReference = prompt(
-              "Enter the completed Yoco/EFT refund transaction reference:",
+              "Enter the completed PayFast/EFT refund transaction reference:",
             );
             if (!refundReference) return;
             const note = prompt("Optional internal refund note:") || "";
             if (
               !confirm(
-                "Confirm that the money has already been returned through Yoco or EFT. GLS TV only records the completed external refund.",
+                "Confirm that the money has already been returned through PayFast or EFT. GLS TV only records the completed external refund.",
               )
             )
               return;
@@ -596,7 +599,7 @@ function PaymentsView({
       <div className="gls-admin-card mt-5 flex flex-wrap gap-2 rounded-xl p-3">
         <input
           className="gls-admin-input min-w-[220px] flex-1"
-          placeholder="Search GLS ref, email, bank/Yoco transaction…"
+          placeholder="Search GLS ref, email, bank/PayFast transaction…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
@@ -668,7 +671,7 @@ function PaymentsView({
             >
               <option value="eft">EFT</option>
               <option value="payfast">PayFast</option>
-              <option value="yoco">Yoco</option>
+              <option value="yoco">Legacy QR link</option>
               <option value="cash">Cash</option>
               <option value="other">Other</option>
             </select>
@@ -681,7 +684,7 @@ function PaymentsView({
               className="gls-admin-input mt-1"
               value={record.transactionId}
               onChange={(e) => record.setTransactionId(e.target.value)}
-              placeholder="Bank/PayFast/Yoco ID"
+              placeholder="Bank/PayFast ID"
             />
           </label>
           <button
@@ -837,7 +840,7 @@ function PaymentsView({
                     >
                       <option value="eft">EFT</option>
                       <option value="payfast">PayFast</option>
-                      <option value="yoco">Yoco</option>
+                      <option value="yoco">Legacy QR link</option>
                       <option value="cash">Cash</option>
                       <option value="other">Other</option>
                     </select>
@@ -879,7 +882,7 @@ function PaymentsView({
                     onClick={syncYoco}
                     className="w-full rounded-md border border-violet-500/35 bg-violet-500/10 px-5 py-2.5 text-sm font-semibold text-violet-100 disabled:opacity-40"
                   >
-                    Check Yoco status + auto-activate
+                    Check legacy link status + auto-activate
                   </button>
                 )}
                 <button
@@ -1758,11 +1761,13 @@ function SettingsView({
           </div>
           <label className="mt-2 flex items-center justify-between gap-3 rounded-lg border border-white/10 px-3 py-3">
             <span>
-              <span className="block text-sm font-semibold text-white">Yoco</span>
+              <span className="block text-sm font-semibold text-white">
+                Legacy QR links (optional)
+              </span>
               <span className="text-[11px] text-gls-muted">
                 {yocoConfigured
-                  ? "Secret key configured"
-                  : "Add YOCO_SECRET_KEY on server"}
+                  ? "Deprecated — keep off unless migrating old requests"
+                  : "Optional YOCO_SECRET_KEY; Prefer PayFast above"}
               </span>
             </span>
             <input

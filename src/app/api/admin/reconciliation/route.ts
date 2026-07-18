@@ -13,7 +13,7 @@ async function assertFinance() {
   return access;
 }
 
-/** Compare GLS paid receipts/requests against recent Yoco payment links. */
+/** Compare GLS paid receipts/requests against PayFast ITN and optional legacy payment links. */
 export async function GET() {
   const access = await assertFinance();
   if (!access) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -37,7 +37,7 @@ export async function GET() {
     try {
       yocoLinks = await listYocoPaymentLinks();
     } catch (cause) {
-      yocoError = cause instanceof Error ? cause.message : "Yoco list failed";
+      yocoError = cause instanceof Error ? cause.message : "Legacy payment-link list failed";
     }
   }
 

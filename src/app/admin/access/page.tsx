@@ -6,6 +6,25 @@ import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 type Assignment = { user_id: string; email: string | null; role: string; revoked_at: string | null };
 type Flag = { key: string; enabled: boolean; reason: string | null };
 
+const FLAG_LABELS: Record<string, { title: string; note?: string }> = {
+  payments: { title: "Payments" },
+  playlist_imports: { title: "Playlist imports" },
+  hls_proxy: { title: "HLS proxy" },
+  catalog_publish: { title: "Catalog publish" },
+  signups: {
+    title: "New signups",
+    note: "Turn off to freeze new email registrations.",
+  },
+  oauth_google: {
+    title: "Enable Google sign-in",
+    note: "Shows the Google button on /auth. Supabase Authentication → Providers → Google must also be configured, or users will see an error after clicking.",
+  },
+  oauth_apple: {
+    title: "Enable Apple sign-in (deferred)",
+    note: "Reserved for later. Apple is not shown in the auth UI while this is off (Apple Developer not ready).",
+  },
+};
+
 export default function AdminAccessPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [flags, setFlags] = useState<Flag[]>([]);
@@ -66,18 +85,37 @@ export default function AdminAccessPage() {
         <p className="mt-1 text-xs text-gls-muted">
           Disabling is fail-closed in protected server routes. Turn off{" "}
           <strong className="text-white/80">signups</strong> to freeze new
-          registrations; <strong className="text-white/80">payments</strong> for
-          billing; Yoco/EFT also toggle under Finance → Settings.
+          registrations; <strong className="text-white/80">oauth_google</strong>{" "}
+          defaults off (email-only until you enable Google). PayFast/EFT also
+          toggle under Finance → Settings.
         </p>
         <div className="mt-4 space-y-2">
-          {flags.map((flag) => (
-            <div key={flag.key} className="flex items-center justify-between rounded border border-white/10 p-3">
-              <div><p className="text-sm text-white">{flag.key}</p><p className="text-xs text-gls-muted">{flag.reason}</p></div>
-              <button className={`rounded px-3 py-1.5 text-xs ${flag.enabled ? "bg-emerald-600 text-white" : "bg-red-700 text-white"}`} onClick={() => void act({ action: "set_feature", key: flag.key, enabled: !flag.enabled, reason: `Changed from admin access review` })}>
-                {flag.enabled ? "Enabled" : "Disabled"}
-              </button>
-            </div>
-          ))}
+          {flags.map((flag) => {
+            const label = FLAG_LABELS[flag.key];
+            return (
+              <div key={flag.key} className="flex items-center justify-between gap-3 rounded border border-white/10 p-3">
+                <div>
+                  <p className="text-sm text-white">{label?.title || flag.key}</p>
+                  <p className="text-xs text-gls-muted">
+                    {label?.note || flag.reason || flag.key}
+                  </p>
+                </div>
+                <button
+                  className={`shrink-0 rounded px-3 py-1.5 text-xs ${flag.enabled ? "bg-emerald-600 text-white" : "bg-red-700 text-white"}`}
+                  onClick={() =>
+                    void act({
+                      action: "set_feature",
+                      key: flag.key,
+                      enabled: !flag.enabled,
+                      reason: `Changed from admin access review`,
+                    })
+                  }
+                >
+                  {flag.enabled ? "Enabled" : "Disabled"}
+                </button>
+              </div>
+            );
+          })}
         </div>
       </section>
     </div>

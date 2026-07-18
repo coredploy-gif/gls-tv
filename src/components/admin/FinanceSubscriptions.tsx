@@ -63,7 +63,7 @@ export function FinanceSubscriptions() {
       <AdminPageHeader
         eyebrow="Finance"
         title="Subscriptions"
-        description="Legacy subscription mirror. Stripe controls are dormant; launch memberships renew manually through Yoco/EFT."
+        description="Legacy subscription mirror. Stripe controls are dormant; launch memberships renew through PayFast or EFT."
       />
       <input
         className="gls-admin-input mt-8 max-w-md"
