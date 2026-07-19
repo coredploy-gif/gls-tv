@@ -4,11 +4,13 @@ import Link from "next/link";
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 type AdminUser = {
@@ -69,57 +71,91 @@ function UserConfigMenu({
     left: number;
     placeAbove: boolean;
   } | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const updatePlacement = useCallback(() => {
+    const rect = rootRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const menuWidth = 184;
+    const menuHeight = menuRef.current?.offsetHeight || 280;
+    const placeAbove =
+      rect.bottom + menuHeight > window.innerHeight &&
+      rect.top > menuHeight + 8;
+    const top = placeAbove ? rect.top - 4 : rect.bottom + 4;
+    const left = Math.min(
+      Math.max(8, rect.right - menuWidth),
+      window.innerWidth - menuWidth - 8,
+    );
+    setCoords({ top, left, placeAbove });
+  }, []);
+
+  useLayoutEffect(() => {
     if (!open) {
       setCoords(null);
       return;
     }
-
-    const updatePlacement = () => {
-      const rect = rootRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      const menuWidth = 184;
-      const menuHeight = menuRef.current?.offsetHeight || 280;
-      const placeAbove =
-        rect.bottom + menuHeight > window.innerHeight &&
-        rect.top > menuHeight + 8;
-      const top = placeAbove ? rect.top - 4 : rect.bottom + 4;
-      const left = Math.min(
-        Math.max(8, rect.right - menuWidth),
-        window.innerWidth - menuWidth - 8,
-      );
-      setCoords({ top, left, placeAbove });
-    };
-
     updatePlacement();
-    // Re-measure after paint once menu has height.
     const raf = requestAnimationFrame(updatePlacement);
+    return () => cancelAnimationFrame(raf);
+  }, [open, updatePlacement]);
 
-    const onDoc = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (
-        !rootRef.current?.contains(target) &&
-        !menuRef.current?.contains(target)
-      ) {
-        onOpenChange(false);
-      }
-    };
+  useEffect(() => {
+    if (!open) return;
+
+    // Defer outside-click so the opening click does not instantly close.
+    let removeOutside: (() => void) | undefined;
+    const armTimer = window.setTimeout(() => {
+      const onDoc = (e: MouseEvent) => {
+        const target = e.target as Node;
+        if (
+          !rootRef.current?.contains(target) &&
+          !menuRef.current?.contains(target)
+        ) {
+          onOpenChange(false);
+        }
+      };
+      document.addEventListener("mousedown", onDoc);
+      removeOutside = () => document.removeEventListener("mousedown", onDoc);
+    }, 0);
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onOpenChange(false);
     };
-    document.addEventListener("mousedown", onDoc);
     document.addEventListener("keydown", onKey);
     window.addEventListener("resize", updatePlacement);
     window.addEventListener("scroll", updatePlacement, true);
     return () => {
-      cancelAnimationFrame(raf);
-      document.removeEventListener("mousedown", onDoc);
+      window.clearTimeout(armTimer);
+      removeOutside?.();
       document.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", updatePlacement);
       window.removeEventListener("scroll", updatePlacement, true);
     };
-  }, [open, onOpenChange]);
+  }, [open, onOpenChange, updatePlacement]);
+
+  const menu =
+    open &&
+    coords &&
+    mounted &&
+    createPortal(
+      <div
+        ref={menuRef}
+        role="menu"
+        className="fixed z-[200] min-w-[11.5rem] rounded-lg border border-white/15 bg-[#12151c] py-1 shadow-xl shadow-black/50"
+        style={{
+          top: coords.top,
+          left: coords.left,
+          transform: coords.placeAbove ? "translateY(-100%)" : undefined,
+        }}
+      >
+        {children}
+      </div>,
+      document.body,
+    );
 
   return (
     <div ref={rootRef} className="relative inline-block">
@@ -128,40 +164,11 @@ function UserConfigMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         className="rounded-md border border-white/15 px-2.5 py-1 text-[11px] text-gls-body hover:text-white"
-        onClick={() => {
-          if (!open) {
-            const rect = rootRef.current?.getBoundingClientRect();
-            if (rect) {
-              const menuWidth = 184;
-              setCoords({
-                top: rect.bottom + 4,
-                left: Math.min(
-                  Math.max(8, rect.right - menuWidth),
-                  window.innerWidth - menuWidth - 8,
-                ),
-                placeAbove: false,
-              });
-            }
-          }
-          onOpenChange(!open);
-        }}
+        onClick={() => onOpenChange(!open)}
       >
         Config
       </button>
-      {open && coords && (
-        <div
-          ref={menuRef}
-          role="menu"
-          className="fixed z-[60] min-w-[11.5rem] rounded-lg border border-white/15 bg-[#12151c] py-1 shadow-xl shadow-black/50"
-          style={{
-            top: coords.top,
-            left: coords.left,
-            transform: coords.placeAbove ? "translateY(-100%)" : undefined,
-          }}
-        >
-          {children}
-        </div>
-      )}
+      {menu}
     </div>
   );
 }
@@ -190,7 +197,10 @@ function MenuItem({
           ? "text-red-200 hover:bg-gls-red/15"
           : "text-gls-body hover:bg-white/5 hover:text-white"
       }`}
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
     >
       {children}
     </button>
