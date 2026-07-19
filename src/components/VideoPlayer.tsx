@@ -93,6 +93,18 @@ function sortedSources(item: CatalogItem): MediaSource[] {
   return list.sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100));
 }
 
+function isSabcLinearSlug(slug: string) {
+  return /^sabc-?[123]$/i.test(slug);
+}
+
+function sabcLinearStartError() {
+  return "SABC didn’t start on this connection. Try again, or switch Wi‑Fi ↔ mobile data.";
+}
+
+function sabcLinearDeniedError() {
+  return "SABC’s CDN refused this connection (IP/network check). In South Africa this is often VPN, DNS filter, or mobile CGNAT — not GLS blocking you.";
+}
+
 /** Hard geo CDNs (SABC family) — browser IP unlocks; server proxy usually makes it worse. */
 function isHardGeo(item: CatalogItem) {
   return (
@@ -136,14 +148,19 @@ function isFoodChannel(item: CatalogItem) {
 }
 
 function liveKindFor(item: CatalogItem, sourceUrl?: string): LiveChannelKind {
+  const myLinks =
+    item.categories.includes("My Links") ||
+    item.categories.includes("Staff picks");
   return {
-    linear: isLinearSportsPack(item),
-    sports: isSportsHeavy(item),
-    trace: isTraceChannel(item.slug, item.title),
+    linear: !myLinks && isLinearSportsPack(item),
+    // Don't apply deep sports latency to My Links — short CDN windows go black.
+    sports: !myLinks && isSportsHeavy(item),
+    trace: !myLinks && isTraceChannel(item.slug, item.title),
     unstable: sourceUrl
       ? isUnstableCdn(sourceUrl) || requiresProxy(sourceUrl)
-      : false,
+      : myLinks,
     privatePlaylist: item.categories.includes("My Playlist"),
+    myLinks,
   };
 }
 
@@ -178,6 +195,16 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
   ) {
     // Cleartext / no-CORS My Links lead with relay — don't revive a poisoned
     // browser-direct memory that blacks out https pages.
+    clearStreamMemory(item.slug);
+  }
+
+  // Also drop memory that pinned a cleartext origin after a bad relay→direct
+  // cutover (black frames with videoWidth set but nothing on screen).
+  if (
+    first?.label === "secure-relay" &&
+    mem?.url &&
+    /^http:\/\//i.test(mem.url)
+  ) {
     clearStreamMemory(item.slug);
   }
 
@@ -294,7 +321,7 @@ function playUrlFor(source: MediaSource, mode: "direct" | "proxy") {
 
 /**
  * YouTube-style live player:
- * - play 30–60s+ behind live edge (deeper on TV) — never chase the tip
+ * - play near the live sync point (lighter lag) — never chase the tip
  * - never auto-snap to live (only Back to live / refresh)
  * - silent recover / proxy / mirror (no black-out panic)
  * - standby warmup of next mirror
@@ -412,6 +439,14 @@ export function VideoPlayer({
     standbyRef.current?.destroy();
     standbyRef.current = null;
     if (!next || next.format !== "hls") return;
+    // Don't warm cleartext / no-CORS origins in the background — they aren't
+    // a viable cutover from secure-relay and only race the live edge.
+    if (
+      next.label === "browser-direct" &&
+      (requiresProxy(next.url) || prefersProxy(next.url))
+    ) {
+      return;
+    }
 
     (async () => {
       try {
@@ -574,17 +609,21 @@ export function VideoPlayer({
           }
         }
 
-        // Stay 30–60s+ behind live; TV profile caps bitrate and deepens latency.
+        // Lighter live lag + strong ahead preload; TV still bitrate-caps.
+        // My Links stay near the tip (short CDN windows) with long frag timeouts.
         const kind = liveKindFor(item, url);
         const profile = resolveDeviceProfile(isTvLikeDevice());
         const tuning = buildLiveHlsTuning(profile, kind);
         const deepLive = Boolean(
           kind.linear || kind.sports || kind.unstable || kind.trace || kind.privatePlaylist,
         );
+        const slowFrags = deepLive || Boolean(kind.myLinks) || profile === "tv";
         const instance = new Hls({
           enableWorker: true,
           lowLatencyMode: false,
           startFragPrefetch: true,
+          // Prefetch the next live segment while the current one plays.
+          maxBufferHole: tuning.maxBufferHole,
           renderTextTracksNatively: true,
           testBandwidth: tuning.testBandwidth,
           startLevel: tuning.preferStartLevel,
@@ -598,15 +637,18 @@ export function VideoPlayer({
           maxBufferLength: tuning.maxBufferLength,
           maxMaxBufferLength: tuning.maxMaxBufferLength,
           maxBufferSize: tuning.maxBufferSize,
-          maxBufferHole: tuning.maxBufferHole,
           backBufferLength: tuning.backBufferLength,
-          highBufferWatchdogPeriod: profile === "tv" ? 3 : 2,
+          highBufferWatchdogPeriod: profile === "tv" ? 3 : 1.5,
           nudgeMaxRetry: 24,
+          // Keep the loader busy — strong preload for live.
+          maxLoadingDelay: kind.myLinks ? 2 : 4,
+          maxStarvationDelay: kind.myLinks ? 2 : 4,
           capLevelToPlayerSize: tuning.capLevelToPlayerSize,
           capLevelOnFPSDrop: tuning.capLevelOnFPSDrop,
-          manifestLoadingTimeOut: deepLive || profile === "tv" ? 45000 : 18000,
-          levelLoadingTimeOut: deepLive || profile === "tv" ? 45000 : 18000,
-          fragLoadingTimeOut: deepLive || profile === "tv" ? 60000 : 22000,
+          manifestLoadingTimeOut: slowFrags ? 45000 : 18000,
+          levelLoadingTimeOut: slowFrags ? 45000 : 18000,
+          // 22s aborts ~4MB TSN segments mid-proxy (~60s at ~70KB/s).
+          fragLoadingTimeOut: kind.myLinks ? 120000 : slowFrags ? 60000 : 22000,
           xhrSetup: (xhr) => {
             // Imported playlists run through our same-origin relay. It needs
             // the signed-in viewer session cookie; direct public HLS sources
@@ -621,7 +663,7 @@ export function VideoPlayer({
 
         const jumpToLive = () => {
           // Explicit Back to live only — seeks to intentional sync point
-          // (already ~30–60s behind edge), never the tip of the playlist.
+          // (already a few segments behind edge), never the tip of the playlist.
           const live = instance.liveSyncPosition;
           if (live != null && Number.isFinite(live)) {
             try {
@@ -699,8 +741,20 @@ export function VideoPlayer({
           if (cancelled) return false;
           if (sourceIndex + 1 >= sources.length) return false;
           if (mirrorsAdvanced >= sources.length - 1) return false;
-          mirrorsAdvanced += 1;
           const nextSrc = sources[sourceIndex + 1];
+          // Cleartext / no-CORS staff picks lead with secure-relay for a reason.
+          // Falling through to browser-direct blacks the player (mixed content /
+          // aborting cross-origin TS) after the relay was already progressing.
+          if (
+            (source.label === "secure-relay" ||
+              source.url.startsWith("/api/hls")) &&
+            nextSrc?.label === "browser-direct" &&
+            nextSrc.url &&
+            (requiresProxy(nextSrc.url) || prefersProxy(nextSrc.url))
+          ) {
+            return false;
+          }
+          mirrorsAdvanced += 1;
           setStatus("Trying another source…");
           setMode(
             nextSrc && prefersProxy(nextSrc.url) && !hardGeo
@@ -730,14 +784,18 @@ export function VideoPlayer({
             if (!failOverPath()) {
               setError(
                 hardGeo
-                  ? /^sabc-?[123]$/i.test(item.slug)
-                    ? "SABC 1–3 are only available in supported regions. This is not SABC News."
+                  ? isSabcLinearSlug(item.slug)
+                    ? sabcLinearStartError()
                     : "This channel is unavailable in this region. Try SABC News or LN24."
                   : "This programme isn’t available right now. Please try another channel.",
               );
             }
           },
-          hardGeo ? 6000 : 10000,
+          hardGeo
+            ? isSabcLinearSlug(item.slug)
+              ? 12000
+              : 6000
+            : 10000,
         );
 
         instance.on(Hls.Events.MANIFEST_PARSED, (_e, data) => {
@@ -763,15 +821,10 @@ export function VideoPlayer({
             .play()
             .then(() => {
               saveGood();
+              // Strong preload ASAP — don't wait seconds before deepening.
               deepenTimer = setTimeout(
                 () => deepenBuffer(instance, url),
-                kind.linear ||
-                  kind.sports ||
-                  kind.trace ||
-                  kind.privatePlaylist ||
-                  profile === "tv"
-                  ? 500
-                  : 2500,
+                item.isLive ? 200 : 1500,
               );
             })
             .catch(() => setStatus("Tap play to start"));
@@ -780,7 +833,7 @@ export function VideoPlayer({
         instance.on(Hls.Events.FRAG_BUFFERED, () => {
           const ahead = bufferedAhead(el);
           setAheadSec(Math.round(ahead));
-          if (ahead >= 6) {
+          if (ahead >= 3) {
             saveGood();
             deepenBuffer(instance, url);
           }
@@ -813,7 +866,11 @@ export function VideoPlayer({
             return;
           }
           if (responseCode === 403) {
-            setError("This channel is not available to play right now.");
+            setError(
+              isSabcLinearSlug(item.slug)
+                ? sabcLinearDeniedError()
+                : "This channel is not available to play right now.",
+            );
             return;
           }
 
@@ -875,7 +932,11 @@ export function VideoPlayer({
           // Soft status only — don't panic-overlay while buffer refills
           setStatus("Buffering…");
           clearWaiting();
-          const sports = isSportsHeavy(item) || isLinearSportsPack(item);
+          // Staff-pick IP feeds need long frag loads — don't treat as sports
+          // just because the title says TSN / Sports.
+          const sports =
+            !kind.myLinks &&
+            (isSportsHeavy(item) || isLinearSportsPack(item));
           waitingTimer = setTimeout(() => {
             if (cancelled || el.readyState >= 3) return;
             if (!gotManifest && failOverPath()) return;
@@ -887,7 +948,7 @@ export function VideoPlayer({
             }
             // Always soft-refill — never auto snap to live on waiting timeout.
             softRefill("waiting_timeout");
-          }, sports || profile === "tv" ? 10000 : 6000);
+          }, kind.myLinks ? 45000 : sports || profile === "tv" ? 10000 : 6000);
         };
 
         const onPlaying = () => {
@@ -910,7 +971,7 @@ export function VideoPlayer({
           setAheadSec(Math.round(bufferedAhead(el)));
           if (!item.isLive) return;
           // Distance to the true live edge (not liveSyncPosition).
-          // Intentional 30–60s behind still shows Back to live.
+          // Intentional sync lag still shows Back to live past the UI threshold.
           let lag = 0;
           try {
             const latency = (instance as HlsType & { latency?: number }).latency;
@@ -986,8 +1047,8 @@ export function VideoPlayer({
         }
         setError(
           hardGeo
-            ? /^sabc-?[123]$/i.test(item.slug)
-              ? "SABC 1–3 are only available in supported regions. This is not SABC News."
+            ? isSabcLinearSlug(item.slug)
+              ? sabcLinearStartError()
               : "This channel isn’t available in your region. Try SABC News or LN24."
             : "We can’t start this programme right now. Please try another channel.",
         );
@@ -1083,9 +1144,12 @@ export function VideoPlayer({
       {error && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/85 p-6 text-center">
           <p className="text-lg font-semibold text-white">{error}</p>
-          {(isHardGeo(item) || /geo|region|south africa/i.test(error)) && (
+          {(
+            /geo|region|cdn refused|ip\/network|south africa/i.test(error) ||
+            (isHardGeo(item) && !isSabcLinearSlug(item.slug))
+          ) && (
             <p className="max-w-md text-sm text-white/70">
-              {/^sabc-?[123]$/i.test(item.slug)
+              {isSabcLinearSlug(item.slug)
                 ? copy("player.geo_restricted_sabc")
                 : copy("player.geo_restricted")}
             </p>
@@ -1099,7 +1163,7 @@ export function VideoPlayer({
                 Choose profile
               </Link>
             )}
-            {isHardGeo(item) && !/^sabc-?[123]$/i.test(item.slug) && (
+            {isHardGeo(item) && !isSabcLinearSlug(item.slug) && (
               <>
                 <Link
                   href="/watch/sabc-news"
@@ -1115,7 +1179,7 @@ export function VideoPlayer({
                 </Link>
               </>
             )}
-            {isHardGeo(item) && /^sabc-?[123]$/i.test(item.slug) && (
+            {isSabcLinearSlug(item.slug) && (
               <p className="max-w-md text-xs text-white/55">
                 Still want news? Open{" "}
                 <Link href="/watch/sabc-news" className="text-white underline">

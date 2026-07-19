@@ -21,7 +21,7 @@ export const COPY_FALLBACKS = {
   "player.geo_restricted":
     "This channel may be subject to regional or rights restrictions. Try another title available in your region.",
   "player.geo_restricted_sabc":
-    "SABC 1–3 use a South Africa–sensitive broadcaster feed. GLS will not bypass regional locks or swap in SABC News.",
+    "GLS does not block South Africa. SABC 1–3 come from SABC’s mangomolo CDN, which checks the viewer’s public IP. If you’re in SA and it still fails, try the other network (Wi‑Fi ↔ mobile data), turn off any VPN/DNS filter, then reload. We will not swap in SABC News.",
   "player.trace_urban_fallback":
     "Switching to Trace Urban — regional feed unavailable",
   "player.sister_fallback":

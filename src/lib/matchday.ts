@@ -346,10 +346,16 @@ async function fetchEspn(
   timeZone: string,
   tip: ReturnType<typeof pickWatchTip>,
 ): Promise<MatchItem[]> {
-  const url = `https://site.api.espn.com/apis/site/v2/sports/${path}`;
+  // Golf/tennis scoreboards often exceed Next's 2MB Data Cache entry limit
+  // (~3.5MB for PGA), which logs hard failures and can trip RSC overlays.
+  const skipDataCache = /^(golf|tennis)\//i.test(path);
+  const dates = day.replace(/-/g, "");
+  const url = `https://site.api.espn.com/apis/site/v2/sports/${path}?dates=${encodeURIComponent(dates)}`;
   try {
     const res = await fetch(url, {
-      next: { revalidate: 180 },
+      ...(skipDataCache
+        ? { cache: "no-store" as RequestCache }
+        : { next: { revalidate: 180 } }),
       headers: { "User-Agent": "GLS-TV/1.0 (matchday)" },
     });
     if (!res.ok) return [];

@@ -87,7 +87,30 @@ function withinQuota(key: string) {
 
 function sameOriginCors(req: NextRequest) {
   const origin = req.headers.get("origin");
-  return !origin || origin === req.nextUrl.origin ? req.nextUrl.origin : null;
+  if (!origin) return req.nextUrl.origin;
+  try {
+    const reqOrigin = new URL(origin);
+    const self = new URL(req.nextUrl.origin);
+    const norm = (host: string) =>
+      host === "127.0.0.1" || host === "::1" ? "localhost" : host;
+    if (
+      reqOrigin.protocol === self.protocol &&
+      norm(reqOrigin.hostname) === norm(self.hostname) &&
+      (reqOrigin.port || defaultPort(reqOrigin.protocol)) ===
+        (self.port || defaultPort(self.protocol))
+    ) {
+      // Echo the browser Origin so 127.0.0.1 pages are not rejected when
+      // Next normalizes req.nextUrl to localhost (or the reverse).
+      return origin;
+    }
+  } catch {
+    /* fall through */
+  }
+  return null;
+}
+
+function defaultPort(protocol: string) {
+  return protocol === "https:" ? "443" : "80";
 }
 
 export async function GET(req: NextRequest) {
@@ -297,11 +320,14 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // Playlists are tiny; media segments (esp. IP sports CDNs) are often
+    // multi‑MB and trickle slowly through the relay — keep the socket alive.
+    const segmentFetch = !/\.m3u8(?:$|\?)/i.test(target);
     const upstream = await measured(
       "upstream",
       secureFetchStream(target, {
         headers: hlsUpstreamHeaders(target, req.headers.get("range")),
-        timeoutMs: 15_000,
+        timeoutMs: segmentFetch ? 90_000 : 15_000,
         maxRedirects: 4,
         maxBytes: 32 * 1024 * 1024,
         allowedHost: ownership ? undefined : isAllowedMediaHost,

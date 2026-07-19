@@ -53,21 +53,24 @@ describe("live playback policy — device profiles", () => {
     expect(resolveDeviceProfile(false)).toBe("default");
   });
 
-  it("keeps phone/PC ~30–60s behind without chasing live", () => {
+  it("keeps phone/PC near live with room to buffer", () => {
     const t = buildLiveHlsTuning("default", { sports: true });
-    expect(t.liveSyncDuration).toBeGreaterThanOrEqual(30);
-    expect(t.liveSyncDuration).toBeLessThanOrEqual(60);
-    expect(t.liveMaxLatencyDuration).toBeGreaterThan(t.liveSyncDuration * 5);
+    expect(t.liveSyncDuration).toBeGreaterThanOrEqual(12);
+    expect(t.liveSyncDuration).toBeLessThanOrEqual(30);
+    expect(t.liveMaxLatencyDuration).toBeGreaterThan(t.liveSyncDuration);
+    expect(t.liveMaxLatencyDuration).toBeLessThanOrEqual(120);
+    expect(t.maxBufferLength).toBeGreaterThanOrEqual(60);
     expect(t.maxBitrate).toBeNull();
     // hls.js forbids mixing duration- and count-based live sync keys.
     expect(t).not.toHaveProperty("liveSyncDurationCount");
     expect(t).not.toHaveProperty("liveMaxLatencyDurationCount");
   });
 
-  it("applies a deeper, bitrate-capped TV profile", () => {
+  it("applies a bitrate-capped TV profile with lighter lag", () => {
     const t = buildLiveHlsTuning("tv", { trace: true });
-    expect(t.liveSyncDuration).toBeGreaterThanOrEqual(55);
-    expect(t.liveMaxLatencyDuration).toBeGreaterThan(t.liveSyncDuration * 8);
+    expect(t.liveSyncDuration).toBeGreaterThanOrEqual(20);
+    expect(t.liveSyncDuration).toBeLessThanOrEqual(40);
+    expect(t.liveMaxLatencyDuration).toBeGreaterThan(t.liveSyncDuration);
     expect(t.maxBitrate).toBeTypeOf("number");
     expect(t.maxBitrate!).toBeLessThanOrEqual(2_500_000);
     expect(t.abrBandWidthFactor).toBeLessThan(0.55);
@@ -75,6 +78,17 @@ describe("live playback policy — device profiles", () => {
     expect(t.testBandwidth).toBe(false);
     expect(t).not.toHaveProperty("liveSyncDurationCount");
     expect(t).not.toHaveProperty("liveMaxLatencyDurationCount");
+  });
+
+  it("keeps My Links / staff picks near the live edge", () => {
+    const t = buildLiveHlsTuning("default", {
+      myLinks: true,
+      sports: true,
+    });
+    // Short CDN windows (~20–40s) 404 when aiming 45–60s behind.
+    expect(t.liveSyncDuration).toBeLessThanOrEqual(8);
+    expect(t.liveMaxLatencyDuration).toBeGreaterThan(t.liveSyncDuration);
+    expect(t.maxBufferLength).toBeGreaterThanOrEqual(30);
   });
 
   it("caps ABR levels to the TV bitrate ceiling", () => {
@@ -87,6 +101,16 @@ describe("live playback policy — device profiles", () => {
     expect(capLevelIndexForBitrate(levels, 2_200_000)).toBe(2);
     expect(capLevelIndexForBitrate(levels, null)).toBe(3);
     expect(capLevelIndexForBitrate([], 2_000_000)).toBe(-1);
+  });
+
+  it("keeps My Links near the live edge to avoid black screens", () => {
+    const t = buildLiveHlsTuning("default", {
+      myLinks: true,
+      sports: true,
+      unstable: true,
+    });
+    expect(t.liveSyncDuration).toBeLessThanOrEqual(10);
+    expect(t.liveMaxLatencyDuration).toBeLessThanOrEqual(40);
   });
 });
 
