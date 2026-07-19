@@ -19,7 +19,9 @@ export const COPY_FALLBACKS = {
   "auth.info.verify_email":
     "Check your email for a verification link, then sign in. You’ll pick who’s watching next. One free 14-day trial per device.",
   "player.geo_restricted":
-    "This channel may be subject to regional or rights restrictions. Try one of the available news alternatives below.",
+    "This channel may be subject to regional or rights restrictions. Try another title available in your region.",
+  "player.geo_restricted_sabc":
+    "SABC 1–3 use a South Africa–sensitive broadcaster feed. GLS will not bypass regional locks or swap in SABC News.",
   "player.trace_urban_fallback":
     "Switching to Trace Urban — regional feed unavailable",
   "player.sister_fallback":

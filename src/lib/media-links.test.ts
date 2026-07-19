@@ -34,20 +34,32 @@ describe("media-links", () => {
       url,
       format: "hls",
     });
+    // Cleartext must lead with same-origin relay (avoids black screens on https).
     expect(sources).toEqual([
-      {
-        url,
-        quality: "Auto",
-        format: "hls",
-        label: "browser-direct",
-      },
       {
         url: "/api/hls?mediaLinkId=link-abc",
         quality: "Auto",
         format: "hls",
         label: "secure-relay",
       },
+      {
+        url,
+        quality: "Auto",
+        format: "hls",
+        label: "browser-direct",
+      },
     ]);
+  });
+
+  it("keeps https browser-direct first when CORS-friendly", () => {
+    const url = "https://cdn.example.org/live/index.m3u8";
+    const sources = mediaLinkPlaySources({
+      id: "link-https",
+      url,
+      format: "hls",
+    });
+    expect(sources[0]?.label).toBe("browser-direct");
+    expect(sources[1]?.label).toBe("secure-relay");
   });
 
   it("accepts public-IP HTTP HLS for My Links / Staff picks validation", () => {

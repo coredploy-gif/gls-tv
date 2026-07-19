@@ -158,11 +158,26 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
 
   // A previous relay fallback must not permanently pin an owner-scoped
   // playlist channel to the server path. Start each later visit like VLC:
-  // original source from the viewer device first.
+  // original source from the viewer device first — unless cleartext / no-CORS
+  // requires the same-origin relay or the page stays black.
+  if (first?.label === "browser-direct") {
+    if (requiresProxy(first.url) || prefersProxy(first.url)) {
+      const relayIdx = sources.findIndex((s) => s.label === "secure-relay");
+      if (relayIdx >= 0) {
+        return { index: relayIdx, mode: "direct" as const };
+      }
+    }
+    if (mem?.url !== first.url || mem.mode !== "direct") {
+      clearStreamMemory(item.slug);
+    }
+  }
+
   if (
-    first?.label === "browser-direct" &&
+    first?.label === "secure-relay" &&
     (mem?.url !== first.url || mem.mode !== "direct")
   ) {
+    // Cleartext / no-CORS My Links lead with relay — don't revive a poisoned
+    // browser-direct memory that blacks out https pages.
     clearStreamMemory(item.slug);
   }
 
@@ -209,9 +224,8 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
   const memNow = getStreamMemory(item.slug);
 
   if (!memNow?.url || (hardGeo && memNow.mode === "proxy")) {
-    // Imported playlists try the original source first, followed by the
-    // authenticated relay and any same-title mirrors.
-    if (first?.label === "browser-direct") {
+    // Imported playlists / My Links: start on source 0 (direct or relay).
+    if (first?.label === "browser-direct" || first?.label === "secure-relay") {
       return { index: 0, mode: "direct" as const };
     }
     if (first && prefersProxy(first.url) && !hardGeo) {
@@ -229,7 +243,10 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
   if (preferFirst && first) {
     return {
       index: 0,
-      mode: prefersProxy(first.url) && !hardGeo ? ("proxy" as const) : ("direct" as const),
+      mode:
+        prefersProxy(first.url) && !hardGeo
+          ? ("proxy" as const)
+          : ("direct" as const),
     };
   }
 
@@ -1068,7 +1085,9 @@ export function VideoPlayer({
           <p className="text-lg font-semibold text-white">{error}</p>
           {(isHardGeo(item) || /geo|region|south africa/i.test(error)) && (
             <p className="max-w-md text-sm text-white/70">
-              {copy("player.geo_restricted")}
+              {/^sabc-?[123]$/i.test(item.slug)
+                ? copy("player.geo_restricted_sabc")
+                : copy("player.geo_restricted")}
             </p>
           )}
           <div className="flex flex-wrap justify-center gap-2">

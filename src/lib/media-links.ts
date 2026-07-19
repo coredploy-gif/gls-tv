@@ -96,6 +96,9 @@ export type MediaLinkCategory = (typeof MEDIA_LINK_CATEGORIES)[number];
  * HLS mirrors imported playlist channels: try the origin first, then the
  * authenticated same-origin relay keyed by mediaLinkId (skips catalogue host
  * allowlisting after DB ownership checks in /api/hls).
+ *
+ * Cleartext HTTP and known no-CORS hosts must lead with the relay — otherwise
+ * https pages stay on a black screen (mixed content / missing CORS).
  */
 export function mediaLinkPlaySources(link: {
   id: string;
@@ -107,20 +110,24 @@ export function mediaLinkPlaySources(link: {
   if (format !== "hls") {
     return [{ url: link.url, quality: "Auto", format }];
   }
-  return [
-    {
-      url: link.url,
-      quality: "Auto",
-      format,
-      label: "browser-direct",
-    },
-    {
-      url: `/api/hls?mediaLinkId=${encodeURIComponent(link.id)}`,
-      quality: "Auto",
-      format,
-      label: "secure-relay",
-    },
-  ];
+  const direct: MediaSource = {
+    url: link.url,
+    quality: "Auto",
+    format,
+    label: "browser-direct",
+  };
+  const relay: MediaSource = {
+    url: `/api/hls?mediaLinkId=${encodeURIComponent(link.id)}`,
+    quality: "Auto",
+    format,
+    label: "secure-relay",
+  };
+  const needsRelayFirst =
+    /^http:\/\//i.test(link.url) ||
+    /jmp2\.uk|pluto\.tv|plutotv|getpublica\.com|ottera\.tv|kaltura\.com|alkassdigital\.net/i.test(
+      link.url,
+    );
+  return needsRelayFirst ? [relay, direct] : [direct, relay];
 }
 
 /**
