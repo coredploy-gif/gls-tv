@@ -113,25 +113,16 @@ function healZaPackOnly(slug: string, title?: string | null): Pack | null {
   const hay = `${slug} ${title || ""}`.toLowerCase();
 
   if (/sabc[\s_-]?1\b|sabc-1|sabc1/.test(hay) && !/news/.test(hay)) {
-    return [
-      src(SABC1, 5, "heal-sabc1-mangomolo"),
-      src(SABC_NEWS, 80, "heal-sabc-news-alt"),
-      src(LN24, 90, "heal-ln24-alt"),
-    ];
+    // Never fall back to SABC News / LN24 — that silently swaps the channel.
+    return [src(SABC1, 5, "heal-sabc1-mangomolo")];
   }
   if (/sabc[\s_-]?2\b|sabc-2|sabc2/.test(hay) && !/news/.test(hay)) {
-    return [
-      src(SABC2, 5, "heal-sabc2-mangomolo"),
-      src(SABC_NEWS, 80, "heal-sabc-news-alt"),
-      src(LN24, 90, "heal-ln24-alt"),
-    ];
+    return [src(SABC2, 5, "heal-sabc2-mangomolo")];
   }
   if (/sabc[\s_-]?3\b|sabc-3|sabc3/.test(hay) && !/news/.test(hay)) {
     return [
       src(SABC3, 5, "heal-sabc3-mangomolo"),
       src(SABC3_CHUNK, 12, "heal-sabc3-chunk"),
-      src(SABC_NEWS, 70, "heal-sabc-news-alt"),
-      src(LN24, 80, "heal-ln24-alt"),
     ];
   }
   if (/sabc[\s_-]?news|sabcnews|news.?24/.test(hay) && /sabc/.test(hay)) {

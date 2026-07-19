@@ -18,6 +18,20 @@ describe("private playlist open heals", () => {
     expect(healPackFor("wildearth", "WildEarth")?.[0]?.url).toContain("amagi");
   });
 
+  it("does not swap SABC 1/2/3 onto SABC News", () => {
+    for (const [slug, title] of [
+      ["sabc-1", "SABC 1"],
+      ["sabc1-za-sd", "SABC 1"],
+      ["sabc-2", "SABC 2"],
+      ["sabc-3", "SABC 3"],
+    ] as const) {
+      const pack = healPackFor(slug, title) || [];
+      expect(pack.some((s) => /\/news\//i.test(s.url))).toBe(false);
+      expect(pack.some((s) => /ln24/i.test(s.url))).toBe(false);
+      expect(pack[0]?.url).toMatch(/mangomolo\.com/);
+    }
+  });
+
   it("does not invent pay ESPN / TSN numbered remaps", () => {
     expect(healPackFor("espn-br-sd", "ESPN")).toBeNull();
     expect(healPackFor("tsn1-ca-sd", "TSN1")).toBeNull();
