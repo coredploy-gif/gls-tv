@@ -262,7 +262,7 @@ function MediaLibraryInner() {
                     required
                     type="url"
                     autoFocus
-                    placeholder="https://…/index.m3u8 or YouTube / MP4 (http public IP OK)"
+                    placeholder="https://…/index.m3u8 or http://IP:port/play/… (http public IP OK)"
                     className="w-full rounded-sm border-2 border-white/25 bg-black/55 px-4 py-4 text-lg text-white outline-none placeholder:text-white/35 focus:border-gls-red focus:ring-2 focus:ring-gls-red/40"
                   />
                 </label>

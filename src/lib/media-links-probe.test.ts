@@ -4,6 +4,14 @@ import path from "node:path";
 
 vi.mock("server-only", () => ({}));
 
+const secureFetchBuffered = vi.fn();
+const validatePublicUrl = vi.fn();
+
+vi.mock("@/lib/secure-url", () => ({
+  secureFetchBuffered: (...args: unknown[]) => secureFetchBuffered(...args),
+  validatePublicUrl: (...args: unknown[]) => validatePublicUrl(...args),
+}));
+
 import {
   probeMediaLinkReachability,
   resolveTrustedAppMediaFilePath,
@@ -14,6 +22,8 @@ const MINI_MP4 = Buffer.from([
   0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6f, 0x6d, 0x00,
   0x00, 0x00, 0x01, 0x69, 0x73, 0x6f, 0x6d, 0x61, 0x76, 0x63, 0x31,
 ]);
+
+const GATEWAY = "http://103.253.18.58:8000/play/a03o";
 
 describe("media-links-probe trusted app media", () => {
   const mediaDir = path.join(process.cwd(), "public", "media");
@@ -57,9 +67,14 @@ describe("media-links-probe trusted app media", () => {
     expect(probe.ok).toBe(true);
     expect(probe.status).toBe("active");
     expect(probe.format).toBe("mp4");
+    expect(secureFetchBuffered).not.toHaveBeenCalled();
   });
 
   it("still returns the SSRF error for arbitrary private IPs", async () => {
+    // Bypass skip path (not an IPTV / .m3u8 URL) — fetch throws reserved-network.
+    secureFetchBuffered.mockRejectedValueOnce(
+      new Error("Private or reserved network targets are blocked"),
+    );
     const probe = await probeMediaLinkReachability(
       "http://10.0.0.5/clip.mp4",
       "mp4",
@@ -69,6 +84,11 @@ describe("media-links-probe trusted app media", () => {
   });
 
   it("rejects loopback HLS that is not trusted app media", async () => {
+    // .m3u8 uses skip-body path → validatePublicUrl only.
+    secureFetchBuffered.mockClear();
+    validatePublicUrl.mockRejectedValueOnce(
+      new Error("Private or reserved network targets are blocked"),
+    );
     const probe = await probeMediaLinkReachability(
       "http://127.0.0.1/live/index.m3u8",
       "hls",
@@ -77,5 +97,33 @@ describe("media-links-probe trusted app media", () => {
     expect(probe.detail).toMatch(
       /Private or reserved|Host is not allowed|localhost/i,
     );
+    expect(secureFetchBuffered).not.toHaveBeenCalled();
+  });
+});
+
+describe("media-links-probe IPTV gateway skip", () => {
+  it("does not buffer /play/ gateway bodies", async () => {
+    secureFetchBuffered.mockClear();
+    validatePublicUrl.mockReset().mockResolvedValue({});
+
+    const probe = await probeMediaLinkReachability(GATEWAY, "hls");
+
+    expect(probe.ok).toBe(true);
+    expect(probe.format).toBe("hls");
+    expect(probe.detail).toMatch(/body probe skipped/i);
+    expect(secureFetchBuffered).not.toHaveBeenCalled();
+    expect(validatePublicUrl).toHaveBeenCalledWith(GATEWAY);
+  });
+
+  it("does not buffer individual .m3u8 bodies", async () => {
+    secureFetchBuffered.mockClear();
+    validatePublicUrl.mockReset().mockResolvedValue({});
+    const stream = "http://40.160.24.55/TSN_5/index.m3u8";
+
+    const probe = await probeMediaLinkReachability(stream, "hls");
+
+    expect(probe.ok).toBe(true);
+    expect(secureFetchBuffered).not.toHaveBeenCalled();
+    expect(validatePublicUrl).toHaveBeenCalledWith(stream);
   });
 });

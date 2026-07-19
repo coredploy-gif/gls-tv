@@ -38,8 +38,9 @@ export type LiveChannelKind = {
   sports?: boolean;
   trace?: boolean;
   unstable?: boolean;
+  /** Imported M3U tag — playback should set `myLinks`; not a deep-sports signal. */
   privatePlaylist?: boolean;
-  /** Personal / staff My Links — short DVR windows; stay near the live edge. */
+  /** Personal / staff My Links / My Playlist — short DVR; stay near the live edge. */
   myLinks?: boolean;
 };
 
@@ -70,37 +71,37 @@ export function resolveDeviceProfile(isTvLike: boolean): LivePlaybackDeviceProfi
 /**
  * Build hls.js live tuning.
  *
- * Intentional ~45–60s behind the tip is not “stutter lag” — it is headroom so
- * the player can preload a large ahead buffer and ride out network dips.
- * My Links stay nearer the tip (short CDN windows). TV still caps bitrate.
+ * Catalog sports: intentional ~45–60s behind + deep preload.
+ * My Links / Staff picks / My Playlist: near the tip, full HD ABR, no
+ * artificial bitrate ceiling. Short CDN windows still need a small sync
+ * cushion so we do not tip-chase into underruns.
  */
 export function buildLiveHlsTuning(
   profile: LivePlaybackDeviceProfile,
   kind: LiveChannelKind = {},
 ): LiveHlsTuning {
   const deep = Boolean(
-    kind.linear || kind.sports || kind.trace || kind.unstable || kind.privatePlaylist,
+    kind.linear || kind.sports || kind.trace || kind.unstable,
   );
   const tv = profile === "tv";
   const myLinks = Boolean(kind.myLinks);
 
-  // My Links / staff picks: short CDN windows (~20–40s). Aim near the tip and
-  // only preload within that window — a 60s+ buffer target thrashing-aborts
-  // every fragment. Catalog sports keep the intentional ~45–60s cushion.
+  // My Links / Staff picks / My Playlist: sit ~12–14s behind tip so a short
+  // cushion can form without tip-chasing. Catalog sports keep a deep cushion.
   const liveSyncDuration = myLinks
     ? tv
-      ? 8
-      : 6
+      ? 14
+      : 12
     : tv
       ? 60
       : deep
         ? 48
         : 36;
-  // Far above sync — do not chase live when the buffer is healthy.
+  // Allow some lag before catch-up — never tip-chase into underruns.
   const liveMaxLatencyDuration = myLinks
     ? tv
-      ? 40
-      : 30
+      ? 60
+      : 45
     : tv
       ? 900
       : 720;
@@ -109,32 +110,27 @@ export function buildLiveHlsTuning(
     return {
       liveSyncDuration,
       liveMaxLatencyDuration,
-      // Heavy preload from the first second (My Links capped to the DVR window).
       maxBufferLength: myLinks
-        ? 20
-        : kind.privatePlaylist
-          ? 150
-          : deep
-            ? 240
-            : 150,
+        ? 18
+        : deep
+          ? 240
+          : 150,
       maxMaxBufferLength: myLinks
-        ? 28
-        : kind.privatePlaylist
-          ? 280
-          : deep
-            ? 480
-            : 300,
-      maxBufferSize: (myLinks ? 40 : deep ? 260 : 160) * 1000 * 1000,
+        ? 24
+        : deep
+          ? 480
+          : 300,
+      maxBufferSize: (myLinks ? 64 : deep ? 260 : 160) * 1000 * 1000,
       backBufferLength: myLinks ? 16 : deep ? 240 : 120,
-      maxBufferHole: myLinks ? 1.2 : 2.2,
-      abrEwmaDefaultEstimate: 220_000,
-      abrBandWidthFactor: 0.4,
-      abrBandWidthUpFactor: 0.2,
-      testBandwidth: false,
-      // ~2 Mbps ceiling — 1080p sports often stalls on mid-tier Android TV.
-      maxBitrate: 2_200_000,
-      preferStartLevel: 0,
-      capLevelToPlayerSize: true,
+      maxBufferHole: myLinks ? 1.5 : 2.2,
+      abrEwmaDefaultEstimate: myLinks ? 2_500_000 : 220_000,
+      abrBandWidthFactor: myLinks ? 0.85 : 0.4,
+      abrBandWidthUpFactor: myLinks ? 0.7 : 0.2,
+      testBandwidth: Boolean(myLinks),
+      // TV My Links: soft HD cap only; desktop allows full ladder.
+      maxBitrate: myLinks ? 4_500_000 : 1_200_000,
+      preferStartLevel: myLinks ? -1 : 0,
+      capLevelToPlayerSize: !myLinks,
       capLevelOnFPSDrop: true,
     };
   }
@@ -142,41 +138,34 @@ export function buildLiveHlsTuning(
   return {
     liveSyncDuration,
     liveMaxLatencyDuration,
-    // Strong preload immediately — My Links stay inside the short live window.
     maxBufferLength: myLinks
-      ? 18
-      : kind.privatePlaylist
-        ? 120
-        : kind.linear || kind.trace
-          ? 240
-          : kind.unstable
-            ? 180
-            : kind.sports
-              ? 180
-              : 90,
-    maxMaxBufferLength: myLinks
-      ? 26
-      : kind.privatePlaylist
+      ? 22
+      : kind.linear || kind.trace
         ? 240
-        : kind.linear || kind.trace
-          ? 480
-          : kind.unstable
+        : kind.unstable
+          ? 180
+          : kind.sports
+            ? 180
+            : 90,
+    maxMaxBufferLength: myLinks
+      ? 30
+      : kind.linear || kind.trace
+        ? 480
+        : kind.unstable
+          ? 360
+          : kind.sports
             ? 360
-            : kind.sports
-              ? 360
-              : 200,
+            : 200,
     maxBufferSize:
       (myLinks
-        ? 36
-        : kind.privatePlaylist
-          ? 140
-          : kind.linear || kind.trace
-            ? 320
-            : kind.unstable
+        ? 80
+        : kind.linear || kind.trace
+          ? 320
+          : kind.unstable
+            ? 240
+            : kind.sports
               ? 240
-              : kind.sports
-                ? 240
-                : 120) *
+              : 120) *
       1000 *
       1000,
     backBufferLength: myLinks
@@ -186,15 +175,17 @@ export function buildLiveHlsTuning(
         : kind.sports || kind.unstable
           ? 210
           : 90,
-    maxBufferHole: myLinks ? 0.8 : deep ? 1.8 : 0.5,
-    abrEwmaDefaultEstimate: deep && !myLinks ? 350_000 : 800_000,
-    abrBandWidthFactor: deep && !myLinks ? 0.5 : 0.8,
-    abrBandWidthUpFactor: deep && !myLinks ? 0.3 : 0.6,
-    testBandwidth: !kind.unstable && !kind.linear && !kind.trace,
-    maxBitrate: null,
-    preferStartLevel: 0,
-    capLevelToPlayerSize: false,
-    capLevelOnFPSDrop: false,
+    maxBufferHole: myLinks ? 1.2 : deep ? 1.8 : 0.5,
+    // My Links / playlists: assume decent bandwidth — climb to HD fast.
+    abrEwmaDefaultEstimate: myLinks ? 3_500_000 : deep ? 250_000 : 800_000,
+    abrBandWidthFactor: myLinks ? 0.9 : deep ? 0.45 : 0.8,
+    abrBandWidthUpFactor: myLinks ? 0.75 : deep ? 0.25 : 0.6,
+    testBandwidth: myLinks || (!kind.unstable && !kind.linear && !kind.trace),
+    // Full HD on My Links / playlists. Soft cap only on heavy catalog sports.
+    maxBitrate: myLinks ? null : deep ? 1_200_000 : null,
+    preferStartLevel: myLinks ? -1 : 0,
+    capLevelToPlayerSize: Boolean(!myLinks && deep),
+    capLevelOnFPSDrop: Boolean(!myLinks && deep),
   };
 }
 
@@ -204,57 +195,47 @@ export function deepenLiveBufferTargets(
 ): Pick<LiveHlsTuning, "maxBufferLength" | "maxMaxBufferLength" | "maxBufferSize"> {
   const tv = profile === "tv";
   const deep = Boolean(
-    kind.linear || kind.sports || kind.trace || kind.unstable || kind.privatePlaylist,
+    kind.linear || kind.sports || kind.trace || kind.unstable,
   );
   const myLinks = Boolean(kind.myLinks);
   if (tv) {
     return {
       maxBufferLength: myLinks
-        ? 24
-        : kind.privatePlaylist
-          ? 200
-          : deep
-            ? 360
-            : 220,
-      maxMaxBufferLength: myLinks
-        ? 32
-        : kind.privatePlaylist
+        ? 20
+        : deep
           ? 360
-          : deep
-            ? 600
-            : 400,
-      maxBufferSize: (myLinks ? 48 : deep ? 320 : 200) * 1000 * 1000,
+          : 220,
+      maxMaxBufferLength: myLinks
+        ? 26
+        : deep
+          ? 600
+          : 400,
+      maxBufferSize: (myLinks ? 72 : deep ? 320 : 200) * 1000 * 1000,
     };
   }
   return {
     maxBufferLength: myLinks
-      ? 22
-      : kind.privatePlaylist
-        ? 180
+      ? 20
+      : kind.linear || kind.trace
+        ? 420
+        : kind.sports
+          ? 360
+          : 200,
+    maxMaxBufferLength: myLinks
+      ? 28
+      : kind.linear || kind.trace
+        ? 720
+        : kind.sports
+          ? 600
+          : 360,
+    maxBufferSize:
+      (myLinks
+        ? 96
         : kind.linear || kind.trace
           ? 420
           : kind.sports
             ? 360
-            : 200,
-    maxMaxBufferLength: myLinks
-      ? 30
-      : kind.privatePlaylist
-        ? 320
-        : kind.linear || kind.trace
-          ? 720
-          : kind.sports
-            ? 600
-            : 360,
-    maxBufferSize:
-      (myLinks
-        ? 42
-        : kind.privatePlaylist
-          ? 180
-          : kind.linear || kind.trace
-            ? 420
-            : kind.sports
-              ? 360
-              : 200) *
+            : 200) *
       1000 *
       1000,
   };

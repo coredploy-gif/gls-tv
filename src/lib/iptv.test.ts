@@ -53,6 +53,34 @@ describe("parseM3uDetailed", () => {
     expect(master.channels[0].title.toLowerCase()).toContain("rok");
   });
 
+  it("treats extensionless IPTV /play/ URLs as a single HLS channel", () => {
+    const stream = "http://103.253.18.58:8000/play/a03o";
+    const result = parseM3uDetailed("not a playlist", {
+      singleStreamUrl: stream,
+      singleStreamTitle: "Arena",
+    });
+    expect(result.channels).toHaveLength(1);
+    expect(result.channels[0].sources[0]).toMatchObject({
+      url: stream,
+      format: "hls",
+    });
+    expect(result.channels[0].title).toBe("Arena");
+    expect(result.stats.kind).toBe("hls-media");
+  });
+
+  it("treats .m3u8 singleStreamUrl as one channel when body is not a playlist", () => {
+    const stream = "http://40.160.24.55/TSN_5/index.m3u8";
+    const result = parseM3uDetailed("MPEG-TS binary garbage", {
+      singleStreamUrl: stream,
+    });
+    expect(result.channels).toHaveLength(1);
+    expect(result.channels[0].sources[0]).toMatchObject({
+      url: stream,
+      format: "hls",
+    });
+    expect(result.stats.kind).toBe("hls-media");
+  });
+
   it("validates URLs, deduplicates deterministically and reports truncation", () => {
     const result = parseM3uDetailed(
       [

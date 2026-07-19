@@ -1,13 +1,13 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createServiceClient, normalizeSlug } from "@/lib/eadmin";
-import { parseM3uDetailed } from "@/lib/iptv";
 import { secureFetchBuffered, validatePublicUrl } from "@/lib/secure-url";
 import { writeAuditLog } from "@/lib/admin/audit";
+import { isAllowedMediaHost } from "@/lib/media-hosts";
 import {
-  isAllowedMediaHost,
-  isIndividualPlaylistUrl,
-} from "@/lib/media-hosts";
+  fetchAndParseM3uImport,
+  m3uImportPreviewErrorMessage,
+} from "@/lib/m3u-import-source";
 import {
   getAdminAccess,
   hasAdminPermission,
@@ -74,28 +74,13 @@ async function gate() {
 }
 
 async function fetchAndParse(url: string) {
-  // Individual .m3u / .m3u8 (any public host, incl. public-IP HTTP): skip catalogue
-  // host allowlist like owned mediaLinkId plays — validatePublicUrl still blocks SSRF.
-  // Non-playlist URLs (if any) keep the GitHub / configured list-host allowlist.
-  const individualPlaylist = isIndividualPlaylistUrl(url);
-  const fetched = await secureFetchBuffered(url, {
-    maxBytes: 4 * 1024 * 1024,
-    timeoutMs: 20_000,
-    // jmp2.uk → aka-live*.delivery.roku.com (and similar FAST chains)
-    maxRedirects: 5,
-    allowedHost: individualPlaylist ? undefined : allowedListSource,
-    headers: {
-      Accept: "application/vnd.apple.mpegurl,audio/x-mpegurl,text/plain,*/*",
-      "User-Agent": "GLS-TV/1.0 (admin-m3u-preview)",
-    },
-  });
-  if (fetched.status < 200 || fetched.status >= 300) throw new Error("Source download failed");
-  const text = new TextDecoder().decode(fetched.body);
-  return parseM3uDetailed(text, {
-    baseUrl: fetched.finalUrl,
-    maxChannels: 2000,
-    // Keep the pasted entry URL (jmp2/pluto/public-IP) stable after CDN redirects.
-    singleStreamUrl: url,
+  // Individual .m3u / .m3u8 / IPTV /play/… (any public host, incl. public-IP HTTP):
+  // skip catalogue host allowlist — validatePublicUrl still blocks SSRF.
+  // Gateway paths skip body download (unbounded TS); list hosts stay allowlisted.
+  return fetchAndParseM3uImport(url, {
+    fetchBuffered: secureFetchBuffered,
+    validateUrl: validatePublicUrl,
+    allowedListHost: allowedListSource,
   });
 }
 
@@ -154,13 +139,8 @@ export async function POST(req: Request) {
         cause instanceof Error && cause.message
           ? cause.message
           : "Source is unavailable";
-      const playlist = isIndividualPlaylistUrl(url);
       return NextResponse.json(
-        {
-          error: playlist
-            ? `Could not preview playlist (${detail}). Private/reserved IPs are blocked; the URL must return #EXTM3U.`
-            : `Source is unavailable or not on the approved list-host allowlist (${detail}).`,
-        },
+        { error: m3uImportPreviewErrorMessage(url, detail) },
         { status: 400 },
       );
     }

@@ -1,8 +1,21 @@
 import type { CatalogItem } from "@/data/types";
+import { isLikelyIptvStreamPath } from "@/lib/media-path";
 import {
   isWeakMediaLinkTitle,
   titleFromMediaUrl,
 } from "@/lib/media-links";
+
+function streamFormatForUrl(streamUrl: string): "hls" | "mp4" {
+  try {
+    const u = new URL(streamUrl);
+    if (/\.m3u8?(?:$|\?)/i.test(u.pathname) || isLikelyIptvStreamPath(u.pathname)) {
+      return "hls";
+    }
+  } catch {
+    /* fall through */
+  }
+  return /\.m3u8(?:$|\?)/i.test(streamUrl) ? "hls" : "mp4";
+}
 
 export type IptvChannel = CatalogItem & {
   tvgId?: string | null;
@@ -94,7 +107,7 @@ export function channelFromSingleHls(
       {
         url: streamUrl,
         quality: "Auto",
-        format: /\.m3u8(?:$|\?)/i.test(streamUrl) ? "hls" : "mp4",
+        format: streamFormatForUrl(streamUrl),
       },
     ],
     tvgId: null,
@@ -239,7 +252,7 @@ export function parseM3uDetailed(
         {
           url: streamUrl,
           quality,
-          format: /\.m3u8(?:$|\?)/i.test(streamUrl) ? "hls" : "mp4",
+          format: streamFormatForUrl(streamUrl),
         },
       ],
       tvgId: tvgId || null,
@@ -247,6 +260,38 @@ export function parseM3uDetailed(
   }
   if (pending) stats.skipped += 1;
   stats.parsed = items.length;
+
+  // Direct IPTV gateway / single .m3u8 URL whose body was not a channel-list /
+  // HLS playlist (e.g. http://IP:port/play/TOKEN returning media bytes): still
+  // one channel when singleStreamUrl is set (admin preview / Staff picks).
+  if (!items.length && singleStreamUrl) {
+    let treatAsSingle = false;
+    try {
+      const path = new URL(singleStreamUrl).pathname.toLowerCase();
+      treatAsSingle =
+        isLikelyIptvStreamPath(path) || path.endsWith(".m3u8");
+    } catch {
+      treatAsSingle = false;
+    }
+    if (treatAsSingle) {
+      const stream = httpUrl(singleStreamUrl);
+      if (stream) {
+        stats.parsed = 1;
+        stats.kind = "hls-media";
+        return {
+          channels: [
+            channelFromSingleHls(stream, {
+              defaultCountry,
+              forceCategory,
+              title: options.singleStreamTitle,
+            }),
+          ],
+          stats,
+        };
+      }
+    }
+  }
+
   return { channels: items, stats };
 }
 

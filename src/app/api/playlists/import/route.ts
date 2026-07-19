@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { parseM3uDetailed } from "@/lib/iptv";
 import { PLAYLIST_LIMITS } from "@/lib/playlists";
 import { getAccountEntitlement } from "@/lib/membership/account";
-import { secureFetchBuffered } from "@/lib/secure-url";
+import { secureFetchBuffered, validatePublicUrl } from "@/lib/secure-url";
+import { shouldSkipUnboundedMediaBodyDownload } from "@/lib/media-path";
 import { isFeatureEnabled } from "@/lib/operations/feature-flags";
 import { consumeRateLimit, clientIp } from "@/lib/rate-limit";
 
@@ -30,6 +31,12 @@ function responseError(
 }
 
 async function fetchM3u(url: string) {
+  // Individual /play/… and .m3u8 streams: never buffer live media.
+  if (shouldSkipUnboundedMediaBodyDownload(url)) {
+    await validatePublicUrl(url);
+    return { text: "", finalUrl: url };
+  }
+
   const res = await secureFetchBuffered(url, {
     timeoutMs: 20_000,
     maxRedirects: 4,

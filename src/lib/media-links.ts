@@ -5,6 +5,7 @@ import {
   isLikelyChannelLogo,
 } from "@/lib/artwork";
 import { COPY_FALLBACKS } from "@/lib/copy";
+import { isLikelyIptvStreamPath } from "@/lib/media-path";
 import { normalizeReligionSubfolderTag } from "@/lib/religion";
 
 /** Title/category tokens that should prefer soccer/sports Unsplash plates. */
@@ -451,6 +452,9 @@ export function detectPlayableFormat(url: string): MediaLinkFormat | null {
   if (/\.webm(\?|#|$)/i.test(url)) return "webm";
   if (/\.(mp4|m4v|mov)(\?|#|$)/i.test(url)) return "mp4";
 
+  // Extensionless IPTV gateways: http://IP:port/play/TOKEN, /live/…, etc.
+  if (isLikelyIptvStreamPath(u.pathname)) return "hls";
+
   return formatFromQueryHints(u);
 }
 
@@ -851,7 +855,7 @@ export const MEDIA_FORMAT_META: Record<
 > = {
   hls: {
     label: "HLS live",
-    hint: "Any public .m3u / .m3u8 (http IP OK; owned relay skips catalogue allowlist)",
+    hint: "Any public .m3u / .m3u8 or IPTV /play/… (http IP:port OK; owned relay skips catalogue allowlist)",
     accent: "#5ee29a",
   },
   youtube: {

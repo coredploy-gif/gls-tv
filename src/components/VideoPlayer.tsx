@@ -60,14 +60,13 @@ function requiresProxy(url: string) {
 }
 
 /**
- * Local http:// pages can hit cleartext HLS direct (same as ad sites / VLC).
- * That avoids the slow Node relay hop — https production still needs /api/hls.
+ * Local http:// pages *can* fetch cleartext HLS without mixed-content blocks,
+ * but most IPTV IPs omit Access-Control-Allow-Origin (Arena 88.212…, etc.).
+ * VLC plays those; the browser does not. Never skip the same-origin relay for
+ * cleartext — /api/hls is required whenever the origin lacks CORS.
  */
-function canPlayCleartextDirect(streamUrl: string) {
-  if (typeof window === "undefined") return false;
-  return (
-    window.location.protocol === "http:" && /^http:\/\//i.test(streamUrl)
-  );
+function canPlayCleartextDirect(_streamUrl: string) {
+  return false;
 }
 
 /**
@@ -159,9 +158,12 @@ function isFoodChannel(item: CatalogItem) {
 }
 
 function liveKindFor(item: CatalogItem, sourceUrl?: string): LiveChannelKind {
+  // My Playlist IPTV uses the same short-window path as My Links / Staff picks
+  // — deep sports sync (45–60s) underruns on typical M3U CDNs.
   const myLinks =
     item.categories.includes("My Links") ||
-    item.categories.includes("Staff picks");
+    item.categories.includes("Staff picks") ||
+    item.categories.includes("My Playlist");
   return {
     linear: !myLinks && isLinearSportsPack(item),
     // Don't apply deep sports latency to My Links — short CDN windows go black.
@@ -202,16 +204,10 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
   }
 
   if (first?.label === "secure-relay") {
-    const directIdx = sources.findIndex((s) => s.label === "browser-direct");
-    const direct = directIdx >= 0 ? sources[directIdx] : null;
-    // Match ad-site / VLC path on local http — skip the slow relay.
-    if (direct && canPlayCleartextDirect(direct.url)) {
-      clearStreamMemory(item.slug);
-      return { index: directIdx, mode: "direct" as const };
-    }
+    // Keep relay first for cleartext / no-CORS My Links & Staff picks.
+    // Skipping to browser-direct on local http blacks out hosts without ACAO
+    // (Arena Sport on 88.212.x works in VLC, fails in the browser).
     if (mem?.url !== first.url || mem.mode !== "direct") {
-      // Cleartext / no-CORS My Links lead with relay — don't revive a poisoned
-      // browser-direct memory that blacks out https pages.
       clearStreamMemory(item.slug);
     }
   }
@@ -306,16 +302,58 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
   return { index: idx, mode: memNow.mode };
 }
 
+/** Seconds of media ahead of the playhead (negative = playhead past buffer). */
 function bufferedAhead(el: HTMLVideoElement): number {
   const { buffered, currentTime } = el;
   if (!buffered.length) return 0;
   for (let i = 0; i < buffered.length; i++) {
-    if (currentTime >= buffered.start(i) && currentTime <= buffered.end(i)) {
-      return Math.max(0, buffered.end(i) - currentTime);
+    if (currentTime >= buffered.start(i) - 0.05 && currentTime <= buffered.end(i) + 0.05) {
+      return buffered.end(i) - currentTime;
     }
   }
+  // Outside every range — signed distance to the latest end (can be negative).
+  return buffered.end(buffered.length - 1) - currentTime;
+}
+
+/**
+ * Heal playhead vs buffer mismatches without replaying old media.
+ *
+ * - overshoot: currentTime past buffer end → nudge to just inside the end
+ *   (NOT several seconds back — that re-plays the same stretch in a loop)
+ * - enter-window: currentTime before buffer (DVR slid away) → step into the
+ *   earliest buffered media. Only on explicit Play when nothing else plays.
+ */
+function snapPlayheadIntoBuffer(
+  el: HTMLVideoElement,
+  mode: "overshoot" | "enter-window" = "overshoot",
+): boolean {
+  const { buffered, currentTime } = el;
+  if (!buffered.length) return false;
+  for (let i = 0; i < buffered.length; i++) {
+    if (currentTime >= buffered.start(i) - 0.05 && currentTime <= buffered.end(i) + 0.05) {
+      return false;
+    }
+  }
+  const start = buffered.start(buffered.length - 1);
   const end = buffered.end(buffered.length - 1);
-  return end > currentTime ? end - currentTime : 0;
+  const span = end - start;
+  if (span < 0.4) return false;
+
+  let target: number | null = null;
+  if (currentTime > end + 0.05) {
+    // Tiny nudge inside the end — never rewind seconds of already-seen video.
+    target = Math.max(start, end - 0.2);
+  } else if (mode === "enter-window" && currentTime < start - 0.05) {
+    // DVR slid past us — join at the front of what is still buffered.
+    target = start + Math.min(0.25, span * 0.05);
+  }
+  if (target == null) return false;
+  try {
+    el.currentTime = target;
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function playUrlFor(source: MediaSource, mode: "direct" | "proxy") {
@@ -329,7 +367,7 @@ function playUrlFor(source: MediaSource, mode: "direct" | "proxy") {
 
 /**
  * YouTube-style live player:
- * - sit ~45–60s behind live with a deep ahead preload (smooth, not stutter)
+ * - sit behind live with a deep ahead preload (smooth — never tip-chase)
  * - never auto-snap to live (only Back to live / refresh)
  * - silent recover / proxy / mirror (no black-out panic)
  * - standby warmup of next mirror
@@ -356,7 +394,6 @@ export function VideoPlayer({
   const deepBufferRef = useRef(false);
 
   const sources = useMemo(() => sortedSources(item), [item]);
-  const privatePlaylist = item.categories.includes("My Playlist");
 
   const [sourceIndex, setSourceIndex] = useState(0);
   const [mode, setMode] = useState<"direct" | "proxy">("direct");
@@ -447,6 +484,15 @@ export function VideoPlayer({
     standbyRef.current?.destroy();
     standbyRef.current = null;
     if (!next || next.format !== "hls") return;
+    // Staff picks / My Links / My Playlist already fight a slow CDN — never warm
+    // a second path in the background (relay+direct racing starves the player).
+    if (
+      item.categories.includes("My Links") ||
+      item.categories.includes("Staff picks") ||
+      item.categories.includes("My Playlist")
+    ) {
+      return;
+    }
     // Don't warm cleartext / no-CORS origins in the background — they aren't
     // a viable cutover from secure-relay and only race the live edge.
     if (
@@ -482,7 +528,7 @@ export function VideoPlayer({
       standbyRef.current?.destroy();
       standbyRef.current = null;
     };
-  }, [sources, sourceIndex, item.id]);
+  }, [sources, sourceIndex, item.id, item.categories]);
 
   useEffect(() => {
     if (!source) return;
@@ -538,7 +584,8 @@ export function VideoPlayer({
         instance.config.maxBufferLength = deep.maxBufferLength;
         instance.config.maxMaxBufferLength = deep.maxMaxBufferLength;
         instance.config.maxBufferSize = deep.maxBufferSize;
-        instance.startLoad(-1);
+        // Do NOT startLoad(-1) here — restarting the loader every few seconds
+        // is what made live stutter on each segment boundary.
       } catch {
         /* ignore */
       }
@@ -617,31 +664,52 @@ export function VideoPlayer({
           }
         }
 
-        // Intentional ~45–60s behind live + heavy ahead preload (smooth, not stutter).
-        // My Links stay nearer the tip (short CDN windows) with long frag timeouts.
+        // Catalog: behind-live cushion + deep preload.
+        // My Links: ad-site style — near tip, full HD ABR, no hard pause gate.
         const kind = liveKindFor(item, url);
         const profile = resolveDeviceProfile(isTvLikeDevice());
         const tuning = buildLiveHlsTuning(profile, kind);
         const deepLive = Boolean(
-          kind.linear || kind.sports || kind.unstable || kind.trace || kind.privatePlaylist,
+          kind.linear || kind.sports || kind.unstable || kind.trace,
         );
         const slowFrags = deepLive || Boolean(kind.myLinks) || profile === "tv";
-        // Start already on the deep preload targets — fill the cushion ASAP.
         const preload = deepenLiveBufferTargets(profile, kind);
+        let primedPlay = false;
+        let rebufferPause = false;
+        /** Pin playhead across pause→play so hls.js cannot jump to live sync. */
+        let pinnedPlayhead: number | null = null;
+        let allowLiveSeek = false;
+        // My Links: play quickly like ad sites (2s cushion). Heavy catalog still primes deeper.
+        const needPrime = Boolean(kind.myLinks) || deepLive || profile === "tv";
+        const primeAheadSec = kind.myLinks ? 2 : deepLive ? 8 : 4;
+        const loadAtPlayhead = () => {
+          try {
+            const at = el.currentTime;
+            if (Number.isFinite(at) && at > 0) instance.startLoad(at);
+            else instance.startLoad();
+          } catch {
+            /* ignore */
+          }
+        };
         const instance = new Hls({
           enableWorker: true,
           lowLatencyMode: false,
+          // Cap + startLoad ourselves after MANIFEST_PARSED so we never race
+          // an HD level or a liveSync seek before the buffer exists.
+          autoStartLoad: false,
           startFragPrefetch: true,
           maxBufferHole: tuning.maxBufferHole,
           renderTextTracksNatively: true,
           testBandwidth: tuning.testBandwidth,
-          startLevel: tuning.preferStartLevel,
+          startLevel: tuning.preferStartLevel < 0 ? -1 : 0,
           abrEwmaDefaultEstimate: tuning.abrEwmaDefaultEstimate,
           abrBandWidthFactor: tuning.abrBandWidthFactor,
           abrBandWidthUpFactor: tuning.abrBandWidthUpFactor,
           // Duration-based live sync only — never mix with *DurationCount keys.
           liveSyncDuration: tuning.liveSyncDuration,
           liveMaxLatencyDuration: tuning.liveMaxLatencyDuration,
+          // Never speed-catch-up toward the tip (feels like a jump on Play).
+          maxLiveSyncPlaybackRate: 1,
           liveDurationInfinity: true,
           maxBufferLength: Math.max(tuning.maxBufferLength, preload.maxBufferLength),
           maxMaxBufferLength: Math.max(
@@ -650,17 +718,16 @@ export function VideoPlayer({
           ),
           maxBufferSize: Math.max(tuning.maxBufferSize, preload.maxBufferSize),
           backBufferLength: tuning.backBufferLength,
-          highBufferWatchdogPeriod: profile === "tv" ? 3 : 2,
+          highBufferWatchdogPeriod: profile === "tv" ? 4 : 3,
           nudgeMaxRetry: 24,
-          // Keep the loader busy so the ahead buffer fills hard.
-          maxLoadingDelay: 2,
-          maxStarvationDelay: 2,
+          // High starvation delay — low values panic-seek and stutter every few seconds.
+          maxLoadingDelay: kind.myLinks ? 4 : 6,
+          maxStarvationDelay: kind.myLinks ? 4 : 6,
           capLevelToPlayerSize: tuning.capLevelToPlayerSize,
           capLevelOnFPSDrop: tuning.capLevelOnFPSDrop,
           manifestLoadingTimeOut: slowFrags ? 45000 : 18000,
           levelLoadingTimeOut: slowFrags ? 45000 : 18000,
-          // 22s aborts ~4MB TSN segments mid-proxy (~60s at ~70KB/s).
-          fragLoadingTimeOut: kind.myLinks ? 120000 : slowFrags ? 60000 : 22000,
+          fragLoadingTimeOut: kind.myLinks ? 45000 : slowFrags ? 60000 : 22000,
           xhrSetup: (xhr) => {
             // Imported playlists run through our same-origin relay. It needs
             // the signed-in viewer session cookie; direct public HLS sources
@@ -676,6 +743,8 @@ export function VideoPlayer({
         const jumpToLive = () => {
           // Explicit Back to live only — seeks to intentional sync point
           // (already ~45–60s behind edge), never the tip of the playlist.
+          allowLiveSeek = true;
+          pinnedPlayhead = null;
           const live = instance.liveSyncPosition;
           if (live != null && Number.isFinite(live)) {
             try {
@@ -687,8 +756,18 @@ export function VideoPlayer({
             setBehindLive(false);
             setLagSec(0);
             void el.play().catch(() => undefined);
+            // Re-arm pin after the seek lands.
+            queueMicrotask(() => {
+              allowLiveSeek = false;
+              pinnedPlayhead = el.currentTime;
+            });
           } else {
-            instance.startLoad();
+            try {
+              instance.startLoad(-1);
+            } catch {
+              /* ignore */
+            }
+            allowLiveSeek = false;
           }
         };
 
@@ -698,16 +777,18 @@ export function VideoPlayer({
         /** Soft refill only — never snap to live on stall / recover. */
         const softRefill = (reason: Parameters<typeof shouldAutoSnapToLive>[0]) => {
           void shouldAutoSnapToLive(reason);
+          // My Links: avoid hammering startLoad on every hole — that restarts
+          // the segment pipeline and causes the 2–5s freeze loop.
+          if (kind.myLinks) {
+            setStatus("Buffering…");
+            return;
+          }
           setStatus(
             isSportsHeavy(item) || profile === "tv"
               ? "Optimising playback…"
               : "Getting things ready…",
           );
-          try {
-            instance.startLoad();
-          } catch {
-            /* ignore */
-          }
+          loadAtPlayhead();
         };
 
         const silentProxy = () => {
@@ -819,36 +900,112 @@ export function VideoPlayer({
             if (tuning.maxBitrate != null && cap >= 0) {
               instance.autoLevelCapping = cap;
             }
-            if (levels.length > 2) {
-              instance.startLevel = Math.min(
-                tuning.preferStartLevel || 0,
-                Math.min(1, levels.length - 1),
-              );
+            // My Links: auto ABR (startLevel -1) so we climb to full HD like ad sites.
+            // Catalog / single-rung: start low when capped.
+            if (kind.myLinks || tuning.preferStartLevel < 0) {
+              instance.startLevel = -1;
+            } else if (tuning.maxBitrate != null && cap >= 0) {
+              instance.startLevel = Math.min(cap, tuning.preferStartLevel || 0);
+              if (levels.length === 1) {
+                try {
+                  instance.currentLevel = instance.startLevel;
+                  instance.loadLevel = instance.startLevel;
+                } catch {
+                  /* ignore */
+                }
+              }
+            } else if (levels.length > 0) {
+              instance.startLevel = 0;
             }
           } catch {
             /* ignore */
           }
-          setStatus(item.isLive ? "Live" : "Ready");
+          // Start after level policy so the first frags match ABR intent.
+          try {
+            instance.startLoad();
+          } catch {
+            /* ignore */
+          }
+          setStatus(item.isLive ? (needPrime ? "Buffering…" : "Live") : "Ready");
+          if (needPrime) {
+            setStatus("Buffering…");
+            deepenTimer = setTimeout(() => {
+              if (cancelled || primedPlay) return;
+              if (!kind.myLinks) {
+                if (snapPlayheadIntoBuffer(el, "overshoot") || bufferedAhead(el) < primeAheadSec) {
+                  return;
+                }
+              }
+              primedPlay = true;
+              setStatus(item.isLive ? "Live" : "Playing");
+              void el
+                .play()
+                .then(() => {
+                  saveGood();
+                  deepenBuffer(instance, url);
+                })
+                .catch(() => setStatus("Tap play to start"));
+            }, kind.myLinks ? 2500 : 8000);
+          } else {
+            void el
+              .play()
+              .then(() => {
+                saveGood();
+                deepenTimer = setTimeout(
+                  () => deepenBuffer(instance, url),
+                  item.isLive ? 200 : 1500,
+                );
+              })
+              .catch(() => setStatus("Tap play to start"));
+          }
+        });
+
+        const resumeAfterRebuffer = () => {
+          if (cancelled) return;
+          // My Links no longer use hard rebuffer-pause — native stall is enough.
+          if (kind.myLinks) return;
+          const ahead = bufferedAhead(el);
+          if (ahead < 4) return;
+          if (!el.paused && !rebufferPause) return;
           void el
             .play()
             .then(() => {
-              saveGood();
-              // Strong preload ASAP — don't wait seconds before deepening.
-              deepenTimer = setTimeout(
-                () => deepenBuffer(instance, url),
-                item.isLive ? 200 : 1500,
-              );
+              rebufferPause = false;
+              setStatus(item.isLive ? "Live" : "Playing");
             })
-            .catch(() => setStatus("Tap play to start"));
-        });
+            .catch(() => {
+              rebufferPause = true;
+              setStatus("Buffering…");
+            });
+        };
 
         instance.on(Hls.Events.FRAG_BUFFERED, () => {
+          // Tiny overshoot nudge only — never rewind seconds of video.
+          snapPlayheadIntoBuffer(el, "overshoot");
           const ahead = bufferedAhead(el);
-          setAheadSec(Math.round(ahead));
+          setAheadSec(Math.round(Math.max(0, ahead)));
           if (ahead >= 3) {
             saveGood();
             deepenBuffer(instance, url);
           }
+          // Never seek to liveSync on prime — that jumps the playhead past the
+          // buffered range and causes ahead<0 stutter (witnessed on TSN 4).
+          if (needPrime && !primedPlay && ahead >= primeAheadSec) {
+            primedPlay = true;
+            if (deepenTimer) {
+              clearTimeout(deepenTimer);
+              deepenTimer = null;
+            }
+            setStatus(item.isLive ? "Live" : "Playing");
+            void el
+              .play()
+              .then(() => {
+                saveGood();
+                deepenBuffer(instance, url);
+              })
+              .catch(() => setStatus("Tap play to start"));
+          }
+          resumeAfterRebuffer();
         });
 
         instance.on(Hls.Events.LEVEL_SWITCHED, () => {
@@ -896,7 +1053,7 @@ export function VideoPlayer({
               return;
             }
             try {
-              instance.startLoad();
+              loadAtPlayhead();
             } catch {
               /* ignore */
             }
@@ -925,27 +1082,69 @@ export function VideoPlayer({
           setError("This programme isn’t available right now. Please try another channel.");
         });
 
-        const onPause = () => {
-          if (!item.isLive) return;
-          markBehind();
+        const restorePinnedPlayhead = () => {
+          if (
+            !item.isLive ||
+            allowLiveSeek ||
+            pinnedPlayhead == null ||
+            !Number.isFinite(pinnedPlayhead)
+          ) {
+            return;
+          }
+          // Only undo a big forward live-sync jump. Never rewind for stalls.
+          if (el.currentTime <= pinnedPlayhead + 2.5) {
+            pinnedPlayhead = null;
+            return;
+          }
+          const pin = pinnedPlayhead;
+          pinnedPlayhead = null; // one-shot — prevents replaying the same stretch
           try {
-            instance.startLoad();
+            const { buffered } = el;
+            let pinOk = false;
+            for (let i = 0; i < buffered.length; i++) {
+              if (pin >= buffered.start(i) - 0.5 && pin <= buffered.end(i) + 0.5) {
+                pinOk = true;
+                break;
+              }
+            }
+            if (pinOk) el.currentTime = pin;
+            else snapPlayheadIntoBuffer(el, "enter-window");
           } catch {
             /* ignore */
           }
+        };
+
+        const onPause = () => {
+          if (!item.isLive) return;
+          // Real user pause only — ignore stall hiccups so we don't rewind later.
+          if (
+            !allowLiveSeek &&
+            !rebufferPause &&
+            el.readyState >= 2 &&
+            Number.isFinite(el.currentTime)
+          ) {
+            pinnedPlayhead = el.currentTime;
+          }
+          if (rebufferPause) {
+            setStatus("Buffering…");
+            return;
+          }
+          markBehind();
+          loadAtPlayhead();
           setStatus("Paused");
         };
 
         const onPlay = () => {
+          // One-shot undo of live-sync seek after Play — no delayed rewinds.
+          restorePinnedPlayhead();
           if (behindLiveRef.current) setStatus("Playing · behind live");
         };
 
         const onWaiting = () => {
-          // Soft status only — don't panic-overlay while buffer refills
+          // Soft status only — don't hard-pause (that caused constant "pausing"
+          // on My Links vs smooth ad-site players that just stall briefly).
           setStatus("Buffering…");
           clearWaiting();
-          // Staff-pick IP feeds need long frag loads — don't treat as sports
-          // just because the title says TSN / Sports.
           const sports =
             !kind.myLinks &&
             (isSportsHeavy(item) || isLinearSportsPack(item));
@@ -958,9 +1157,8 @@ export function VideoPlayer({
               setError("This stream is taking longer than usual. Please try another channel.");
               return;
             }
-            // Always soft-refill — never auto snap to live on waiting timeout.
             softRefill("waiting_timeout");
-          }, kind.myLinks ? 45000 : sports || profile === "tv" ? 10000 : 6000);
+          }, kind.myLinks ? 20000 : sports || profile === "tv" ? 10000 : 6000);
         };
 
         const onPlaying = () => {
@@ -970,7 +1168,9 @@ export function VideoPlayer({
           recoverCount = 0;
           saveGood();
           deepenBuffer(instance, url);
-          setAheadSec(Math.round(bufferedAhead(el)));
+          // Do NOT restore/update pin here — stalls re-fire "playing" and
+          // would rewind into already-watched media (the repeat loop).
+          setAheadSec(Math.round(Math.max(0, bufferedAhead(el))));
           if (item.isLive && behindLiveRef.current) {
             setStatus("Behind live");
           } else {
@@ -980,8 +1180,37 @@ export function VideoPlayer({
 
         lagTimer = setInterval(() => {
           if (cancelled) return;
-          setAheadSec(Math.round(bufferedAhead(el)));
+          // Tiny overshoot heal for all live — without it My Links freeze with
+          // ahead<0 (playhead past media) until a manual seek.
+          if (item.isLive && snapPlayheadIntoBuffer(el, "overshoot")) {
+            if (!kind.myLinks) {
+              rebufferPause = true;
+              try {
+                el.pause();
+              } catch {
+                /* ignore */
+              }
+              setStatus("Buffering…");
+            }
+          }
+          const ahead = bufferedAhead(el);
+          setAheadSec(Math.round(Math.max(0, ahead)));
           if (!item.isLive) return;
+
+          if (!kind.myLinks && deepLive && primedPlay) {
+            if (!rebufferPause && !el.paused && ahead < 1.5) {
+              rebufferPause = true;
+              try {
+                el.pause();
+              } catch {
+                /* ignore */
+              }
+              setStatus("Buffering…");
+            } else if (rebufferPause && ahead >= 5) {
+              resumeAfterRebuffer();
+            }
+          }
+
           // Distance to the true live edge (not liveSyncPosition).
           // Intentional ~45–60s behind still shows Back to live.
           let lag = 0;
@@ -1004,7 +1233,7 @@ export function VideoPlayer({
           setLagSec(lag);
           // Never auto-clear — only Back to live clears via jumpToLive.
           if (shouldMarkBehindLive(lag)) markBehind();
-        }, 1500);
+        }, 1000);
 
         el.addEventListener("waiting", onWaiting);
         el.addEventListener("playing", onPlaying);
@@ -1255,10 +1484,9 @@ export function VideoPlayer({
                 <span className="gls-live-dot h-1.5 w-1.5 rounded-full bg-gls-red" />
               )}
               {status}
-              {(privatePlaylist || aheadSec >= 5) && (
+              {(aheadSec >= 5) && (
                 <span className="normal-case tracking-normal text-emerald-300/90">
-                  · {aheadSec}s
-                  {privatePlaylist ? " / 60s buffer target" : " ahead"}
+                  · {aheadSec}s ahead
                 </span>
               )}
               {item.categories.includes("Geo") && (

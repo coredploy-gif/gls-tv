@@ -2,7 +2,11 @@ import "server-only";
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import { secureFetchBuffered } from "@/lib/secure-url";
+import {
+  isLikelyIptvStreamPath,
+  shouldSkipUnboundedMediaBodyDownload,
+} from "@/lib/media-path";
+import { secureFetchBuffered, validatePublicUrl } from "@/lib/secure-url";
 import {
   formatFromContentType,
   formatFromMediaMagic,
@@ -75,6 +79,8 @@ function evaluateDirectMediaBody(
     provisional: boolean;
     contentType?: string;
     detailPrefix?: string;
+    /** Extensionless IPTV gateway — allow TS/octet-stream without #EXTM3U. */
+    iptvGateway?: boolean;
   },
 ): MediaLinkProbeResult {
   const contentType = options.contentType || "";
@@ -84,29 +90,60 @@ function evaluateDirectMediaBody(
 
   if (format === "hls") {
     const text = body.toString("utf8").slice(0, 512);
-    if (!/#EXTM3U/i.test(text)) {
+    if (/#EXTM3U/i.test(text)) {
+      return { ok: true, status: "active", detail: prefix, format: "hls" };
+    }
+    const ctLeaf = (options.contentType || "")
+      .split(";")[0]
+      .trim()
+      .toLowerCase();
+    if (ctLeaf && /^(text\/html|application\/json|text\/xml|application\/xml)/i.test(ctLeaf)) {
       return {
         ok: false,
         status: "error",
-        detail: "URL did not return an HLS playlist (#EXTM3U).",
+        detail: `URL returned ${ctLeaf}, not an HLS/live stream.`,
       };
     }
-    return { ok: true, status: "active", detail: prefix, format: "hls" };
+    // IPTV /play/ gateways often stream MPEG-TS or opaque bytes without a playlist leaf.
+    if (options.iptvGateway) {
+      if (
+        /mpegurl|mpegts|mp2t|octet-stream|video\/|audio\//i.test(ctLeaf) ||
+        (body.length > 0 && body[0] === 0x47) ||
+        body.length > 0
+      ) {
+        return {
+          ok: true,
+          status: "active",
+          detail: `${prefix} · live stream endpoint`,
+          format: "hls",
+        };
+      }
+    }
+    return {
+      ok: false,
+      status: "error",
+      detail: "URL did not return an HLS playlist (#EXTM3U).",
+    };
   }
 
   if (options.provisional) {
+    // Extensionless IPTV / HLS gateways often omit .m3u8 but return #EXTM3U.
+    const head = body.toString("utf8").slice(0, 512);
+    if (/#EXTM3U/i.test(head) || fromCt === "hls") {
+      return {
+        ok: true,
+        status: "active",
+        detail: `${prefix} · detected hls via ${fromCt === "hls" ? "Content-Type" : "playlist header"}`,
+        format: "hls",
+      };
+    }
     const sniffed = fromCt || fromMagic;
-    if (
-      !sniffed ||
-      sniffed === "hls" ||
-      sniffed === "youtube" ||
-      sniffed === "vimeo"
-    ) {
+    if (!sniffed || sniffed === "youtube" || sniffed === "vimeo") {
       return {
         ok: false,
         status: "error",
         detail:
-          "No playable extension in the URL, and the response was not video/* (or recognizable MP4/WebM). Add .mp4/.webm to the path, or use a link that returns a video Content-Type.",
+          "No playable extension in the URL, and the response was not video/* / HLS (or recognizable MP4/WebM). Add .mp4/.webm/.m3u8 to the path, or use a link that returns a video/mpegurl Content-Type.",
       };
     }
     return {
@@ -211,6 +248,39 @@ export async function probeMediaLinkReachability(
     return probeTrustedAppMediaFile(url, format, provisional);
   }
 
+  let iptvGateway = false;
+  try {
+    iptvGateway = isLikelyIptvStreamPath(new URL(url).pathname);
+  } catch {
+    iptvGateway = false;
+  }
+
+  // Live IPTV gateways / .m3u8 leaves often stream unbounded MPEG-TS (or announce
+  // a huge Content-Length). secureFetchBuffered would throw "Upstream response
+  // is too large" — SSRF-check only, never download the body.
+  if (shouldSkipUnboundedMediaBodyDownload(url)) {
+    try {
+      await validatePublicUrl(url);
+      return {
+        ok: true,
+        status: "active",
+        detail: iptvGateway
+          ? "Individual live stream endpoint · body probe skipped"
+          : "Individual HLS URL · body probe skipped",
+        format: format === "hls" || provisional || iptvGateway ? "hls" : format,
+      };
+    } catch (cause) {
+      return {
+        ok: false,
+        status: "error",
+        detail:
+          cause instanceof Error
+            ? cause.message
+            : "Could not validate that URL from our servers.",
+      };
+    }
+  }
+
   try {
     const result = await secureFetchBuffered(url, {
       maxBytes: format === "hls" || provisional ? 64_000 : 8_192,
@@ -237,6 +307,7 @@ export async function probeMediaLinkReachability(
       provisional,
       contentType: headerContentType(result.headers),
       detailPrefix: "Reachable",
+      iptvGateway,
     });
   } catch (cause) {
     return {

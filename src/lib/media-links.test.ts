@@ -71,6 +71,22 @@ describe("media-links", () => {
     expect(v.title).toBe("TSN 5");
   });
 
+  it("accepts http IP:port IPTV /play/ gateway URLs as HLS", () => {
+    const url = "http://103.253.18.58:8000/play/a03o";
+    expect(detectPlayableFormat(url)).toBe("hls");
+    const v = validateMediaLinkUrl(url, "Arena");
+    expect(v.ok).toBe(true);
+    expect(v.format).toBe("hls");
+    expect(v.provisional).toBeUndefined();
+    expect(v.title).toBe("Arena");
+  });
+
+  it("rejects javascript: and other non-http schemes", () => {
+    expect(validateMediaLinkUrl("javascript:alert(1)").ok).toBe(false);
+    expect(validateMediaLinkUrl("data:text/html,hi").ok).toBe(false);
+    expect(validateMediaLinkUrl("file:///etc/passwd").ok).toBe(false);
+  });
+
   it("accepts arbitrary public hostname .m3u8 without catalogue allowlist", () => {
     const url = "https://cdn.random-public.example/live/index.m3u8";
     expect(detectPlayableFormat(url)).toBe("hls");

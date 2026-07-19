@@ -237,7 +237,7 @@ export function AdminMediaLinksPanel() {
               setPreview(null);
             }}
             required
-            placeholder="https://…/index.m3u8 (any public host; http IP OK)"
+            placeholder="https://…/index.m3u8 or http://IP:port/play/… (any public host; http IP OK)"
             className="gls-admin-input w-full"
           />
         </label>

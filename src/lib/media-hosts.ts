@@ -1,6 +1,12 @@
 import net from "node:net";
 import { isReservedAddress } from "@/lib/secure-url";
 
+export {
+  isIndividualPlaylistUrl,
+  isLikelyIptvStreamPath,
+  isLikelySingleStreamHlsUrl,
+} from "@/lib/media-path";
+
 const MEDIA_HOST_SUFFIXES = [
   "mangomolo.com",
   "sabcplus.com",
@@ -61,6 +67,8 @@ const MEDIA_HOST_SUFFIXES = [
 ];
 
 export function isAllowedMediaHost(hostname: string) {
+  // Public IP literals (http://1.2.3.4:8000/play/…) — reserved/private still denied.
+  if (isPublicIpHostname(hostname)) return true;
   const configured = (process.env.GLS_HLS_ALLOWED_HOSTS || "")
     .split(",")
     .map((host) => host.trim().toLowerCase())
@@ -75,30 +83,4 @@ export function isPublicIpHostname(hostname: string) {
   const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
   if (!net.isIP(host)) return false;
   return !isReservedAddress(host);
-}
-
-/**
- * Path (before query) ends with `.m3u` or `.m3u8`.
- * Individual My Links / Staff picks / M3U preview may skip the catalogue host
- * allowlist for these; SSRF still uses validatePublicUrl.
- */
-export function isIndividualPlaylistUrl(raw: string) {
-  try {
-    const path = new URL(raw).pathname.toLowerCase();
-    return path.endsWith(".m3u8") || path.endsWith(".m3u");
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Single-stream HLS entry URLs (…/index.m3u8). Multi-channel lists are usually .m3u.
- * @deprecated Prefer {@link isIndividualPlaylistUrl} for allowlist skip decisions.
- */
-export function isLikelySingleStreamHlsUrl(raw: string) {
-  try {
-    return new URL(raw).pathname.toLowerCase().endsWith(".m3u8");
-  } catch {
-    return false;
-  }
 }

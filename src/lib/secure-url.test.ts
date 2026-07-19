@@ -39,6 +39,13 @@ describe("secure URL address checks", () => {
     ).rejects.toThrow(/Private or reserved network targets are blocked/);
   });
 
+  it("allows public IP:port IPTV stream URLs (SSRF still blocks reserved)", async () => {
+    const { url } = await validatePublicUrl("http://103.253.18.58:8000/play/a03o");
+    expect(url.hostname).toBe("103.253.18.58");
+    expect(url.port).toBe("8000");
+    expect(url.pathname).toBe("/play/a03o");
+  });
+
   it("stops buffering when a streamed response exceeds its byte limit", async () => {
     const stream = Readable.from([Buffer.alloc(8), Buffer.alloc(8)]);
     await expect(readStreamBuffered(stream, 12)).rejects.toThrow(

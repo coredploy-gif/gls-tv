@@ -346,7 +346,7 @@ export function PlaylistManager() {
                     type="url"
                     inputMode="url"
                     autoFocus
-                    placeholder="https://example.com/playlist.m3u or …/stream.m3u8"
+                    placeholder="https://example.com/playlist.m3u or http://IP:port/play/…"
                     className="w-full rounded-sm border-2 border-white/25 bg-black/55 px-4 py-4 text-lg text-white outline-none placeholder:text-white/35 focus:border-gls-red focus:ring-2 focus:ring-gls-red/40"
                   />
                 </label>

@@ -167,7 +167,7 @@ export function AdminM3uImport() {
           type="url"
           value={url}
           onChange={(event) => setUrl(event.target.value)}
-          placeholder="https://…/stream.m3u8 or allowlisted .m3u list (http public-IP OK)"
+          placeholder="https://…/stream.m3u8, http://IP:port/play/…, or allowlisted .m3u list"
           className="gls-admin-input flex-1"
         />
         <button
