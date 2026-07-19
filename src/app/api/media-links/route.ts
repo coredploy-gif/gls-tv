@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAccountEntitlement } from "@/lib/membership/account";
 import {
   normalizeMediaLinkCategory,
+  resolveMediaLinkThumbnail,
   validateMediaLinkUrl,
 } from "@/lib/media-links";
 import { probeMediaLinkReachability } from "@/lib/media-links-probe";
@@ -102,6 +103,7 @@ export async function POST(req: NextRequest) {
   }
 
   const resolvedFormat = probe.format || validation.format;
+  const category = normalizeMediaLinkCategory(body.category);
 
   const { count } = await supabase
     .from("user_media_links")
@@ -120,8 +122,16 @@ export async function POST(req: NextRequest) {
     title: validation.title!,
     format: resolvedFormat,
     status: probe.status,
-    thumbnail_url: validation.thumbnailUrl || null,
-    category: normalizeMediaLinkCategory(body.category),
+    thumbnail_url:
+      validation.thumbnailUrl ||
+      resolveMediaLinkThumbnail({
+        title: validation.title!,
+        category,
+        format: resolvedFormat,
+        thumbnailUrl: null,
+      }) ||
+      null,
+    category,
     embed_url: validation.embedUrl || null,
     video_id: validation.videoId || null,
     last_checked_at: new Date().toISOString(),

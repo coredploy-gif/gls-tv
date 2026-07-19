@@ -5,6 +5,7 @@ import {
   isLikelyChannelLogo,
 } from "@/lib/artwork";
 import playable from "@/data/generated/top10-playable.json";
+import playableKidsJson from "@/data/generated/playable-kids.json";
 
 type Raw = {
   title: string;
@@ -69,6 +70,71 @@ function toItem(
   };
 }
 
+/**
+ * Fixed English kids Top 10 — US/UK FAST cartoons always, independent of
+ * probe diversity (which mixed FR/IT/ES/IN/DE into the generated slice).
+ */
+const ENGLISH_KIDS_TOP10_SLUGS = [
+  "happykids-us-sd",
+  "mrbeanliveaction-uk-english",
+  "toongoggles-us-sd",
+  "ninjakidztv-us-sd",
+  "legochannel-us-sd",
+  "teletubbies-uk-sd",
+  "yugioh-us-sd",
+  "filmriseanime-us-sd",
+  "moonbugkids-uk-sd",
+  "babysharktv-us-sd",
+] as const;
+
+const BABY_SHARK_RAW: Raw = {
+  title: "Baby Shark TV",
+  slug: "babysharktv-us-sd",
+  url: "https://newidco-babysharktv-1-us.roku.wurl.tv/playlist.m3u8",
+  id: "iptv-babysharktv-us-sd",
+  countries: ["us"],
+  categories: ["Kids", "Animation"],
+  poster: "https://i.imgur.com/SbBKr8L.png",
+};
+
+function buildEnglishKidsTop10(): CatalogItem[] {
+  const bySlug = new Map<string, CatalogItem>();
+
+  for (const item of playableKidsJson as CatalogItem[]) {
+    if (item.slug) bySlug.set(item.slug, item);
+  }
+  for (const r of playable.kids as Raw[]) {
+    if (!bySlug.has(r.slug)) bySlug.set(r.slug, toItem(r, "Kids"));
+  }
+  if (!bySlug.has(BABY_SHARK_RAW.slug)) {
+    bySlug.set(BABY_SHARK_RAW.slug, toItem(BABY_SHARK_RAW, "Kids"));
+  }
+
+  const out: CatalogItem[] = [];
+  for (const slug of ENGLISH_KIDS_TOP10_SLUGS) {
+    const hit = bySlug.get(slug);
+    if (!hit) continue;
+    const cats = new Set([
+      ...hit.categories,
+      "Kids",
+      "Playable",
+      "Verified",
+      "Popular",
+      "EnglishKids",
+    ]);
+    const curated = curatedArtForSlug(slug);
+    out.push({
+      ...hit,
+      languages: ["English"],
+      categories: [...cats],
+      poster: curated?.poster || hit.poster,
+      backdrop: curated?.backdrop || hit.backdrop,
+      featured: true,
+    });
+  }
+  return out.slice(0, 10);
+}
+
 export const TOP10 = {
   sports: (playable.sports as Raw[]).map((r) => toItem(r, "Sports")),
   news: [
@@ -89,16 +155,21 @@ export const TOP10 = {
       .map((r) => toItem(r, "News"))
       .filter((i) => i.slug !== "al-jazeera-english"),
   ].slice(0, 10),
-  kids: (playable.kids as Raw[]).map((r) => toItem(r, "Kids")),
+  /** Always English US/UK cartoon FAST — not the mixed intl probe slice. */
+  kids: buildEnglishKidsTop10(),
   food: (playable.food as Raw[]).map((r) => toItem(r, "Food")),
 };
 
 export const TOP10_CATEGORIES = [
   { key: "sports" as const, title: "Top 10 Sports · Playable" },
   { key: "news" as const, title: "Top 10 News · Playable" },
-  { key: "kids" as const, title: "Top 10 Kids · Playable" },
+  { key: "kids" as const, title: "Top 10 Kids · English" },
   { key: "food" as const, title: "Top 10 Food · Playable" },
 ];
+
+export function getEnglishKidsTop10(): CatalogItem[] {
+  return [...TOP10.kids];
+}
 
 export function getAllTop10(): CatalogItem[] {
   const map = new Map<string, CatalogItem>();

@@ -31,6 +31,9 @@ const MEDIA_HOST_SUFFIXES = [
   "googleusercontent.com",
   "akamaized.net",
   "akamaihd.net",
+  // France 24 official live + Alkass Shoof GCP (proxy Referer: shoof.alkass.net)
+  "france24.com",
+  "alkassdigital.net",
   // Food / FAST CDN child hosts (Publica → Ottera → Kaltura; Tubi Aegis)
   "getpublica.com",
   "ottera.tv",
@@ -44,6 +47,13 @@ const MEDIA_HOST_SUFFIXES = [
   "fasttvcdn.com",
   "kwikmotion.com",
   "simplestreamcdn.com",
+  // MENA / Turkey public broadcasters (curated-mena + playable packs)
+  "trt.com.tr",
+  "alarabiya.net",
+  "skynewsarabia.com",
+  "edgenextcdn.net",
+  "ercdn.net",
+  "mncdn.com",
   // South African Islamic radio (official station / iono.fm streams)
   "my-control-panel.com",
   "radioislam.co.za",

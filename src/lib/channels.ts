@@ -22,6 +22,7 @@ import { CURATED_RADIO_AFRICA } from "@/data/curated-radio-africa";
 import { CURATED_RADIO_ZA } from "@/data/curated-radio-za";
 import { CURATED_RADIO_MW } from "@/data/curated-radio-mw";
 import { CURATED_RELIGION } from "@/data/curated-religion";
+import { CURATED_MENA } from "@/data/curated-mena";
 import {
   buildReligionPool,
   getReligionFolderForItem,
@@ -29,6 +30,7 @@ import {
 import {
   CURATED_PUBLIC_MOVIES,
   CURATED_PUBLIC_SPORTS,
+  CURATED_PUBLIC_KIDS,
   CURATED_SERIES_SEEDS,
 } from "@/data/curated-public-fast";
 import { CURATED_VOD_SERIES } from "@/data/curated-vod-series";
@@ -138,7 +140,9 @@ export function getVerifiedChannels() {
     CURATED_RADIO_MW,
     CURATED_RADIO_AFRICA,
     CURATED_RELIGION,
+    CURATED_MENA,
     CURATED_PUBLIC_SPORTS,
+    CURATED_PUBLIC_KIDS,
     CURATED_PUBLIC_MOVIES,
     CURATED_SERIES_SEEDS,
     CURATED_VOD_SERIES,
@@ -162,7 +166,9 @@ export function getAllChannels(): CatalogItem[] {
     CURATED_RADIO_MW,
     CURATED_RADIO_AFRICA,
     CURATED_RELIGION,
+    CURATED_MENA,
     CURATED_PUBLIC_SPORTS,
+    CURATED_PUBLIC_KIDS,
     CURATED_PUBLIC_MOVIES,
     CURATED_SERIES_SEEDS,
     CURATED_VOD_SERIES,
@@ -289,6 +295,11 @@ export function getLiveTvChannels() {
   return getAllChannels().filter(isLiveTvEligible);
 }
 
+/** Live TV channels tagged for a country hub (`/live/[country]`). */
+export function getLiveTvByCountry(code: string) {
+  return getLiveTvChannels().filter((c) => c.countries.includes(code));
+}
+
 export function getChannelBySlug(slug: string): CatalogItem | undefined {
   const lists = [
     top10,
@@ -298,7 +309,9 @@ export function getChannelBySlug(slug: string): CatalogItem | undefined {
     CURATED_RADIO_MW,
     CURATED_RADIO_AFRICA,
     CURATED_RELIGION,
+    CURATED_MENA,
     CURATED_PUBLIC_SPORTS,
+    CURATED_PUBLIC_KIDS,
     CURATED_PUBLIC_MOVIES,
     CURATED_SERIES_SEEDS,
     CURATED_VOD_SERIES,
@@ -373,6 +386,7 @@ export function getWrestlingChannels() {
 
 export function getKidsChannels() {
   return mergeUnique(
+    CURATED_PUBLIC_KIDS,
     playableKids,
     top10.filter((c) => c.categories.includes("Kids")),
     [...playableAfrica, ...playableAsia, ...usChannels].filter(

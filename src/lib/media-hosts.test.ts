@@ -21,6 +21,12 @@ describe("isAllowedMediaHost", () => {
     expect(isAllowedMediaHost("mainradiostreaming.zbc.co.zw")).toBe(true);
   });
 
+  it("allows France 24 and Alkass official CDNs for HLS proxy", () => {
+    expect(isAllowedMediaHost("live.france24.com")).toBe(true);
+    expect(isAllowedMediaHost("static.france24.com")).toBe(true);
+    expect(isAllowedMediaHost("liveeu-gcp.alkassdigital.net")).toBe(true);
+  });
+
   it("rejects unrelated hosts", () => {
     expect(isAllowedMediaHost("evil.example")).toBe(false);
     expect(isAllowedMediaHost("github.com")).toBe(false);

@@ -26,10 +26,20 @@ export async function GET(req: Request) {
   const params = new URL(req.url).searchParams;
   const playlistId = params.get("playlistId");
   const offset = Math.max(0, Math.min(Number(params.get("offset")) || 0, 5000));
-  const limit = Math.max(
-    1,
-    Math.min(Number(params.get("limit")) || PLAYLIST_LIMITS.pageSize, 1000),
-  );
+  // limit=0 returns playlists only (for Saved playlists management).
+  const rawLimit = Number(params.get("limit"));
+  const limit =
+    rawLimit === 0
+      ? 0
+      : Math.max(
+          1,
+          Math.min(
+            Number.isFinite(rawLimit) && rawLimit > 0
+              ? rawLimit
+              : PLAYLIST_LIMITS.pageSize,
+            1000,
+          ),
+        );
 
   const { data: playlists, error: pErr } = await supabase
     .from("user_playlists")
@@ -43,6 +53,19 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: pErr.message }, { status: 500 });
   }
 
+  if (limit === 0 || !entitlement.allowed) {
+    return NextResponse.json({
+      playlists: (playlists ?? []).map((playlist) => ({
+        ...playlist,
+        source_url: null,
+        source_redacted: redactSource(playlist.source_url),
+      })),
+      channels: [],
+      entitled: entitlement.allowed,
+      page: { offset, limit, hasMore: false },
+    });
+  }
+
   let channelQuery = supabase
     .from("user_playlist_channels")
     .select(
@@ -53,9 +76,7 @@ export async function GET(req: Request) {
     .order("sort_order", { ascending: true })
     .range(offset, offset + limit - 1);
   if (playlistId) channelQuery = channelQuery.eq("playlist_id", playlistId);
-  const { data: channels, error: cErr } = entitlement.allowed
-    ? await channelQuery
-    : { data: [], error: null };
+  const { data: channels, error: cErr } = await channelQuery;
 
   if (cErr) {
     return NextResponse.json({ error: cErr.message }, { status: 500 });

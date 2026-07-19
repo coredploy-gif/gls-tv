@@ -19,17 +19,30 @@ function art(id: string): ChannelArt {
 
 /** Unique cinematic stills keyed by slug (home / sports / kids / news / food). */
 export const CURATED_CHANNEL_ART: Record<string, ChannelArt> = {
-  // Sports / home hero — extreme + stadium variety
-  "red-bull-tv": art("photo-1551524559-8af4e6624178"),
-  "redbulltv-at-sd": art("photo-1522163189787-03190bc2697a"),
-  "atglive-se-sd": art("photo-1558618666-fcd25c85cd64"),
+  // Sports / home hero — soccer-first 4K plates (variety per slug)
+  "red-bull-tv": art("photo-1574629810360-7efbbe195018"),
+  "redbulltv-at-sd": art("photo-1431324155629-1a6deb1dec8d"),
+  "atglive-se-sd": art("photo-1522778119026-d647f0596c20"),
   "draftkingsnetwork-us-sd": art("photo-1508098682721-e5dbc6094189"),
-  "fueltv-pt-au": art("photo-1502680390469-be75c87ebe73"),
+  "fueltv-pt-au": art("photo-1579952363873-27f3bade9f55"),
   "fueltv-pt-emea": art("photo-1459865264687-595d652de67e"),
-  "kcmnld426-us-sd": art("photo-1492144534655-ae79c964c9d7"),
-  "mtrspt1-us-hd": art("photo-1568605117036-5fe5e7bab0b7"),
-  "pac12insider-us-sd": art("photo-1574629810360-7efbbe195018"),
-  "racerinternational-pl-fast": art("photo-1517940310602-285956722135"),
+  "kcmnld426-us-sd": art("photo-1517466787929-bc90951d0974"),
+  "mtrspt1-us-hd": art("photo-1560272564-c83b66b1ad12"),
+  "pac12insider-us-sd": art("photo-1575361204480-aadea25e6d68"),
+  "racerinternational-pl-fast": art("photo-1624526267942-ab0ff8a3e972"),
+  // Soccer / football FAST & hub cards
+  "beinsportsxtra-us-sd": art("photo-1574629810360-7efbbe195018"),
+  "beinsportsxtraenespanol-us-sd": art("photo-1517466787929-bc90951d0974"),
+  "stadium-us-sd": art("photo-1431324155629-1a6deb1dec8d"),
+  "fifaplus-us-sd": art("photo-1522778119026-d647f0596c20"),
+  "alkass-one": art("photo-1579952363873-27f3bade9f55"),
+  "alkass-two": art("photo-1508098682721-e5dbc6094189"),
+  "alkass-four": art("photo-1560272564-c83b66b1ad12"),
+  "30a-golf-kingdom": art("photo-1489944440615-453fc2b6a9a9"),
+  "acc-digital-network": art("photo-1606925797300-0b35e9d3864f"),
+  "cricket-gold": art("photo-1459865264687-595d652de67e"),
+  "dd-sports": art("photo-1575361204480-aadea25e6d68"),
+  "tennis-channel-fast": art("photo-1624526267942-ab0ff8a3e972"),
 
   // News
   "al-jazeera-english": art("photo-1495020689067-958852a7765e"),
@@ -54,6 +67,17 @@ export const CURATED_CHANNEL_ART: Record<string, ChannelArt> = {
   "ninjakidztv-us-sd": art("photo-1566576912321-d58ddd7a6088"),
   "legochannel-us-sd": art("photo-1587654780291-39c9404d749b"),
   "toongoggles-us-sd": art("photo-1503454537195-1dcabb73ffb9"),
+  "teletubbies-uk-sd": art("photo-1516627145497-ae6968895b74"),
+  "yugioh-us-sd": art("photo-1606092195730-5d7b9af1efc5"),
+  "filmriseanime-us-sd": art("photo-1471286174890-9c112ffca5b4"),
+  "moonbugkids-uk-sd": art("photo-1596464716127-f2a82984de30"),
+  "babysharktv-us-sd": art("photo-1515488042361-ee00e0ddd4e4"),
+  "brattv-us-sd": art("photo-1503454537195-1dcabb73ffb9"),
+  "kartoonchannel-us-sd": art("photo-1566576912321-d58ddd7a6088"),
+  "ketchuptv-us-sd": art("photo-1587654780291-39c9404d749b"),
+  "ryanandfriends-us-sd": art("photo-1516627145497-ae6968895b74"),
+  "tgjunior-us-sd": art("photo-1471286174890-9c112ffca5b4"),
+  "zoomoo-sg-sd": art("photo-1503454537195-1dcabb73ffb9"),
 
   // Food
   "inthekitchen-us-sd": art("photo-1556909114-f6e7ad7d3136"),

@@ -22,7 +22,7 @@ function browserClient() {
 }
 
 function applyHeal(item: CatalogItem, sources: MediaSource[]): CatalogItem {
-  const { sources: healed, tags, cleared } = healChannelSources({
+  const { sources: healed, tags, cleared, notice } = healChannelSources({
     ...item,
     sources,
   });
@@ -32,6 +32,9 @@ function applyHeal(item: CatalogItem, sources: MediaSource[]): CatalogItem {
     tags.includes("LinearPay") ||
     tags.includes("Rights");
   const urbanFallback = tags.includes(TRACE_URBAN_FALLBACK_TAG);
+  const sisterNotice =
+    notice ||
+    (urbanFallback ? TRACE_URBAN_FALLBACK_NOTICE : null);
   return {
     ...item,
     // Keep regional Trace card titles; only explain the Urban sister swap.
@@ -39,8 +42,8 @@ function applyHeal(item: CatalogItem, sources: MediaSource[]): CatalogItem {
     sources: healed,
     description: linearPay
       ? `${item.title} is a linear pay-TV sports channel. GLS lists it for discovery and onboarding — use the official licensed provider in your territory (no open pirate HLS).`
-      : urbanFallback
-        ? TRACE_URBAN_FALLBACK_NOTICE
+      : sisterNotice
+        ? sisterNotice
         : item.description,
     categories: [
       ...new Set([

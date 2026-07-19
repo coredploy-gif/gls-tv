@@ -39,6 +39,9 @@ export const COUNTRIES: CountryMeta[] = [
   { code: "de", name: "Germany", flag: "🇩🇪" },
   { code: "fr", name: "France", flag: "🇫🇷" },
   { code: "br", name: "Brazil", flag: "🇧🇷" },
+  { code: "sa", name: "Saudi Arabia", flag: "🇸🇦" },
+  { code: "ae", name: "United Arab Emirates", flag: "🇦🇪" },
+  { code: "tr", name: "Turkey", flag: "🇹🇷" },
   { code: "world", name: "Worldwide", flag: "🌍" },
 ];
 
@@ -561,7 +564,12 @@ export const CATALOG: CatalogItem[] = [
     isLive: true,
     sources: [
       {
-        url: "https://static.france24.com/live/F24_EN_HI_HLS/live_web.m3u8",
+        url: "https://live.france24.com/hls/live/2037218-b/F24_EN_HI_HLS/master_5000.m3u8",
+        quality: "1080p",
+        format: "hls",
+      },
+      {
+        url: "https://live.france24.com/hls/live/2037218/F24_EN_HI_HLS/master_5000.m3u8",
         quality: "1080p",
         format: "hls",
       },

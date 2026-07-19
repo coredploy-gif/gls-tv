@@ -17,13 +17,33 @@ import {
   needsDeepBuffer,
 } from "@/lib/channel-heal";
 import { isBrokenTraceOrigin, isTraceChannel, hasTraceUrbanFallbackTag } from "@/lib/trace-mirrors";
+import { hasSisterFallbackTag } from "@/lib/heal-registry";
 import { isLinearPayCategory } from "@/lib/linear-pay";
 import { useAppCopy } from "@/lib/useAppCopy";
 import { PlayerChrome } from "@/components/PlayerChrome";
 import { isSafariLike, resolveCastUrl } from "@/lib/remote-playback";
+import { isTvLikeDevice } from "@/lib/tv-detect";
+import {
+  buildLiveHlsTuning,
+  capLevelIndexForBitrate,
+  deepenLiveBufferTargets,
+  resolveDeviceProfile,
+  shouldAutoSnapToLive,
+  shouldMarkBehindLive,
+  type LiveChannelKind,
+} from "@/lib/live-playback-policy";
+
+export type PlayerNeighbor = {
+  href: string;
+  title: string;
+};
 
 type VideoPlayerProps = {
   item: CatalogItem;
+  /** Previous channel in catalogue / playlist context (optional). */
+  prevChannel?: PlayerNeighbor | null;
+  /** Next channel in catalogue / playlist context (optional). */
+  nextChannel?: PlayerNeighbor | null;
 };
 
 type HlsCtor = typeof import("hls.js").default;
@@ -52,6 +72,8 @@ function prefersProxy(url: string) {
   if (isPlutoFamily(url)) return true;
   // Publica/Ottera/Kaltura child CDNs may need same-origin relay after manifest rewrite.
   if (/getpublica\.com|ottera\.tv|kaltura\.com/i.test(url)) return true;
+  // Alkass GCP CORS is locked to shoof.alkass.net — must start on /api/hls.
+  if (/alkassdigital\.net/i.test(url)) return true;
   return false;
 }
 
@@ -110,6 +132,18 @@ function isUnstableCdn(url: string) {
 /** Food / cooking FAST — allow extra mirror steps before the offline overlay. */
 function isFoodChannel(item: CatalogItem) {
   return item.categories.some((c) => /food|cook|chef|kitchen/i.test(c));
+}
+
+function liveKindFor(item: CatalogItem, sourceUrl?: string): LiveChannelKind {
+  return {
+    linear: isLinearSportsPack(item),
+    sports: isSportsHeavy(item),
+    trace: isTraceChannel(item.slug, item.title),
+    unstable: sourceUrl
+      ? isUnstableCdn(sourceUrl) || requiresProxy(sourceUrl)
+      : false,
+    privatePlaylist: item.categories.includes("My Playlist"),
+  };
 }
 
 function initialPick(item: CatalogItem, sources: MediaSource[]) {
@@ -237,14 +271,25 @@ function playUrlFor(source: MediaSource, mode: "direct" | "proxy") {
 
 /**
  * YouTube-style live player:
- * - fast start (low ABR + short buffer) then deepen ahead buffer
+ * - play 30–60s+ behind live edge (deeper on TV) — never chase the tip
+ * - never auto-snap to live (only Back to live / refresh)
  * - silent recover / proxy / mirror (no black-out panic)
  * - standby warmup of next mirror
  * - last-good mirror memory + wake lock + media session
- * - pause keeps playhead; buffer keeps filling; Back to live on demand
+ * - pause keeps playhead; buffer keeps filling; rewind within DVR window
  */
-export function VideoPlayer({ item }: VideoPlayerProps) {
+export function VideoPlayer({
+  item,
+  prevChannel = null,
+  nextChannel = null,
+}: VideoPlayerProps) {
   const copy = useAppCopy();
+  const healBanner =
+    hasTraceUrbanFallbackTag(item.categories) ||
+    hasSisterFallbackTag(item.categories);
+  const healBannerText = hasTraceUrbanFallbackTag(item.categories)
+    ? copy("player.trace_urban_fallback")
+    : item.description?.trim() || copy("player.sister_fallback");
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<HlsType | null>(null);
   const standbyRef = useRef<HlsType | null>(null);
@@ -417,29 +462,16 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
       rememberStream(item.slug, source.url, mode);
     };
 
-    const deepenBuffer = (instance: HlsType) => {
+    const deepenBuffer = (instance: HlsType, sourceUrl?: string) => {
       if (deepBufferRef.current) return;
       deepBufferRef.current = true;
       try {
-        const linear = isLinearSportsPack(item);
-        const sports = isSportsHeavy(item);
-        const trace = isTraceChannel(item.slug, item.title);
-        const privatePlaylist = item.categories.includes("My Playlist");
-        // Keep a substantial reserve for long-form live / Trace music.
-        instance.config.maxBufferLength =
-          privatePlaylist ? 60 : linear || trace ? 420 : sports ? 320 : 140;
-        instance.config.maxMaxBufferLength =
-          privatePlaylist ? 180 : linear || trace ? 720 : sports ? 540 : 280;
-        instance.config.maxBufferSize =
-          (privatePlaylist
-            ? 90
-            : linear || trace
-              ? 380
-              : sports
-                ? 280
-                : 120) *
-          1000 *
-          1000;
+        const kind = liveKindFor(item, sourceUrl);
+        const profile = resolveDeviceProfile(isTvLikeDevice());
+        const deep = deepenLiveBufferTargets(profile, kind);
+        instance.config.maxBufferLength = deep.maxBufferLength;
+        instance.config.maxMaxBufferLength = deep.maxMaxBufferLength;
+        instance.config.maxBufferSize = deep.maxBufferSize;
         instance.startLoad(-1);
       } catch {
         /* ignore */
@@ -519,71 +551,39 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
           }
         }
 
-        // Fast start: low tier + short buffer, then deepen after playing.
-        // Linear sports + Trace: deep reserve against CDN / Wi-Fi jitter.
-        const linear = isLinearSportsPack(item);
-        const sports = isSportsHeavy(item);
-        const trace = isTraceChannel(item.slug, item.title);
-        const privatePlaylist = item.categories.includes("My Playlist");
-        const unstable = isUnstableCdn(url) || requiresProxy(url) || trace;
-        const deepLive =
-          linear || sports || unstable || trace || privatePlaylist;
+        // Stay 30–60s+ behind live; TV profile caps bitrate and deepens latency.
+        const kind = liveKindFor(item, url);
+        const profile = resolveDeviceProfile(isTvLikeDevice());
+        const tuning = buildLiveHlsTuning(profile, kind);
+        const deepLive = Boolean(
+          kind.linear || kind.sports || kind.unstable || kind.trace || kind.privatePlaylist,
+        );
         const instance = new Hls({
           enableWorker: true,
           lowLatencyMode: false,
           startFragPrefetch: true,
-          testBandwidth: !unstable && !linear && !trace,
-          startLevel: 0,
-          abrEwmaDefaultEstimate:
-            deepLive ? 350_000 : 800_000,
-          abrBandWidthFactor: deepLive ? 0.5 : 0.8,
-          abrBandWidthUpFactor: deepLive ? 0.3 : 0.6,
-          // Stay further behind live edge so the buffer can fill deeply.
-          liveSyncDurationCount: linear || trace ? 32 : unstable ? 22 : sports ? 20 : 6,
-          liveMaxLatencyDurationCount:
-            linear || trace ? 260 : unstable ? 180 : sports ? 160 : 50,
+          renderTextTracksNatively: true,
+          testBandwidth: tuning.testBandwidth,
+          startLevel: tuning.preferStartLevel,
+          abrEwmaDefaultEstimate: tuning.abrEwmaDefaultEstimate,
+          abrBandWidthFactor: tuning.abrBandWidthFactor,
+          abrBandWidthUpFactor: tuning.abrBandWidthUpFactor,
+          // Duration-based live sync only — never mix with *DurationCount keys.
+          liveSyncDuration: tuning.liveSyncDuration,
+          liveMaxLatencyDuration: tuning.liveMaxLatencyDuration,
           liveDurationInfinity: true,
-          // Private playlists may preload up to at least 60 seconds when the
-          // upstream live window and available bandwidth permit it.
-          maxBufferLength:
-            privatePlaylist
-              ? 60
-              : linear || trace
-                ? 200
-                : unstable
-                  ? 140
-                  : sports
-                    ? 120
-                    : 30,
-          maxMaxBufferLength:
-            privatePlaylist
-              ? 180
-              : linear || trace
-                ? 480
-                : unstable
-                  ? 320
-                  : sports
-                    ? 280
-                    : 90,
-          maxBufferSize:
-            (privatePlaylist
-              ? 90
-              : linear || trace
-                ? 220
-                : unstable
-                  ? 160
-                  : sports
-                    ? 130
-                    : 40) *
-            1000 *
-            1000,
-          maxBufferHole: deepLive ? 1.8 : 0.5,
-          backBufferLength: linear || trace ? 300 : sports || unstable ? 210 : 75,
-          highBufferWatchdogPeriod: 2,
+          maxBufferLength: tuning.maxBufferLength,
+          maxMaxBufferLength: tuning.maxMaxBufferLength,
+          maxBufferSize: tuning.maxBufferSize,
+          maxBufferHole: tuning.maxBufferHole,
+          backBufferLength: tuning.backBufferLength,
+          highBufferWatchdogPeriod: profile === "tv" ? 3 : 2,
           nudgeMaxRetry: 24,
-          manifestLoadingTimeOut: deepLive ? 45000 : 18000,
-          levelLoadingTimeOut: deepLive ? 45000 : 18000,
-          fragLoadingTimeOut: deepLive ? 60000 : 22000,
+          capLevelToPlayerSize: tuning.capLevelToPlayerSize,
+          capLevelOnFPSDrop: tuning.capLevelOnFPSDrop,
+          manifestLoadingTimeOut: deepLive || profile === "tv" ? 45000 : 18000,
+          levelLoadingTimeOut: deepLive || profile === "tv" ? 45000 : 18000,
+          fragLoadingTimeOut: deepLive || profile === "tv" ? 60000 : 22000,
           xhrSetup: (xhr) => {
             // Imported playlists run through our same-origin relay. It needs
             // the signed-in viewer session cookie; direct public HLS sources
@@ -597,6 +597,8 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
         instance.attachMedia(el);
 
         const jumpToLive = () => {
+          // Explicit Back to live only — seeks to intentional sync point
+          // (already ~30–60s behind edge), never the tip of the playlist.
           const live = instance.liveSyncPosition;
           if (live != null && Number.isFinite(live)) {
             try {
@@ -615,6 +617,21 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
 
         (el as HTMLVideoElement & { __glsJumpLive?: () => void }).__glsJumpLive =
           jumpToLive;
+
+        /** Soft refill only — never snap to live on stall / recover. */
+        const softRefill = (reason: Parameters<typeof shouldAutoSnapToLive>[0]) => {
+          void shouldAutoSnapToLive(reason);
+          setStatus(
+            isSportsHeavy(item) || profile === "tv"
+              ? "Optimising playback…"
+              : "Getting things ready…",
+          );
+          try {
+            instance.startLoad();
+          } catch {
+            /* ignore */
+          }
+        };
 
         const silentProxy = () => {
           // The direct source in an imported playlist has a dedicated relay
@@ -701,10 +718,17 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
         instance.on(Hls.Events.MANIFEST_PARSED, (_e, data) => {
           gotManifest = true;
           clearWatchdog();
-          // Prefer a mid-safe start if many levels; still start low when uncertain
           try {
-            if (data.levels?.length > 2) {
-              instance.startLevel = Math.min(1, data.levels.length - 1);
+            const levels = data.levels || [];
+            const cap = capLevelIndexForBitrate(levels, tuning.maxBitrate);
+            if (tuning.maxBitrate != null && cap >= 0) {
+              instance.autoLevelCapping = cap;
+            }
+            if (levels.length > 2) {
+              instance.startLevel = Math.min(
+                tuning.preferStartLevel || 0,
+                Math.min(1, levels.length - 1),
+              );
             }
           } catch {
             /* ignore */
@@ -715,11 +739,12 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
             .then(() => {
               saveGood();
               deepenTimer = setTimeout(
-                () => deepenBuffer(instance),
-                isLinearSportsPack(item) ||
-                  isSportsHeavy(item) ||
-                  isTraceChannel(item.slug, item.title) ||
-                  item.categories.includes("My Playlist")
+                () => deepenBuffer(instance, url),
+                kind.linear ||
+                  kind.sports ||
+                  kind.trace ||
+                  kind.privatePlaylist ||
+                  profile === "tv"
                   ? 500
                   : 2500,
               );
@@ -732,34 +757,27 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
           setAheadSec(Math.round(ahead));
           if (ahead >= 6) {
             saveGood();
-            deepenBuffer(instance);
+            deepenBuffer(instance, url);
           }
         });
 
         instance.on(Hls.Events.LEVEL_SWITCHED, () => {
-          // After ABR climbs, push deeper buffer
-          if (el.readyState >= 3) deepenBuffer(instance);
+          // After ABR climbs, push deeper buffer — never seek to live.
+          if (el.readyState >= 3) deepenBuffer(instance, url);
         });
 
         instance.on(Hls.Events.ERROR, (_e, data) => {
           if (!data.fatal) {
-            // Silent non-fatal recover — never flash error overlay
+            // Silent non-fatal recover — refill only; never snap to live.
             if (
-              !behindLiveRef.current &&
-              (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR ||
-                data.details === Hls.ErrorDetails.BUFFER_SEEK_OVER_HOLE)
+              data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR ||
+              data.details === Hls.ErrorDetails.BUFFER_SEEK_OVER_HOLE
             ) {
-              setStatus(isSportsHeavy(item) ? "Optimising playback…" : "Getting things ready…");
-              if (isSportsHeavy(item)) {
-                // Don't yo-yo to live edge on sports — refill while slightly behind
-                try {
-                  instance.startLoad();
-                } catch {
-                  /* ignore */
-                }
-              } else {
-                jumpToLive();
-              }
+              softRefill(
+                data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR
+                  ? "buffer_stalled"
+                  : "buffer_seek_hole",
+              );
             }
             return;
           }
@@ -804,7 +822,8 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
             } catch {
               /* ignore */
             }
-            if (!behindLiveRef.current) jumpToLive();
+            // Never jumpToLive after media recover — stay on playhead / DVR.
+            softRefill("media_error_recover");
             return;
           }
 
@@ -836,23 +855,14 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
             if (cancelled || el.readyState >= 3) return;
             if (!gotManifest && failOverPath()) return;
             recoverCount += 1;
-            if (recoverCount > (sports ? 6 : 4)) {
+            if (recoverCount > (sports || profile === "tv" ? 6 : 4)) {
               if (failOverPath()) return;
               setError("This stream is taking longer than usual. Please try another channel.");
               return;
             }
-            if (behindLiveRef.current || sports) {
-              setStatus("Getting things ready…");
-              try {
-                instance.startLoad();
-              } catch {
-                /* ignore */
-              }
-              return;
-            }
-            setStatus("Resuming playback…");
-            jumpToLive();
-          }, sports ? 10000 : 6000);
+            // Always soft-refill — never auto snap to live on waiting timeout.
+            softRefill("waiting_timeout");
+          }, sports || profile === "tv" ? 10000 : 6000);
         };
 
         const onPlaying = () => {
@@ -861,7 +871,7 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
           gotManifest = true;
           recoverCount = 0;
           saveGood();
-          deepenBuffer(instance);
+          deepenBuffer(instance, url);
           setAheadSec(Math.round(bufferedAhead(el)));
           if (item.isLive && behindLiveRef.current) {
             setStatus("Behind live");
@@ -874,15 +884,28 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
           if (cancelled) return;
           setAheadSec(Math.round(bufferedAhead(el)));
           if (!item.isLive) return;
-          const live = instance.liveSyncPosition;
-          if (live == null || !Number.isFinite(live)) return;
-          const lag = Math.max(0, Math.round(live - el.currentTime));
-          setLagSec(lag);
-          if (lag > 8) markBehind();
-          else if (lag <= 3 && !el.paused) {
-            behindLiveRef.current = false;
-            setBehindLive(false);
+          // Distance to the true live edge (not liveSyncPosition).
+          // Intentional 30–60s behind still shows Back to live.
+          let lag = 0;
+          try {
+            const latency = (instance as HlsType & { latency?: number }).latency;
+            if (typeof latency === "number" && Number.isFinite(latency)) {
+              lag = Math.max(0, Math.round(latency));
+            } else {
+              const win = el.seekable;
+              if (win.length > 0) {
+                lag = Math.max(
+                  0,
+                  Math.round(win.end(win.length - 1) - el.currentTime),
+                );
+              }
+            }
+          } catch {
+            /* ignore */
           }
+          setLagSec(lag);
+          // Never auto-clear — only Back to live clears via jumpToLive.
+          if (shouldMarkBehindLive(lag)) markBehind();
         }, 1500);
 
         el.addEventListener("waiting", onWaiting);
@@ -900,6 +923,13 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
         };
       } catch (err) {
         console.error(err);
+        const msg = err instanceof Error ? err.message : String(err);
+        // Config throws must not flip mode — that re-ran setup every render
+        // (Maximum update depth) when duration+count live keys were mixed.
+        if (/Illegal hls\.js config|don't mix up liveSync/i.test(msg)) {
+          setError("Playback could not start. Please try another channel.");
+          return;
+        }
         if (
           source.label === "browser-direct" &&
           sourceIndex + 1 < sources.length
@@ -950,7 +980,9 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
       hlsRef.current = null;
     };
   }, [
-    source,
+    source?.url,
+    source?.format,
+    source?.label,
     item.isLive,
     item.id,
     item.slug,
@@ -965,6 +997,12 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
     };
     el?.__glsJumpLive?.();
     setStatus("Live");
+  };
+
+  const markBehindUi = () => {
+    behindLiveRef.current = true;
+    setBehindLive(true);
+    setStatus("Behind live");
   };
 
   if (!sources.length) {
@@ -1079,14 +1117,14 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
 
       {!error && (
         <>
-          {hasTraceUrbanFallbackTag(item.categories) && (
+          {healBanner && (
             <div className="absolute inset-x-0 top-0 z-[16] bg-amber-500/90 px-4 py-2 text-center text-xs font-semibold tracking-wide text-black sm:text-sm">
-              {copy("player.trace_urban_fallback")}
+              {healBannerText}
             </div>
           )}
           <div
             className={`gls-player-status absolute left-4 z-[15] flex flex-wrap items-center gap-2 transition-opacity duration-300 ${
-              hasTraceUrbanFallbackTag(item.categories) ? "top-12" : "top-4"
+              healBanner ? "top-12" : "top-4"
             } ${
               statusBusy ? "opacity-100" : "pointer-events-none opacity-0"
             }`}
@@ -1117,7 +1155,7 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
               type="button"
               onClick={goLive}
               className={`absolute left-4 z-[15] rounded bg-gls-red px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
-                hasTraceUrbanFallbackTag(item.categories) ? "top-24" : "top-14"
+                healBanner ? "top-24" : "top-14"
               }`}
             >
               Back to live
@@ -1129,6 +1167,12 @@ export function VideoPlayer({ item }: VideoPlayerProps) {
             isLive={Boolean(item.isLive)}
             title={item.title}
             format={source?.format}
+            prevChannel={prevChannel}
+            nextChannel={nextChannel}
+            onUserSeekLive={() => {
+              // Rewind / scrub within DVR — stay behind live, never auto-return.
+              markBehindUi();
+            }}
             castUrl={
               source
                 ? // Fetchable playlist/progressive URL only — never the MSE blob.

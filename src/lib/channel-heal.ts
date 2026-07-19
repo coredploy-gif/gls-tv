@@ -1,5 +1,11 @@
 import type { CatalogItem, MediaSource } from "@/data/types";
-import overridesJson from "@/data/generated/channel-overrides.json";
+import {
+  applyHostRewrites,
+  brandHealPack,
+  isRegistryFragileHost,
+  verifiedHealUrl,
+  verifiedSlugPack,
+} from "@/lib/heal-registry";
 import {
   healTraceSources,
   isBrokenTraceOrigin,
@@ -10,9 +16,13 @@ import {
 } from "@/lib/trace-mirrors";
 
 /**
- * Pre-go-live channel healing.
+ * System-wide channel healing (playback path).
  * Prefer open / verified HLS mirrors; demote known-dead or sticky hosts.
  * Policy: no invented pirate pay-TV URLs — only curated open FAST / FTA mirrors.
+ *
+ * Layers (in order): Trace family → slug overrides / playable index → brand
+ * registry → ZA FTA packs → host rewrites → fragile demote.
+ * Extend brands/hosts in `heal-registry.ts`.
  */
 
 const SABC1 =
@@ -33,26 +43,7 @@ const AFROBEATS =
   "https://stream.ecable.tv/afrobeats/tracks-v1a1/mono.m3u8";
 const KZN1 =
   "https://cdn.freevisiontv.co.za/sttv/smil:1kzn.stream.smil/playlist.m3u8";
-const DW_EN =
-  "https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/master.m3u8";
-const FRANCE24_EN =
-  "https://static.france24.com/live/F24_EN_HI_HLS/live_web.m3u8";
-const AL_JAZEERA_EN = "https://cdn-7.pishow.tv/live/429/master.m3u8";
-const CGTN = "https://live.cgtn.com/1000e/prog_index.m3u8";
-const RED_BULL =
-  "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8";
 const BOK_TV = "https://livestream2.bokradio.co.za/hls/Bok5c.m3u8";
-const BEIN_XTRA = "https://bein-xtra-bein.amagi.tv/playlist.m3u8";
-const FOX_WEATHER = "https://247wlive.foxweather.com/stream/index.m3u8";
-const ESPN8_OCHO =
-  "https://d3b6q2ou5kp8ke.cloudfront.net/ESPNTheOcho.m3u8";
-const TSN_OCHO =
-  "https://d3pnbvng3bx2nj.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-rds8g35qfqrnv/TSN_The_Ocho.m3u8";
-
-const channelOverrides = overridesJson as Record<
-  string,
-  { title?: string; url?: string; note?: string; categories?: string[] }
->;
 
 function src(
   url: string,
@@ -67,6 +58,7 @@ function src(
 export function isFragileHost(url: string): boolean {
   return (
     isBrokenTraceOrigin(url) ||
+    isRegistryFragileHost(url) ||
     /channels\.trace\.plus|blocked\.grouptag|streamvidex|qzz\.io|live20\.bozztv\.com|nghk\.ai|sinalmycn\.com|lb\.dstvmultimedia\.com/i.test(
       url,
     )
@@ -116,8 +108,8 @@ export function isPlutoFamily(url: string): boolean {
 
 type Pack = MediaSource[];
 
-/** Slug / title → preferred open mirrors (prepended). */
-export function healPackFor(slug: string, title?: string | null): Pack | null {
+/** ZA / regional FTA packs (brand networks live in heal-registry). */
+function healZaPackOnly(slug: string, title?: string | null): Pack | null {
   const hay = `${slug} ${title || ""}`.toLowerCase();
 
   if (/sabc[\s_-]?1\b|sabc-1|sabc1/.test(hay) && !/news/.test(hay)) {
@@ -138,7 +130,6 @@ export function healPackFor(slug: string, title?: string | null): Pack | null {
     return [
       src(SABC3, 5, "heal-sabc3-mangomolo"),
       src(SABC3_CHUNK, 12, "heal-sabc3-chunk"),
-      // Soft alts when viewer IP is outside ZA geofence
       src(SABC_NEWS, 70, "heal-sabc-news-alt"),
       src(LN24, 80, "heal-ln24-alt"),
     ];
@@ -167,36 +158,6 @@ export function healPackFor(slug: string, title?: string | null): Pack | null {
   if (/\bbok[\s_-]?tv\b/.test(hay)) {
     return [src(BOK_TV, 5, "heal-bok-tv")];
   }
-  if (
-    /deutsche.?welle|dw[\s_-]?english|dwenglish|(?:^|[\s_-])dw(?:[\s_-]english|\b)/.test(
-      hay,
-    )
-  ) {
-    return [src(DW_EN, 5, "heal-dw-english")];
-  }
-  if (/france[\s_-]?24/.test(hay)) {
-    return [src(FRANCE24_EN, 5, "heal-france24-en")];
-  }
-  if (/al[\s_-]?jazeera/.test(hay)) {
-    return [src(AL_JAZEERA_EN, 5, "heal-al-jazeera-en")];
-  }
-  if (/\bcgtn\b/.test(hay)) {
-    return [src(CGTN, 5, "heal-cgtn")];
-  }
-  if (/red[\s_-]?bull/.test(hay)) {
-    return [src(RED_BULL, 5, "heal-red-bull")];
-  }
-  // Free FAST only — never remap pay ESPN / TSN linear numbers.
-  if (/espn[\s_-]?8|espn8|the[\s_-]?ocho/.test(hay) && /espn/.test(hay)) {
-    return [src(ESPN8_OCHO, 5, "heal-espn8-ocho")];
-  }
-  if (/tsn[\s_-]?the[\s_-]?ocho|tsntheocho/.test(hay)) {
-    return [src(TSN_OCHO, 5, "heal-tsn-ocho")];
-  }
-  if (/fox[\s_-]?weather/.test(hay)) {
-    return [src(FOX_WEATHER, 5, "heal-fox-weather")];
-  }
-  // BBC Food — CloudFront plays direct from ZA; Pluto stitcher/jmp2 are dead here.
   if (/bbc[\s_-]?food|bbcfood/.test(hay)) {
     return [
       src(
@@ -206,17 +167,6 @@ export function healPackFor(slug: string, title?: string | null): Pack | null {
       ),
     ];
   }
-
-  // beIN XTRA FAST (open Amagi) — not pay beIN numbered linears.
-  if (/bein/.test(hay) && /xtra|extra/.test(hay)) {
-    return [src(BEIN_XTRA, 5, "heal-bein-xtra")];
-  }
-  // Curated catalog maps dead beIN Sports USA restream → XTRA FAST.
-  if (/beinsportsusa|bein[\s_-]?sports[\s_-]?usa\b/.test(hay) && !/xtra|extra|haber/.test(hay)) {
-    return [src(BEIN_XTRA, 5, "heal-bein-usa-xtra")];
-  }
-
-  // Italian TeleArena — Wowza/streamlock already used elsewhere in playable packs
   if (/tele.?arena|telearena/.test(hay)) {
     return [
       src(
@@ -226,20 +176,26 @@ export function healPackFor(slug: string, title?: string | null): Pack | null {
       ),
     ];
   }
-
   return null;
 }
 
-/** Curated slug override URL when present (open / verified only). */
+/**
+ * Slug / title → preferred open mirrors (prepended).
+ * Combines ZA FTA packs + brand registry for callers/tests.
+ */
+export function healPackFor(slug: string, title?: string | null): Pack | null {
+  const za = healZaPackOnly(slug, title);
+  if (za) return za;
+  return brandHealPack(slug, title)?.sources ?? null;
+}
+
+/** Curated slug override / playable-index URL when present. */
 export function overrideHealUrl(slug: string): string | null {
-  const url = channelOverrides[slug]?.url?.trim();
-  return url || null;
+  return verifiedHealUrl(slug);
 }
 
 function overrideHealPack(slug: string): Pack | null {
-  const url = overrideHealUrl(slug);
-  if (!url) return null;
-  return [src(url, 4, `heal-override-${slug}`)];
+  return verifiedSlugPack(slug);
 }
 
 /**
@@ -256,7 +212,9 @@ export function primaryPrivateHealUrl(
   if (isTraceChannel(slug, title)) {
     return primaryTraceHealUrl(slug, title);
   }
-  return healPackFor(slug, title)?.[0]?.url ?? null;
+  const brand = brandHealPack(slug, title);
+  if (brand?.sources[0]?.url) return brand.sources[0].url;
+  return healZaPackOnly(slug, title)?.[0]?.url ?? null;
 }
 
 function mergeSources(
@@ -291,7 +249,7 @@ function mergeSources(
 }
 
 /**
- * Private playlist healing — Trace + open FTA packs + curated overrides.
+ * Private playlist healing — Trace + registry brands + open FTA packs + overrides.
  * Unlike healChannelSources, NEVER clears Arena/Fox/TSN/ESPN user URLs
  * and NEVER drops raw-IP / nghk sources (demote only; health labels handle dead).
  */
@@ -299,11 +257,11 @@ export function healPrivatePlaylistSources(
   slug: string,
   title: string | null | undefined,
   sources: MediaSource[],
-): { sources: MediaSource[]; tags: string[] } {
+): { sources: MediaSource[]; tags: string[]; notice?: string | null } {
   const tags: string[] = [];
   let next = [...sources];
+  let notice: string | null = null;
 
-  // 1) Trace music / sports family → Amagi FAST
   if (isTraceChannel(slug, title)) {
     next = healTraceSources(slug, title, next);
     tags.push("Healed", "Playable");
@@ -312,41 +270,46 @@ export function healPrivatePlaylistSources(
     }
   }
 
-  // 2) Curated slug overrides (India news, beIN→XTRA, Trace Sport, etc.)
   const overridePack = overrideHealPack(slug);
   if (overridePack) {
     next = mergeSources(overridePack, next);
     tags.push("Healed", "Playable");
   }
 
-  // 3) Known FTA / open FAST packs — merge without wiping user URLs
-  const pack = healPackFor(slug, title);
-  if (pack) {
-    next = mergeSources(pack, next);
+  const brand = brandHealPack(slug, title);
+  if (brand) {
+    next = mergeSources(brand.sources, next);
+    tags.push(...brand.tags);
+    notice = brand.notice;
+  }
+
+  const zaPack = healZaPackOnly(slug, title);
+  if (zaPack) {
+    next = mergeSources(zaPack, next);
     tags.push("Healed", "Playable");
-    if (isGeoSensitiveChannel(slug, title)) {
-      tags.push("Geo");
-    }
+    if (isGeoSensitiveChannel(slug, title)) tags.push("Geo");
   } else if (
     !overridePack &&
+    !brand &&
     next.some((s) => isFragileHost(s.url) || isRawIpUrl(s.url))
   ) {
-    // Demote fragile / raw-IP hosts; keep them as last resort
     next = mergeSources([], next);
     tags.push("ProxyOk");
   }
 
-  // 4) Pluto / jmp2 — proxy + deep buffer (do not replace URLs)
+  const rewritten = applyHostRewrites(next);
+  next = rewritten.sources;
+  if (rewritten.rewritten > 0) tags.push("Healed", "Playable");
+
   if (next.some((s) => isPlutoFamily(s.url))) {
     tags.push("ProxyOk", "Playable");
   }
 
-  // 5) Pay-linear brands stay on owner URLs — surface rights warning only
   if (isArenaPayLinear(slug, title)) {
     tags.push("LinearPay", "LinearSports", "Sports", "Rights");
   }
 
-  return { sources: next, tags: [...new Set(tags)] };
+  return { sources: next, tags: [...new Set(tags)], notice };
 }
 
 /**
@@ -355,11 +318,16 @@ export function healPrivatePlaylistSources(
  */
 export function healChannelSources(
   item: Pick<CatalogItem, "slug" | "title" | "sources" | "categories">,
-): { sources: MediaSource[]; tags: string[]; cleared?: boolean } {
+): {
+  sources: MediaSource[];
+  tags: string[];
+  cleared?: boolean;
+  notice?: string | null;
+} {
   const tags: string[] = [];
   let sources = [...(item.sources || [])];
+  let notice: string | null = null;
 
-  // 0) Arena Sport / Fight / Premium — show as linear pay (no pirate HLS)
   if (isArenaPayLinear(item.slug, item.title)) {
     return {
       sources: [],
@@ -368,7 +336,6 @@ export function healChannelSources(
     };
   }
 
-  // 1) Trace music / sports family → Amagi FAST (public catalog + DB seeds)
   if (isTraceChannel(item.slug, item.title)) {
     sources = healTraceSources(item.slug, item.title, sources);
     tags.push("Healed", "Playable");
@@ -377,39 +344,46 @@ export function healChannelSources(
     }
   }
 
-  // 2) Curated slug overrides (same pack used for private playlists / africa.json)
   const overridePack = overrideHealPack(item.slug);
   if (overridePack) {
     sources = mergeSources(overridePack, sources);
     tags.push("Healed", "Playable");
   }
 
-  // 3) ZA FTA / news / hope / TeleArena packs
-  const pack = healPackFor(item.slug, item.title);
-  if (pack) {
-    sources = mergeSources(pack, sources);
+  const brand = brandHealPack(item.slug, item.title);
+  if (brand) {
+    sources = mergeSources(brand.sources, sources);
+    tags.push(...brand.tags);
+    notice = brand.notice;
+  }
+
+  const zaPack = healZaPackOnly(item.slug, item.title);
+  if (zaPack) {
+    sources = mergeSources(zaPack, sources);
     tags.push("Healed", "Playable");
     if (isGeoSensitiveChannel(item.slug, item.title, item.categories)) {
       tags.push("Geo");
     }
   } else if (
     !overridePack &&
+    !brand &&
     sources.some((s) => isFragileHost(s.url) || isRawIpUrl(s.url))
   ) {
-    // Demote fragile / raw-IP hosts even without a dedicated pack
     sources = mergeSources([], sources);
     tags.push("ProxyOk");
   }
 
-  // Drop raw-IP and nghk restreams that survived merge
+  const rewritten = applyHostRewrites(sources);
+  sources = rewritten.sources;
+  if (rewritten.rewritten > 0) tags.push("Healed", "Playable");
+
   sources = sources.filter((s) => !isRawIpUrl(s.url) && !/nghk\.ai/i.test(s.url));
 
-  // 4) Pluto / jmp2 series — keep URLs but tag for proxy + deep buffer
   if (sources.some((s) => isPlutoFamily(s.url))) {
     tags.push("ProxyOk", "Playable");
   }
 
-  return { sources, tags: [...new Set(tags)] };
+  return { sources, tags: [...new Set(tags)], notice };
 }
 
 export function needsDeepBuffer(item: {
@@ -420,7 +394,9 @@ export function needsDeepBuffer(item: {
 }): boolean {
   if (
     item.categories?.some((c) =>
-      /Healed|Geo|LinearSports|ProxyOk|Music|Sports|News/i.test(c),
+      /Healed|Geo|LinearSports|ProxyOk|Music|Sports|News|SisterFallback/i.test(
+        c,
+      ),
     )
   ) {
     return true;

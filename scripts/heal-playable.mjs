@@ -84,7 +84,7 @@ const CURATED = [
     bucket: "news",
     title: "France 24 English",
     slug: "france-24-english",
-    url: "https://static.france24.com/live/F24_EN_HI_HLS/live_web.m3u8",
+    url: "https://live.france24.com/hls/live/2037218-b/F24_EN_HI_HLS/master_5000.m3u8",
     countries: ["fr", "world"],
     categories: ["News"],
   },

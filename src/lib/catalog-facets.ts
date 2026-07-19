@@ -40,6 +40,8 @@ export const CATALOG_COUNTRIES: { code: string; label: string }[] = [
   { code: "au", label: "Australia" },
   { code: "nl", label: "Netherlands" },
   { code: "tr", label: "Turkey" },
+  { code: "sa", label: "Saudi Arabia" },
+  { code: "ae", label: "United Arab Emirates" },
   { code: "ar", label: "Argentina" },
   { code: "cl", label: "Chile" },
   { code: "pl", label: "Poland" },

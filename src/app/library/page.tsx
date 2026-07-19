@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function LibraryPage() {
   return (
-    <main className="min-h-screen bg-gls-black pb-24 pt-24">
+    <main className="gls-below-nav min-h-screen bg-gls-black pb-24">
       <BrowseNav />
       <div className="mx-auto max-w-[1200px] px-4 sm:px-8 lg:px-12">
         <MediaLibrary />

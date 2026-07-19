@@ -73,7 +73,7 @@ export function FinanceSubscriptions() {
       />
       {msg && <p className="mt-3 text-sm text-gls-body">{msg}</p>}
 
-      <div className="gls-admin-card mt-5 overflow-x-auto rounded-xl">
+      <div className="gls-admin-card gls-h-scroll mt-5 rounded-xl">
         <table className="w-full min-w-[800px] text-left text-sm">
           <thead className="border-b border-white/10 text-[10px] uppercase tracking-[0.16em] text-gls-muted">
             <tr>

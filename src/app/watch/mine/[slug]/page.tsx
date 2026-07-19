@@ -11,6 +11,7 @@ import {
   hasTraceUrbanFallbackTag,
   TRACE_URBAN_FALLBACK_NOTICE,
 } from "@/lib/trace-mirrors";
+import { hasSisterFallbackTag } from "@/lib/heal-registry";
 import { getAccountEntitlement } from "@/lib/membership/account";
 import { playlistHealthRank } from "@/lib/playlist-health";
 import { redirect, notFound } from "next/navigation";
@@ -86,6 +87,29 @@ export default async function WatchMinePage({ params }: Props) {
     channelRowToCatalog(r as UserPlaylistChannelRow),
   );
 
+  const playlistOrdered = [
+    ...(relatedRows || []).map((r) => r as UserPlaylistChannelRow),
+    row as UserPlaylistChannelRow,
+  ].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  const playIdx = playlistOrdered.findIndex((r) => r.id === slug);
+  const prevRow = playIdx > 0 ? playlistOrdered[playIdx - 1] : null;
+  const nextRow =
+    playIdx >= 0 && playIdx < playlistOrdered.length - 1
+      ? playlistOrdered[playIdx + 1]
+      : null;
+  const prevChannel = prevRow
+    ? {
+        href: `/watch/mine/${prevRow.id}`,
+        title: prevRow.title,
+      }
+    : null;
+  const nextChannel = nextRow
+    ? {
+        href: `/watch/mine/${nextRow.id}`,
+        title: nextRow.title,
+      }
+    : null;
+
   return (
     <main className="min-h-screen bg-gls-black pb-20">
       <BrowseNav />
@@ -94,7 +118,11 @@ export default async function WatchMinePage({ params }: Props) {
         <WatchBackButton fallbackHref="/playlists" label="Back to playlists" />
 
         <div className="mt-4 overflow-hidden rounded-sm border border-white/10 shadow-2xl shadow-black/60">
-          <VideoPlayer item={item} />
+          <VideoPlayer
+            item={item}
+            prevChannel={prevChannel}
+            nextChannel={nextChannel}
+          />
         </div>
 
         <div className="mt-8 max-w-3xl">
@@ -109,12 +137,16 @@ export default async function WatchMinePage({ params }: Props) {
               {item.title}
             </h1>
           </div>
-          {hasTraceUrbanFallbackTag(item.categories) ? (
+          {hasTraceUrbanFallbackTag(item.categories) ||
+          hasSisterFallbackTag(item.categories) ? (
             <p
               className="mt-4 rounded border border-amber-400/35 bg-amber-500/15 px-3 py-2 text-sm font-medium text-amber-100"
               role="status"
             >
-              {item.description?.trim() || TRACE_URBAN_FALLBACK_NOTICE}
+              {item.description?.trim() ||
+                (hasTraceUrbanFallbackTag(item.categories)
+                  ? TRACE_URBAN_FALLBACK_NOTICE
+                  : "Switching to a working sister feed — primary stream unavailable")}
             </p>
           ) : (
             <p className="mt-4 text-base leading-relaxed text-gls-body">
@@ -126,8 +158,8 @@ export default async function WatchMinePage({ params }: Props) {
           </p>
           <p className="mt-4 text-xs text-gls-muted">
             Manage sources in{" "}
-            <Link href="/playlists" className="text-white underline">
-              My Playlists
+            <Link href="/playlists/saved" className="text-white underline">
+              Saved playlists
             </Link>
             .
           </p>

@@ -151,7 +151,7 @@ export function MembershipOverview() {
   }
 
   const nav = (
-    <div className="flex flex-wrap gap-2">
+    <>
       {[
         ["/admin/finance", "Finance"],
         ["/admin/finance/members", "Member ledger"],
@@ -161,12 +161,12 @@ export function MembershipOverview() {
         <Link
           key={href}
           href={href}
-          className="rounded-md border border-white/15 px-3 py-2 text-xs font-bold uppercase tracking-wide text-gls-muted hover:text-white"
+          className="shrink-0 rounded-md border border-white/15 px-3 py-2 text-xs font-bold uppercase tracking-wide text-gls-muted hover:text-white"
         >
           {label}
         </Link>
       ))}
-    </div>
+    </>
   );
 
   return (
@@ -322,8 +322,8 @@ export function MembershipOverview() {
             Export list
           </button>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
+        <div className="gls-h-scroll">
+          <table className="min-w-[720px] w-full text-left text-sm">
             <thead className="bg-white/[0.03] text-[10px] uppercase tracking-[0.18em] text-gls-muted">
               <tr>
                 <th className="px-4 py-3 font-bold">Member</th>

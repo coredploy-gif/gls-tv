@@ -68,7 +68,7 @@ export default async function FeaturedMediaWatchPage({ params }: Props) {
   const embedUrl = resolveMediaEmbedUrl(link);
 
   return (
-    <main className="min-h-screen bg-gls-black pb-24 pt-20">
+    <main className="gls-below-nav min-h-screen bg-gls-black pb-24">
       <BrowseNav />
       <div className="mx-auto max-w-[1200px] px-4 sm:px-8 lg:px-12">
         <div className="mb-4 flex items-center gap-3">

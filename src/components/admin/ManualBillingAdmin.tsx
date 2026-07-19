@@ -279,10 +279,10 @@ export function ManualBillingAdmin({
   };
 
   const nav = (
-    <div className="flex flex-wrap gap-2">
+    <>
       <Link
         href="/admin/finance/membership"
-        className="rounded-md border border-gls-red/30 bg-gls-red/10 px-3 py-2 text-xs font-bold uppercase tracking-wide text-red-100 hover:text-white"
+        className="shrink-0 rounded-md border border-gls-red/30 bg-gls-red/10 px-3 py-2 text-xs font-bold uppercase tracking-wide text-red-100 hover:text-white"
       >
         Funnel
       </Link>
@@ -300,7 +300,7 @@ export function ManualBillingAdmin({
         <Link
           key={key}
           href={`/admin/finance/${key}`}
-          className={`rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition ${
+          className={`shrink-0 rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition ${
             view === key
               ? "bg-white text-black"
               : "border border-white/15 text-gls-muted hover:text-white"
@@ -309,7 +309,7 @@ export function ManualBillingAdmin({
           {label}
         </Link>
       ))}
-    </div>
+    </>
   );
   const copy = TITLES[view];
 
@@ -596,7 +596,7 @@ function PaymentsView({
         ))}
       </div>
 
-      <div className="gls-admin-card mt-5 flex flex-wrap gap-2 rounded-xl p-3">
+      <div className="gls-admin-card gls-h-scroll gls-h-scroll-row mt-5 rounded-xl p-3">
         <input
           className="gls-admin-input min-w-[220px] flex-1"
           placeholder="Search GLS ref, email, bank/PayFast transaction…"
@@ -604,7 +604,7 @@ function PaymentsView({
           onChange={(e) => setQ(e.target.value)}
         />
         <select
-          className="gls-admin-input w-auto"
+          className="gls-admin-input w-auto shrink-0"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
         >
@@ -625,7 +625,7 @@ function PaymentsView({
         <button
           type="button"
           onClick={() => setShowRecord((value) => !value)}
-          className="gls-cta rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wide"
+          className="gls-cta shrink-0 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wide"
         >
           + Record bank payment
         </button>
@@ -1227,7 +1227,7 @@ function ReceiptsView({
         value={q}
         onChange={(e) => setQ(e.target.value)}
       />
-      <div className="gls-admin-card mt-5 overflow-x-auto rounded-xl">
+      <div className="gls-admin-card gls-h-scroll mt-5 rounded-xl">
         <table className="w-full min-w-[820px] text-left text-sm">
           <thead className="border-b border-white/10 bg-white/[0.03] text-[10px] uppercase tracking-[0.18em] text-gls-muted">
             <tr>
@@ -1586,7 +1586,7 @@ function ReconcileView({
           </div>
         ))}
       </div>
-      <div className="gls-admin-card mt-6 overflow-x-auto rounded-xl">
+      <div className="gls-admin-card gls-h-scroll mt-6 rounded-xl">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="border-b border-white/10 text-[10px] uppercase tracking-wider text-gls-muted">
             <tr>

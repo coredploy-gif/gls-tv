@@ -21,6 +21,7 @@ import {
   hasTraceUrbanFallbackTag,
   TRACE_URBAN_FALLBACK_NOTICE,
 } from "@/lib/trace-mirrors";
+import { hasSisterFallbackTag } from "@/lib/heal-registry";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -41,6 +42,12 @@ export default async function WatchPage({ params }: Props) {
 
   const related = getRelatedChannels(item, 24);
   const hubKey = hubKeyForItem(item);
+  const prevChannel = related[1]
+    ? { href: `/watch/${related[1].slug}`, title: related[1].title }
+    : null;
+  const nextChannel = related[0]
+    ? { href: `/watch/${related[0].slug}`, title: related[0].title }
+    : null;
   const moreTitle =
     hubKey === "kids"
       ? "More Kids"
@@ -64,7 +71,11 @@ export default async function WatchPage({ params }: Props) {
         <WatchBackButton fallbackHref={fallbackHref} label="Back" />
 
         <div className="mt-4 overflow-hidden rounded-sm border border-white/10 shadow-2xl shadow-black/60">
-          <VideoPlayer item={item} />
+          <VideoPlayer
+            item={item}
+            prevChannel={prevChannel}
+            nextChannel={nextChannel}
+          />
         </div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
@@ -79,12 +90,16 @@ export default async function WatchPage({ params }: Props) {
               {item.title}
             </h1>
           </div>
-          {hasTraceUrbanFallbackTag(item.categories) && (
+          {(hasTraceUrbanFallbackTag(item.categories) ||
+            hasSisterFallbackTag(item.categories)) && (
             <p
               className="mt-3 rounded border border-amber-400/35 bg-amber-500/15 px-3 py-2 text-sm font-medium text-amber-100"
               role="status"
             >
-              {item.description?.trim() || TRACE_URBAN_FALLBACK_NOTICE}
+              {item.description?.trim() ||
+                (hasTraceUrbanFallbackTag(item.categories)
+                  ? TRACE_URBAN_FALLBACK_NOTICE
+                  : "Switching to a working sister feed — primary stream unavailable")}
             </p>
           )}
           <WatchLibrarySync
@@ -100,7 +115,8 @@ export default async function WatchPage({ params }: Props) {
               <span className="text-gls-muted">{item.sources[0].quality}</span>
             )}
           </div>
-          {!hasTraceUrbanFallbackTag(item.categories) && (
+          {!hasTraceUrbanFallbackTag(item.categories) &&
+            !hasSisterFallbackTag(item.categories) && (
             <p className="mt-4 text-base leading-relaxed text-gls-body">
               {item.description}
             </p>

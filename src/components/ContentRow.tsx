@@ -13,6 +13,10 @@ type ContentRowProps = {
   /** Cap sideways tiles; rest via View more */
   limit?: number;
   viewMoreHref?: string;
+  /** Link label next to the row title (default: View more ›) */
+  viewMoreLabel?: string;
+  /** Show the more link even when the row is under `limit` */
+  alwaysShowViewMore?: boolean;
   /** Continue watching remove */
   onRemove?: (slug: string) => void;
   /** Serializable base URL for rows rendered by a Server Component. */
@@ -26,6 +30,8 @@ export function ContentRow({
   ranked = false,
   limit = ROW_LIMIT,
   viewMoreHref,
+  viewMoreLabel = "View more ›",
+  alwaysShowViewMore = false,
   onRemove,
   hrefPrefix,
   hrefForItem,
@@ -35,7 +41,9 @@ export function ContentRow({
   if (!items.length) return null;
 
   const visible = items.slice(0, limit);
-  const hasMore = Boolean(viewMoreHref) && items.length > limit;
+  const hasMore =
+    Boolean(viewMoreHref) &&
+    (alwaysShowViewMore || items.length > limit);
 
   const slide = (dir: -1 | 1) => {
     const el = scrollerRef.current;
@@ -56,7 +64,7 @@ export function ContentRow({
               href={viewMoreHref!}
               className="shrink-0 text-sm font-medium text-gls-pink/80 transition hover:text-gls-pink-soft"
             >
-              View more ›
+              {viewMoreLabel}
             </Link>
           )}
         </div>

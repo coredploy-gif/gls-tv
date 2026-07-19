@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient, isEadminEmail } from "@/lib/eadmin";
 import {
+  resolveMediaLinkThumbnail,
   validateMediaLinkUrl,
 } from "@/lib/media-links";
 import { probeMediaLinkReachability } from "@/lib/media-links-probe";
@@ -91,14 +92,23 @@ export async function POST(req: Request) {
     if (probe.format) resolvedFormat = probe.format;
 
     if (body.preview_only) {
+      const category =
+        (body.category || "Featured").trim().slice(0, 60) || "Featured";
       return NextResponse.json({
         preview: {
           url,
           title: validation.title,
           format: resolvedFormat,
-          category: (body.category || "Featured").trim().slice(0, 60) || "Featured",
+          category,
           notes: (body.notes || "").trim().slice(0, 500),
-          thumbnailUrl: validation.thumbnailUrl,
+          thumbnailUrl:
+            validation.thumbnailUrl ||
+            resolveMediaLinkThumbnail({
+              title: validation.title!,
+              category,
+              format: resolvedFormat,
+              thumbnailUrl: null,
+            }),
           embedUrl: validation.embedUrl,
           probe: probe.detail || "Reachable",
         },
@@ -113,6 +123,16 @@ export async function POST(req: Request) {
 
   // New saves are drafts unless explicitly published via confirm step.
   const publish = body.is_published === true;
+  const category =
+    (body.category || "Featured").trim().slice(0, 60) || "Featured";
+  const thumbnailUrl =
+    validation.thumbnailUrl ||
+    resolveMediaLinkThumbnail({
+      title: validation.title!,
+      category,
+      format: resolvedFormat,
+      thumbnailUrl: null,
+    });
 
   const { data, error } = await service
     .from("admin_media_links")
@@ -122,8 +142,8 @@ export async function POST(req: Request) {
         url,
         title: validation.title!,
         format: resolvedFormat,
-        category: (body.category || "Featured").trim().slice(0, 60) || "Featured",
-        thumbnail_url: validation.thumbnailUrl || null,
+        category,
+        thumbnail_url: thumbnailUrl || null,
         embed_url: validation.embedUrl || null,
         video_id: validation.videoId || null,
         is_published: publish,

@@ -151,6 +151,35 @@ function parseM3u(text) {
   return items;
 }
 
+const SOCCER_ART_IDS = [
+  "photo-1574629810360-7efbbe195018",
+  "photo-1431324155629-1a6deb1dec8d",
+  "photo-1522778119026-d647f0596c20",
+  "photo-1579952363873-27f3bade9f55",
+  "photo-1517466787929-bc90951d0974",
+  "photo-1508098682721-e5dbc6094189",
+  "photo-1560272564-c83b66b1ad12",
+  "photo-1459865264687-595d652de67e",
+  "photo-1575361204480-aadea25e6d68",
+  "photo-1489944440615-453fc2b6a9a9",
+  "photo-1606925797300-0b35e9d3864f",
+  "photo-1624526267942-ab0ff8a3e972",
+];
+
+function hashSeed(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+function soccerArt(slug) {
+  const id = SOCCER_ART_IDS[hashSeed(slug) % SOCCER_ART_IDS.length];
+  return {
+    poster: `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&h=2400&q=92`,
+    backdrop: `https://images.unsplash.com/${id}?auto=format&fit=crop&w=3840&h=2160&q=92`,
+  };
+}
+
 function toItem(base, tier) {
   const cats = [
     ...new Set([
@@ -164,6 +193,7 @@ function toItem(base, tier) {
         : ["ProxyOk", "Verified"]),
     ]),
   ];
+  const art = soccerArt(base.slug || base.id || base.title);
   return {
     id: base.id || `iptv-${base.slug}`,
     slug: base.slug,
@@ -176,12 +206,8 @@ function toItem(base, tier) {
     countries: base.countries || ["world"],
     categories: cats,
     languages: ["en"],
-    poster:
-      base.poster ||
-      "https://images.unsplash.com/photo-1574629810360-7efbbe195878?auto=format&fit=crop&w=600&q=80",
-    backdrop:
-      base.poster ||
-      "https://images.unsplash.com/photo-1574629810360-7efbbe195878?auto=format&fit=crop&w=2400&q=80",
+    poster: art.poster,
+    backdrop: art.backdrop,
     license: "open_stream",
     isLive: true,
     featured: tier === "direct",

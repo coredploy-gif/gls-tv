@@ -5,6 +5,7 @@ import { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { BrowseNav } from "@/components/BrowseNav";
 import { ContentRow } from "@/components/ContentRow";
+import { MyLinksHomeRow } from "@/components/MyLinksHomeRow";
 import { MyPlaylistHomeRow } from "@/components/MyPlaylistHomeRow";
 import { TitleCard } from "@/components/TitleCard";
 import { useLibrary } from "@/lib/library";
@@ -98,6 +99,7 @@ export function HomeLibraryRows() {
 
   return (
     <>
+      <MyLinksHomeRow />
       <MyPlaylistHomeRow />
       {continueItems.length > 0 && (
         <ContentRow

@@ -117,7 +117,7 @@ export function ContactInboxBoard() {
         description="Enquiries from /auth Message GLS — separate from signed-in tickets, with convert-to-ticket when useful."
       />
 
-      <div className="gls-admin-card mt-8 flex flex-wrap gap-2 rounded-lg p-3">
+      <div className="gls-admin-card gls-h-scroll gls-h-scroll-row mt-8 rounded-lg p-3">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -127,7 +127,7 @@ export function ContactInboxBoard() {
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="gls-admin-input w-auto"
+          className="gls-admin-input w-auto shrink-0"
         >
           {STATUSES.map((s) => (
             <option key={s} value={s}>
@@ -138,7 +138,7 @@ export function ContactInboxBoard() {
         <button
           type="button"
           onClick={() => void load()}
-          className="rounded-md border border-white/20 px-4 py-2 text-sm text-gls-body transition hover:border-white/40 hover:text-white"
+          className="shrink-0 rounded-md border border-white/20 px-4 py-2 text-sm text-gls-body transition hover:border-white/40 hover:text-white"
         >
           {busy ? "…" : "Apply"}
         </button>
@@ -146,7 +146,7 @@ export function ContactInboxBoard() {
 
       {err && <p className="mt-3 text-sm text-gls-red">{err}</p>}
 
-      <div className="gls-admin-card mt-4 overflow-x-auto rounded-lg">
+      <div className="gls-admin-card gls-h-scroll mt-4 rounded-lg">
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="border-b border-white/10 bg-white/[0.03] text-[10px] uppercase tracking-[0.18em] text-gls-muted">
             <tr>

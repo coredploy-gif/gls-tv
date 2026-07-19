@@ -1,5 +1,6 @@
 import type { CatalogItem, MediaSource } from "@/data/types";
 import { healPrivatePlaylistSources } from "@/lib/channel-heal";
+import { SISTER_FALLBACK_TAG } from "@/lib/heal-registry";
 import {
   TRACE_URBAN_FALLBACK_NOTICE,
   TRACE_URBAN_FALLBACK_TAG,
@@ -77,12 +78,10 @@ export function channelRowToCatalog(
       label: "secure-relay",
     },
   ];
-  const { sources, tags: healTags } = healPrivatePlaylistSources(
-    row.slug,
-    row.title,
-    baseSources,
-  );
+  const { sources, tags: healTags, notice: healNotice } =
+    healPrivatePlaylistSources(row.slug, row.title, baseSources);
   const urbanFallback = healTags.includes(TRACE_URBAN_FALLBACK_TAG);
+  const sisterFallback = healTags.includes(SISTER_FALLBACK_TAG);
 
   return {
     id: `user-${row.id}`,
@@ -91,7 +90,9 @@ export function channelRowToCatalog(
     type: "live",
     description: urbanFallback
       ? TRACE_URBAN_FALLBACK_NOTICE
-      : row.description || "Imported from your playlist",
+      : sisterFallback && healNotice
+        ? healNotice
+        : row.description || "Imported from your playlist",
     countries: row.countries?.length ? row.countries : ["world"],
     categories: [
       ...new Set([

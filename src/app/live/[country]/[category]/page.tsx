@@ -1,11 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { BrowseNav } from "@/components/BrowseNav";
-import {
-  getCountry,
-  getLiveByCountryAndCategory,
-} from "@/data/catalog";
-import { getUsChannels, isLiveTvEligible } from "@/lib/channels";
+import { getCountry } from "@/data/catalog";
+import { getLiveTvByCountry, isLiveTvEligible } from "@/lib/channels";
 
 type Props = {
   params: Promise<{ country: string; category: string }>;
@@ -30,20 +27,11 @@ export default async function LiveCategoryPage({ params }: Props) {
   if (isMoviesCategory(decoded)) redirect("/movies");
   if (isSeriesCategory(decoded)) redirect("/series");
 
-  const seed = getLiveByCountryAndCategory(code, decoded).filter(
-    isLiveTvEligible,
-  );
-  const fromUs =
-    code === "us"
-      ? getUsChannels()
-          .filter(isLiveTvEligible)
-          .filter((ch) =>
-            ch.categories.some(
-              (c) => c.toLowerCase() === decoded.toLowerCase(),
-            ),
-          )
-      : [];
-  const channels = [...fromUs, ...seed];
+  const channels = getLiveTvByCountry(code)
+    .filter(isLiveTvEligible)
+    .filter((ch) =>
+      ch.categories.some((c) => c.toLowerCase() === decoded.toLowerCase()),
+    );
   if (!channels.length) notFound();
 
   const label =

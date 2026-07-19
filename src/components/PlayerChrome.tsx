@@ -7,6 +7,7 @@ import {
   useState,
   type RefObject,
 } from "react";
+import { useRouter } from "next/navigation";
 import {
   absoluteStreamUrl,
   castFeedbackForResult,
@@ -14,12 +15,23 @@ import {
   promptCastOrAirPlay,
   shouldShowCastControl,
 } from "@/lib/remote-playback";
+import {
+  clampSeekTime,
+  getSeekableWindow,
+  seekBySeconds,
+} from "@/lib/live-playback-policy";
 
 const IDLE_MS = 2800;
 /** Ignore sub-second HLS stalls so live edge waits don't pin chrome open. */
 const BUFFER_SHOW_MS = 500;
 /** Keep Cast guidance visible long enough to read / copy. */
 const CAST_HINT_MS = 12000;
+const SKIP_SEC = 10;
+
+export type ChromeNeighbor = {
+  href: string;
+  title: string;
+};
 
 type PlayerChromeProps = {
   videoRef: RefObject<HTMLVideoElement | null>;
@@ -34,6 +46,10 @@ type PlayerChromeProps = {
   castUrl?: string | null;
   /** When true, force chrome visible (rare explicit overrides). */
   forceVisible?: boolean;
+  prevChannel?: ChromeNeighbor | null;
+  nextChannel?: ChromeNeighbor | null;
+  /** Called when the user rewinds / scrubs live DVR (stay behind live). */
+  onUserSeekLive?: () => void;
 };
 
 function formatTime(seconds: number) {
@@ -47,6 +63,17 @@ function formatTime(seconds: number) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+function listCaptionTracks(el: HTMLVideoElement): TextTrack[] {
+  const out: TextTrack[] = [];
+  const list = el.textTracks;
+  for (let i = 0; i < list.length; i++) {
+    const t = list[i];
+    if (!t) continue;
+    if (t.kind === "subtitles" || t.kind === "captions") out.push(t);
+  }
+  return out;
+}
+
 export function PlayerChrome({
   videoRef,
   isLive = false,
@@ -54,13 +81,23 @@ export function PlayerChrome({
   format,
   castUrl = null,
   forceVisible = false,
+  prevChannel = null,
+  nextChannel = null,
+  onUserSeekLive,
 }: PlayerChromeProps) {
+  const router = useRouter();
   const [visible, setVisible] = useState(true);
   const [paused, setPaused] = useState(true);
   const [buffering, setBuffering] = useState(false);
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [seekMin, setSeekMin] = useState(0);
+  const [seekMax, setSeekMax] = useState(0);
   const [isFs, setIsFs] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [hasCaptions, setHasCaptions] = useState(false);
+  const [captionsOn, setCaptionsOn] = useState(false);
   const [castHint, setCastHint] = useState<string | null>(null);
   const [castCopyUrl, setCastCopyUrl] = useState<string | null>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
@@ -74,6 +111,7 @@ export function PlayerChrome({
   const bufferingRef = useRef(false);
   const castHintRef = useRef(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const lastVolRef = useRef(1);
 
   forceVisibleRef.current = forceVisible;
   bufferingRef.current = buffering;
@@ -108,7 +146,6 @@ export function PlayerChrome({
         setCastCopyUrl(null);
         setCopyStatus("idle");
         castHintRef.current = false;
-        // Resume normal idle hide once guidance is gone.
         const el = videoRef.current;
         const playing = Boolean(el && !el.paused && !el.ended);
         if (playing && !forceVisibleRef.current && !bufferingRef.current) {
@@ -125,7 +162,6 @@ export function PlayerChrome({
     clearIdle();
     const el = videoRef.current;
     const playing = Boolean(el && !el.paused && !el.ended);
-    // Keep controls up while Cast guidance is on screen.
     if (
       !playing ||
       forceVisibleRef.current ||
@@ -137,11 +173,92 @@ export function PlayerChrome({
     idleTimer.current = setTimeout(() => setVisible(false), IDLE_MS);
   }, [clearIdle, videoRef]);
 
+  const syncSeekWindow = useCallback(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (isLive) {
+      const win = getSeekableWindow(el);
+      if (win) {
+        setSeekMin(win.start);
+        setSeekMax(win.end);
+      }
+      return;
+    }
+    setSeekMin(0);
+    setSeekMax(Number.isFinite(el.duration) ? el.duration : 0);
+  }, [isLive, videoRef]);
+
   const togglePlay = useCallback(() => {
     const el = videoRef.current;
     if (!el) return;
     if (el.paused) void el.play();
     else el.pause();
+    bump();
+  }, [bump, videoRef]);
+
+  const skip = useCallback(
+    (delta: number) => {
+      const el = videoRef.current;
+      if (!el) return;
+      seekBySeconds(el, delta);
+      if (isLive) onUserSeekLive?.();
+      syncSeekWindow();
+      bump();
+    },
+    [bump, isLive, onUserSeekLive, syncSeekWindow, videoRef],
+  );
+
+  const toggleMute = useCallback(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (el.muted || el.volume === 0) {
+      el.muted = false;
+      el.volume = lastVolRef.current > 0 ? lastVolRef.current : 0.8;
+    } else {
+      lastVolRef.current = el.volume > 0 ? el.volume : lastVolRef.current;
+      el.muted = true;
+    }
+    setMuted(el.muted || el.volume === 0);
+    setVolume(el.muted ? 0 : el.volume);
+    bump();
+  }, [bump, videoRef]);
+
+  const onVolume = useCallback(
+    (value: number) => {
+      const el = videoRef.current;
+      if (!el) return;
+      const v = Math.min(1, Math.max(0, value));
+      el.volume = v;
+      el.muted = v === 0;
+      if (v > 0) lastVolRef.current = v;
+      setVolume(v);
+      setMuted(el.muted);
+      bump();
+    },
+    [bump, videoRef],
+  );
+
+  const syncCaptions = useCallback(() => {
+    const el = videoRef.current;
+    if (!el) {
+      setHasCaptions(false);
+      return;
+    }
+    const tracks = listCaptionTracks(el);
+    setHasCaptions(tracks.length > 0);
+    setCaptionsOn(tracks.some((t) => t.mode === "showing"));
+  }, [videoRef]);
+
+  const toggleCaptions = useCallback(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    const tracks = listCaptionTracks(el);
+    if (!tracks.length) return;
+    const turnOn = !tracks.some((t) => t.mode === "showing");
+    tracks.forEach((t, i) => {
+      t.mode = turnOn && i === 0 ? "showing" : "hidden";
+    });
+    setCaptionsOn(turnOn);
     bump();
   }, [bump, videoRef]);
 
@@ -176,15 +293,12 @@ export function PlayerChrome({
         Boolean(wrap) &&
         typeof wrap!.requestFullscreen === "function";
 
-      // Prefer stage fullscreen when the Fullscreen API is actually usable.
-      // iOS Safari reports fullscreenEnabled=false — skip to webkit path.
       if (standardOk) {
         await wrap!.requestFullscreen();
         bump();
         return;
       }
 
-      // iOS Safari: use video webkitEnterFullscreen (needs playsInline).
       if (
         video &&
         typeof video.webkitEnterFullscreen === "function" &&
@@ -199,7 +313,6 @@ export function PlayerChrome({
         await video.requestFullscreen();
       }
     } catch {
-      // Last-resort iOS path if requestFullscreen threw.
       try {
         if (video && typeof video.webkitEnterFullscreen === "function") {
           video.webkitEnterFullscreen();
@@ -219,6 +332,11 @@ export function PlayerChrome({
       setPaused(el.paused);
       setCurrent(el.currentTime || 0);
       setDuration(Number.isFinite(el.duration) ? el.duration : 0);
+      setMuted(el.muted || el.volume === 0);
+      setVolume(el.muted ? 0 : el.volume);
+      if (el.volume > 0 && !el.muted) lastVolRef.current = el.volume;
+      syncSeekWindow();
+      syncCaptions();
     };
     const onPlay = () => {
       setPaused(false);
@@ -250,6 +368,13 @@ export function PlayerChrome({
     const onTime = () => {
       setCurrent(el.currentTime || 0);
       if (Number.isFinite(el.duration)) setDuration(el.duration);
+      syncSeekWindow();
+    };
+    const onVol = () => {
+      setMuted(el.muted || el.volume === 0);
+      setVolume(el.muted ? 0 : el.volume);
+      if (el.volume > 0 && !el.muted) lastVolRef.current = el.volume;
+      bump();
     };
     const syncFs = () => {
       const webkit = el as HTMLVideoElement & {
@@ -261,6 +386,7 @@ export function PlayerChrome({
       );
       bump();
     };
+    const onTrackChange = () => syncCaptions();
 
     sync();
     el.addEventListener("play", onPlay);
@@ -270,13 +396,13 @@ export function PlayerChrome({
     el.addEventListener("timeupdate", onTime);
     el.addEventListener("loadedmetadata", sync);
     el.addEventListener("durationchange", sync);
-    // User volume changes are activity; do not listen to `seeking` — live HLS
-    // edge sync fires seeking often and would pin chrome open forever.
-    el.addEventListener("volumechange", bump);
+    el.addEventListener("volumechange", onVol);
+    el.addEventListener("progress", syncSeekWindow);
     document.addEventListener("fullscreenchange", syncFs);
-    // iOS Safari webkit fullscreen lifecycle (no document.fullscreenElement).
     el.addEventListener("webkitbeginfullscreen", syncFs);
     el.addEventListener("webkitendfullscreen", syncFs);
+    el.textTracks?.addEventListener("addtrack", onTrackChange);
+    el.textTracks?.addEventListener("change", onTrackChange);
 
     return () => {
       clearBufferTimer();
@@ -287,12 +413,15 @@ export function PlayerChrome({
       el.removeEventListener("timeupdate", onTime);
       el.removeEventListener("loadedmetadata", sync);
       el.removeEventListener("durationchange", sync);
-      el.removeEventListener("volumechange", bump);
+      el.removeEventListener("volumechange", onVol);
+      el.removeEventListener("progress", syncSeekWindow);
       document.removeEventListener("fullscreenchange", syncFs);
       el.removeEventListener("webkitbeginfullscreen", syncFs);
       el.removeEventListener("webkitendfullscreen", syncFs);
+      el.textTracks?.removeEventListener("addtrack", onTrackChange);
+      el.textTracks?.removeEventListener("change", onTrackChange);
     };
-  }, [bump, clearBufferTimer, clearIdle, videoRef]);
+  }, [bump, clearBufferTimer, clearIdle, syncCaptions, syncSeekWindow, videoRef]);
 
   useEffect(() => {
     if (forceVisible) {
@@ -310,7 +439,6 @@ export function PlayerChrome({
     let lastY = Number.NaN;
     const show = () => bump();
     const onMove = (e: PointerEvent) => {
-      // Ignore 0-delta / synthetic noise that would reset the idle timer forever.
       if (e.clientX === lastX && e.clientY === lastY) return;
       lastX = e.clientX;
       lastY = e.clientY;
@@ -336,6 +464,14 @@ export function PlayerChrome({
           "F",
           "k",
           "K",
+          "m",
+          "M",
+          "c",
+          "C",
+          "j",
+          "J",
+          "l",
+          "L",
         ].includes(e.key)
       ) {
         show();
@@ -357,6 +493,22 @@ export function PlayerChrome({
       }
       if (e.key === "MediaPlay") void el.play();
       if (e.key === "MediaPause") el.pause();
+      if ((e.key === "m" || e.key === "M") && !inField) {
+        e.preventDefault();
+        toggleMute();
+      }
+      if ((e.key === "c" || e.key === "C") && !inField && hasCaptions) {
+        e.preventDefault();
+        toggleCaptions();
+      }
+      if ((e.key === "j" || e.key === "J") && !inField) {
+        e.preventDefault();
+        skip(-SKIP_SEC);
+      }
+      if ((e.key === "l" || e.key === "L") && !inField) {
+        e.preventDefault();
+        skip(SKIP_SEC);
+      }
       if ((e.key === "f" || e.key === "F") && !inField) {
         void toggleFullscreen();
       }
@@ -374,7 +526,7 @@ export function PlayerChrome({
           webkit.webkitExitFullscreen();
         }
       }
-      if (!isLive && (e.key === "ArrowLeft" || e.key === "ArrowRight") && !inField) {
+      if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !inField) {
         if (inControl) return;
         const stage = rootRef.current?.parentElement;
         const focusInPlayer =
@@ -382,13 +534,7 @@ export function PlayerChrome({
           Boolean(document.fullscreenElement && stage === document.fullscreenElement);
         if (!focusInPlayer) return;
         e.preventDefault();
-        el.currentTime = Math.max(
-          0,
-          Math.min(
-            el.duration || Infinity,
-            el.currentTime + (e.key === "ArrowRight" ? 10 : -10),
-          ),
-        );
+        skip(e.key === "ArrowRight" ? SKIP_SEC : -SKIP_SEC);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -398,7 +544,15 @@ export function PlayerChrome({
       root.removeEventListener("touchstart", show);
       window.removeEventListener("keydown", onKey);
     };
-  }, [bump, isLive, toggleFullscreen, videoRef]);
+  }, [
+    bump,
+    hasCaptions,
+    skip,
+    toggleCaptions,
+    toggleFullscreen,
+    toggleMute,
+    videoRef,
+  ]);
 
   useEffect(() => {
     const el = videoRef.current;
@@ -409,15 +563,12 @@ export function PlayerChrome({
     }
 
     const syncCast = () => {
-      // Solid affordance: remote picker works OR we have a fetchable cast URL
-      // (live HLS MSE still shows Cast like radio, with copy-link fallback).
       setCanCast(castLikelyWorks(el, format) || Boolean(fetchable));
     };
     syncCast();
 
     const remote = (el as HTMLVideoElement & { remote?: RemotePlayback }).remote;
     if (!remote || typeof remote.watchAvailability !== "function") {
-      // Re-check when src / MSE attachment may change.
       el.addEventListener("loadedmetadata", syncCast);
       el.addEventListener("emptied", syncCast);
       return () => {
@@ -472,8 +623,10 @@ export function PlayerChrome({
 
   const onSeek = (value: number) => {
     const el = videoRef.current;
-    if (!el || isLive) return;
-    el.currentTime = value;
+    if (!el) return;
+    el.currentTime = clampSeekTime(el, value);
+    if (isLive) onUserSeekLive?.();
+    syncSeekWindow();
     bump();
   };
 
@@ -492,7 +645,6 @@ export function PlayerChrome({
     if (feedback) {
       showCastFeedback(feedback.message, feedback.copyUrl);
     } else {
-      // User dismissed the picker — clear the “Looking for…” hint quietly.
       clearCastHintTimer();
       setCastHint(null);
       setCastCopyUrl(null);
@@ -511,9 +663,16 @@ export function PlayerChrome({
     }
   };
 
+  const goNeighbor = (n: ChromeNeighbor | null | undefined) => {
+    if (!n) return;
+    bump();
+    router.push(n.href);
+  };
+
   const showChrome =
     visible || forceVisible || paused || buffering || Boolean(castHint);
-  const progressMax = !isLive && duration > 0 ? duration : 0;
+  const canScrub = seekMax > seekMin + 1;
+  const scrubValue = Math.min(Math.max(current, seekMin), seekMax || current);
 
   return (
     <div
@@ -556,33 +715,35 @@ export function PlayerChrome({
             {title}
           </p>
         )}
-        {!isLive && progressMax > 0 && (
+        {canScrub && (
           <div className="mb-2 flex items-center gap-2">
             <span className="w-10 shrink-0 text-[11px] tabular-nums text-white/70">
-              {formatTime(current)}
+              {isLive
+                ? `-${formatTime(Math.max(0, seekMax - current))}`
+                : formatTime(current)}
             </span>
             <input
               type="range"
               className="gls-player-scrub"
-              min={0}
-              max={progressMax}
+              min={seekMin}
+              max={seekMax}
               step={0.1}
-              value={Math.min(current, progressMax)}
-              aria-label="Seek"
+              value={scrubValue}
+              aria-label={isLive ? "Seek within buffered window" : "Seek"}
               tabIndex={showChrome ? 0 : -1}
               onChange={(e) => onSeek(Number(e.target.value))}
             />
             <span className="w-10 shrink-0 text-right text-[11px] tabular-nums text-white/70">
-              {formatTime(duration)}
+              {isLive ? "Live" : formatTime(duration)}
             </span>
           </div>
         )}
-        {isLive && (
+        {isLive && !canScrub && (
           <div className="mb-2 h-1 overflow-hidden rounded-full bg-white/20">
             <div className="h-full w-full animate-pulse bg-gls-red/80" />
           </div>
         )}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             className="gls-player-btn"
@@ -592,6 +753,85 @@ export function PlayerChrome({
           >
             {paused ? "Play" : "Pause"}
           </button>
+          <button
+            type="button"
+            className="gls-player-btn"
+            aria-label={`Rewind ${SKIP_SEC} seconds`}
+            title={`Rewind ${SKIP_SEC}s`}
+            tabIndex={showChrome ? 0 : -1}
+            onClick={() => skip(-SKIP_SEC)}
+          >
+            −{SKIP_SEC}s
+          </button>
+          <button
+            type="button"
+            className="gls-player-btn"
+            aria-label={`Fast forward ${SKIP_SEC} seconds`}
+            title={`Forward ${SKIP_SEC}s`}
+            tabIndex={showChrome ? 0 : -1}
+            onClick={() => skip(SKIP_SEC)}
+          >
+            +{SKIP_SEC}s
+          </button>
+          {prevChannel && (
+            <button
+              type="button"
+              className="gls-player-btn"
+              aria-label={`Previous: ${prevChannel.title}`}
+              title={prevChannel.title}
+              tabIndex={showChrome ? 0 : -1}
+              onClick={() => goNeighbor(prevChannel)}
+            >
+              Prev
+            </button>
+          )}
+          {nextChannel && (
+            <button
+              type="button"
+              className="gls-player-btn"
+              aria-label={`Next: ${nextChannel.title}`}
+              title={nextChannel.title}
+              tabIndex={showChrome ? 0 : -1}
+              onClick={() => goNeighbor(nextChannel)}
+            >
+              Next
+            </button>
+          )}
+          <button
+            type="button"
+            className="gls-player-btn"
+            aria-label={muted ? "Unmute" : "Mute"}
+            tabIndex={showChrome ? 0 : -1}
+            onClick={toggleMute}
+          >
+            {muted ? "Unmute" : "Mute"}
+          </button>
+          <label className="gls-player-vol flex items-center gap-1.5">
+            <span className="sr-only">Volume</span>
+            <input
+              type="range"
+              className="gls-player-vol-slider"
+              min={0}
+              max={1}
+              step={0.05}
+              value={muted ? 0 : volume}
+              aria-label="Volume"
+              tabIndex={showChrome ? 0 : -1}
+              onChange={(e) => onVolume(Number(e.target.value))}
+            />
+          </label>
+          {hasCaptions && (
+            <button
+              type="button"
+              className={`gls-player-btn ${captionsOn ? "is-active" : ""}`}
+              aria-label={captionsOn ? "Hide subtitles" : "Show subtitles"}
+              aria-pressed={captionsOn}
+              tabIndex={showChrome ? 0 : -1}
+              onClick={toggleCaptions}
+            >
+              CC
+            </button>
+          )}
           {shouldShowCastControl(format, castUrl) && (
             <button
               type="button"

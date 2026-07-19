@@ -29,7 +29,7 @@ export function AdminPageHeader({
         )}
       </div>
       {actions && (
-        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+        <div className="gls-h-scroll gls-h-scroll-row gls-h-scroll-fade w-full min-w-0 sm:w-auto sm:max-w-full">
           {actions}
         </div>
       )}

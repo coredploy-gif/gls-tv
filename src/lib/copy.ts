@@ -22,6 +22,8 @@ export const COPY_FALLBACKS = {
     "This channel may be subject to regional or rights restrictions. Try one of the available news alternatives below.",
   "player.trace_urban_fallback":
     "Switching to Trace Urban — regional feed unavailable",
+  "player.sister_fallback":
+    "Switching to a working sister feed — primary stream unavailable",
   "faq.hero.eyebrow": "Help centre",
   "faq.hero.lead":
     "Straight answers about membership, playback, regions, and why GLS doesn’t ship a VPN. Local-first streaming — not geo-bypass.",

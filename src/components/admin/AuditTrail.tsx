@@ -45,7 +45,7 @@ export function AuditTrail() {
         description="Admin actions + billing events — who changed what, grants, refunds, replies."
       />
 
-      <div className="gls-admin-card mt-8 flex flex-wrap gap-2 rounded-lg p-3">
+      <div className="gls-admin-card gls-h-scroll gls-h-scroll-row mt-8 rounded-lg p-3">
         <input
           className="gls-admin-input min-w-[200px] flex-1"
           placeholder="Filter action / actor / id…"
@@ -53,7 +53,7 @@ export function AuditTrail() {
           onChange={(e) => setQ(e.target.value)}
         />
         <select
-          className="gls-admin-input w-auto"
+          className="gls-admin-input w-auto shrink-0"
           value={source}
           onChange={(e) => setSource(e.target.value)}
         >
@@ -64,7 +64,7 @@ export function AuditTrail() {
         <button
           type="button"
           onClick={() => void load()}
-          className="rounded-md border border-white/20 px-4 py-2 text-sm text-gls-body hover:text-white"
+          className="shrink-0 rounded-md border border-white/20 px-4 py-2 text-sm text-gls-body hover:text-white"
         >
           Apply
         </button>
@@ -72,7 +72,7 @@ export function AuditTrail() {
 
       {err && <p className="mt-3 text-sm text-gls-red">{err}</p>}
 
-      <div className="gls-admin-card mt-4 overflow-x-auto rounded-lg">
+      <div className="gls-admin-card gls-h-scroll mt-4 rounded-lg">
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="border-b border-white/10 bg-white/[0.03] text-[10px] uppercase tracking-[0.18em] text-gls-muted">
             <tr>

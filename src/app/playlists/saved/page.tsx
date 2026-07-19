@@ -1,18 +1,18 @@
 import { BrowseNav } from "@/components/BrowseNav";
-import { PlaylistManager } from "@/components/PlaylistManager";
+import { SavedPlaylistsManager } from "@/components/SavedPlaylistsManager";
 
 export const metadata = {
-  title: "My Playlists",
+  title: "Saved Playlists",
   description:
-    "Browse and watch channels imported from your M3U playlists — search, filter by category, and play in GLS TV.",
+    "Manage M3U playlists saved to your GLS TV account — re-sync, rename, replace, or remove.",
 };
 
-export default function PlaylistsPage() {
+export default function SavedPlaylistsPage() {
   return (
     <main className="gls-below-nav min-h-screen bg-gls-black pb-24">
       <BrowseNav />
       <div className="mx-auto max-w-[1200px] px-4 sm:px-8 lg:px-12">
-        <PlaylistManager />
+        <SavedPlaylistsManager />
       </div>
     </main>
   );

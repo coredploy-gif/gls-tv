@@ -10,6 +10,7 @@ import {
   normalizeEvodUrl,
   normalizeMediaLinkCategory,
   resolveMediaEmbedUrl,
+  resolveMediaLinkThumbnail,
   titleFromMediaUrl,
   USER_MEDIA_DISCLAIMER,
   validateMediaLinkUrl,
@@ -319,5 +320,53 @@ describe("media-links", () => {
     expect(
       isTrustedAppMediaUrl("http://127.0.0.1:3010/admin/secret"),
     ).toBe(false);
+  });
+
+  it("fills sports / live HLS staff pick posters from Unsplash plates", () => {
+    const tsn4 = resolveMediaLinkThumbnail({
+      title: "TSN 4 _ Sports",
+      category: "Sports",
+      format: "hls",
+      thumbnailUrl: null,
+    });
+    const tsn5 = resolveMediaLinkThumbnail({
+      title: "TSN 5 _ Sports",
+      category: "Sports",
+      format: "hls",
+      thumbnailUrl: null,
+    });
+    expect(tsn4).toMatch(/images\.unsplash\.com/);
+    expect(tsn5).toMatch(/images\.unsplash\.com/);
+    expect(tsn4).not.toBe(tsn5);
+  });
+
+  it("keeps existing non-logo posters (eVOD) unchanged", () => {
+    const evod =
+      "https://cdn.example.com/evod/cover-art.jpg";
+    expect(
+      resolveMediaLinkThumbnail({
+        title: "Film on eVOD",
+        category: "Movies",
+        format: "evod",
+        thumbnailUrl: evod,
+      }),
+    ).toBe(evod);
+    expect(
+      resolveMediaLinkThumbnail({
+        title: "Film on eVOD",
+        category: "Movies",
+        format: "evod",
+        thumbnailUrl: null,
+      }),
+    ).toBeNull();
+  });
+
+  it("seeds HLS validation thumbnails for sports titles", () => {
+    const v = validateMediaLinkUrl(
+      "http://40.160.24.55/TSN_5/index.m3u8",
+      "TSN 5 _ Sports",
+    );
+    expect(v.ok).toBe(true);
+    expect(v.thumbnailUrl).toMatch(/images\.unsplash\.com/);
   });
 });

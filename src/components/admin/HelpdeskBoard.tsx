@@ -235,7 +235,7 @@ function HelpdeskBoardInner() {
         description="Member chat tickets and converted public contacts. Open a row for the full thread."
         actions={
           <>
-            <div className="flex overflow-hidden rounded-md border border-white/15 bg-black/40 p-0.5">
+            <div className="flex shrink-0 overflow-hidden rounded-md border border-white/15 bg-black/40 p-0.5">
               {(["list", "board"] as const).map((v) => (
                 <button
                   key={v}
@@ -254,7 +254,7 @@ function HelpdeskBoardInner() {
             <button
               type="button"
               onClick={createTicket}
-              className="gls-cta rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wide"
+              className="gls-cta shrink-0 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wide"
             >
               + Ticket
             </button>
@@ -262,7 +262,7 @@ function HelpdeskBoardInner() {
         }
       />
 
-      <div className="gls-admin-card mt-8 flex flex-wrap gap-2 rounded-lg p-3">
+      <div className="gls-admin-card gls-h-scroll gls-h-scroll-row mt-8 rounded-lg p-3">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -272,7 +272,7 @@ function HelpdeskBoardInner() {
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="gls-admin-input w-auto"
+          className="gls-admin-input w-auto shrink-0"
         >
           {STATUSES.map((s) => (
             <option key={s} value={s}>
@@ -283,7 +283,7 @@ function HelpdeskBoardInner() {
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
-          className="gls-admin-input w-auto"
+          className="gls-admin-input w-auto shrink-0"
         >
           {PRIORITIES.map((s) => (
             <option key={s} value={s}>
@@ -294,7 +294,7 @@ function HelpdeskBoardInner() {
         <select
           value={source}
           onChange={(e) => setSource(e.target.value)}
-          className="gls-admin-input w-auto"
+          className="gls-admin-input w-auto shrink-0"
         >
           {["all", "chat", "contact", "email", "manual", "system"].map((s) => (
             <option key={s} value={s}>
@@ -305,7 +305,7 @@ function HelpdeskBoardInner() {
         <button
           type="button"
           onClick={() => void load()}
-          className="rounded-md border border-white/20 px-4 py-2 text-sm text-gls-body transition hover:border-white/40 hover:text-white"
+          className="shrink-0 rounded-md border border-white/20 px-4 py-2 text-sm text-gls-body transition hover:border-white/40 hover:text-white"
         >
           {busy ? "…" : "Apply"}
         </button>
@@ -314,7 +314,7 @@ function HelpdeskBoardInner() {
       {err && <p className="mt-3 text-sm text-gls-red">{err}</p>}
 
       {view === "list" ? (
-        <div className="gls-admin-card mt-4 overflow-x-auto rounded-lg">
+        <div className="gls-admin-card gls-h-scroll mt-4 rounded-lg">
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="border-b border-white/10 bg-white/[0.03] text-[10px] uppercase tracking-[0.18em] text-gls-muted">
               <tr>
@@ -388,7 +388,7 @@ function HelpdeskBoardInner() {
           </table>
         </div>
       ) : (
-        <div className="mt-4 flex gap-3 overflow-x-auto pb-4">
+        <div className="gls-h-scroll gls-h-scroll-row gls-h-scroll-fade mt-4 gap-3 pb-4">
           {BOARD_COLS.map((col) => (
             <div
               key={col}

@@ -160,7 +160,7 @@ export function FinanceReminders() {
           </div>
         </div>
 
-        <div className="gls-admin-card overflow-x-auto rounded-xl">
+        <div className="gls-admin-card gls-h-scroll rounded-xl">
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead className="border-b border-white/10 bg-white/[0.03] text-[10px] uppercase tracking-[0.18em] text-gls-muted">
               <tr>

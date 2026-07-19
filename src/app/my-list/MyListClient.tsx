@@ -52,7 +52,7 @@ export default function MyListClient() {
         : listItems;
 
   return (
-    <main className="min-h-screen bg-gls-black pb-20 pt-24">
+    <main className="gls-below-nav min-h-screen bg-gls-black pb-20">
       <BrowseNav />
       <div className="mx-auto max-w-[1600px] px-4 sm:px-8 lg:px-12">
         <h1 className="gls-display text-5xl text-white">My List</h1>

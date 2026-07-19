@@ -28,14 +28,16 @@ const CINEMATIC_PLATES = [
 /** Diversified 4K-capable plates per hub — hashed per channel so rows aren't clones. */
 const CATEGORY_PLATES: Record<string, string[]> = {
   sports: [
-    u("photo-1551524559-8af4e6624178", 1600, 2400), // ski / extreme
-    u("photo-1461896836934-ffe607ba6851", 1600, 2400), // sprint track
-    u("photo-1574629810360-7efbbe195018", 1600, 2400), // stadium night
-    u("photo-1546519638-68e109498ffc", 1600, 2400), // basketball
-    u("photo-1612872087720-bb876e2e67d1", 1600, 2400), // volleyball
-    u("photo-1492144534655-ae79c964c9d7", 1600, 2400), // motorsport
-    u("photo-1502680390469-be75c87ebe73", 1600, 2400), // surf
-    u("photo-1522163189787-03190bc2697a", 1600, 2400), // climbing
+    u("photo-1574629810360-7efbbe195018", 1600, 2400), // soccer stadium night
+    u("photo-1431324155629-1a6deb1dec8d", 1600, 2400), // soccer crowd
+    u("photo-1522778119026-d647f0596c20", 1600, 2400), // soccer ball
+    u("photo-1579952363873-27f3bade9f55", 1600, 2400), // soccer strike
+    u("photo-1517466787929-bc90951d0974", 1600, 2400), // soccer match
+    u("photo-1508098682721-e5dbc6094189", 1600, 2400), // stadium bowl
+    u("photo-1560272564-c83b66b1ad12", 1600, 2400), // pitch action
+    u("photo-1459865264687-595d652de67e", 1600, 2400), // aerial pitch
+    u("photo-1575361204480-aadea25e6d68", 1600, 2400), // green pitch
+    u("photo-1624526267942-ab0ff8a3e972", 1600, 2400), // night floodlights
   ],
   news: [
     u("photo-1504711434869-e1e241b58b61", 1600, 2400),
@@ -58,6 +60,8 @@ const CATEGORY_PLATES: Record<string, string[]> = {
     u("photo-1596464716127-f2a82984de30", 1600, 2400),
     u("photo-1503454537195-1dcabb73ffb9", 1600, 2400),
     u("photo-1471286174890-9c112ffca5b4", 1600, 2400),
+    u("photo-1516627145497-ae6968895b74", 1600, 2400),
+    u("photo-1606092195730-5d7b9af1efc5", 1600, 2400),
   ],
   food: [
     u("photo-1556909114-f6e7ad7d3136", 1600, 2400),

@@ -548,14 +548,14 @@ export function AdminShell({
         </div>
       )}
 
-      <div className="relative flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-white/[0.07] bg-[#07070b]/80 backdrop-blur-xl">
-          <div className="flex h-12 items-center justify-between gap-3 px-3 sm:h-14 sm:px-6 lg:px-8">
+      <div className="relative flex min-w-0 max-w-full flex-1 flex-col">
+        <header className="sticky top-0 z-20 min-w-0 max-w-full border-b border-white/[0.07] bg-[#07070b]/80 backdrop-blur-xl">
+          <div className="flex h-12 min-w-0 items-center justify-between gap-3 px-3 sm:h-14 sm:px-6 lg:px-8">
             <div className="flex min-w-0 items-center gap-2.5">
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/[0.04] text-white lg:hidden"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-white/[0.04] text-white lg:hidden"
                 aria-label="Open admin menu"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
@@ -601,9 +601,12 @@ export function AdminShell({
             </div>
           </div>
 
-          {/* Quick jump chips on small screens */}
-          <div className="flex gap-2 overflow-x-auto px-3 pb-2.5 [-ms-overflow-style:none] [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden">
-            {NAV.slice(0, 8).map((item) => {
+          {/* Quick jump chips — swipeable on small screens; full nav stays in hamburger */}
+          <nav
+            aria-label="Admin sections"
+            className="gls-h-scroll gls-h-scroll-row gls-h-scroll-fade px-3 pb-2.5 lg:hidden"
+          >
+            {NAV.map((item) => {
               const active =
                 pathname === item.href ||
                 (item.href !== "/admin" && pathname.startsWith(item.href));
@@ -630,7 +633,7 @@ export function AdminShell({
                 </Link>
               );
             })}
-          </div>
+          </nav>
         </header>
 
         <div

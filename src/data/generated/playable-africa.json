@@ -589,9 +589,9 @@
     "slug": "mekameleentv-tr-sd",
     "title": "Mekameleen TV",
     "type": "live",
-    "description": "Africa · direct Playable (CORS*)",
+    "description": "Egyptian opposition news · direct Playable (CORS*)",
     "countries": [
-      "tr"
+      "eg"
     ],
     "categories": [
       "News",
@@ -1189,7 +1189,7 @@
     "slug": "mbc5-ae-sd",
     "title": "MBC 5",
     "type": "live",
-    "description": "Africa · direct Playable (CORS*)",
+    "description": "UAE · MBC Group FAST · direct Playable (CORS*)",
     "countries": [
       "ae"
     ],

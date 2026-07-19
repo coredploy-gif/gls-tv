@@ -21,6 +21,7 @@ import { getChannelBySlug, getWrestlingChannels, getAsiaSeries } from "@/lib/cha
 import { catalogFromSeed } from "@/lib/stream-seeds-catalog";
 import { isLinearPayCategory } from "@/lib/linear-pay";
 import type { CatalogItem } from "@/data/types";
+import { getEnglishKidsTop10 } from "@/data/top10";
 
 type Props = {
   hubKey: HubKey;
@@ -230,12 +231,31 @@ export function CategoryHub({ hubKey }: Props) {
           />
         )}
 
-        <ContentRow
-          title={`Top 10 ${hub.title}`}
-          items={hub.top10}
-          ranked
-          limit={10}
-        />
+        {/* Kids hub: Popular first, then fixed English Top 10 under it */}
+        {hubKey === "kids" ? (
+          <>
+            <ContentRow
+              title="Popular"
+              items={popular.length ? popular : filtered}
+              limit={ROW_LIMIT}
+              viewMoreHref={`${moreBase}/popular?country=${country}`}
+            />
+            <ContentRow
+              title="Top 10 Kids · English"
+              items={getEnglishKidsTop10()}
+              ranked
+              limit={10}
+              viewMoreHref="/kids"
+            />
+          </>
+        ) : (
+          <ContentRow
+            title={`Top 10 ${hub.title}`}
+            items={hub.top10}
+            ranked
+            limit={10}
+          />
+        )}
 
         {hubKey === "sports" && (
           <>
@@ -383,12 +403,25 @@ export function CategoryHub({ hubKey }: Props) {
           </>
         )}
 
-        <ContentRow
-          title="Popular"
-          items={popular.length ? popular : filtered}
-          limit={ROW_LIMIT}
-          viewMoreHref={`${moreBase}/popular?country=${country}`}
-        />
+        {hubKey !== "kids" && (
+          <ContentRow
+            title="Popular"
+            items={popular.length ? popular : filtered}
+            limit={ROW_LIMIT}
+            viewMoreHref={`${moreBase}/popular?country=${country}`}
+          />
+        )}
+
+        {/* Live TV: English kids Top 10 always under Popular */}
+        {hubKey === "live" && (
+          <ContentRow
+            title="Top 10 Kids · English"
+            items={getEnglishKidsTop10()}
+            ranked
+            limit={10}
+            viewMoreHref="/kids"
+          />
+        )}
 
         {hubKey === "food" && (
           <ContentRow

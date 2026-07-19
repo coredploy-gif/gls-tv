@@ -13,4 +13,15 @@ describe("HLS upstream headers", () => {
       Referer: "https://media.example/",
     });
   });
+
+  it("uses Shoof referer for Alkass GCP hosts", () => {
+    expect(
+      hlsUpstreamHeaders(
+        "https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8",
+        null,
+      ),
+    ).toMatchObject({
+      Referer: "https://shoof.alkass.net/",
+    });
+  });
 });

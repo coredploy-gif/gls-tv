@@ -1,6 +1,15 @@
 import type { CatalogItem, MediaSource } from "@/data/types";
+import {
+  cinematicPosterPlate,
+  isCinematicArtUrl,
+  isLikelyChannelLogo,
+} from "@/lib/artwork";
 import { COPY_FALLBACKS } from "@/lib/copy";
 import { normalizeReligionSubfolderTag } from "@/lib/religion";
+
+/** Title/category tokens that should prefer soccer/sports Unsplash plates. */
+const SPORTS_HINT_RE =
+  /\b(sport|sports|tsn|espn|bein|soccer|football|nhl|nba|mlb|mls|tennis|golf|cricket|ufc|mma|racing|f1)\b/i;
 
 export type MediaLinkFormat =
   | "hls"
@@ -114,7 +123,46 @@ export function mediaLinkPlaySources(link: {
   ];
 }
 
+/**
+ * Staff picks / My Links cards: keep real posters (eVOD, YouTube, curated),
+ * but invent varied Unsplash plates for sports / live HLS with empty or logo-only art.
+ */
+export function resolveMediaLinkThumbnail(input: {
+  title: string;
+  category?: string | null;
+  format?: MediaLinkFormat | null;
+  thumbnailUrl?: string | null;
+}): string | null {
+  const thumb = (input.thumbnailUrl || "").trim() || null;
+  if (thumb && isCinematicArtUrl(thumb)) return thumb;
+  if (thumb && !isLikelyChannelLogo(thumb)) return thumb;
+
+  const category = (input.category || "").trim();
+  const sportsHint = SPORTS_HINT_RE.test(`${category} ${input.title}`);
+  const liveHls = input.format === "hls";
+
+  // Do not invent art for eVOD / YouTube / file links — only sports or live HLS.
+  if (!sportsHint && !liveHls) return thumb;
+
+  const categories = [category || (liveHls ? "live" : "Other")];
+  if (sportsHint) categories.push("sports");
+
+  return cinematicPosterPlate(
+    `${input.title}|${category}|${input.format || ""}`,
+    categories,
+  );
+}
+
 export function userMediaLinkToCatalog(link: UserMediaLink): CatalogItem {
+  const art = resolveMediaLinkThumbnail({
+    title: link.title,
+    category: link.category,
+    format: link.format,
+    thumbnailUrl: link.thumbnail_url,
+  });
+  const poster =
+    art ||
+    "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&h=2400&q=80";
   return {
     id: `media-${link.id}`,
     slug: `media-${link.id}`,
@@ -124,12 +172,10 @@ export function userMediaLinkToCatalog(link: UserMediaLink): CatalogItem {
     countries: ["world"],
     categories: ["My Links", link.category, "Playable"],
     languages: ["English"],
-    poster:
-      link.thumbnail_url ||
-      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&h=2400&q=80",
-    backdrop:
-      link.thumbnail_url ||
-      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=3840&h=2160&q=80",
+    poster,
+    backdrop: art
+      ? art.replace(/w=\d+&h=\d+/, "w=3840&h=2160")
+      : "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=3840&h=2160&q=80",
     license: "open_stream",
     isLive: link.format === "hls",
     featured: false,
@@ -138,6 +184,15 @@ export function userMediaLinkToCatalog(link: UserMediaLink): CatalogItem {
 }
 
 export function adminMediaLinkToCatalog(link: AdminMediaLink): CatalogItem {
+  const art = resolveMediaLinkThumbnail({
+    title: link.title,
+    category: link.category,
+    format: link.format,
+    thumbnailUrl: link.thumbnail_url,
+  });
+  const poster =
+    art ||
+    "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&h=2400&q=80";
   return {
     id: `staff-${link.id}`,
     slug: `staff-${link.id}`,
@@ -147,12 +202,10 @@ export function adminMediaLinkToCatalog(link: AdminMediaLink): CatalogItem {
     countries: ["world"],
     categories: ["Staff picks", link.category, "Playable"],
     languages: ["English"],
-    poster:
-      link.thumbnail_url ||
-      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&h=2400&q=80",
-    backdrop:
-      link.thumbnail_url ||
-      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=3840&h=2160&q=80",
+    poster,
+    backdrop: art
+      ? art.replace(/w=\d+&h=\d+/, "w=3840&h=2160")
+      : "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=3840&h=2160&q=80",
     license: "open_stream",
     isLive: link.format === "hls",
     featured: false,
@@ -577,9 +630,20 @@ export function resolveMediaEmbedUrl(link: {
 export function thumbnailFor(
   format: MediaLinkFormat,
   videoId?: string | null,
+  opts?: { title?: string; category?: string | null },
 ): string | undefined {
   if (format === "youtube" && videoId) {
     return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  }
+  if (format === "hls" && opts?.title) {
+    return (
+      resolveMediaLinkThumbnail({
+        title: opts.title,
+        category: opts.category,
+        format: "hls",
+        thumbnailUrl: null,
+      }) || undefined
+    );
   }
   return undefined;
 }
@@ -763,13 +827,14 @@ export function validateMediaLinkUrl(
         : null;
   const embedUrl = embedUrlFor(url, format);
 
+  const title = resolveMediaLinkTitle(url, format, preferredTitle);
   return {
     ok: true,
     format,
-    title: resolveMediaLinkTitle(url, format, preferredTitle),
+    title,
     embedUrl,
     videoId: videoId || undefined,
-    thumbnailUrl: thumbnailFor(format, videoId),
+    thumbnailUrl: thumbnailFor(format, videoId, { title }),
   };
 }
 

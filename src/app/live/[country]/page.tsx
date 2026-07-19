@@ -1,12 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BrowseNav } from "@/components/BrowseNav";
-import {
-  getCountry,
-  getLiveByCountry,
-  getLiveCategoriesForCountry,
-} from "@/data/catalog";
-import { getUsChannels, isLiveTvEligible } from "@/lib/channels";
+import { getCountry, getLiveCategoriesForCountry } from "@/data/catalog";
+import { getLiveTvByCountry, isLiveTvEligible } from "@/lib/channels";
 import { groupByCategory } from "@/lib/iptv";
 
 type Props = { params: Promise<{ country: string }> };
@@ -16,10 +12,7 @@ export default async function LiveCountryPage({ params }: Props) {
   const country = getCountry(code);
   if (!country) notFound();
 
-  const iptvUs =
-    code === "us" ? getUsChannels().filter(isLiveTvEligible) : [];
-  const seedChannels = getLiveByCountry(code).filter(isLiveTvEligible);
-  const channels = code === "us" ? [...iptvUs, ...seedChannels] : seedChannels;
+  const channels = getLiveTvByCountry(code).filter(isLiveTvEligible);
 
   const categoryMap = groupByCategory(channels);
   const categories =
