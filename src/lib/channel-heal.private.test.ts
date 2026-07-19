@@ -32,6 +32,19 @@ describe("private playlist open heals", () => {
     }
   });
 
+  it("strips sister News URLs from healed SABC 1 sources", () => {
+    const { sources } = healPrivatePlaylistSources("sabc-1", "SABC 1", [
+      {
+        url: "https://sabconetanw.cdn.mangomolo.com/news/smil:news.stream.smil/master.m3u8",
+        quality: "Auto",
+        format: "hls",
+        priority: 1,
+      },
+    ]);
+    expect(sources.every((s) => !/\/news\//i.test(s.url))).toBe(true);
+    expect(sources[0]?.url).toMatch(/sabc1/);
+  });
+
   it("does not invent pay ESPN / TSN numbered remaps", () => {
     expect(healPackFor("espn-br-sd", "ESPN")).toBeNull();
     expect(healPackFor("tsn1-ca-sd", "TSN1")).toBeNull();

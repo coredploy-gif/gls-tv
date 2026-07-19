@@ -9,7 +9,8 @@ export type StreamMemoryEntry = {
   updatedAt: number;
 };
 
-const KEY = "gls-tv-stream-memory-v10";
+/** v11: flush poisoned SABC 1/2/3 → News memories from v10. */
+const KEY = "gls-tv-stream-memory-v11";
 /** Keep last-good path for more channels across devices / PWA sessions. */
 const MAX = 400;
 
@@ -38,9 +39,23 @@ function write(store: Store) {
   }
 }
 
+/** Sister FTA mirrors that must never stick on SABC 1/2/3 (wrong channel). */
+export function isWrongSabcSisterUrl(slug: string, url: string): boolean {
+  const s = slug.toLowerCase();
+  if (!/^sabc-?[123]\b|^sabc[123]/.test(s) || /news/.test(s)) return false;
+  return /sabconetanw|\/news\/smil:news|ln24\.stream|internetmultimediaonline\.org\/ln24/i.test(
+    url,
+  );
+}
+
 export function getStreamMemory(slug: string): StreamMemoryEntry | null {
   const e = read()[slug];
-  return e ?? null;
+  if (!e) return null;
+  if (isWrongSabcSisterUrl(slug, e.url)) {
+    clearStreamMemory(slug);
+    return null;
+  }
+  return e;
 }
 
 export function rememberStream(
@@ -48,6 +63,7 @@ export function rememberStream(
   url: string,
   mode: "direct" | "proxy",
 ) {
+  if (isWrongSabcSisterUrl(slug, url)) return;
   const store = read();
   store[slug] = { url, mode, updatedAt: Date.now() };
   write(store);

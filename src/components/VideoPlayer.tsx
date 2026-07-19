@@ -7,6 +7,7 @@ import type HlsType from "hls.js";
 import {
   clearStreamMemory,
   getStreamMemory,
+  isWrongSabcSisterUrl,
   rememberStream,
 } from "@/lib/stream-memory";
 import { isLinearSportsPack } from "@/lib/sports-packs";
@@ -167,6 +168,11 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
 
   // Drop poisoned proxy memory that left SABC 3 flashing "Mirror 1 · proxy…"
   if (hardGeo && mem?.mode === "proxy") {
+    clearStreamMemory(item.slug);
+  }
+
+  // Drop SABC News / LN24 memory stuck on SABC 1/2/3 (wrong channel).
+  if (mem?.url && isWrongSabcSisterUrl(item.slug, mem.url)) {
     clearStreamMemory(item.slug);
   }
 
@@ -707,7 +713,9 @@ export function VideoPlayer({
             if (!failOverPath()) {
               setError(
                 hardGeo
-                  ? "This channel is unavailable in this region. Try SABC News or LN24."
+                  ? /^sabc-?[123]$/i.test(item.slug)
+                    ? "SABC 1–3 are only available in supported regions. This is not SABC News."
+                    : "This channel is unavailable in this region. Try SABC News or LN24."
                   : "This programme isn’t available right now. Please try another channel.",
               );
             }
@@ -961,7 +969,9 @@ export function VideoPlayer({
         }
         setError(
           hardGeo
-            ? "This channel isn’t available in your region. Try SABC News or LN24."
+            ? /^sabc-?[123]$/i.test(item.slug)
+              ? "SABC 1–3 are only available in supported regions. This is not SABC News."
+              : "This channel isn’t available in your region. Try SABC News or LN24."
             : "We can’t start this programme right now. Please try another channel.",
         );
       }
@@ -1070,7 +1080,7 @@ export function VideoPlayer({
                 Choose profile
               </Link>
             )}
-            {isHardGeo(item) && (
+            {isHardGeo(item) && !/^sabc-?[123]$/i.test(item.slug) && (
               <>
                 <Link
                   href="/watch/sabc-news"
@@ -1085,6 +1095,19 @@ export function VideoPlayer({
                   LN24
                 </Link>
               </>
+            )}
+            {isHardGeo(item) && /^sabc-?[123]$/i.test(item.slug) && (
+              <p className="max-w-md text-xs text-white/55">
+                Still want news? Open{" "}
+                <Link href="/watch/sabc-news" className="text-white underline">
+                  SABC News
+                </Link>{" "}
+                or{" "}
+                <Link href="/watch/ln24-sa" className="text-white underline">
+                  LN24
+                </Link>
+                .
+              </p>
             )}
             {sourceIndex + 1 < sources.length && (
               <button

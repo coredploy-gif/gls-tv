@@ -45,6 +45,29 @@ const KZN1 =
   "https://cdn.freevisiontv.co.za/sttv/smil:1kzn.stream.smil/playlist.m3u8";
 const BOK_TV = "https://livestream2.bokradio.co.za/hls/Bok5c.m3u8";
 
+/** True for SABC 1/2/3 (not News). */
+export function isNumberedSabcChannel(slug: string, title?: string | null) {
+  const hay = `${slug} ${title || ""}`.toLowerCase();
+  if (/news/.test(hay)) return false;
+  return /sabc[\s_-]?[123]\b|sabc-[123]|sabc[123]/.test(hay);
+}
+
+/** News / LN24 mirrors must never attach to SABC 1/2/3. */
+export function isSabcSisterSwapUrl(url: string) {
+  return /sabconetanw|\/news\/smil:news|ln24\.stream|internetmultimediaonline\.org\/ln24/i.test(
+    url,
+  );
+}
+
+function stripSabcSisterSwaps(
+  slug: string,
+  title: string | null | undefined,
+  sources: MediaSource[],
+): MediaSource[] {
+  if (!isNumberedSabcChannel(slug, title)) return sources;
+  return sources.filter((s) => !isSabcSisterSwapUrl(s.url));
+}
+
 function src(
   url: string,
   priority: number,
@@ -292,6 +315,8 @@ export function healPrivatePlaylistSources(
   next = rewritten.sources;
   if (rewritten.rewritten > 0) tags.push("Healed", "Playable");
 
+  next = stripSabcSisterSwaps(slug, title, next);
+
   if (next.some((s) => isPlutoFamily(s.url))) {
     tags.push("ProxyOk", "Playable");
   }
@@ -369,6 +394,7 @@ export function healChannelSources(
   if (rewritten.rewritten > 0) tags.push("Healed", "Playable");
 
   sources = sources.filter((s) => !isRawIpUrl(s.url) && !/nghk\.ai/i.test(s.url));
+  sources = stripSabcSisterSwaps(item.slug, item.title, sources);
 
   if (sources.some((s) => isPlutoFamily(s.url))) {
     tags.push("ProxyOk", "Playable");
