@@ -18,6 +18,7 @@ import {
   claimViewerDeviceSession,
   kidsLimitForPlan,
 } from "@/lib/membership/viewer-sessions";
+import { redirectAfterViewerPick } from "@/lib/membership/access-paths";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -76,6 +77,7 @@ export async function POST(req: NextRequest) {
     name?: string;
     avatar_id?: string;
     is_kids?: boolean;
+    next?: string;
   };
 
   const action = body.action || "list";
@@ -139,7 +141,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const redirectTo = viewer.is_kids ? "/kids" : "/browse";
+    const redirectTo = redirectAfterViewerPick(
+      body.next,
+      Boolean(viewer.is_kids),
+    );
     const res = NextResponse.json({
       ok: true,
       redirectTo,

@@ -79,10 +79,15 @@ export function ProfileAvatarMenu() {
                 onClick={async () => {
                   setOpen(false);
                   if (v.id === viewer.id) return;
+                  const next = `${window.location.pathname}${window.location.search}`;
                   const res = await fetch("/api/membership/profiles", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "select", viewerId: v.id }),
+                    body: JSON.stringify({
+                      action: "select",
+                      viewerId: v.id,
+                      ...(next.startsWith("/profiles") ? {} : { next }),
+                    }),
                   });
                   const json = await res.json();
                   if (res.ok && json.redirectTo) {

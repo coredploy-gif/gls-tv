@@ -8,6 +8,10 @@ import { safeNextPath } from "@/lib/auth/safe-next";
 import { useAppCopy } from "@/lib/useAppCopy";
 import { TvPairingPanel } from "@/components/TvPairingPanel";
 import { useIsTvLikeDevice } from "@/lib/useIsTvLikeDevice";
+import {
+  pathNeedsViewer,
+  profilesGateHref,
+} from "@/lib/membership/access-paths";
 
 type Mode = "signin" | "signup";
 
@@ -133,10 +137,18 @@ export function AuthPanel({
   const tvOverride = searchParams.get("tv") === "1";
   const isTv = useIsTvLikeDevice(tvOverride) && !forceEmail;
 
-  const postLoginHref = safeNextPath(
-    searchParams.get("next"),
-    DEFAULT_POST_LOGIN_HREF,
-  );
+  const postLoginHref = (() => {
+    const intended = safeNextPath(
+      searchParams.get("next"),
+      DEFAULT_POST_LOGIN_HREF,
+    );
+    // Fresh logins never have a viewer cookie yet — go through Who's watching
+    // and return to the intended page (e.g. My Playlists) after pick.
+    if (pathNeedsViewer(intended.split("?")[0] || intended)) {
+      return profilesGateHref(intended);
+    }
+    return intended;
+  })();
 
   useEffect(() => {
     onBusyChange?.(redirecting || busy);

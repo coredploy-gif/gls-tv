@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { GlsLogo } from "@/components/GlsLogo";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { getOrCreateDeviceId } from "@/lib/membership/device-client";
+import { safeNextPath } from "@/lib/auth/safe-next";
 
 type Viewer = {
   id: string;
@@ -26,6 +27,8 @@ type Payload = {
 export function ProfilesGate() {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextAfterPick = safeNextPath(searchParams.get("next"), "");
   const [data, setData] = useState<Payload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [picking, setPicking] = useState<string | null>(null);
@@ -73,6 +76,7 @@ export function ProfilesGate() {
             action: "select",
             viewerId: p.id,
             deviceId,
+            ...(nextAfterPick ? { next: nextAfterPick } : {}),
           }),
         });
         const json = (await res.json()) as {

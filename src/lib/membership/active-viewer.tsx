@@ -63,7 +63,12 @@ export function ActiveViewerProvider({ children }: { children: ReactNode }) {
       }).then(async (res) => {
         if (res.status === 409) {
           document.cookie = `${ACTIVE_VIEWER_COOKIE}=; path=/; max-age=0; samesite=lax`;
-          window.location.assign("/profiles?reason=device");
+          const next = `${window.location.pathname}${window.location.search}`;
+          const params = new URLSearchParams({ reason: "device" });
+          if (next && !next.startsWith("/profiles")) {
+            params.set("next", next);
+          }
+          window.location.assign(`/profiles?${params.toString()}`);
         }
       });
     }, 120_000);
@@ -80,7 +85,15 @@ export function ActiveViewerProvider({ children }: { children: ReactNode }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "heartbeat" }),
     }).catch(() => undefined);
-    window.location.assign("/profiles");
+    const next =
+      typeof window !== "undefined"
+        ? `${window.location.pathname}${window.location.search}`
+        : "/browse";
+    window.location.assign(
+      next.startsWith("/profiles")
+        ? "/profiles"
+        : `/profiles?next=${encodeURIComponent(next)}`,
+    );
   }, []);
 
   const value = useMemo(

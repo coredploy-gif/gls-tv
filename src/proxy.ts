@@ -1,72 +1,52 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { ACTIVE_VIEWER_COOKIE, VIEWER_SESSION_COOKIE } from "@/lib/membership/plans";
+import {
+  pathNeedsAuth,
+  pathNeedsEntitlement,
+  pathSkipsViewerGate,
+  profilesGateHref,
+} from "@/lib/membership/access-paths";
 import { isEadminEmail } from "@/lib/eadmin";
 import { operationalLog } from "@/lib/operations/logger";
 
-const PROTECTED_PREFIXES = [
-  "/browse",
-  "/watch",
-  "/kids",
-  "/profiles",
-  "/playlists",
-  "/library",
-  "/search",
-  "/sports",
-  "/news",
-  "/movies",
-  "/series",
-  "/live",
-  "/food",
-  "/religion",
-  "/asia",
-  "/africa",
-  "/mylist",
-  "/my-list",
-  "/account",
-  "/billing",
-  "/receipts",
-  "/notifications",
-  "/support",
-  "/admin",
-  "/eadmin",
-];
-
-/** Auth required but no viewer-profile gate (admin / auth surfaces). */
-const SKIP_VIEWER_GATE = [
-  "/admin",
-  "/eadmin",
-  "/profiles",
-  "/auth",
-  "/billing",
-  "/receipts",
-  "/pricing",
-  "/account",
-  "/notifications",
-  "/support",
-];
-
 const AUTH_PUBLIC = ["/auth", "/pricing", "/legal", "/faq", "/api"];
 
-const ENTITLEMENT_PREFIXES = [
-  "/browse",
-  "/watch",
-  "/kids",
-  "/playlists",
-  "/library",
-  "/search",
-  "/sports",
-  "/news",
-  "/movies",
-  "/series",
-  "/live",
-  "/food",
-  "/religion",
-  "/asia",
-  "/africa",
-  "/mylist",
-  "/my-list",
-];
+function requestPathWithSearch(request: NextRequest) {
+  return `${request.nextUrl.pathname}${request.nextUrl.search}`;
+}
+
+function redirectToProfiles(
+  request: NextRequest,
+  opts?: { reason?: string; clearViewer?: boolean; clearSession?: boolean },
+) {
+  const gate = profilesGateHref(requestPathWithSearch(request), {
+    reason: opts?.reason,
+  });
+  const redirect = request.nextUrl.clone();
+  const qIndex = gate.indexOf("?");
+  redirect.pathname = qIndex >= 0 ? gate.slice(0, qIndex) : gate;
+  redirect.search = qIndex >= 0 ? gate.slice(qIndex) : "";
+  const res = NextResponse.redirect(redirect);
+  if (opts?.clearViewer) {
+    res.cookies.set(ACTIVE_VIEWER_COOKIE, "", {
+      path: "/",
+      maxAge: 0,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+  }
+  if (opts?.clearSession) {
+    res.cookies.set(VIEWER_SESSION_COOKIE, "", {
+      path: "/",
+      maxAge: 0,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+  }
+  return res;
+}
 
 export async function proxy(request: NextRequest) {
   const requestId = request.headers.get("x-request-id") || crypto.randomUUID();
@@ -117,9 +97,9 @@ export async function proxy(request: NextRequest) {
   const isPublicAuthSurface = AUTH_PUBLIC.some(
     (p) => path === p || path.startsWith(`${p}/`),
   );
-  const needsAuth = PROTECTED_PREFIXES.some(
-    (p) => path === p || path.startsWith(`${p}/`),
-  );
+  const needsAuth = pathNeedsAuth(path);
+  const skipViewerGate = pathSkipsViewerGate(path);
+  const needsEntitlement = pathNeedsEntitlement(path);
 
   if (needsAuth && !user && !isApi) {
     operationalLog("warn", "proxy.access_denied", { requestId, path, reason: "authentication_required" });
@@ -129,13 +109,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(redirect);
   }
 
-  const skipViewerGate = SKIP_VIEWER_GATE.some(
-    (p) => path === p || path.startsWith(`${p}/`),
-  );
-
-  const needsEntitlement = ENTITLEMENT_PREFIXES.some(
-    (p) => path === p || path.startsWith(`${p}/`),
-  );
   if (user && needsEntitlement && !isEadminEmail(user.email)) {
     const viewerId = request.cookies.get(ACTIVE_VIEWER_COOKIE)?.value || null;
     const [profileResult, subscriptionResult, viewerResult] = await Promise.all([
@@ -203,39 +176,18 @@ export async function proxy(request: NextRequest) {
     }
 
     if (viewerId && (viewerResult.error || !viewerResult.data)) {
-      const redirect = request.nextUrl.clone();
-      redirect.pathname = "/profiles";
-      redirect.search = "";
-      const staleViewer = NextResponse.redirect(redirect);
-      staleViewer.cookies.set(ACTIVE_VIEWER_COOKIE, "", {
-        path: "/",
-        maxAge: 0,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
+      return redirectToProfiles(request, {
+        clearViewer: true,
+        clearSession: true,
       });
-      staleViewer.cookies.set(VIEWER_SESSION_COOKIE, "", {
-        path: "/",
-        maxAge: 0,
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-      });
-      return staleViewer;
     }
 
     const sessionToken = request.cookies.get(VIEWER_SESSION_COOKIE)?.value;
     if (viewerId && !sessionToken) {
-      const redirect = request.nextUrl.clone();
-      redirect.pathname = "/profiles";
-      redirect.searchParams.set("reason", "device");
-      const missingSession = NextResponse.redirect(redirect);
-      missingSession.cookies.set(ACTIVE_VIEWER_COOKIE, "", {
-        path: "/",
-        maxAge: 0,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
+      return redirectToProfiles(request, {
+        reason: "device",
+        clearViewer: true,
       });
-      return missingSession;
     }
 
     if (viewerId && sessionToken) {
@@ -252,24 +204,11 @@ export async function proxy(request: NextRequest) {
         new Date(deviceSession.last_active_at).getTime() >
           Date.now() - 30 * 60_000;
       if (!fresh) {
-        const redirect = request.nextUrl.clone();
-        redirect.pathname = "/profiles";
-        redirect.searchParams.set("reason", "device");
-        const expiredSession = NextResponse.redirect(redirect);
-        expiredSession.cookies.set(ACTIVE_VIEWER_COOKIE, "", {
-          path: "/",
-          maxAge: 0,
-          sameSite: "lax",
-          secure: process.env.NODE_ENV === "production",
+        return redirectToProfiles(request, {
+          reason: "device",
+          clearViewer: true,
+          clearSession: true,
         });
-        expiredSession.cookies.set(VIEWER_SESSION_COOKIE, "", {
-          path: "/",
-          maxAge: 0,
-          httpOnly: true,
-          sameSite: "lax",
-          secure: process.env.NODE_ENV === "production",
-        });
-        return expiredSession;
       }
     }
   }
@@ -282,10 +221,7 @@ export async function proxy(request: NextRequest) {
     needsAuth &&
     !request.cookies.get(ACTIVE_VIEWER_COOKIE)?.value
   ) {
-    const redirect = request.nextUrl.clone();
-    redirect.pathname = "/profiles";
-    redirect.search = "";
-    return NextResponse.redirect(redirect);
+    return redirectToProfiles(request);
   }
 
   return response;
