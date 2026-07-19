@@ -3,6 +3,7 @@ import {
   AFRICA_RADIO_BROWSE_FLAGSHIPS,
   CURATED_RADIO_AFRICA,
 } from "@/data/curated-radio-africa";
+import { CURATED_MALAWI_TV } from "@/data/curated-malawi-tv";
 import { CURATED_RADIO_MW } from "@/data/curated-radio-mw";
 import { CURATED_RADIO_ZA } from "@/data/curated-radio-za";
 
@@ -44,9 +45,9 @@ export function getRadioCountryGroups(): { country: CountryMeta; stations: Catal
   })).filter((group) => group.stations.length > 0);
 }
 
-/** Malawi radio only — MBC TV hidden while BozzTV CDN is offline. */
+/** Malawi TV first (visible even if CDN flaky), then radio. */
 export function getMalawiBrowseItems(): CatalogItem[] {
-  return getRadioStationsByCountry("mw");
+  return [...CURATED_MALAWI_TV, ...getRadioStationsByCountry("mw")];
 }
 
 /** One flagship per country for home browse (avoids duplicating the full /radio grid). */

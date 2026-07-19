@@ -13,17 +13,17 @@ const MBC_BACKDROP =
   "https://images.unsplash.com/photo-1522868514708-6a4f9f31edb1?auto=format&fit=crop&w=3840&h=2160&q=80";
 
 /**
- * MBC linear TV seeds — kept for staff/admin reference while BozzTV CDN is down.
- * Not exported to browse or channel catalog until streams return HTTP 200.
+ * MBC linear TV — official mbc.mw/live BozzTV HLS.
+ * Shown on browse even when the CDN is flaky; descriptions warn playback may fail.
  */
-const MALAWI_TV_OFFLINE: CatalogItem[] = [
+export const CURATED_MALAWI_TV: CatalogItem[] = [
   {
     id: "curated-mbc-tv-1",
     slug: "mbc-tv-1",
     title: "MBC TV",
     type: "live",
     description:
-      "Malawi Broadcasting Corporation · national television (English & Chichewa). Official mbc.mw/live stream.",
+      "Malawi Broadcasting Corporation · national television (English & Chichewa). Official mbc.mw/live stream — may be offline when MBC’s CDN is down.",
     countries: ["mw"],
     categories: [
       "News",
@@ -33,13 +33,14 @@ const MALAWI_TV_OFFLINE: CatalogItem[] = [
       "Playable",
       "Public",
       "MBC",
+      "Malawi TV",
     ],
     languages: ["English", "Chichewa"],
     poster: MBC_POSTER,
     backdrop: MBC_BACKDROP,
     license: "fta_public",
     isLive: true,
-    featured: false,
+    featured: true,
     sources: [
       {
         url: MBC_TV_1,
@@ -56,7 +57,7 @@ const MALAWI_TV_OFFLINE: CatalogItem[] = [
     title: "MBC TV 2",
     type: "live",
     description:
-      "MBC 2 On the Go · sports, entertainment & youth programming. Official mbc.mw/live/tv2.html stream.",
+      "MBC 2 On the Go · sports, entertainment & youth programming. Official mbc.mw/live stream — may be offline when MBC’s CDN is down.",
     countries: ["mw"],
     categories: [
       "Entertainment",
@@ -66,6 +67,7 @@ const MALAWI_TV_OFFLINE: CatalogItem[] = [
       "Playable",
       "Public",
       "MBC",
+      "Malawi TV",
     ],
     languages: ["English", "Chichewa"],
     poster: MBC_POSTER,
@@ -85,7 +87,5 @@ const MALAWI_TV_OFFLINE: CatalogItem[] = [
   },
 ];
 
-/** Hidden while BozzTV HLS endpoints return 404 — re-export when CDN heals. */
-export const MALAWI_TV_OFFLINE_SEEDS = MALAWI_TV_OFFLINE;
-
-export const CURATED_MALAWI_TV: CatalogItem[] = [];
+/** Alias kept for older imports / restore scripts. */
+export const MALAWI_TV_OFFLINE_SEEDS = CURATED_MALAWI_TV;

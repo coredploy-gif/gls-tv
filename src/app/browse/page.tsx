@@ -106,7 +106,7 @@ export default function BrowsePage() {
 
         {malawiItems.length > 0 && (
           <ContentRow
-            title="🇲🇼 Malawi · MBC Radio"
+            title="🇲🇼 Malawi · MBC TV & radio"
             items={malawiItems}
             limit={12}
             viewMoreHref="/radio"
@@ -139,13 +139,6 @@ export default function BrowsePage() {
           viewMoreHref="/sports"
         />
         <ContentRow
-          title="Top 10 Kids"
-          items={[...TOP10.kids]}
-          ranked
-          limit={10}
-          viewMoreHref="/kids"
-        />
-        <ContentRow
           title="Top 10 News"
           items={[...TOP10.news]}
           ranked
@@ -164,6 +157,13 @@ export default function BrowsePage() {
           items={popular}
           limit={12}
           viewMoreHref="/live/more/popular"
+        />
+        <ContentRow
+          title="Top 10 Kids · English"
+          items={[...TOP10.kids]}
+          ranked
+          limit={10}
+          viewMoreHref="/kids"
         />
         <ContentRow
           title="UK picks"
