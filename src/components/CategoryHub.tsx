@@ -13,6 +13,7 @@ import {
   filterByCountry,
   getHub,
   getHubChannels,
+  orderCountriesForHub,
   popularFirst,
   type HubKey,
   ROW_LIMIT,
@@ -85,7 +86,10 @@ export function CategoryHub({ hubKey }: Props) {
     };
   }, [hubKey]);
 
-  const countries = useMemo(() => countriesFor(all), [all]);
+  const countries = useMemo(
+    () => orderCountriesForHub(hubKey, countriesFor(all)),
+    [all, hubKey],
+  );
   const [country, setCountry] = useState<string>("all");
   const [q, setQ] = useState("");
 
@@ -492,32 +496,29 @@ export function CategoryHub({ hubKey }: Props) {
           viewMoreHref={`${moreBase}/all?country=${country}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
         />
 
-        {/* Country spotlight rows (Netflix-style) — pin ZA on Africa */}
+        {/* Country spotlight rows — hub pins (ZA / MENA) already applied above */}
         {country === "all" &&
-          (() => {
-            const ordered =
-              hubKey === "africa"
-                ? [
-                    ...countries.filter((c) => c.code === "za"),
-                    ...countries.filter((c) => c.code !== "za"),
-                  ]
-                : countries;
-            return ordered.slice(0, hubKey === "africa" ? 6 : 4).map((c) => {
+          countries
+            .slice(0, hubKey === "africa" || hubKey === "live" ? 6 : 4)
+            .map((c) => {
               const list = popularFirst(
                 all.filter((i) => i.countries.includes(c.code)),
               );
               if (list.length < 3) return null;
+              const viewMoreHref =
+                hubKey === "live"
+                  ? `/live/${c.code}`
+                  : `${moreBase}/all?country=${c.code}`;
               return (
                 <ContentRow
                   key={c.code}
                   title={`${c.flag} ${c.name}`}
                   items={list}
                   limit={ROW_LIMIT}
-                  viewMoreHref={`${moreBase}/all?country=${c.code}`}
+                  viewMoreHref={viewMoreHref}
                 />
               );
-            });
-          })()}
+            })}
       </div>
     </main>
   );

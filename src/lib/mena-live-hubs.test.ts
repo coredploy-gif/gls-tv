@@ -1,12 +1,29 @@
 import { describe, expect, it } from "vitest";
 import { getCountry } from "@/data/catalog";
 import { getChannelBySlug, getLiveTvByCountry } from "@/lib/channels";
+import {
+  countriesFor,
+  getHubChannels,
+  LIVE_PINNED_COUNTRIES,
+  orderCountriesForHub,
+} from "@/lib/hubs";
 
 describe("MENA live country hubs", () => {
   it("registers sa, ae, tr in COUNTRIES", () => {
     expect(getCountry("sa")?.name).toMatch(/Saudi/i);
     expect(getCountry("ae")?.name).toMatch(/Emirates|UAE/i);
     expect(getCountry("tr")?.name).toMatch(/Turkey/i);
+  });
+
+  it("pins sa, ae, tr into Live TV country chips (not buried by volume ranking)", () => {
+    const ranked = countriesFor(getHubChannels("live"));
+    const chips = orderCountriesForHub("live", ranked).slice(0, 16);
+    const codes = chips.map((c) => c.code);
+    for (const code of LIVE_PINNED_COUNTRIES) {
+      expect(codes).toContain(code);
+      expect(ranked.some((c) => c.code === code && c.count > 0)).toBe(true);
+    }
+    expect(codes.slice(0, 3)).toEqual(["sa", "ae", "tr"]);
   });
 
   it("seeds Saudi public news + religion", () => {

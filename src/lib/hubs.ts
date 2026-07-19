@@ -258,7 +258,17 @@ function mergeBySlug(...lists: CatalogItem[][]) {
   return [...map.values()];
 }
 
-export function countriesFor(items: CatalogItem[]) {
+export type CountryChip = {
+  code: string;
+  count: number;
+  name: string;
+  flag: string;
+};
+
+/** Curated Live TV hubs that must stay visible even with low channel counts. */
+export const LIVE_PINNED_COUNTRIES = ["sa", "ae", "tr"] as const;
+
+export function countriesFor(items: CatalogItem[]): CountryChip[] {
   const counts = new Map<string, number>();
   for (const item of items) {
     for (const code of item.countries.length ? item.countries : ["world"]) {
@@ -276,6 +286,33 @@ export function countriesFor(items: CatalogItem[]) {
         flag: meta?.flag ?? "🌍",
       };
     });
+}
+
+/** Keep priority codes first (stable), then the rest in existing order. */
+export function pinCountriesFirst<T extends { code: string }>(
+  countries: T[],
+  pins: readonly string[],
+): T[] {
+  const pinned = pins
+    .map((code) => countries.find((c) => c.code === code))
+    .filter((c): c is T => Boolean(c));
+  const pinSet = new Set(pins);
+  const rest = countries.filter((c) => !pinSet.has(c.code));
+  return [...pinned, ...rest];
+}
+
+/** Hub-specific chip / spotlight ordering (pins curated countries above volume ranking). */
+export function orderCountriesForHub(
+  hubKey: HubKey,
+  countries: CountryChip[],
+): CountryChip[] {
+  if (hubKey === "africa") {
+    return pinCountriesFirst(countries, ["za"]);
+  }
+  if (hubKey === "live") {
+    return pinCountriesFirst(countries, LIVE_PINNED_COUNTRIES);
+  }
+  return countries;
 }
 
 export function filterByCountry(items: CatalogItem[], country: string | null) {
