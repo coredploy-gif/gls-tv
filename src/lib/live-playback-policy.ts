@@ -43,8 +43,8 @@ export type LiveChannelKind = {
   myLinks?: boolean;
 };
 
-/** Seconds of lag that count as “behind live” for UI (Back to live). */
-export const BEHIND_LIVE_LAG_SEC = 8;
+/** Seconds past intentional sync that count as “behind live” for UI. */
+export const BEHIND_LIVE_LAG_SEC = 12;
 
 /**
  * Auto snap-to-live is never allowed for stall / recover / waiting paths.
@@ -68,9 +68,11 @@ export function resolveDeviceProfile(isTvLike: boolean): LivePlaybackDeviceProfi
 }
 
 /**
- * Build hls.js live tuning. Prefer a lighter live-edge lag with a strong
- * ahead buffer (“preload”) so playback stays smooth without sitting a minute
- * behind. TV still caps bitrate for weak SoCs.
+ * Build hls.js live tuning.
+ *
+ * Intentional ~45–60s behind the tip is not “stutter lag” — it is headroom so
+ * the player can preload a large ahead buffer and ride out network dips.
+ * My Links stay nearer the tip (short CDN windows). TV still caps bitrate.
  */
 export function buildLiveHlsTuning(
   profile: LivePlaybackDeviceProfile,
@@ -82,49 +84,48 @@ export function buildLiveHlsTuning(
   const tv = profile === "tv";
   const myLinks = Boolean(kind.myLinks);
 
-  // Lighter lag for now — still stay a few segments back so short CDN windows
-  // and ABR switches do not 404 at the tip.
+  // My Links / staff picks: short CDN windows (~20–40s). Aim near the tip and
+  // only preload within that window — a 60s+ buffer target thrashing-aborts
+  // every fragment. Catalog sports keep the intentional ~45–60s cushion.
   const liveSyncDuration = myLinks
     ? tv
-      ? 6
-      : 4
+      ? 8
+      : 6
     : tv
-      ? 28
+      ? 60
       : deep
-        ? 22
-        : 16;
-  // Soft catch-up when latency drifts far past sync (hls seeks to sync point,
-  // not the tip). Kept as a multiple of sync — never mix *DurationCount keys.
+        ? 48
+        : 36;
+  // Far above sync — do not chase live when the buffer is healthy.
   const liveMaxLatencyDuration = myLinks
     ? tv
-      ? 28
-      : 20
+      ? 40
+      : 30
     : tv
-      ? 90
-      : deep
-        ? 70
-        : 55;
+      ? 900
+      : 720;
 
   if (tv) {
     return {
       liveSyncDuration,
       liveMaxLatencyDuration,
+      // Heavy preload from the first second (My Links capped to the DVR window).
       maxBufferLength: myLinks
-        ? 45
+        ? 20
         : kind.privatePlaylist
-          ? 120
+          ? 150
           : deep
-            ? 180
-            : 100,
+            ? 240
+            : 150,
       maxMaxBufferLength: myLinks
-        ? 90
+        ? 28
         : kind.privatePlaylist
-          ? 240
+          ? 280
           : deep
-            ? 360
-            : 200,
-      maxBufferSize: (myLinks ? 60 : deep ? 200 : 120) * 1000 * 1000,
-      backBufferLength: myLinks ? 36 : deep ? 180 : 90,
+            ? 480
+            : 300,
+      maxBufferSize: (myLinks ? 40 : deep ? 260 : 160) * 1000 * 1000,
+      backBufferLength: myLinks ? 16 : deep ? 240 : 120,
       maxBufferHole: myLinks ? 1.2 : 2.2,
       abrEwmaDefaultEstimate: 220_000,
       abrBandWidthFactor: 0.4,
@@ -141,51 +142,51 @@ export function buildLiveHlsTuning(
   return {
     liveSyncDuration,
     liveMaxLatencyDuration,
-    // Strong preload from the first second — deepenLiveBufferTargets raises later.
+    // Strong preload immediately — My Links stay inside the short live window.
     maxBufferLength: myLinks
-      ? 36
+      ? 18
       : kind.privatePlaylist
-        ? 90
+        ? 120
         : kind.linear || kind.trace
-          ? 160
+          ? 240
           : kind.unstable
-            ? 120
+            ? 180
             : kind.sports
-              ? 100
-              : 60,
+              ? 180
+              : 90,
     maxMaxBufferLength: myLinks
-      ? 72
+      ? 26
       : kind.privatePlaylist
-        ? 200
+        ? 240
         : kind.linear || kind.trace
-          ? 360
+          ? 480
           : kind.unstable
-            ? 280
+            ? 360
             : kind.sports
-              ? 240
-              : 140,
+              ? 360
+              : 200,
     maxBufferSize:
       (myLinks
-        ? 48
+        ? 36
         : kind.privatePlaylist
-          ? 110
+          ? 140
           : kind.linear || kind.trace
-            ? 240
+            ? 320
             : kind.unstable
-              ? 180
+              ? 240
               : kind.sports
-                ? 160
-                : 80) *
+                ? 240
+                : 120) *
       1000 *
       1000,
     backBufferLength: myLinks
-      ? 30
+      ? 14
       : kind.linear || kind.trace
-        ? 180
+        ? 300
         : kind.sports || kind.unstable
-          ? 120
-          : 60,
-    maxBufferHole: myLinks ? 0.8 : deep ? 1.4 : 0.5,
+          ? 210
+          : 90,
+    maxBufferHole: myLinks ? 0.8 : deep ? 1.8 : 0.5,
     abrEwmaDefaultEstimate: deep && !myLinks ? 350_000 : 800_000,
     abrBandWidthFactor: deep && !myLinks ? 0.5 : 0.8,
     abrBandWidthUpFactor: deep && !myLinks ? 0.3 : 0.6,
@@ -209,51 +210,51 @@ export function deepenLiveBufferTargets(
   if (tv) {
     return {
       maxBufferLength: myLinks
-        ? 75
+        ? 24
         : kind.privatePlaylist
-          ? 150
+          ? 200
           : deep
-            ? 280
-            : 160,
+            ? 360
+            : 220,
       maxMaxBufferLength: myLinks
-        ? 120
+        ? 32
         : kind.privatePlaylist
-          ? 280
+          ? 360
           : deep
-            ? 480
-            : 280,
-      maxBufferSize: (myLinks ? 80 : deep ? 280 : 160) * 1000 * 1000,
+            ? 600
+            : 400,
+      maxBufferSize: (myLinks ? 48 : deep ? 320 : 200) * 1000 * 1000,
     };
   }
   return {
     maxBufferLength: myLinks
-      ? 60
+      ? 22
       : kind.privatePlaylist
-        ? 120
+        ? 180
         : kind.linear || kind.trace
-          ? 320
+          ? 420
           : kind.sports
-            ? 240
-            : 160,
+            ? 360
+            : 200,
     maxMaxBufferLength: myLinks
-      ? 120
+      ? 30
       : kind.privatePlaylist
-        ? 240
+        ? 320
         : kind.linear || kind.trace
-          ? 560
+          ? 720
           : kind.sports
-            ? 420
-            : 280,
+            ? 600
+            : 360,
     maxBufferSize:
       (myLinks
-        ? 72
+        ? 42
         : kind.privatePlaylist
-          ? 140
+          ? 180
           : kind.linear || kind.trace
-            ? 360
+            ? 420
             : kind.sports
-              ? 260
-              : 140) *
+              ? 360
+              : 200) *
       1000 *
       1000,
   };

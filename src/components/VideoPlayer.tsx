@@ -60,6 +60,17 @@ function requiresProxy(url: string) {
 }
 
 /**
+ * Local http:// pages can hit cleartext HLS direct (same as ad sites / VLC).
+ * That avoids the slow Node relay hop — https production still needs /api/hls.
+ */
+function canPlayCleartextDirect(streamUrl: string) {
+  if (typeof window === "undefined") return false;
+  return (
+    window.location.protocol === "http:" && /^http:\/\//i.test(streamUrl)
+  );
+}
+
+/**
  * HTTPS hosts that still need /api/hls in the browser:
  * jmp2.uk redirects into Pluto stitcher with relative paths + no CORS.
  * Trace+ / some sticky CDNs need proxy Referer when used as last resort.
@@ -178,7 +189,8 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
   // original source from the viewer device first — unless cleartext / no-CORS
   // requires the same-origin relay or the page stays black.
   if (first?.label === "browser-direct") {
-    if (requiresProxy(first.url) || prefersProxy(first.url)) {
+    // https pages must relay cleartext; http://127.0.0.1 can go direct.
+    if (prefersProxy(first.url) && !canPlayCleartextDirect(first.url)) {
       const relayIdx = sources.findIndex((s) => s.label === "secure-relay");
       if (relayIdx >= 0) {
         return { index: relayIdx, mode: "direct" as const };
@@ -189,23 +201,19 @@ function initialPick(item: CatalogItem, sources: MediaSource[]) {
     }
   }
 
-  if (
-    first?.label === "secure-relay" &&
-    (mem?.url !== first.url || mem.mode !== "direct")
-  ) {
-    // Cleartext / no-CORS My Links lead with relay — don't revive a poisoned
-    // browser-direct memory that blacks out https pages.
-    clearStreamMemory(item.slug);
-  }
-
-  // Also drop memory that pinned a cleartext origin after a bad relay→direct
-  // cutover (black frames with videoWidth set but nothing on screen).
-  if (
-    first?.label === "secure-relay" &&
-    mem?.url &&
-    /^http:\/\//i.test(mem.url)
-  ) {
-    clearStreamMemory(item.slug);
+  if (first?.label === "secure-relay") {
+    const directIdx = sources.findIndex((s) => s.label === "browser-direct");
+    const direct = directIdx >= 0 ? sources[directIdx] : null;
+    // Match ad-site / VLC path on local http — skip the slow relay.
+    if (direct && canPlayCleartextDirect(direct.url)) {
+      clearStreamMemory(item.slug);
+      return { index: directIdx, mode: "direct" as const };
+    }
+    if (mem?.url !== first.url || mem.mode !== "direct") {
+      // Cleartext / no-CORS My Links lead with relay — don't revive a poisoned
+      // browser-direct memory that blacks out https pages.
+      clearStreamMemory(item.slug);
+    }
   }
 
   // Drop poisoned proxy memory that left SABC 3 flashing "Mirror 1 · proxy…"
@@ -321,7 +329,7 @@ function playUrlFor(source: MediaSource, mode: "direct" | "proxy") {
 
 /**
  * YouTube-style live player:
- * - play near the live sync point (lighter lag) — never chase the tip
+ * - sit ~45–60s behind live with a deep ahead preload (smooth, not stutter)
  * - never auto-snap to live (only Back to live / refresh)
  * - silent recover / proxy / mirror (no black-out panic)
  * - standby warmup of next mirror
@@ -609,8 +617,8 @@ export function VideoPlayer({
           }
         }
 
-        // Lighter live lag + strong ahead preload; TV still bitrate-caps.
-        // My Links stay near the tip (short CDN windows) with long frag timeouts.
+        // Intentional ~45–60s behind live + heavy ahead preload (smooth, not stutter).
+        // My Links stay nearer the tip (short CDN windows) with long frag timeouts.
         const kind = liveKindFor(item, url);
         const profile = resolveDeviceProfile(isTvLikeDevice());
         const tuning = buildLiveHlsTuning(profile, kind);
@@ -618,11 +626,12 @@ export function VideoPlayer({
           kind.linear || kind.sports || kind.unstable || kind.trace || kind.privatePlaylist,
         );
         const slowFrags = deepLive || Boolean(kind.myLinks) || profile === "tv";
+        // Start already on the deep preload targets — fill the cushion ASAP.
+        const preload = deepenLiveBufferTargets(profile, kind);
         const instance = new Hls({
           enableWorker: true,
           lowLatencyMode: false,
           startFragPrefetch: true,
-          // Prefetch the next live segment while the current one plays.
           maxBufferHole: tuning.maxBufferHole,
           renderTextTracksNatively: true,
           testBandwidth: tuning.testBandwidth,
@@ -634,15 +643,18 @@ export function VideoPlayer({
           liveSyncDuration: tuning.liveSyncDuration,
           liveMaxLatencyDuration: tuning.liveMaxLatencyDuration,
           liveDurationInfinity: true,
-          maxBufferLength: tuning.maxBufferLength,
-          maxMaxBufferLength: tuning.maxMaxBufferLength,
-          maxBufferSize: tuning.maxBufferSize,
+          maxBufferLength: Math.max(tuning.maxBufferLength, preload.maxBufferLength),
+          maxMaxBufferLength: Math.max(
+            tuning.maxMaxBufferLength,
+            preload.maxMaxBufferLength,
+          ),
+          maxBufferSize: Math.max(tuning.maxBufferSize, preload.maxBufferSize),
           backBufferLength: tuning.backBufferLength,
-          highBufferWatchdogPeriod: profile === "tv" ? 3 : 1.5,
+          highBufferWatchdogPeriod: profile === "tv" ? 3 : 2,
           nudgeMaxRetry: 24,
-          // Keep the loader busy — strong preload for live.
-          maxLoadingDelay: kind.myLinks ? 2 : 4,
-          maxStarvationDelay: kind.myLinks ? 2 : 4,
+          // Keep the loader busy so the ahead buffer fills hard.
+          maxLoadingDelay: 2,
+          maxStarvationDelay: 2,
           capLevelToPlayerSize: tuning.capLevelToPlayerSize,
           capLevelOnFPSDrop: tuning.capLevelOnFPSDrop,
           manifestLoadingTimeOut: slowFrags ? 45000 : 18000,
@@ -663,7 +675,7 @@ export function VideoPlayer({
 
         const jumpToLive = () => {
           // Explicit Back to live only — seeks to intentional sync point
-          // (already a few segments behind edge), never the tip of the playlist.
+          // (already ~45–60s behind edge), never the tip of the playlist.
           const live = instance.liveSyncPosition;
           if (live != null && Number.isFinite(live)) {
             try {
@@ -742,15 +754,15 @@ export function VideoPlayer({
           if (sourceIndex + 1 >= sources.length) return false;
           if (mirrorsAdvanced >= sources.length - 1) return false;
           const nextSrc = sources[sourceIndex + 1];
-          // Cleartext / no-CORS staff picks lead with secure-relay for a reason.
-          // Falling through to browser-direct blacks the player (mixed content /
-          // aborting cross-origin TS) after the relay was already progressing.
+          // On https, never fall from relay onto cleartext direct (mixed content /
+          // black screens). On local http, direct is the preferred path already.
           if (
             (source.label === "secure-relay" ||
               source.url.startsWith("/api/hls")) &&
             nextSrc?.label === "browser-direct" &&
             nextSrc.url &&
-            (requiresProxy(nextSrc.url) || prefersProxy(nextSrc.url))
+            (requiresProxy(nextSrc.url) || prefersProxy(nextSrc.url)) &&
+            !canPlayCleartextDirect(nextSrc.url)
           ) {
             return false;
           }
@@ -971,7 +983,7 @@ export function VideoPlayer({
           setAheadSec(Math.round(bufferedAhead(el)));
           if (!item.isLive) return;
           // Distance to the true live edge (not liveSyncPosition).
-          // Intentional sync lag still shows Back to live past the UI threshold.
+          // Intentional ~45–60s behind still shows Back to live.
           let lag = 0;
           try {
             const latency = (instance as HlsType & { latency?: number }).latency;

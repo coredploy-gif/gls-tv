@@ -4,6 +4,20 @@ import https from "node:https";
 import net from "node:net";
 import { Readable, Transform } from "node:stream";
 
+/** Reuse sockets for HLS playlist + segment bursts through /api/hls. */
+const httpAgent = new http.Agent({
+  keepAlive: true,
+  maxSockets: 16,
+  maxFreeSockets: 8,
+  timeout: 90_000,
+});
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  maxSockets: 16,
+  maxFreeSockets: 8,
+  timeout: 90_000,
+});
+
 export type SecureFetchOptions = {
   headers?: Record<string, string>;
   maxBytes: number;
@@ -166,6 +180,7 @@ export async function secureFetchStream(
           method: "GET",
           headers: { ...options.headers, Host: url.host },
           servername: url.hostname,
+          agent: url.protocol === "https:" ? httpsAgent : httpAgent,
           // Pin to pre-validated public IPs (SSRF). Support Node's all:true lookup.
           lookup: pinnedLookup(addresses),
         },
