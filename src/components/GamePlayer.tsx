@@ -12,6 +12,19 @@ type LeaderRow = {
   user_id: string;
 };
 
+function isPwaOrCompact(): boolean {
+  if (typeof window === "undefined") return false;
+  const standalone =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.matchMedia("(display-mode: fullscreen)").matches ||
+    window.matchMedia("(display-mode: minimal-ui)").matches ||
+    ("standalone" in navigator &&
+      Boolean((navigator as Navigator & { standalone?: boolean }).standalone));
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  const narrow = window.matchMedia("(max-width: 900px)").matches;
+  return standalone || (coarse && narrow);
+}
+
 export function GamePlayer({
   gameId,
   src,
@@ -36,10 +49,16 @@ export function GamePlayer({
   const [sideOpen, setSideOpen] = useState(false);
   const [nativeFs, setNativeFs] = useState(false);
   const [showPadDesktop, setShowPadDesktop] = useState(false);
+  const [allowNativeFs, setAllowNativeFs] = useState(false);
   const saving = useRef(false);
   const shellRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const wantNativeFs = useRef(false);
+
+  useEffect(() => {
+    // Native fullscreen hides / clips chrome in installed PWA & phones.
+    // Expand stays a CSS overlay so ← Games is always reachable.
+    setAllowNativeFs(!isPwaOrCompact());
+  }, []);
 
   async function refresh() {
     const res = await fetch(`/api/games/scores?gameId=${encodeURIComponent(gameId)}`, {
@@ -141,19 +160,14 @@ export function GamePlayer({
   }, [expanded]);
 
   useEffect(() => {
-    if (!expanded || !wantNativeFs.current) return;
-    wantNativeFs.current = false;
-    const target = shellRef.current;
-    if (!target?.requestFullscreen) return;
-    void target.requestFullscreen().then(
-      () => setNativeFs(true),
-      () => undefined,
-    );
-  }, [expanded]);
-
-  useEffect(() => {
     function onFsChange() {
       const el = document.fullscreenElement;
+      // If something else (iframe/game) stole fullscreen, kick it — chrome must stay.
+      if (el && el !== shellRef.current) {
+        void document.exitFullscreen().catch(() => undefined);
+        setNativeFs(false);
+        return;
+      }
       setNativeFs(!!el && el === shellRef.current);
     }
     document.addEventListener("fullscreenchange", onFsChange);
@@ -161,7 +175,7 @@ export function GamePlayer({
   }, []);
 
   function enterExpand() {
-    wantNativeFs.current = true;
+    // Overlay only — never auto-request native fullscreen (PWA trap).
     setSideOpen(false);
     setExpanded(true);
   }
@@ -191,6 +205,7 @@ export function GamePlayer({
   }
 
   async function toggleNativeFullscreen() {
+    if (!allowNativeFs) return;
     if (document.fullscreenElement) {
       await exitFullscreenOnly();
       return;
@@ -201,7 +216,7 @@ export function GamePlayer({
       await target.requestFullscreen();
       setNativeFs(true);
     } catch {
-      /* ignore */
+      /* ignore — keep expand overlay with chrome */
     }
   }
 
@@ -271,7 +286,7 @@ export function GamePlayer({
       onClick={() => void leaveToGames()}
       data-tv-back-close={expanded ? "true" : undefined}
       aria-label={expanded ? "Close" : "Back to all games"}
-      className="inline-flex items-center gap-2 rounded-full bg-gls-red px-3 py-2 text-sm font-bold text-white shadow-lg transition hover:brightness-110 sm:px-4"
+      className="inline-flex items-center gap-2 rounded-full bg-gls-red px-3 py-2.5 text-sm font-bold text-white shadow-lg transition hover:brightness-110 sm:px-4"
     >
       <span aria-hidden>←</span>
       Games
@@ -285,30 +300,32 @@ export function GamePlayer({
         <button
           type="button"
           onClick={enterExpand}
-          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/75 px-3 py-2 text-sm font-semibold text-white shadow-lg backdrop-blur-sm transition hover:border-white/40 hover:bg-black/90 sm:px-4"
+          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/75 px-3 py-2.5 text-sm font-semibold text-white shadow-lg backdrop-blur-sm transition hover:border-white/40 hover:bg-black/90 sm:px-4"
         >
-          Expand play
+          Larger play
         </button>
       ) : (
         <>
           <button
             type="button"
             onClick={() => void exitExpand()}
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.1] px-3 py-2 text-sm font-semibold text-white"
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.1] px-3 py-2.5 text-sm font-semibold text-white"
           >
             Minimize
           </button>
-          <button
-            type="button"
-            onClick={() => void toggleNativeFullscreen()}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-2 text-sm font-semibold text-white"
-          >
-            {nativeFs ? "Exit FS" : "Fullscreen"}
-          </button>
+          {allowNativeFs && (
+            <button
+              type="button"
+              onClick={() => void toggleNativeFullscreen()}
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-2.5 text-sm font-semibold text-white"
+            >
+              {nativeFs ? "Exit FS" : "Fullscreen"}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setSideOpen((v) => !v)}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-2 text-sm font-semibold text-white"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-2.5 text-sm font-semibold text-white"
             aria-expanded={sideOpen}
           >
             {sideOpen ? "Hide info" : "Scores"}
@@ -317,7 +334,7 @@ export function GamePlayer({
             <button
               type="button"
               onClick={() => setShowPadDesktop((v) => !v)}
-              className="hidden items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-2 text-sm font-semibold text-white lg:inline-flex"
+              className="hidden items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-2.5 text-sm font-semibold text-white lg:inline-flex"
             >
               {showPadDesktop ? "Hide pad" : "Show pad"}
             </button>
@@ -337,27 +354,49 @@ export function GamePlayer({
     />
   ) : null;
 
+  // No allow=fullscreen — game iframe must not cover our exit chrome.
   const iframe = (
     <iframe
       ref={iframeRef}
       title={title}
       src={src}
-      allow="fullscreen"
       className="block h-full w-full border-0 bg-black"
     />
   );
 
-  /** Always-reachable exit over the stage (phones / immersive play). */
   const floatingExit = (
     <button
       type="button"
       onClick={() => void leaveToGames()}
       aria-label="Close"
       data-tv-back-close="true"
-      className="absolute left-2 top-2 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/80 text-lg font-bold text-white shadow-xl backdrop-blur-md transition hover:bg-gls-red sm:left-3 sm:top-3"
+      className="absolute left-[max(0.5rem,env(safe-area-inset-left))] top-[max(0.5rem,env(safe-area-inset-top))] z-40 inline-flex h-12 min-w-12 items-center justify-center rounded-full border border-white/30 bg-gls-red px-3 text-base font-bold text-white shadow-xl transition hover:brightness-110"
     >
       ✕
     </button>
+  );
+
+  /** Full-width exit strip — always visible under the stage in expand/PWA. */
+  const bottomExitBar = (
+    <div className="relative z-40 flex shrink-0 gap-2 border-t border-white/15 bg-black/95 px-3 py-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <button
+        type="button"
+        onClick={() => void leaveToGames()}
+        aria-label="Close"
+        data-tv-back-close="true"
+        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gls-red py-3.5 text-base font-bold text-white shadow-lg"
+      >
+        <span aria-hidden>←</span>
+        Back to Games
+      </button>
+      <button
+        type="button"
+        onClick={() => void exitExpand()}
+        className="rounded-xl border border-white/20 bg-white/[0.08] px-4 py-3.5 text-sm font-semibold text-white"
+      >
+        Minimize
+      </button>
+    </div>
   );
 
   if (expanded) {
@@ -370,8 +409,10 @@ export function GamePlayer({
         aria-label={`${title} — expanded play`}
         data-tv-back-root
       >
-        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-black/90 px-3 py-1.5 backdrop-blur-md pt-[max(0.375rem,env(safe-area-inset-top))]">
-          <p className="min-w-0 truncate text-sm font-bold text-white">{title}</p>
+        <div className="relative z-40 flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-black px-3 py-2 pt-[max(0.5rem,env(safe-area-inset-top))]">
+          <p className="min-w-0 flex-1 truncate text-sm font-bold text-white">
+            {title}
+          </p>
           {toolbar}
         </div>
 
@@ -382,7 +423,7 @@ export function GamePlayer({
               {floatingExit}
             </div>
             {showPad && (
-              <div className="relative z-10 shrink-0 border-t border-white/10 bg-black/95 px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:px-3 sm:py-2">
+              <div className="relative z-10 shrink-0 border-t border-white/10 bg-black/95 px-2 py-1.5 sm:px-3 sm:py-2">
                 {pad}
               </div>
             )}
@@ -397,6 +438,8 @@ export function GamePlayer({
             </div>
           )}
         </div>
+
+        {bottomExitBar}
       </div>
     );
   }
@@ -406,7 +449,7 @@ export function GamePlayer({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
         <div className="space-y-4">
           <div className="overflow-hidden rounded-xl border border-white/10 bg-black shadow-2xl shadow-black/50">
-            <div className="relative flex flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-black/80 px-3 py-2">
+            <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-black/90 px-3 py-2">
               <p className="min-w-0 truncate text-sm font-semibold text-white/80">
                 {title}
               </p>
@@ -415,6 +458,23 @@ export function GamePlayer({
             <div className="relative aspect-[4/5] w-full sm:aspect-[5/4]">
               <div className="absolute inset-0">{iframe}</div>
               {floatingExit}
+            </div>
+            <div className="flex gap-2 border-t border-white/10 bg-black/95 px-3 py-2">
+              <button
+                type="button"
+                onClick={() => void leaveToGames()}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gls-red py-3 text-sm font-bold text-white"
+              >
+                <span aria-hidden>←</span>
+                Back to Games
+              </button>
+              <button
+                type="button"
+                onClick={enterExpand}
+                className="rounded-xl border border-white/20 bg-white/[0.08] px-4 py-3 text-sm font-semibold text-white"
+              >
+                Larger play
+              </button>
             </div>
             {showPad && (
               <div className="border-t border-white/10 bg-black/90 px-3 py-3">
