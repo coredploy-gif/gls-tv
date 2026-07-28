@@ -267,7 +267,7 @@ export function MembershipOverview() {
             {data.presenceSummary?.online ?? 0}
           </p>
           <p className="mt-1 text-xs text-gls-muted">
-            Heartbeat in last 15 min
+            App activity in last 15 min
             {data.presenceSummary?.asOf
               ? ` · ${new Date(data.presenceSummary.asOf).toLocaleTimeString()}`
               : ""}

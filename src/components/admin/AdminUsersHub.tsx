@@ -715,7 +715,7 @@ export function AdminUsersHub() {
                 {presenceSummary.online}
               </p>
               <p className="mt-1 text-[11px] text-gls-muted">
-                Heartbeat in the last 15 minutes
+                App activity in the last 15 minutes
                 {presenceSummary.asOf
                   ? ` · updated ${new Date(presenceSummary.asOf).toLocaleTimeString()}`
                   : ""}

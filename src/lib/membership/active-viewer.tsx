@@ -54,24 +54,37 @@ export function ActiveViewerProvider({ children }: { children: ReactNode }) {
     queueMicrotask(() => void refresh());
     const onFocus = () => void refresh();
     window.addEventListener("focus", onFocus);
-    const heartbeat = window.setInterval(() => {
+
+    const sendHeartbeat = () => {
       if (document.visibilityState !== "visible") return;
       void fetch("/api/membership/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "heartbeat" }),
       }).then(async (res) => {
-        if (res.status === 409) {
-          document.cookie = `${ACTIVE_VIEWER_COOKIE}=; path=/; max-age=0; samesite=lax`;
-          const next = `${window.location.pathname}${window.location.search}`;
-          const params = new URLSearchParams({ reason: "device" });
-          if (next && !next.startsWith("/profiles")) {
-            params.set("next", next);
-          }
-          window.location.assign(`/profiles?${params.toString()}`);
+        if (res.status !== 409) return;
+        // Don't kick admins off the console to Who's watching.
+        const path = window.location.pathname;
+        if (
+          path.startsWith("/admin") ||
+          path.startsWith("/eadmin") ||
+          path.startsWith("/account")
+        ) {
+          return;
         }
+        document.cookie = `${ACTIVE_VIEWER_COOKIE}=; path=/; max-age=0; samesite=lax`;
+        const next = `${window.location.pathname}${window.location.search}`;
+        const params = new URLSearchParams({ reason: "device" });
+        if (next && !next.startsWith("/profiles")) {
+          params.set("next", next);
+        }
+        window.location.assign(`/profiles?${params.toString()}`);
       });
-    }, 120_000);
+    };
+
+    // Immediate ping so Online is accurate without waiting 2 minutes.
+    sendHeartbeat();
+    const heartbeat = window.setInterval(sendHeartbeat, 60_000);
     return () => {
       window.removeEventListener("focus", onFocus);
       window.clearInterval(heartbeat);

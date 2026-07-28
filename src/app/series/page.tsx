@@ -9,12 +9,14 @@ import {
   VOD_SERIES_GENRES,
   getVodSeriesByGenre,
 } from "@/data/curated-vod-series";
+import { GLS_TV_ORIGINALS } from "@/data/curated-gls-originals";
 import { KoreanDramaGuide } from "@/components/KoreanDramaGuide";
 
 export default function SeriesPage() {
   const classic = getByType("series").filter(
     (item) => !item.id.startsWith("vod-series-"),
   );
+  const originals = GLS_TV_ORIGINALS;
   const vodAll = CURATED_VOD_SERIES;
   const vodFeatured = vodAll.filter((i) => i.featured);
   const seeded = CURATED_SERIES_SEEDS;
@@ -47,10 +49,18 @@ export default function SeriesPage() {
             Series
           </h1>
           <p className="mt-3 max-w-2xl text-gls-muted">
-            On-demand VOD shelves first — pause and rewind. Live 24/7 drama
-            channels are listed below. Open / public-domain feeds only.
+            GLS TV Originals first, then on-demand VOD shelves — pause and
+            rewind. Live 24/7 drama channels are listed below.
           </p>
         </div>
+
+        {originals.length > 0 && (
+          <ContentRow
+            title="GLS TV Originals"
+            items={originals}
+            limit={12}
+          />
+        )}
 
         {vodFeatured.length > 0 && (
           <ContentRow

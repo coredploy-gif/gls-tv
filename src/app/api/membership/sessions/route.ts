@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/eadmin";
 import { VIEWER_SESSION_COOKIE } from "@/lib/membership/plans";
+import { touchAccountPresence } from "@/lib/membership/account-presence";
 import {
   touchViewerDeviceSession,
   validateViewerDeviceSession,
@@ -29,8 +30,15 @@ export async function POST(req: NextRequest) {
   const action = body.action || "heartbeat";
 
   if (action === "heartbeat" || action === "validate") {
+    // Always bump account-level presence so admin Online is accurate
+    // even on /admin (no Who's watching device session required).
+    void touchAccountPresence(service, user.id);
+
     if (action === "heartbeat") {
-      const touched = await touchViewerDeviceSession(service, user.id, token || "");
+      if (!token) {
+        return NextResponse.json({ ok: true, presenceOnly: true });
+      }
+      const touched = await touchViewerDeviceSession(service, user.id, token);
       if (!touched.ok) {
         const res = NextResponse.json(
           { ok: false, error: touched.error, code: "SESSION_EXPIRED" },
@@ -48,6 +56,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, session: touched.session });
     }
 
+    if (!token) {
+      return NextResponse.json({ ok: true, presenceOnly: true });
+    }
     const validated = await validateViewerDeviceSession(service, user.id, token);
     if (!validated.ok) {
       return NextResponse.json(

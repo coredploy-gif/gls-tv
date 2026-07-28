@@ -34,6 +34,7 @@ import {
   CURATED_SERIES_SEEDS,
 } from "@/data/curated-public-fast";
 import { CURATED_VOD_SERIES } from "@/data/curated-vod-series";
+import { GLS_TV_ORIGINALS } from "@/data/curated-gls-originals";
 import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
 
 const sportsChannels = sportsJson as CatalogItem[];
@@ -134,6 +135,7 @@ function mergeUnique(...lists: CatalogItem[][]) {
 export function getVerifiedChannels() {
   return mergeUnique(
     top10,
+    GLS_TV_ORIGINALS,
     CURATED_AFRICA,
     CURATED_MALAWI_TV,
     CURATED_RADIO_ZA,
@@ -160,6 +162,7 @@ export function getAllChannels(): CatalogItem[] {
   // Prefer strict playable packs. Raw africa/asia dumps are catalog-only (no Playable badge).
   return mergeUnique(
     top10,
+    GLS_TV_ORIGINALS,
     CURATED_AFRICA,
     CURATED_MALAWI_TV,
     CURATED_RADIO_ZA,
@@ -386,6 +389,9 @@ export function getWrestlingChannels() {
 
 export function getKidsChannels() {
   return mergeUnique(
+    GLS_TV_ORIGINALS.filter((c) =>
+      c.categories.some((x) => /^kids$/i.test(x)),
+    ),
     CURATED_PUBLIC_KIDS,
     playableKids,
     top10.filter((c) => c.categories.includes("Kids")),

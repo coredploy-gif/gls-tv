@@ -25,15 +25,18 @@ Commercial titles (The L Word, etc.) need **rights-cleared on-demand files** (or
 ### What works today
 
 - **On demand (pause/rewind):** `/series` opens with **On demand · featured** and genre rows (Drama, Comedy, Sci-Fi, Horror, Animation, Kids, Classic, Adventure) from `CURATED_VOD_SERIES` (`isLive: false`).
+- **GLS TV Originals:** `src/data/curated-gls-originals.ts` — your adult animation + kids cartoons on the **GLS TV Originals** row.
 - **Live series channels:** Featured 24/7 row (The L Word, Star Trek, …) — intentionally live.
 
-### How to add more real VOD series later
+### How to add your own Originals / VOD
 
-1. Prefer adding to `src/data/curated-vod-series.ts` (`CURATED_VOD_SERIES`) with **`isLive: false`** and a finite MP4 / VOD HLS URL.
-2. Genre tags (`Drama`, `Comedy`, `Sci-Fi`, …) drive rows on `/series`.
-3. Obtain a **playable VOD URL** (not a 24/7 live playlist).
-4. Optional later: episode picker UI — catalog already has optional season/episode counts.
-5. Keep Eadmin `stream_seeds` for **live** slots; do not mark live sliding-window HLS as VOD.
+1. Host each episode as **MP4 or VOD HLS** on a CDN (Cloudflare R2, Bunny, S3, etc.).
+2. Edit `src/data/curated-gls-originals.ts` — set title, poster, and `url`. Use `audience: "adult"` or `"kids"`.
+3. Keep **`isLive: false`** so pause/rewind works.
+4. Deploy — titles appear on `/series` (and kids ones on `/kids`).
+5. Quick teaser without a code deploy: `/admin/links` → Staff pick (category Series or Kids).
+6. Other open VOD shelves: `src/data/curated-vod-series.ts`.
+7. Keep Eadmin `stream_seeds` for **live** slots only.
 
 ### What does *not* fix L Word scrubbing
 

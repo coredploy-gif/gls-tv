@@ -116,6 +116,11 @@ export async function GET(req: NextRequest) {
   const rawPageSize = Number(params.get("pageSize") || params.get("limit") || 20);
   const pageSize = PAGE_SIZES.has(rawPageSize) ? rawPageSize : 20;
 
+  // Admin viewing Users counts as online for the acting admin.
+  void import("@/lib/membership/account-presence").then(({ touchAccountPresence }) =>
+    touchAccountPresence(service, access.user.id),
+  );
+
   const {
     loadPresenceSummary,
     loadPresenceForUserIds,

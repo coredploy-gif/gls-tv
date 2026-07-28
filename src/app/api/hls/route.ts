@@ -216,12 +216,20 @@ export async function GET(req: NextRequest) {
       }
       // Fire-and-forget stream presence (admin Watching status).
       void markViewerSessionStreaming(service, user.id, sessionToken);
+      void import("@/lib/membership/account-presence").then(({ touchAccountPresence }) =>
+        touchAccountPresence(service, user.id, { streaming: true }),
+      );
     } else if (!isEadminEmail(user.email)) {
       return respond(
         NextResponse.json(
           { error: "Choose a profile on this device before watching." },
           { status: 409 },
         ),
+      );
+    } else if (service) {
+      // EADMIN may stream without a device session — still mark Watching.
+      void import("@/lib/membership/account-presence").then(({ touchAccountPresence }) =>
+        touchAccountPresence(service, user.id, { streaming: true }),
       );
     }
 
