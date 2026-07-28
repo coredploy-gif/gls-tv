@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { GameVirtualPad } from "@/components/GameVirtualPad";
 import type { GamePadScheme } from "@/lib/games";
 
@@ -26,6 +27,7 @@ export function GamePlayer({
   padScheme?: GamePadScheme;
   accent?: string;
 }) {
+  const router = useRouter();
   const [leaderboard, setLeaderboard] = useState<LeaderRow[]>([]);
   const [myBest, setMyBest] = useState(0);
   const [status, setStatus] = useState("Play to climb the board");
@@ -62,7 +64,22 @@ export function GamePlayer({
   useEffect(() => {
     async function onMessage(event: MessageEvent) {
       const data = event.data;
-      if (!data || data.type !== "gls-game-score" || data.gameId !== gameId) return;
+      if (!data || typeof data !== "object") return;
+      if (data.type === "gls-game-exit") {
+        if (document.fullscreenElement) {
+          try {
+            await document.exitFullscreen();
+          } catch {
+            /* ignore */
+          }
+        }
+        setNativeFs(false);
+        setExpanded(false);
+        setSideOpen(false);
+        router.push("/games");
+        return;
+      }
+      if (data.type !== "gls-game-score" || data.gameId !== gameId) return;
       const score = Number(data.score);
       if (!Number.isFinite(score) || score <= 0) return;
       if (!data.force && score <= myBest) return;
@@ -93,17 +110,28 @@ export function GamePlayer({
     }
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [gameId, myBest]);
+  }, [gameId, myBest, router]);
 
   useEffect(() => {
     if (!expanded) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        void exitExpand();
-      }
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      void (async () => {
+        if (document.fullscreenElement) {
+          try {
+            await document.exitFullscreen();
+          } catch {
+            /* ignore */
+          }
+          setNativeFs(false);
+          return;
+        }
+        setExpanded(false);
+        setSideOpen(false);
+      })();
     }
     window.addEventListener("keydown", onKey);
     return () => {
@@ -138,7 +166,7 @@ export function GamePlayer({
     setExpanded(true);
   }
 
-  async function exitExpand() {
+  async function exitFullscreenOnly() {
     if (document.fullscreenElement) {
       try {
         await document.exitFullscreen();
@@ -147,18 +175,24 @@ export function GamePlayer({
       }
     }
     setNativeFs(false);
+  }
+
+  async function exitExpand() {
+    await exitFullscreenOnly();
     setExpanded(false);
     setSideOpen(false);
   }
 
+  async function leaveToGames() {
+    await exitFullscreenOnly();
+    setExpanded(false);
+    setSideOpen(false);
+    router.push("/games");
+  }
+
   async function toggleNativeFullscreen() {
     if (document.fullscreenElement) {
-      try {
-        await document.exitFullscreen();
-      } catch {
-        /* ignore */
-      }
-      setNativeFs(false);
+      await exitFullscreenOnly();
       return;
     }
     const target = shellRef.current;
@@ -231,8 +265,22 @@ export function GamePlayer({
       </div>
     ) : null;
 
+  const backToGamesBtn = (
+    <button
+      type="button"
+      onClick={() => void leaveToGames()}
+      data-tv-back-close={expanded ? "true" : undefined}
+      aria-label={expanded ? "Close" : "Back to all games"}
+      className="inline-flex items-center gap-2 rounded-full bg-gls-red px-3 py-2 text-sm font-bold text-white shadow-lg transition hover:brightness-110 sm:px-4"
+    >
+      <span aria-hidden>←</span>
+      Games
+    </button>
+  );
+
   const toolbar = (
     <div className="flex flex-wrap items-center gap-2">
+      {backToGamesBtn}
       {!expanded ? (
         <button
           type="button"
@@ -246,9 +294,9 @@ export function GamePlayer({
           <button
             type="button"
             onClick={() => void exitExpand()}
-            className="inline-flex items-center gap-2 rounded-full bg-gls-red px-4 py-2 text-sm font-bold text-white"
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.1] px-3 py-2 text-sm font-semibold text-white"
           >
-            Exit
+            Minimize
           </button>
           <button
             type="button"
@@ -299,6 +347,19 @@ export function GamePlayer({
     />
   );
 
+  /** Always-reachable exit over the stage (phones / immersive play). */
+  const floatingExit = (
+    <button
+      type="button"
+      onClick={() => void leaveToGames()}
+      aria-label="Close"
+      data-tv-back-close="true"
+      className="absolute left-2 top-2 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/80 text-lg font-bold text-white shadow-xl backdrop-blur-md transition hover:bg-gls-red sm:left-3 sm:top-3"
+    >
+      ✕
+    </button>
+  );
+
   if (expanded) {
     return (
       <div
@@ -307,19 +368,18 @@ export function GamePlayer({
         role="dialog"
         aria-modal="true"
         aria-label={`${title} — expanded play`}
+        data-tv-back-root
       >
-        {/* Top chrome — always visible in FS, never overlays the stage */}
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-black/90 px-3 py-1.5 backdrop-blur-md pt-[max(0.375rem,env(safe-area-inset-top))]">
           <p className="min-w-0 truncate text-sm font-bold text-white">{title}</p>
           {toolbar}
         </div>
 
-        {/* Column: stage takes remaining height; pad docks below without overlap */}
         <div className="relative flex min-h-0 flex-1 flex-col lg:flex-row">
           <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-black">
-            {/* Stage constrains iframe — game scales to fit inside */}
             <div className="relative min-h-0 flex-1">
               <div className="absolute inset-0">{iframe}</div>
+              {floatingExit}
             </div>
             {showPad && (
               <div className="relative z-10 shrink-0 border-t border-white/10 bg-black/95 px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:px-3 sm:py-2">
@@ -346,11 +406,15 @@ export function GamePlayer({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
         <div className="space-y-4">
           <div className="overflow-hidden rounded-xl border border-white/10 bg-black shadow-2xl shadow-black/50">
-            <div className="relative flex justify-end border-b border-white/10 bg-black/80 px-3 py-2">
+            <div className="relative flex flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-black/80 px-3 py-2">
+              <p className="min-w-0 truncate text-sm font-semibold text-white/80">
+                {title}
+              </p>
               {toolbar}
             </div>
-            <div className="aspect-[4/5] w-full sm:aspect-[5/4]">
-              <div className="h-full w-full">{iframe}</div>
+            <div className="relative aspect-[4/5] w-full sm:aspect-[5/4]">
+              <div className="absolute inset-0">{iframe}</div>
+              {floatingExit}
             </div>
             {showPad && (
               <div className="border-t border-white/10 bg-black/90 px-3 py-3">

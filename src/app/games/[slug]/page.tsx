@@ -22,9 +22,10 @@ export default async function GameDetailPage({
       <div className="mx-auto max-w-[1200px] px-4 pt-28 sm:px-8 lg:px-12 lg:pt-24">
         <Link
           href="/games"
-          className="inline-flex text-sm font-semibold text-white/60 transition hover:text-white"
+          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-3 py-2 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/10"
         >
-          ← All games
+          <span aria-hidden>←</span>
+          All games
         </Link>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <span
