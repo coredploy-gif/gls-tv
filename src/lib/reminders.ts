@@ -6,7 +6,8 @@ export type ReminderKind =
   | "payment_failed"
   | "ticket_reply"
   | "admin"
-  | "system";
+  | "system"
+  | "exception_grace";
 
 export type ReminderSeverity = "info" | "warn" | "urgent";
 

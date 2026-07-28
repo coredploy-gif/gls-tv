@@ -33,6 +33,7 @@ import {
   shouldMarkBehindLive,
   type LiveChannelKind,
 } from "@/lib/live-playback-policy";
+import { isRawMpegTsGateway } from "@/lib/media-path";
 
 export type PlayerNeighbor = {
   href: string;
@@ -48,6 +49,8 @@ type VideoPlayerProps = {
 };
 
 type HlsCtor = typeof import("hls.js").default;
+type MpegtsModule = typeof import("mpegts.js").default;
+type MpegtsPlayer = ReturnType<MpegtsModule["createPlayer"]>;
 
 function toProxiedHls(url: string) {
   if (url.startsWith("/api/hls")) return url;
@@ -67,6 +70,13 @@ function requiresProxy(url: string) {
  */
 function canPlayCleartextDirect(_streamUrl: string) {
   return false;
+}
+
+function isMpegTsSource(source: MediaSource) {
+  return (
+    source.format === "mpegts" ||
+    (source.format === "hls" && isRawMpegTsGateway(source.url))
+  );
 }
 
 /**
@@ -358,7 +368,9 @@ function snapPlayheadIntoBuffer(
 
 function playUrlFor(source: MediaSource, mode: "direct" | "proxy") {
   const relay =
-    source.format === "hls" || requiresProxy(source.url);
+    source.format === "hls" ||
+    source.format === "mpegts" ||
+    requiresProxy(source.url);
   if (mode === "proxy" && relay) {
     return toProxiedHls(source.url);
   }
@@ -388,6 +400,7 @@ export function VideoPlayer({
     : item.description?.trim() || copy("player.sister_fallback");
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<HlsType | null>(null);
+  const mpegtsRef = useRef<MpegtsPlayer | null>(null);
   const standbyRef = useRef<HlsType | null>(null);
   const behindLiveRef = useRef(false);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
@@ -483,7 +496,8 @@ export function VideoPlayer({
     const next = sources[sourceIndex + 1];
     standbyRef.current?.destroy();
     standbyRef.current = null;
-    if (!next || next.format !== "hls") return;
+    if (!next || (next.format !== "hls" && next.format !== "mpegts")) return;
+    if (next.format === "mpegts" || isRawMpegTsGateway(next.url)) return;
     // Staff picks / My Links / My Playlist already fight a slow CDN — never warm
     // a second path in the background (relay+direct racing starves the player).
     if (
@@ -605,8 +619,122 @@ export function VideoPlayer({
       // Soft swap — keep element mounted; clear old media
       hlsRef.current?.destroy();
       hlsRef.current = null;
+      try {
+        mpegtsRef.current?.pause();
+        mpegtsRef.current?.unload();
+        mpegtsRef.current?.detachMediaElement();
+        mpegtsRef.current?.destroy();
+      } catch {
+        /* ignore */
+      }
+      mpegtsRef.current = null;
       el.removeAttribute("src");
       el.load();
+
+      if (isMpegTsSource(source)) {
+        const url = playUrlFor(source, mode);
+        try {
+          const mpegtsMod = await import("mpegts.js");
+          const mpegts = (mpegtsMod.default ??
+            mpegtsMod) as MpegtsModule;
+          if (cancelled) return;
+          if (!mpegts.isSupported()) {
+            setError("MPEG-TS playback is not supported on this device.");
+            return;
+          }
+
+          const failOver = () => {
+            if (cancelled) return;
+            if (
+              mode === "direct" &&
+              !source.url.startsWith("/api/hls") &&
+              (requiresProxy(source.url) || prefersProxy(source.url))
+            ) {
+              setStatus("Trying relay…");
+              setMode("proxy");
+              return;
+            }
+            if (sourceIndex + 1 < sources.length) {
+              setStatus("Trying another source…");
+              setMode("direct");
+              setSourceIndex((index) => index + 1);
+              return;
+            }
+            setError("This channel is not available to play right now.");
+          };
+
+          const destroyMpegts = () => {
+            try {
+              mpegtsRef.current?.pause();
+              mpegtsRef.current?.unload();
+              mpegtsRef.current?.detachMediaElement();
+              mpegtsRef.current?.destroy();
+            } catch {
+              /* ignore */
+            }
+            mpegtsRef.current = null;
+          };
+
+          /**
+           * IPTV /play/ gateways often use DVB MPEG-1/2 audio (mp2). Chrome MSE
+           * cannot decode mp2, and mpegts.js may stall on a black frame without
+           * a clean ERROR. Start video-only; picture is better than silence.
+           */
+          const startMpegTs = async (hasAudio: boolean) => {
+            destroyMpegts();
+            if (cancelled || !videoRef.current) return;
+            const media = videoRef.current;
+            const player = mpegts.createPlayer(
+              {
+                type: "mse",
+                isLive: true,
+                url,
+                withCredentials: url.startsWith("/api/hls"),
+                hasAudio,
+                hasVideo: true,
+              },
+              {
+                // Workers + Turbopack can stall live IO; main thread is fine for TS.
+                enableWorker: false,
+                enableStashBuffer: true,
+                stashInitialSize: 512,
+                liveBufferLatencyChasing: true,
+                liveBufferLatencyMaxLatency: 10,
+                liveBufferLatencyMinRemain: 1.5,
+              },
+            );
+            mpegtsRef.current = player;
+            player.on(mpegts.Events.ERROR, () => {
+              if (cancelled) return;
+              failOver();
+            });
+            player.attachMediaElement(media);
+            player.load();
+            setStatus(
+              hasAudio
+                ? item.isLive
+                  ? "Live"
+                  : "Ready"
+                : item.isLive
+                  ? "Live · video only"
+                  : "Ready · video only",
+            );
+            try {
+              await player.play();
+              saveGood();
+            } catch {
+              setStatus("Tap play to start");
+            }
+          };
+
+          await startMpegTs(false);
+        } catch {
+          if (!cancelled) {
+            setError("This channel is not available to play right now.");
+          }
+        }
+        return;
+      }
 
       if (source.format !== "hls") {
         const url = playUrlFor(source, mode);
@@ -1307,6 +1435,15 @@ export function VideoPlayer({
       detachMedia?.();
       hlsRef.current?.destroy();
       hlsRef.current = null;
+      try {
+        mpegtsRef.current?.pause();
+        mpegtsRef.current?.unload();
+        mpegtsRef.current?.detachMediaElement();
+        mpegtsRef.current?.destroy();
+      } catch {
+        /* ignore */
+      }
+      mpegtsRef.current = null;
     };
   }, [
     source?.url,

@@ -71,14 +71,30 @@ describe("media-links", () => {
     expect(v.title).toBe("TSN 5");
   });
 
-  it("accepts http IP:port IPTV /play/ gateway URLs as HLS", () => {
+  it("accepts http IP:port IPTV /play/ gateway URLs as MPEG-TS", () => {
     const url = "http://103.253.18.58:8000/play/a03o";
-    expect(detectPlayableFormat(url)).toBe("hls");
+    expect(detectPlayableFormat(url)).toBe("mpegts");
     const v = validateMediaLinkUrl(url, "Arena");
     expect(v.ok).toBe(true);
-    expect(v.format).toBe("hls");
+    expect(v.format).toBe("mpegts");
     expect(v.provisional).toBeUndefined();
     expect(v.title).toBe("Arena");
+  });
+
+  it("builds mpegts relay sources for Astra /play/ gateways", () => {
+    const url = "http://103.253.18.58:8000/play/a03o";
+    const sources = mediaLinkPlaySources({
+      id: "a03o-link",
+      url,
+      format: "hls", // older rows may still say hls
+    });
+    expect(sources[0]).toEqual({
+      url: "/api/hls?mediaLinkId=a03o-link",
+      quality: "Auto",
+      format: "mpegts",
+      label: "secure-relay",
+    });
+    expect(sources[1]?.format).toBe("mpegts");
   });
 
   it("rejects javascript: and other non-http schemes", () => {

@@ -277,6 +277,27 @@ export async function touchViewerDeviceSession(
   return { ok: true as const, session: data };
 }
 
+/** Mark a session as actively streaming (HLS / live playback). */
+export async function markViewerSessionStreaming(
+  service: SupabaseClient,
+  userId: string,
+  sessionToken: string,
+) {
+  const now = new Date().toISOString();
+  const { data, error } = await service
+    .from("viewer_device_sessions")
+    .update({ last_active_at: now, last_stream_at: now })
+    .eq("user_id", userId)
+    .eq("session_token", sessionToken)
+    .is("revoked_at", null)
+    .gte("last_active_at", activeSinceIso())
+    .select("id, last_stream_at")
+    .maybeSingle();
+  if (error) return { ok: false as const, error: error.message };
+  if (!data) return { ok: false as const, error: "Session expired or signed out" };
+  return { ok: true as const, session: data };
+}
+
 export async function validateViewerDeviceSession(
   service: SupabaseClient,
   userId: string,

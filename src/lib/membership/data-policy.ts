@@ -44,5 +44,5 @@ export const MEMBER_FLOW_COPY = {
   renewLater:
     "Before trial ends (or anytime), choose a 30-day R45 / R55 / R65 membership and pay through PayFast (card debit) or verified EFT.",
   adminExempt:
-    "Owner admin accounts bypass trial clocks and device locks.",
+    "Staff accounts configured on the server bypass trial clocks and device locks.",
 } as const;

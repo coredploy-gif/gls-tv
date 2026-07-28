@@ -3,6 +3,10 @@ import { getAdminAccess, hasAdminPermission } from "@/lib/admin/access";
 import { writeAuditLog } from "@/lib/admin/audit";
 import { createServiceClient } from "@/lib/eadmin";
 import {
+  OWNER_ADMIN_LABEL,
+  isProtectedAdminIdentity,
+} from "@/lib/privacy/admin-identity";
+import {
   filterMembersByBucket,
   loadMembershipOverview,
 } from "@/lib/membership/admin-metrics-query";
@@ -41,18 +45,23 @@ export async function GET(req: NextRequest) {
     );
 
     const overview = await loadMembershipOverview();
-    const filtered = filterMembersByBucket(overview.members, bucket);
+    const { loadPresenceSummary } = await import("@/lib/admin/presence");
+    const presenceSummary = await loadPresenceSummary(service);
+    const filtered = filterMembersByBucket(overview.members, bucket).filter(
+      (member) => !isProtectedAdminIdentity(member.email),
+    );
 
     return NextResponse.json({
       generatedAt: overview.generatedAt,
       definitions: MEMBERSHIP_METRIC_DEFINITIONS,
       summary: overview.summary,
+      presenceSummary,
       byPlan: overview.byPlan,
       bucket,
       members: filtered.slice(0, limit).map((member) => ({
         id: member.id,
         email: member.email,
-        display_name: member.display_name,
+        display_name: member.display_name || OWNER_ADMIN_LABEL,
         member_reference: member.member_reference,
         plan: member.plan,
         is_premium: member.is_premium,

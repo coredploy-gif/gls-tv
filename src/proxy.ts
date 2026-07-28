@@ -115,7 +115,7 @@ export async function proxy(request: NextRequest) {
       supabase
         .from("profiles")
         .select(
-          "plan, trial_ends_at, trial_bypassed, is_admin_exception, is_premium, account_status",
+          "plan, trial_ends_at, trial_bypassed, is_admin_exception, is_premium, account_status, access_tier, exception_grace_ends_at",
         )
         .eq("id", user.id)
         .maybeSingle(),
@@ -141,6 +141,10 @@ export async function proxy(request: NextRequest) {
       profile?.is_admin_exception ||
       profile?.plan === "exception" ||
       profile?.plan === "admin";
+    const graceActive =
+      (Boolean(profile?.exception_grace_ends_at) &&
+        new Date(profile!.exception_grace_ends_at!).getTime() > now) ||
+      profile?.plan === "grace";
     const trialActive =
       Boolean(profile?.trial_ends_at) &&
       new Date(profile!.trial_ends_at!).getTime() > now;
@@ -149,10 +153,18 @@ export async function proxy(request: NextRequest) {
       subscription?.status === "active" &&
       Boolean(subscription.current_period_end) &&
       new Date(subscription.current_period_end!).getTime() > now;
+    const redBullOnly =
+      !exception &&
+      !graceActive &&
+      !trialActive &&
+      !paidActive &&
+      (profile?.access_tier === "red_bull_only" || profile?.plan === "restricted");
     const lookupFailed = Boolean(profileResult.error || subscriptionResult.error);
     const suspended = profile?.account_status && profile.account_status !== "active";
+    const entitled =
+      exception || trialActive || paidActive || graceActive || redBullOnly;
 
-    if (lookupFailed || !profile || suspended || (!exception && !trialActive && !paidActive)) {
+    if (lookupFailed || !profile || suspended || !entitled) {
       operationalLog("warn", "proxy.entitlement_denied", {
         requestId,
         path,
@@ -173,6 +185,19 @@ export async function proxy(request: NextRequest) {
         secure: process.env.NODE_ENV === "production",
       });
       return denied;
+    }
+
+    if (redBullOnly) {
+      const { pathAllowedForRedBullOnly, redBullOnlyHomeHref } = await import(
+        "@/lib/membership/exception-grace"
+      );
+      if (!pathAllowedForRedBullOnly(path)) {
+        const redirect = request.nextUrl.clone();
+        const home = redBullOnlyHomeHref();
+        redirect.pathname = home.split("?")[0]!;
+        redirect.search = home.includes("?") ? `?${home.split("?")[1]}` : "";
+        return NextResponse.redirect(redirect);
+      }
     }
 
     if (viewerId && (viewerResult.error || !viewerResult.data)) {

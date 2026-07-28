@@ -6,7 +6,11 @@ import {
   type AdminAccess,
 } from "@/lib/admin/access";
 import { writeAuditLog } from "@/lib/admin/audit";
-import { createServiceClient } from "@/lib/eadmin";
+import { createServiceClient, isEadminEmail } from "@/lib/eadmin";
+import {
+  OWNER_ADMIN_LABEL,
+  isProtectedAdminIdentity,
+} from "@/lib/privacy/admin-identity";
 import { maxViewerSlots } from "@/lib/membership/plans";
 
 export const runtime = "nodejs";
@@ -103,15 +107,32 @@ export async function GET(req: NextRequest) {
     params.get("q") || params.get("search") || "",
   );
   const status = (params.get("status") || "all").trim();
+  const presence = (params.get("presence") || "all").trim() as
+    | "all"
+    | "watching"
+    | "online"
+    | "offline";
   const requestedPage = Math.max(1, Number(params.get("page") || 1) || 1);
   const rawPageSize = Number(params.get("pageSize") || params.get("limit") || 20);
   const pageSize = PAGE_SIZES.has(rawPageSize) ? rawPageSize : 20;
+
+  const {
+    loadPresenceSummary,
+    loadPresenceForUserIds,
+    loadPresenceUserIdSets,
+    loadLastSignInAt,
+  } = await import("@/lib/admin/presence");
+
+  const [presenceSummary, presenceSets] = await Promise.all([
+    loadPresenceSummary(service),
+    loadPresenceUserIdSets(service),
+  ]);
 
   const buildQuery = () => {
     let query = service
       .from("profiles")
       .select(
-        "id, email, display_name, plan, is_premium, trial_ends_at, is_admin_exception, trial_bypassed, account_status, suspended_at, suspended_reason, max_viewer_profiles, created_at, member_reference",
+        "id, email, display_name, plan, is_premium, trial_ends_at, is_admin_exception, trial_bypassed, account_status, suspended_at, suspended_reason, max_viewer_profiles, created_at, member_reference, access_tier, exception_grace_ends_at",
         { count: "exact" },
       )
       .order("created_at", { ascending: false });
@@ -124,6 +145,23 @@ export async function GET(req: NextRequest) {
       query = query.or(
         "is_admin_exception.eq.true,trial_bypassed.eq.true,plan.eq.exception,plan.eq.admin",
       );
+    }
+
+    if (presence === "watching") {
+      const ids = [...presenceSets.watching];
+      query = query.in(
+        "id",
+        ids.length ? ids : ["00000000-0000-0000-0000-000000000000"],
+      );
+    } else if (presence === "online") {
+      const ids = [...presenceSets.online];
+      query = query.in(
+        "id",
+        ids.length ? ids : ["00000000-0000-0000-0000-000000000000"],
+      );
+    } else if (presence === "offline" && presenceSets.online.size) {
+      const ids = [...presenceSets.online].slice(0, 800);
+      query = query.not("id", "in", `(${ids.join(",")})`);
     }
 
     if (q) {
@@ -167,11 +205,43 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  const rows = (data || []).filter((row) => {
+    if (!isProtectedAdminIdentity(row.email)) return true;
+    return row.id === access.user.id || isEadminEmail(access.user.email);
+  });
+
+  const ids = rows.map((r) => r.id);
+  const [presenceMap, signInMap] = await Promise.all([
+    loadPresenceForUserIds(service, ids),
+    loadLastSignInAt(service, ids),
+  ]);
+
+  const users = rows.map((row) => {
+    const presenceRow = presenceMap.get(row.id);
+    const lastSignInAt = signInMap.get(row.id) ?? null;
+    const base = isProtectedAdminIdentity(row.email)
+      ? {
+          ...row,
+          display_name: OWNER_ADMIN_LABEL,
+          email: row.id === access.user.id ? row.email : null,
+        }
+      : row;
+    return {
+      ...base,
+      presence: presenceRow?.status || "offline",
+      last_active_at: presenceRow?.lastActiveAt || null,
+      last_stream_at: presenceRow?.lastStreamAt || null,
+      last_sign_in_at: lastSignInAt,
+      active_sessions: presenceRow?.activeSessions || 0,
+    };
+  });
+
   return NextResponse.json({
-    users: data || [],
+    users,
     total: count ?? total,
     page,
     pageSize,
+    presenceSummary,
     aal: access.aal,
     canManage: canManageUsers(access),
     canOwnerActions: requireOwnerMfa(access),
@@ -289,6 +359,10 @@ export async function POST(req: NextRequest) {
         trial_bypassed: true,
         is_admin_exception: true,
         is_premium: true,
+        access_tier: "full",
+        exception_grace_ends_at: null,
+        exception_grace_started_at: null,
+        exception_last_nudge_at: null,
         max_viewer_profiles: maxViewerSlots("exception"),
         updated_at: new Date().toISOString(),
       })
@@ -309,6 +383,90 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ ok: true, count: ids.length, userIds: ids });
+  }
+
+  if (action === "ungrant_exception") {
+    if (!canManageUsers(access)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (!userIds.length) {
+      return NextResponse.json({ error: "userIds required" }, { status: 400 });
+    }
+
+    const {
+      firstOfComingMonth,
+      exceptionGraceStartCopy,
+    } = await import("@/lib/membership/exception-grace");
+    const graceEnds = firstOfComingMonth();
+    const graceEndsIso = graceEnds.toISOString();
+    const nowIso = new Date().toISOString();
+    const copy = exceptionGraceStartCopy(graceEnds);
+
+    const { error } = await service
+      .from("profiles")
+      .update({
+        plan: "grace",
+        trial_bypassed: false,
+        is_admin_exception: false,
+        is_premium: false,
+        access_tier: "full",
+        exception_grace_started_at: nowIso,
+        exception_grace_ends_at: graceEndsIso,
+        exception_last_nudge_at: nowIso,
+        max_viewer_profiles: maxViewerSlots("trial"),
+        updated_at: nowIso,
+      })
+      .in("id", userIds);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Drop admin-granted active exception subscriptions so paywall is real.
+    await service
+      .from("subscriptions")
+      .update({
+        status: "canceled",
+        updated_at: nowIso,
+      })
+      .in("user_id", userIds)
+      .eq("provider", "admin");
+
+    const day = nowIso.slice(0, 10);
+    for (const userId of userIds) {
+      await service.from("user_reminders").insert({
+        user_id: userId,
+        kind: "exception_grace",
+        title: copy.title,
+        body: copy.body,
+        href: "/pricing",
+        severity: "urgent",
+        dedupe_key: `exception-grace-start-${graceEndsIso.slice(0, 10)}-${userId.slice(0, 8)}`,
+        created_by: access.user.email,
+        meta: {
+          grace_ends_at: graceEndsIso,
+          nudge: "start",
+          day,
+        },
+      });
+    }
+
+    await writeAuditLog(service, {
+      actorEmail: access.user.email,
+      actorUserId: access.user.id,
+      action: "users_ungrant_exception",
+      entityType: "profile",
+      entityId: userIds[0],
+      summary: `Ungranted exception for ${userIds.length} user(s); grace until ${graceEndsIso.slice(0, 10)}`,
+      meta: { userIds, graceEndsAt: graceEndsIso },
+    });
+
+    return NextResponse.json({
+      ok: true,
+      count: userIds.length,
+      userIds,
+      graceEndsAt: graceEndsIso,
+    });
   }
 
   if (action === "disable" || action === "enable" || action === "delete") {

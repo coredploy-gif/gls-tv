@@ -166,12 +166,111 @@ async function run(req: NextRequest) {
     renewal += 1;
   }
 
-  const summary = `trial=${trial} ended=${ended} past_due=${pastDue} renewal=${renewal}`;
+  const {
+    EXCEPTION_GRACE_NUDGE_DAYS,
+    exceptionGraceEndedCopy,
+    exceptionGraceNudgeCopy,
+  } = await import("@/lib/membership/exception-grace");
+
+  let graceNudges = 0;
+  let graceRestricted = 0;
+
+  const { data: graceRows } = await service
+    .from("profiles")
+    .select(
+      "id, plan, is_premium, is_admin_exception, trial_bypassed, access_tier, exception_grace_ends_at, exception_last_nudge_at",
+    )
+    .not("exception_grace_ends_at", "is", null)
+    .limit(500);
+
+  for (const row of graceRows || []) {
+    if (
+      row.is_premium ||
+      row.is_admin_exception ||
+      row.trial_bypassed ||
+      row.plan === "exception" ||
+      row.plan === "admin"
+    ) {
+      continue;
+    }
+    if (!row.exception_grace_ends_at) continue;
+    const endsAt = new Date(row.exception_grace_ends_at);
+    const endsMs = endsAt.getTime();
+
+    // Grace over → Red Bull TV only
+    if (endsMs <= now) {
+      if (
+        row.access_tier === "red_bull_only" &&
+        row.plan === "restricted"
+      ) {
+        continue;
+      }
+      const ended = exceptionGraceEndedCopy();
+      await service
+        .from("profiles")
+        .update({
+          plan: "restricted",
+          access_tier: "red_bull_only",
+          is_premium: false,
+          trial_bypassed: false,
+          is_admin_exception: false,
+          updated_at: nowIso,
+        })
+        .eq("id", row.id);
+      await upsertReminder(service, {
+        user_id: row.id,
+        kind: "exception_grace",
+        title: ended.title,
+        body: ended.body,
+        href: "/pricing",
+        severity: "urgent",
+        dedupe_key: `exception-grace-ended-${row.exception_grace_ends_at.slice(0, 10)}`,
+        created_by: "cron",
+        meta: { grace_ends_at: row.exception_grace_ends_at, nudge: "ended" },
+      });
+      graceRestricted += 1;
+      continue;
+    }
+
+    // Still in grace → nudge every 5 days
+    const lastNudge = row.exception_last_nudge_at
+      ? new Date(row.exception_last_nudge_at).getTime()
+      : 0;
+    const daysSinceNudge = (now - lastNudge) / 86_400_000;
+    if (lastNudge && daysSinceNudge < EXCEPTION_GRACE_NUDGE_DAYS) {
+      continue;
+    }
+    const nudge = exceptionGraceNudgeCopy(endsAt);
+    const dayKey = nowIso.slice(0, 10);
+    await upsertReminder(service, {
+      user_id: row.id,
+      kind: "exception_grace",
+      title: nudge.title,
+      body: nudge.body,
+      href: "/pricing",
+      severity: "urgent",
+      dedupe_key: `exception-grace-nudge-${dayKey}-${row.id.slice(0, 8)}`,
+      created_by: "cron",
+      meta: {
+        grace_ends_at: row.exception_grace_ends_at,
+        nudge: "interval",
+      },
+    });
+    await service
+      .from("profiles")
+      .update({ exception_last_nudge_at: nowIso, updated_at: nowIso })
+      .eq("id", row.id);
+    graceNudges += 1;
+  }
+
+  const summary = `trial=${trial} ended=${ended} past_due=${pastDue} renewal=${renewal} grace_nudges=${graceNudges} grace_restricted=${graceRestricted}`;
   await recordCronRun(service, "reminders", "ok", summary, {
     trial,
     ended,
     pastDue,
     renewal,
+    graceNudges,
+    graceRestricted,
   }, started);
 
   return NextResponse.json({
@@ -180,6 +279,8 @@ async function run(req: NextRequest) {
     ended,
     pastDue,
     renewal,
+    graceNudges,
+    graceRestricted,
     scannedTrials: (trials || []).length,
   });
 }

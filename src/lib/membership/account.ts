@@ -7,6 +7,8 @@ import {
 } from "@/lib/membership/plans";
 import { hashDevice, hashIp, trialBlockUntil } from "@/lib/membership/device";
 
+export type AccessTier = "full" | "red_bull_only";
+
 export type AccountProfile = {
   id: string;
   display_name: string | null;
@@ -17,6 +19,8 @@ export type AccountProfile = {
   is_admin_exception: boolean;
   is_premium: boolean;
   max_viewer_profiles: number;
+  access_tier?: AccessTier | string | null;
+  exception_grace_ends_at?: string | null;
 };
 
 export type AccountSubscription = {
@@ -28,8 +32,21 @@ export type AccountEntitlement = {
   account: AccountProfile | null;
   subscription: AccountSubscription | null;
   allowed: boolean;
-  reason: "admin" | "exception" | "trial" | "subscription" | "expired" | "lookup_failed";
+  /** full catalogue vs Red Bull TV only after grace expires unpaid. */
+  accessMode: "full" | "red_bull_only";
+  reason:
+    | "admin"
+    | "exception"
+    | "exception_grace"
+    | "trial"
+    | "subscription"
+    | "red_bull_only"
+    | "expired"
+    | "lookup_failed";
 };
+
+const PROFILE_SELECT =
+  "id, display_name, email, plan, trial_ends_at, trial_bypassed, is_admin_exception, is_premium, max_viewer_profiles, access_tier, exception_grace_ends_at";
 
 export type ViewerProfile = {
   id: string;
@@ -47,12 +64,50 @@ export async function getAccountProfile(
   const sb = await createClient();
   const { data } = await sb
     .from("profiles")
-    .select(
-      "id, display_name, email, plan, trial_ends_at, trial_bypassed, is_admin_exception, is_premium, max_viewer_profiles",
-    )
+    .select(PROFILE_SELECT)
     .eq("id", userId)
     .maybeSingle();
   return (data as AccountProfile | null) ?? null;
+}
+
+function graceStillOpen(account: AccountProfile) {
+  if (!account.exception_grace_ends_at) return false;
+  return new Date(account.exception_grace_ends_at).getTime() > Date.now();
+}
+
+function paidActive(
+  account: AccountProfile,
+  subscription?: AccountSubscription | null,
+) {
+  return (
+    account.is_premium &&
+    subscription?.status === "active" &&
+    Boolean(subscription.current_period_end) &&
+    new Date(subscription.current_period_end!).getTime() > Date.now()
+  );
+}
+
+export function accountAccessMode(
+  account: AccountProfile | null,
+  email?: string | null,
+  subscription?: AccountSubscription | null,
+): "full" | "red_bull_only" | "none" {
+  if (!account) return "none";
+  if (isEadminEmail(email || account.email)) return "full";
+  if (account.trial_bypassed || account.is_admin_exception) return "full";
+  if (account.plan === "exception" || account.plan === "admin") return "full";
+  if (paidActive(account, subscription)) return "full";
+  if (graceStillOpen(account) || account.plan === "grace") return "full";
+  if (account.trial_ends_at) {
+    if (new Date(account.trial_ends_at).getTime() > Date.now()) return "full";
+  }
+  if (
+    account.access_tier === "red_bull_only" ||
+    account.plan === "restricted"
+  ) {
+    return "red_bull_only";
+  }
+  return "none";
 }
 
 export function accountHasAccess(
@@ -60,22 +115,7 @@ export function accountHasAccess(
   email?: string | null,
   subscription?: AccountSubscription | null,
 ) {
-  if (!account) return false;
-  if (isEadminEmail(email || account.email)) return true;
-  if (account.trial_bypassed || account.is_admin_exception) return true;
-  if (account.plan === "exception" || account.plan === "admin") return true;
-  if (
-    account.is_premium &&
-    subscription?.status === "active" &&
-    subscription.current_period_end &&
-    new Date(subscription.current_period_end).getTime() > Date.now()
-  ) {
-    return true;
-  }
-  if (account.trial_ends_at) {
-    return new Date(account.trial_ends_at).getTime() > Date.now();
-  }
-  return false;
+  return accountAccessMode(account, email, subscription) !== "none";
 }
 
 export async function getAccountEntitlement(
@@ -88,9 +128,7 @@ export async function getAccountEntitlement(
       await Promise.all([
         sb
           .from("profiles")
-          .select(
-            "id, display_name, email, plan, trial_ends_at, trial_bypassed, is_admin_exception, is_premium, max_viewer_profiles",
-          )
+          .select(PROFILE_SELECT)
           .eq("id", userId)
           .maybeSingle(),
         sb
@@ -104,14 +142,18 @@ export async function getAccountEntitlement(
         account: (account as AccountProfile | null) ?? null,
         subscription: (subscription as AccountSubscription | null) ?? null,
         allowed: false,
+        accessMode: "full",
         reason: "lookup_failed",
       };
     }
     const typedAccount = account as AccountProfile;
     const typedSubscription = subscription as AccountSubscription | null;
-    const allowed = accountHasAccess(typedAccount, email, typedSubscription);
+    const mode = accountAccessMode(typedAccount, email, typedSubscription);
+    const allowed = mode !== "none";
     let reason: AccountEntitlement["reason"] = "expired";
-    if (allowed) {
+    if (mode === "red_bull_only") {
+      reason = "red_bull_only";
+    } else if (allowed) {
       if (isEadminEmail(email || typedAccount.email)) reason = "admin";
       else if (
         typedAccount.trial_bypassed ||
@@ -120,11 +162,9 @@ export async function getAccountEntitlement(
         typedAccount.plan === "admin"
       ) {
         reason = "exception";
-      } else if (
-        typedSubscription?.status === "active" &&
-        typedSubscription.current_period_end &&
-        new Date(typedSubscription.current_period_end).getTime() > Date.now()
-      ) {
+      } else if (graceStillOpen(typedAccount) || typedAccount.plan === "grace") {
+        reason = "exception_grace";
+      } else if (paidActive(typedAccount, typedSubscription)) {
         reason = "subscription";
       } else {
         reason = "trial";
@@ -134,6 +174,7 @@ export async function getAccountEntitlement(
       account: typedAccount,
       subscription: typedSubscription,
       allowed,
+      accessMode: mode === "none" ? "full" : mode,
       reason,
     };
   } catch {
@@ -141,6 +182,7 @@ export async function getAccountEntitlement(
       account: null,
       subscription: null,
       allowed: false,
+      accessMode: "full",
       reason: "lookup_failed",
     };
   }

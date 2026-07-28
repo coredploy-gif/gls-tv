@@ -21,6 +21,22 @@ export function isLikelyIptvStreamPath(pathname: string) {
 }
 
 /**
+ * Astra / Flussonic-style continuous MPEG-TS (not HLS).
+ * Example: `http://IP:port/play/a03o` — browsers need mpegts.js, not hls.js.
+ * Paths ending in `.m3u8` / `.m3u` stay HLS even under `/play/`.
+ */
+export function isRawMpegTsGateway(raw: string) {
+  try {
+    const path = new URL(raw).pathname.toLowerCase().split("?")[0] || "";
+    if (/\.m3u8?$/.test(path)) return false;
+    if (/\.ts$/.test(path)) return true;
+    return /^\/play(\/|$)/.test(path);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Individual stream or playlist URL: `.m3u` / `.m3u8`, or IPTV gateway paths
  * like `http://IP:port/play/…`. My Links / Staff picks / M3U preview may skip
  * the catalogue host allowlist for these; SSRF still uses validatePublicUrl.

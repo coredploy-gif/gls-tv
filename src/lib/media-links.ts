@@ -5,7 +5,7 @@ import {
   isLikelyChannelLogo,
 } from "@/lib/artwork";
 import { COPY_FALLBACKS } from "@/lib/copy";
-import { isLikelyIptvStreamPath } from "@/lib/media-path";
+import { isLikelyIptvStreamPath, isRawMpegTsGateway } from "@/lib/media-path";
 import { normalizeReligionSubfolderTag } from "@/lib/religion";
 
 /** Title/category tokens that should prefer soccer/sports Unsplash plates. */
@@ -14,6 +14,7 @@ const SPORTS_HINT_RE =
 
 export type MediaLinkFormat =
   | "hls"
+  | "mpegts"
   | "youtube"
   | "vimeo"
   | "evod"
@@ -106,9 +107,16 @@ export function mediaLinkPlaySources(link: {
   url: string;
   format: MediaLinkFormat;
 }): MediaSource[] {
-  const format: "hls" | "mp4" =
-    link.format === "mp4" || link.format === "webm" ? "mp4" : "hls";
-  if (format !== "hls") {
+  // Stored format may still say "hls" for older /play/ rows — URL wins.
+  const mpegts =
+    link.format === "mpegts" || isRawMpegTsGateway(link.url);
+  const format: "hls" | "mp4" | "mpegts" =
+    link.format === "mp4" || link.format === "webm"
+      ? "mp4"
+      : mpegts
+        ? "mpegts"
+        : "hls";
+  if (format === "mp4") {
     return [{ url: link.url, quality: "Auto", format }];
   }
   const direct: MediaSource = {
@@ -147,7 +155,7 @@ export function resolveMediaLinkThumbnail(input: {
 
   const category = (input.category || "").trim();
   const sportsHint = SPORTS_HINT_RE.test(`${category} ${input.title}`);
-  const liveHls = input.format === "hls";
+  const liveHls = input.format === "hls" || input.format === "mpegts";
 
   // Do not invent art for eVOD / YouTube / file links — only sports or live HLS.
   if (!sportsHint && !liveHls) return thumb;
@@ -175,7 +183,12 @@ export function userMediaLinkToCatalog(link: UserMediaLink): CatalogItem {
     id: `media-${link.id}`,
     slug: `media-${link.id}`,
     title: link.title,
-    type: link.format === "hls" ? "live" : "movie",
+    type:
+      link.format === "hls" ||
+      link.format === "mpegts" ||
+      isRawMpegTsGateway(link.url)
+        ? "live"
+        : "movie",
     description: `${link.format.toUpperCase()} · My Links`,
     countries: ["world"],
     categories: ["My Links", link.category, "Playable"],
@@ -185,7 +198,10 @@ export function userMediaLinkToCatalog(link: UserMediaLink): CatalogItem {
       ? art.replace(/w=\d+&h=\d+/, "w=3840&h=2160")
       : "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=3840&h=2160&q=80",
     license: "open_stream",
-    isLive: link.format === "hls",
+    isLive:
+      link.format === "hls" ||
+      link.format === "mpegts" ||
+      isRawMpegTsGateway(link.url),
     featured: false,
     sources: mediaLinkPlaySources(link),
   };
@@ -205,7 +221,12 @@ export function adminMediaLinkToCatalog(link: AdminMediaLink): CatalogItem {
     id: `staff-${link.id}`,
     slug: `staff-${link.id}`,
     title: link.title,
-    type: link.format === "hls" ? "live" : "movie",
+    type:
+      link.format === "hls" ||
+      link.format === "mpegts" ||
+      isRawMpegTsGateway(link.url)
+        ? "live"
+        : "movie",
     description: `${link.format.toUpperCase()} · Staff pick`,
     countries: ["world"],
     categories: ["Staff picks", link.category, "Playable"],
@@ -215,7 +236,10 @@ export function adminMediaLinkToCatalog(link: AdminMediaLink): CatalogItem {
       ? art.replace(/w=\d+&h=\d+/, "w=3840&h=2160")
       : "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=3840&h=2160&q=80",
     license: "open_stream",
-    isLive: link.format === "hls",
+    isLive:
+      link.format === "hls" ||
+      link.format === "mpegts" ||
+      isRawMpegTsGateway(link.url),
     featured: false,
     sources: mediaLinkPlaySources(link),
   };
@@ -401,12 +425,20 @@ export function formatFromContentType(
   if (ct.includes("mpegurl") || ct === "application/vnd.apple.mpegurl") {
     return "hls";
   }
+  if (
+    ct.includes("mp2t") ||
+    ct.includes("mpegts") ||
+    ct === "video/mp2t" ||
+    ct === "video/mpeg"
+  ) {
+    return "mpegts";
+  }
   if (ct === "video/webm") return "webm";
   if (ct.startsWith("video/")) return "mp4";
   return null;
 }
 
-/** ftyp… / EBML (WebM) magic in the first bytes of a ranged GET. */
+/** ftyp… / EBML (WebM) / MPEG-TS sync magic in the first bytes of a ranged GET. */
 export function formatFromMediaMagic(body: Uint8Array): MediaLinkFormat | null {
   if (body.length >= 8) {
     const box = String.fromCharCode(
@@ -426,6 +458,13 @@ export function formatFromMediaMagic(body: Uint8Array): MediaLinkFormat | null {
     body[3] === 0xa3
   ) {
     return "webm";
+  }
+  // MPEG-TS sync byte (0x47) at packet start — common for Astra /play/ gateways
+  if (body.length >= 188 && body[0] === 0x47 && body[188] === 0x47) {
+    return "mpegts";
+  }
+  if (body.length >= 1 && body[0] === 0x47) {
+    return "mpegts";
   }
   return null;
 }
@@ -452,7 +491,9 @@ export function detectPlayableFormat(url: string): MediaLinkFormat | null {
   if (/\.webm(\?|#|$)/i.test(url)) return "webm";
   if (/\.(mp4|m4v|mov)(\?|#|$)/i.test(url)) return "mp4";
 
-  // Extensionless IPTV gateways: http://IP:port/play/TOKEN, /live/…, etc.
+  // Extensionless IPTV gateways: http://IP:port/play/TOKEN → continuous MPEG-TS;
+  // other /live/… paths are treated as HLS entrypoints (often redirect to .m3u8).
+  if (isRawMpegTsGateway(url)) return "mpegts";
   if (isLikelyIptvStreamPath(u.pathname)) return "hls";
 
   return formatFromQueryHints(u);
@@ -855,8 +896,13 @@ export const MEDIA_FORMAT_META: Record<
 > = {
   hls: {
     label: "HLS live",
-    hint: "Any public .m3u / .m3u8 or IPTV /play/… (http IP:port OK; owned relay skips catalogue allowlist)",
+    hint: "Any public .m3u / .m3u8 (http IP:port OK; owned relay skips catalogue allowlist)",
     accent: "#5ee29a",
+  },
+  mpegts: {
+    label: "MPEG-TS live",
+    hint: "Astra / Flussonic /play/… gateways (continuous TS; browser uses mpegts.js + relay)",
+    accent: "#5eb8e2",
   },
   youtube: {
     label: "YouTube",

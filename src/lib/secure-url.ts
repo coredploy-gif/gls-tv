@@ -227,9 +227,11 @@ export async function secureFetchStream(
           });
         },
       );
-      request.setTimeout(timeoutMs, () =>
-        request.destroy(new Error("Upstream request timed out")),
-      );
+      if (timeoutMs > 0) {
+        request.setTimeout(timeoutMs, () =>
+          request.destroy(new Error("Upstream request timed out")),
+        );
+      }
       request.on("error", reject);
       request.end();
     });

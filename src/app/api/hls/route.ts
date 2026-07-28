@@ -25,6 +25,7 @@ import {
   isBrokenTraceOrigin,
   isTraceChannel,
 } from "@/lib/trace-mirrors";
+import { isRawMpegTsGateway } from "@/lib/media-path";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -156,6 +157,8 @@ export async function GET(req: NextRequest) {
 
   let authenticatedUserId: string | null = null;
   let persistedUrl: string | null = null;
+  let restrictRedBullOnly = false;
+  let redBullChannelMeta: { slug?: string; title?: string } | null = null;
 
   if (!signedRequest) {
     if (!(await measured("flag", isFeatureEnabled("hls_proxy")))) {
@@ -189,11 +192,13 @@ export async function GET(req: NextRequest) {
         ),
       );
     }
+    restrictRedBullOnly = entitlement.accessMode === "red_bull_only";
     const service = createServiceClient();
     if (service && sessionToken) {
-      const { validateViewerDeviceSession } = await import(
-        "@/lib/membership/viewer-sessions"
-      );
+      const {
+        validateViewerDeviceSession,
+        markViewerSessionStreaming,
+      } = await import("@/lib/membership/viewer-sessions");
       const session = await measured(
         "session",
         validateViewerDeviceSession(service, user.id, sessionToken),
@@ -209,6 +214,8 @@ export async function GET(req: NextRequest) {
           ),
         );
       }
+      // Fire-and-forget stream presence (admin Watching status).
+      void markViewerSessionStreaming(service, user.id, sessionToken);
     } else if (!isEadminEmail(user.email)) {
       return respond(
         NextResponse.json(
@@ -233,6 +240,7 @@ export async function GET(req: NextRequest) {
           NextResponse.json({ error: "Channel not found" }, { status: 404 }),
         );
       }
+      redBullChannelMeta = { slug: channel.slug, title: channel.title };
       const rawStream = channel.stream_url?.trim() || "";
       const openHeal = primaryPrivateHealUrl(channel.slug, channel.title);
       const override = overrideHealUrl(channel.slug);
@@ -249,6 +257,17 @@ export async function GET(req: NextRequest) {
       // Arena pay-linear returns null from primaryPrivateHealUrl — left alone.
       persistedUrl = preferHeal && openHeal ? openHeal : rawStream;
     } else if (mediaLinkId) {
+      if (restrictRedBullOnly) {
+        return respond(
+          NextResponse.json(
+            {
+              error:
+                "Your grace period has ended. Only Red Bull TV is available until you choose a plan.",
+            },
+            { status: 403 },
+          ),
+        );
+      }
       // Owned My Links + published staff picks mirror playlist channelId:
       // authenticate + DB ownership, then skip catalogue host allowlisting.
       const { data: userLink } = await measured(
@@ -279,6 +298,27 @@ export async function GET(req: NextRequest) {
         }
         persistedUrl = staffLink.url.trim();
       }
+    }
+  }
+
+  if (restrictRedBullOnly) {
+    const { isRedBullOnlySlug, isRedBullOnlyTitle } = await import(
+      "@/lib/membership/exception-grace"
+    );
+    const slugOk = isRedBullOnlySlug(redBullChannelMeta?.slug);
+    const titleOk = isRedBullOnlyTitle(redBullChannelMeta?.title);
+    const urlHint = raw || persistedUrl || "";
+    const urlOk = /rbmn-live|redbull/i.test(urlHint);
+    if (!slugOk && !titleOk && !urlOk) {
+      return respond(
+        NextResponse.json(
+          {
+            error:
+              "Your grace period has ended. Only Red Bull TV is available until you choose a plan.",
+          },
+          { status: 403 },
+        ),
+      );
     }
   }
 
@@ -322,14 +362,16 @@ export async function GET(req: NextRequest) {
   try {
     // Playlists are tiny; media segments (esp. IP sports CDNs) are often
     // multi‑MB and trickle slowly through the relay — keep the socket alive.
-    const segmentFetch = !/\.m3u8(?:$|\?)/i.test(target);
+    // Astra /play/ gateways are unbounded live MPEG-TS — no byte cap / idle timeout.
+    const liveTs = isRawMpegTsGateway(target);
+    const segmentFetch = liveTs || !/\.m3u8(?:$|\?)/i.test(target);
     const upstream = await measured(
       "upstream",
       secureFetchStream(target, {
         headers: hlsUpstreamHeaders(target, req.headers.get("range")),
-        timeoutMs: segmentFetch ? 90_000 : 15_000,
+        timeoutMs: liveTs ? 0 : segmentFetch ? 90_000 : 15_000,
         maxRedirects: 4,
-        maxBytes: 32 * 1024 * 1024,
+        maxBytes: liveTs ? Number.MAX_SAFE_INTEGER : 32 * 1024 * 1024,
         allowedHost: ownership ? undefined : isAllowedMediaHost,
       }),
     );

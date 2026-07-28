@@ -27,6 +27,8 @@ import {
 
 const SABC1 =
   "https://sabconeta.cdn.mangomolo.com/sabc1/smil:sabc1.stream.smil/master.m3u8";
+const SABC1_CHUNK =
+  "https://sabconeta.cdn.mangomolo.com/sabc1/smil:sabc1.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8";
 const SABC2 =
   "https://sabctwota.cdn.mangomolo.com/sabc2/smil:sabc2.stream.smil/master.m3u8";
 const SABC3 =
@@ -137,7 +139,10 @@ function healZaPackOnly(slug: string, title?: string | null): Pack | null {
 
   if (/sabc[\s_-]?1\b|sabc-1|sabc1/.test(hay) && !/news/.test(hay)) {
     // Never fall back to SABC News / LN24 — that silently swaps the channel.
-    return [src(SABC1, 5, "heal-sabc1-mangomolo")];
+    return [
+      src(SABC1, 5, "heal-sabc1-mangomolo"),
+      src(SABC1_CHUNK, 12, "heal-sabc1-chunk"),
+    ];
   }
   if (/sabc[\s_-]?2\b|sabc-2|sabc2/.test(hay) && !/news/.test(hay)) {
     return [src(SABC2, 5, "heal-sabc2-mangomolo")];

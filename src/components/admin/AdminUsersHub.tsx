@@ -28,15 +28,48 @@ type AdminUser = {
   max_viewer_profiles: number;
   created_at: string | null;
   member_reference: string | null;
+  access_tier?: string | null;
+  exception_grace_ends_at?: string | null;
+  presence?: "watching" | "online" | "offline";
+  last_active_at?: string | null;
+  last_stream_at?: string | null;
+  last_sign_in_at?: string | null;
+  active_sessions?: number;
 };
 
 type StatusFilter = "all" | "active" | "disabled" | "exception";
+type PresenceFilter = "all" | "watching" | "online" | "offline";
+
+type PresenceSummary = {
+  online: number;
+  watching: number;
+  asOf: string;
+};
 
 type ModalMode = "email" | "password" | null;
 
 type PageSize = 20 | 30 | 40 | 50;
 
 const PAGE_SIZE_OPTIONS: PageSize[] = [20, 30, 40, 50];
+
+function formatWhen(iso: string | null | undefined) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleString();
+}
+
+function presenceLabel(status: AdminUser["presence"]) {
+  if (status === "watching") return "Watching";
+  if (status === "online") return "Online";
+  return "Offline";
+}
+
+function presenceTone(status: AdminUser["presence"]) {
+  if (status === "watching") return "bg-emerald-500/20 text-emerald-300";
+  if (status === "online") return "bg-lime-500/15 text-lime-200";
+  return "bg-white/10 text-gls-muted";
+}
 
 function statusLabel(status: string | null | undefined) {
   const value = status || "active";
@@ -214,9 +247,10 @@ export function AdminUsersHub() {
   const [params, setParams] = useState<{
     q: string;
     status: StatusFilter;
+    presence: PresenceFilter;
     page: number;
     pageSize: PageSize;
-  }>({ q: "", status: "all", page: 1, pageSize: 20 });
+  }>({ q: "", status: "all", presence: "all", page: 1, pageSize: 20 });
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [menuUserId, setMenuUserId] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -226,12 +260,26 @@ export function AdminUsersHub() {
   const [needsMfa, setNeedsMfa] = useState(false);
   const [canOwnerActions, setCanOwnerActions] = useState(false);
   const [grantEmail, setGrantEmail] = useState("");
+  const [presenceSummary, setPresenceSummary] = useState<PresenceSummary>({
+    online: 0,
+    watching: 0,
+    asOf: "",
+  });
 
   const [modal, setModal] = useState<ModalMode>(null);
   const [modalUser, setModalUser] = useState<AdminUser | null>(null);
   const [modalEmail, setModalEmail] = useState("");
   const [modalPassword, setModalPassword] = useState("");
   const [modalPassword2, setModalPassword2] = useState("");
+
+  useEffect(() => {
+    const raw = new URLSearchParams(window.location.search).get("presence");
+    if (raw === "watching" || raw === "online" || raw === "offline") {
+      setParams((prev) =>
+        prev.presence === raw ? prev : { ...prev, presence: raw, page: 1 },
+      );
+    }
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -245,7 +293,7 @@ export function AdminUsersHub() {
   }, [q]);
 
   // Clear page-local selection when filters change (not on page-only navigation).
-  const filterKey = `${params.q}|${params.status}|${params.pageSize}`;
+  const filterKey = `${params.q}|${params.status}|${params.presence}|${params.pageSize}`;
   const prevFilterKey = useRef(filterKey);
   useEffect(() => {
     if (prevFilterKey.current === filterKey) return;
@@ -257,7 +305,7 @@ export function AdminUsersHub() {
   const load = useCallback(async () => {
     setLoading(true);
     const res = await fetch(
-      `/api/admin/users?q=${encodeURIComponent(params.q)}&status=${params.status}&page=${params.page}&pageSize=${params.pageSize}`,
+      `/api/admin/users?q=${encodeURIComponent(params.q)}&status=${params.status}&presence=${params.presence}&page=${params.page}&pageSize=${params.pageSize}`,
       { cache: "no-store" },
     );
     const json = await res.json();
@@ -269,6 +317,9 @@ export function AdminUsersHub() {
     }
     setUsers(json.users || []);
     setTotal(Number(json.total) || 0);
+    if (json.presenceSummary) {
+      setPresenceSummary(json.presenceSummary);
+    }
     if (json.page && json.page !== params.page) {
       setParams((prev) =>
         prev.page === json.page ? prev : { ...prev, page: json.page },
@@ -291,6 +342,14 @@ export function AdminUsersHub() {
 
   useEffect(() => {
     queueMicrotask(() => void load());
+  }, [load]);
+
+  // Live presence refresh every 20s without blocking the table filters.
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      void load();
+    }, 20_000);
+    return () => window.clearInterval(id);
   }, [load]);
 
   const allSelected = useMemo(
@@ -556,6 +615,25 @@ export function AdminUsersHub() {
               <option value="disabled">Disabled / pending</option>
               <option value="exception">Exceptions</option>
             </select>
+            <select
+              className="gls-admin-input max-w-[11rem]"
+              value={params.presence}
+              onChange={(e) => {
+                const next = e.target.value as PresenceFilter;
+                setSelected(new Set());
+                setMenuUserId(null);
+                setParams((prev) => ({
+                  ...prev,
+                  presence: next,
+                  page: 1,
+                }));
+              }}
+            >
+              <option value="all">All presence</option>
+              <option value="watching">Watching now</option>
+              <option value="online">Online</option>
+              <option value="offline">Offline</option>
+            </select>
             <label className="flex items-center gap-1.5 text-[11px] text-gls-muted">
               <span className="sr-only">Rows per page</span>
               <select
@@ -589,6 +667,62 @@ export function AdminUsersHub() {
             </button>
           </div>
 
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() =>
+                setParams((prev) => ({
+                  ...prev,
+                  presence: "watching",
+                  page: 1,
+                }))
+              }
+              className={`rounded-xl border px-4 py-3 text-left transition ${
+                params.presence === "watching"
+                  ? "border-emerald-400/50 bg-emerald-500/15"
+                  : "border-white/10 bg-white/[0.03] hover:border-emerald-400/30"
+              }`}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">
+                Watching live
+              </p>
+              <p className="mt-1 text-2xl font-semibold text-white">
+                {presenceSummary.watching}
+              </p>
+              <p className="mt-1 text-[11px] text-gls-muted">
+                Stream activity in the last 5 minutes
+              </p>
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setParams((prev) => ({
+                  ...prev,
+                  presence: "online",
+                  page: 1,
+                }))
+              }
+              className={`rounded-xl border px-4 py-3 text-left transition ${
+                params.presence === "online"
+                  ? "border-lime-400/50 bg-lime-500/10"
+                  : "border-white/10 bg-white/[0.03] hover:border-lime-400/30"
+              }`}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-lime-200">
+                Online now
+              </p>
+              <p className="mt-1 text-2xl font-semibold text-white">
+                {presenceSummary.online}
+              </p>
+              <p className="mt-1 text-[11px] text-gls-muted">
+                Heartbeat in the last 15 minutes
+                {presenceSummary.asOf
+                  ? ` · updated ${new Date(presenceSummary.asOf).toLocaleTimeString()}`
+                  : ""}
+              </p>
+            </button>
+          </div>
+
           {selectedIds.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-gls-pink/30 bg-gls-pink/10 px-3 py-2.5">
               <span className="text-xs font-semibold text-white">
@@ -603,6 +737,20 @@ export function AdminUsersHub() {
                 }
               >
                 Grant exception
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                className="rounded-md border border-amber-400/35 bg-amber-500/10 px-2.5 py-1 text-[11px] text-amber-100 hover:text-white disabled:opacity-40"
+                onClick={() =>
+                  void runAction(
+                    "ungrant_exception",
+                    { userIds: selectedIds },
+                    `Ungrant exception for ${selectedIds.length} member(s)? They get grace until the 1st of next month, then Red Bull TV only if they don’t pay.`,
+                  )
+                }
+              >
+                Ungrant exception
               </button>
               <button
                 type="button"
@@ -676,7 +824,7 @@ export function AdminUsersHub() {
           )}
 
           <div className="gls-h-scroll mt-4 rounded-xl border border-white/10">
-            <table className="min-w-[720px] w-full text-left text-sm">
+            <table className="min-w-[980px] w-full text-left text-sm">
               <thead className="border-b border-white/10 bg-white/[0.03] text-[10px] uppercase tracking-[0.18em] text-gls-muted">
                 <tr>
                   <th className="px-3 py-3">
@@ -688,6 +836,8 @@ export function AdminUsersHub() {
                     />
                   </th>
                   <th className="px-3 py-3 font-semibold">Member</th>
+                  <th className="px-3 py-3 font-semibold">Presence</th>
+                  <th className="px-3 py-3 font-semibold">Last login</th>
                   <th className="px-3 py-3 font-semibold">Plan</th>
                   <th className="px-3 py-3 font-semibold">Status</th>
                   <th className="px-3 py-3 font-semibold">Actions</th>
@@ -699,6 +849,16 @@ export function AdminUsersHub() {
                     u.is_admin_exception ||
                     u.trial_bypassed ||
                     u.plan === "exception";
+                  const onGrace =
+                    u.plan === "grace" ||
+                    Boolean(
+                      u.exception_grace_ends_at &&
+                        new Date(u.exception_grace_ends_at).getTime() >
+                          Date.now(),
+                    );
+                  const redBullOnly =
+                    u.access_tier === "red_bull_only" ||
+                    u.plan === "restricted";
                   const isActive = (u.account_status || "active") === "active";
                   return (
                     <tr
@@ -728,6 +888,35 @@ export function AdminUsersHub() {
                         </p>
                       </td>
                       <td className="px-3 py-3">
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${presenceTone(u.presence)}`}
+                        >
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              u.presence === "watching"
+                                ? "bg-emerald-400"
+                                : u.presence === "online"
+                                  ? "bg-lime-300"
+                                  : "bg-white/30"
+                            }`}
+                            aria-hidden
+                          />
+                          {presenceLabel(u.presence)}
+                        </span>
+                        {u.presence === "watching" && u.last_stream_at ? (
+                          <p className="mt-1 text-[10px] text-gls-muted">
+                            Stream {formatWhen(u.last_stream_at)}
+                          </p>
+                        ) : u.last_active_at ? (
+                          <p className="mt-1 text-[10px] text-gls-muted">
+                            Active {formatWhen(u.last_active_at)}
+                          </p>
+                        ) : null}
+                      </td>
+                      <td className="px-3 py-3 text-[12px] text-gls-body">
+                        {formatWhen(u.last_sign_in_at)}
+                      </td>
+                      <td className="px-3 py-3">
                         <div className="flex flex-wrap gap-1.5">
                           <span className="gls-admin-pill bg-gls-pink/15 text-gls-pink">
                             {u.plan}
@@ -740,6 +929,19 @@ export function AdminUsersHub() {
                           {isException && (
                             <span className="gls-admin-pill bg-sky-500/15 text-sky-200">
                               exception
+                            </span>
+                          )}
+                          {onGrace && (
+                            <span className="gls-admin-pill bg-amber-500/15 text-amber-100">
+                              grace
+                              {u.exception_grace_ends_at
+                                ? ` · ${new Date(u.exception_grace_ends_at).toLocaleDateString()}`
+                                : ""}
+                            </span>
+                          )}
+                          {redBullOnly && (
+                            <span className="gls-admin-pill bg-white/10 text-gls-body">
+                              Red Bull only
                             </span>
                           )}
                         </div>
@@ -786,6 +988,18 @@ export function AdminUsersHub() {
                             }
                           >
                             Grant exception
+                          </MenuItem>
+                          <MenuItem
+                            disabled={busy || (!isException && !onGrace)}
+                            onClick={() =>
+                              void runAction(
+                                "ungrant_exception",
+                                { userIds: [u.id] },
+                                "Ungrant exception? They get grace until the 1st of next month, then Red Bull TV only if they don’t pay.",
+                              )
+                            }
+                          >
+                            Ungrant exception
                           </MenuItem>
                           <MenuItem
                             disabled={busy}

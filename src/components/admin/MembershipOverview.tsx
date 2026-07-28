@@ -37,6 +37,11 @@ type OverviewResponse = {
     signups30d: number;
     exceptions: number;
   };
+  presenceSummary?: {
+    online: number;
+    watching: number;
+    asOf: string;
+  };
   byPlan: Record<string, number>;
   bucket: MembershipBucket;
   members: OverviewMember[];
@@ -119,6 +124,14 @@ export function MembershipOverview() {
       void load(bucket);
     }, 0);
     return () => clearTimeout(timer);
+  }, [bucket, load]);
+
+  // Live presence counts every 20s.
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      void load(bucket);
+    }, 20_000);
+    return () => window.clearInterval(id);
   }, [bucket, load]);
 
   const conversion = useMemo(() => {
@@ -226,6 +239,40 @@ export function MembershipOverview() {
             </button>
           );
         })}
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <Link
+          href="/admin/users?presence=watching"
+          className="gls-admin-card rounded-xl border border-emerald-400/25 bg-emerald-500/10 p-5 transition hover:border-emerald-400/45"
+        >
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-emerald-300">
+            Watching live
+          </p>
+          <p className="gls-display mt-3 text-4xl text-white">
+            {data.presenceSummary?.watching ?? 0}
+          </p>
+          <p className="mt-1 text-xs text-gls-muted">
+            Streaming now · open Users filter
+          </p>
+        </Link>
+        <Link
+          href="/admin/users?presence=online"
+          className="gls-admin-card rounded-xl border border-lime-400/20 bg-lime-500/10 p-5 transition hover:border-lime-400/40"
+        >
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-lime-200">
+            Online now
+          </p>
+          <p className="gls-display mt-3 text-4xl text-white">
+            {data.presenceSummary?.online ?? 0}
+          </p>
+          <p className="mt-1 text-xs text-gls-muted">
+            Heartbeat in last 15 min
+            {data.presenceSummary?.asOf
+              ? ` · ${new Date(data.presenceSummary.asOf).toLocaleTimeString()}`
+              : ""}
+          </p>
+        </Link>
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-3">

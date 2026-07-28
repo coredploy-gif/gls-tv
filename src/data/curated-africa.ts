@@ -2,6 +2,9 @@ import type { CatalogItem } from "@/data/types";
 
 const SABC1 =
   "https://sabconeta.cdn.mangomolo.com/sabc1/smil:sabc1.stream.smil/master.m3u8";
+/** Same host as master — used on SABC+ community playlists when master hiccups. */
+const SABC1_CHUNK =
+  "https://sabconeta.cdn.mangomolo.com/sabc1/smil:sabc1.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8";
 const SABC2 =
   "https://sabctwota.cdn.mangomolo.com/sabc2/smil:sabc2.stream.smil/master.m3u8";
 const SABC3 =
@@ -118,6 +121,13 @@ export const CURATED_AFRICA: CatalogItem[] = [
         format: "hls",
         priority: 10,
         label: "mangomolo",
+      },
+      {
+        url: SABC1_CHUNK,
+        quality: "720p",
+        format: "hls",
+        priority: 20,
+        label: "sabc1-chunk",
       },
     ],
   },

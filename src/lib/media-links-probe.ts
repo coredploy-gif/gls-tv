@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import {
   isLikelyIptvStreamPath,
+  isRawMpegTsGateway,
   shouldSkipUnboundedMediaBodyDownload,
 } from "@/lib/media-path";
 import { secureFetchBuffered, validatePublicUrl } from "@/lib/secure-url";
@@ -111,11 +112,14 @@ function evaluateDirectMediaBody(
         (body.length > 0 && body[0] === 0x47) ||
         body.length > 0
       ) {
+        const isTs =
+          (body.length > 0 && body[0] === 0x47) ||
+          /mpegts|mp2t|octet-stream/i.test(ctLeaf);
         return {
           ok: true,
           status: "active",
           detail: `${prefix} · live stream endpoint`,
-          format: "hls",
+          format: isTs ? "mpegts" : "hls",
         };
       }
     }
@@ -261,13 +265,20 @@ export async function probeMediaLinkReachability(
   if (shouldSkipUnboundedMediaBodyDownload(url)) {
     try {
       await validatePublicUrl(url);
+      const rawTs = isRawMpegTsGateway(url);
       return {
         ok: true,
         status: "active",
         detail: iptvGateway
           ? "Individual live stream endpoint · body probe skipped"
           : "Individual HLS URL · body probe skipped",
-        format: format === "hls" || provisional || iptvGateway ? "hls" : format,
+        format: rawTs
+          ? "mpegts"
+          : format === "mpegts"
+            ? "mpegts"
+            : format === "hls" || provisional || iptvGateway
+              ? "hls"
+              : format,
       };
     } catch (cause) {
       return {

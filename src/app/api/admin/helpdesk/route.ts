@@ -181,7 +181,8 @@ export async function POST(req: NextRequest) {
       .insert({
         ticket_id: id,
         author_type: "agent",
-        author_email: user.email,
+        // Never store the owner’s personal email on member-visible threads.
+        author_email: "GLS Support",
         body: message.slice(0, 8000),
       })
       .select("*")
@@ -256,7 +257,7 @@ export async function POST(req: NextRequest) {
       await service.from("helpdesk_messages").insert({
         ticket_id: data.id,
         author_type: "agent",
-        author_email: user.email,
+        author_email: "GLS Support",
         body: desc,
       });
     }

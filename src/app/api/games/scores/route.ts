@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient, isEadminEmail } from "@/lib/eadmin";
+import { publicPlayerDisplayName } from "@/lib/privacy/admin-identity";
 import { isKnownGameId } from "@/lib/games";
 
 export const runtime = "nodejs";
@@ -24,11 +26,38 @@ export async function GET(req: NextRequest) {
     .eq("game_id", gameId)
     .order("score", { ascending: false })
     .order("created_at", { ascending: true })
-    .limit(20);
+    .limit(40);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  const rows = data || [];
+  const service = createServiceClient();
+  const adminUserIds = new Set<string>();
+  if (service && rows.length) {
+    const ids = [...new Set(rows.map((r) => r.user_id).filter(Boolean))];
+    const { data: profiles } = await service
+      .from("profiles")
+      .select("id, email")
+      .in("id", ids);
+    for (const p of profiles || []) {
+      if (isEadminEmail(p.email)) adminUserIds.add(p.id);
+    }
+  }
+
+  const leaderboard = rows
+    .filter((row) => !adminUserIds.has(row.user_id))
+    .slice(0, 20)
+    .map((row) => ({
+      id: row.id,
+      display_name: publicPlayerDisplayName({
+        displayName: row.display_name,
+        fallback: "Player",
+      }),
+      score: row.score,
+      created_at: row.created_at,
+    }));
 
   const { data: mine } = await supabase
     .from("game_scores")
@@ -40,7 +69,7 @@ export async function GET(req: NextRequest) {
     .maybeSingle();
 
   return NextResponse.json({
-    leaderboard: data || [],
+    leaderboard,
     myBest: mine?.score ?? 0,
   });
 }
@@ -67,16 +96,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid score" }, { status: 400 });
   }
 
+  // Owner admin scores stay private — never publish name/email on leaderboards.
+  if (isEadminEmail(user.email)) {
+    return NextResponse.json({
+      ok: true,
+      saved: false,
+      myBest: Math.floor(score),
+      private: true,
+    });
+  }
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("display_name")
     .eq("id", user.id)
     .maybeSingle();
 
-  const displayName =
-    profile?.display_name?.trim() ||
-    user.email?.split("@")[0] ||
-    "Player";
+  const displayName = publicPlayerDisplayName({
+    email: user.email,
+    displayName: profile?.display_name,
+    fallback: "Player",
+  }).slice(0, 48);
 
   const { data: best } = await supabase
     .from("game_scores")
@@ -98,7 +138,7 @@ export async function POST(req: NextRequest) {
   const { error } = await supabase.from("game_scores").insert({
     game_id: gameId,
     user_id: user.id,
-    display_name: displayName.slice(0, 48),
+    display_name: displayName,
     score: Math.floor(score),
   });
 

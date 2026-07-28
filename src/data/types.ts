@@ -10,7 +10,7 @@ export type LicenseKind =
 export interface MediaSource {
   url: string;
   quality: string;
-  format: "hls" | "mp4" | "dash";
+  format: "hls" | "mp4" | "dash" | "mpegts";
   /** Lower = preferred. Used for failover mirrors. */
   priority?: number;
   label?: string;

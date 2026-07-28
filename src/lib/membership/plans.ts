@@ -1,5 +1,7 @@
 export type GlsPlanId =
   | "trial"
+  | "grace"
+  | "restricted"
   | "gls_55"
   | "gls_65"
   | "gls_75"
@@ -56,6 +58,8 @@ export function adultLimitForPlan(plan: GlsPlanId | string | null | undefined) {
     case "exception":
     case "admin":
       return 4;
+    case "grace":
+    case "restricted":
     case "trial":
     default:
       return 2;
