@@ -64,6 +64,11 @@ function loadCastSdk() {
   return sdkPromise;
 }
 
+/** Warm the sender SDK before the user clicks, preserving Cast's gesture requirement. */
+export function prepareGoogleCast() {
+  return loadCastSdk();
+}
+
 export async function castStreamToGoogleTv(input: {
   url: string;
   format?: string;
@@ -71,8 +76,9 @@ export async function castStreamToGoogleTv(input: {
   poster?: string;
 }): Promise<GoogleCastResult> {
   if (!/^https?:\/\//i.test(input.url)) return "unavailable";
-  if (!(await loadCastSdk())) return "unavailable";
   const root = window as CastGlobals;
+  const alreadyReady = Boolean(root.cast?.framework && root.chrome?.cast?.media);
+  if (!alreadyReady && !(await loadCastSdk())) return "unavailable";
   const framework = root.cast?.framework;
   const api = root.chrome?.cast;
   if (!framework || !api) return "unavailable";

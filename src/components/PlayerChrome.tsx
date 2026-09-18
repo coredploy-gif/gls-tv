@@ -22,7 +22,7 @@ import {
   seekBySeconds,
 } from "@/lib/live-playback-policy";
 import { readPlayerVolume, writePlayerVolume } from "@/lib/player-preferences";
-import { castStreamToGoogleTv } from "@/lib/google-cast";
+import { castStreamToGoogleTv, prepareGoogleCast } from "@/lib/google-cast";
 import { buildPlaybackMetric, sendPlaybackMetric } from "@/lib/playback-telemetry";
 
 const IDLE_MS = 2800;
@@ -114,6 +114,7 @@ export function PlayerChrome({
     "idle",
   );
   const [canCast, setCanCast] = useState(false);
+  const [googleCastReady, setGoogleCastReady] = useState<boolean | null>(null);
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bufferTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const castHintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -349,6 +350,15 @@ export function PlayerChrome({
     }
     bump();
   }, [bump, videoRef]);
+
+  useEffect(() => {
+    if (isSafariLike()) return;
+    let cancelled = false;
+    void prepareGoogleCast().then((ready) => {
+      if (!cancelled) setGoogleCastReady(ready);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     const el = videoRef.current;
@@ -691,7 +701,7 @@ export function PlayerChrome({
     }
     showCastFeedback("Looking for Cast / AirPlay devices…");
     const googleUrl = absoluteStreamUrl(castUrl);
-    if (googleUrl && !isSafariLike()) {
+    if (googleUrl && !isSafariLike() && googleCastReady !== false) {
       const googleResult = await castStreamToGoogleTv({
         url: googleUrl,
         format,
@@ -711,7 +721,19 @@ export function PlayerChrome({
         return;
       }
     }
-    const result = await promptCastOrAirPlay(el, { format, castUrl });
+    if (googleCastReady === false && !isSafariLike() && (format === "hls" || format === "dash")) {
+      showCastFeedback(
+        "Google Cast is not available in this browser. Open GLS TV in desktop or Android Chrome on the same Wi-Fi as your TV, then press Cast again.",
+        googleUrl,
+      );
+      return;
+    }
+    const result = await Promise.race([
+      promptCastOrAirPlay(el, { format, castUrl }),
+      new Promise<"unavailable">((resolve) =>
+        window.setTimeout(() => resolve("unavailable"), 4_000),
+      ),
+    ]);
     const feedback = castFeedbackForResult(result, { format, castUrl });
     if (feedback) {
       showCastFeedback(feedback.message, feedback.copyUrl);
