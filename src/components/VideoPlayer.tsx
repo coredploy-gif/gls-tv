@@ -21,7 +21,7 @@ import { isBrokenTraceOrigin, isTraceChannel, hasTraceUrbanFallbackTag } from "@
 import { hasSisterFallbackTag } from "@/lib/heal-registry";
 import { isLinearPayCategory } from "@/lib/linear-pay";
 import { useAppCopy } from "@/lib/useAppCopy";
-import { PlayerChrome } from "@/components/PlayerChrome";
+import { PlayerChrome, type PlayerTrackOption } from "@/components/PlayerChrome";
 import { isSafariLike, resolveCastUrl } from "@/lib/remote-playback";
 import { isTvLikeDevice } from "@/lib/tv-detect";
 import {
@@ -417,6 +417,10 @@ export function VideoPlayer({
   const [behindLive, setBehindLive] = useState(false);
   const [lagSec, setLagSec] = useState(0);
   const [aheadSec, setAheadSec] = useState(0);
+  const [qualityOptions, setQualityOptions] = useState<PlayerTrackOption[]>([]);
+  const [qualityValue, setQualityValue] = useState(-1);
+  const [audioOptions, setAudioOptions] = useState<PlayerTrackOption[]>([]);
+  const [audioValue, setAudioValue] = useState(-1);
 
   const source = sources[sourceIndex];
 
@@ -460,8 +464,27 @@ export function VideoPlayer({
       setAheadSec(0);
       setError(null);
       deepBufferRef.current = false;
+      setQualityOptions([]);
+      setQualityValue(-1);
+      setAudioOptions([]);
+      setAudioValue(-1);
     });
   }, [item.id, item.slug]);
+
+  const changeQuality = (value: number) => {
+    const hls = hlsRef.current;
+    if (!hls) return;
+    setQualityValue(value);
+    hls.currentLevel = value;
+    hls.nextLevel = value;
+  };
+
+  const changeAudio = (value: number) => {
+    const hls = hlsRef.current;
+    if (!hls || value < 0) return;
+    hls.audioTrack = value;
+    setAudioValue(value);
+  };
 
   useEffect(() => {
     behindLiveRef.current = behindLive;
@@ -494,6 +517,16 @@ export function VideoPlayer({
   // Media Session (lock-screen controls)
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
+    const setHandler = (
+      action: MediaSessionAction,
+      handler: MediaSessionActionHandler | null,
+    ) => {
+      try {
+        navigator.mediaSession.setActionHandler(action, handler);
+      } catch {
+        /* WebView/browser does not expose every Media Session action. */
+      }
+    };
     try {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: item.title,
@@ -503,21 +536,79 @@ export function VideoPlayer({
           ? [{ src: item.poster, sizes: "512x512", type: "image/png" }]
           : [],
       });
-      navigator.mediaSession.setActionHandler("play", () => {
+      setHandler("play", () => {
         void videoRef.current?.play();
       });
-      navigator.mediaSession.setActionHandler("pause", () => {
+      setHandler("pause", () => {
         videoRef.current?.pause();
       });
-      navigator.mediaSession.setActionHandler("previoustrack", () => {
+      setHandler("stop", () => {
+        videoRef.current?.pause();
+      });
+      setHandler("previoustrack", () => {
         if (prevChannel) window.location.assign(prevChannel.href);
       });
-      navigator.mediaSession.setActionHandler("nexttrack", () => {
+      setHandler("nexttrack", () => {
         if (nextChannel) window.location.assign(nextChannel.href);
       });
+      if (!item.isLive) {
+        setHandler("seekbackward", (details) => {
+          const el = videoRef.current;
+          if (!el) return;
+          el.currentTime = Math.max(0, el.currentTime - (details.seekOffset ?? 10));
+        });
+        setHandler("seekforward", (details) => {
+          const el = videoRef.current;
+          if (!el) return;
+          el.currentTime = Math.min(el.duration || Infinity, el.currentTime + (details.seekOffset ?? 10));
+        });
+        setHandler("seekto", (details) => {
+          const el = videoRef.current;
+          if (!el || details.seekTime == null) return;
+          if (details.fastSeek && "fastSeek" in el) el.fastSeek(details.seekTime);
+          else el.currentTime = details.seekTime;
+        });
+      } else {
+        setHandler("seekbackward", null);
+        setHandler("seekforward", null);
+        setHandler("seekto", null);
+      }
     } catch {
       /* ignore */
     }
+
+    const el = videoRef.current;
+    const syncMediaState = () => {
+      const current = videoRef.current;
+      if (!current) return;
+      navigator.mediaSession.playbackState = current.paused ? "paused" : "playing";
+      if (
+        !item.isLive &&
+        Number.isFinite(current.duration) &&
+        current.duration > 0 &&
+        Number.isFinite(current.currentTime)
+      ) {
+        try {
+          navigator.mediaSession.setPositionState({
+            duration: current.duration,
+            playbackRate: current.playbackRate || 1,
+            position: Math.min(current.currentTime, current.duration),
+          });
+        } catch {
+          /* Position state is optional on older Android WebViews. */
+        }
+      }
+    };
+    el?.addEventListener("play", syncMediaState);
+    el?.addEventListener("pause", syncMediaState);
+    el?.addEventListener("timeupdate", syncMediaState);
+    syncMediaState();
+    return () => {
+      el?.removeEventListener("play", syncMediaState);
+      el?.removeEventListener("pause", syncMediaState);
+      el?.removeEventListener("timeupdate", syncMediaState);
+      navigator.mediaSession.playbackState = "none";
+    };
   }, [item.title, item.poster, item.isLive, nextChannel, prevChannel]);
 
   // AirPlay / remote playback: allow wireless targets on Safari & Chromium
@@ -1062,6 +1153,24 @@ export function VideoPlayer({
           clearWatchdog();
           try {
             const levels = data.levels || [];
+            setQualityOptions([
+              { value: -1, label: "Auto (recommended)" },
+              ...levels.map((level, index) => ({
+                value: index,
+                label: level.height
+                  ? `${level.height}p${level.bitrate ? ` · ${Math.round(level.bitrate / 1000)} kbps` : ""}`
+                  : `Quality ${index + 1}${level.bitrate ? ` · ${Math.round(level.bitrate / 1000)} kbps` : ""}`,
+              })),
+            ]);
+            setQualityValue(-1);
+            const audioTracks = instance.audioTracks || [];
+            setAudioOptions(
+              audioTracks.map((track, index) => ({
+                value: index,
+                label: track.name || track.lang || `Audio ${index + 1}`,
+              })),
+            );
+            setAudioValue(instance.audioTrack >= 0 ? instance.audioTrack : 0);
             const cap = capLevelIndexForBitrate(levels, tuning.maxBitrate);
             if (tuning.maxBitrate != null && cap >= 0) {
               instance.autoLevelCapping = cap;
@@ -1711,6 +1820,15 @@ export function VideoPlayer({
             format={source?.format}
             prevChannel={prevChannel}
             nextChannel={nextChannel}
+            playbackStatus={status}
+            sourcePosition={Math.min(sourceIndex + 1, sources.length)}
+            sourceCount={Math.max(1, sources.length)}
+            qualityOptions={qualityOptions}
+            qualityValue={qualityValue}
+            onQualityChange={changeQuality}
+            audioOptions={audioOptions}
+            audioValue={audioValue}
+            onAudioChange={changeAudio}
             onUserSeekLive={() => {
               // Rewind / scrub within DVR — stay behind live, never auto-return.
               markBehindUi();

@@ -37,6 +37,11 @@ export type ChromeNeighbor = {
   title: string;
 };
 
+export type PlayerTrackOption = {
+  value: number;
+  label: string;
+};
+
 type PlayerChromeProps = {
   videoRef: RefObject<HTMLVideoElement | null>;
   isLive?: boolean;
@@ -54,6 +59,15 @@ type PlayerChromeProps = {
   forceVisible?: boolean;
   prevChannel?: ChromeNeighbor | null;
   nextChannel?: ChromeNeighbor | null;
+  playbackStatus?: string;
+  sourcePosition?: number;
+  sourceCount?: number;
+  qualityOptions?: PlayerTrackOption[];
+  qualityValue?: number;
+  onQualityChange?: (value: number) => void;
+  audioOptions?: PlayerTrackOption[];
+  audioValue?: number;
+  onAudioChange?: (value: number) => void;
   /** Called when the user rewinds / scrubs live DVR (stay behind live). */
   onUserSeekLive?: () => void;
 };
@@ -91,6 +105,15 @@ export function PlayerChrome({
   forceVisible = false,
   prevChannel = null,
   nextChannel = null,
+  playbackStatus,
+  sourcePosition = 1,
+  sourceCount = 1,
+  qualityOptions = [],
+  qualityValue = -1,
+  onQualityChange,
+  audioOptions = [],
+  audioValue = -1,
+  onAudioChange,
   onUserSeekLive,
 }: PlayerChromeProps) {
   const router = useRouter();
@@ -115,6 +138,8 @@ export function PlayerChrome({
   );
   const [canCast, setCanCast] = useState(false);
   const [googleCastReady, setGoogleCastReady] = useState<boolean | null>(null);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bufferTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const castHintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -569,6 +594,12 @@ export function PlayerChrome({
         router.push(nextChannel.href);
       }
       if (e.key === "Escape") {
+        if (guideOpen || settingsOpen) {
+          e.preventDefault();
+          setGuideOpen(false);
+          setSettingsOpen(false);
+          return;
+        }
         const webkit = el as HTMLVideoElement & {
           webkitDisplayingFullscreen?: boolean;
           webkitExitFullscreen?: () => void;
@@ -593,12 +624,37 @@ export function PlayerChrome({
         skip(e.key === "ArrowRight" ? SKIP_SEC : -SKIP_SEC);
       }
     };
+    const onTvBack = (rawEvent: Event) => {
+      const event = rawEvent as CustomEvent;
+      if (guideOpen || settingsOpen) {
+        event.preventDefault();
+        setGuideOpen(false);
+        setSettingsOpen(false);
+        bump();
+        return;
+      }
+      const el = videoRef.current as
+        | (HTMLVideoElement & {
+            webkitDisplayingFullscreen?: boolean;
+            webkitExitFullscreen?: () => void;
+          })
+        | null;
+      if (document.fullscreenElement) {
+        event.preventDefault();
+        void document.exitFullscreen();
+      } else if (el?.webkitDisplayingFullscreen && el.webkitExitFullscreen) {
+        event.preventDefault();
+        el.webkitExitFullscreen();
+      }
+    };
     window.addEventListener("keydown", onKey);
+    window.addEventListener("gls-tv-back", onTvBack);
     return () => {
       root.removeEventListener("pointermove", onMove);
       root.removeEventListener("pointerdown", show);
       root.removeEventListener("touchstart", show);
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("gls-tv-back", onTvBack);
     };
   }, [
     bump,
@@ -612,6 +668,8 @@ export function PlayerChrome({
     toggleMute,
     togglePictureInPicture,
     videoRef,
+    guideOpen,
+    settingsOpen,
   ]);
 
   useEffect(() => {
@@ -804,9 +862,12 @@ export function PlayerChrome({
         onPointerDown={(e) => e.stopPropagation()}
       >
         {title && (
-          <p className="mb-2 truncate text-sm font-semibold text-white/90 sm:text-base">
-            {title}
-          </p>
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <p className="truncate text-sm font-semibold text-white/90 sm:text-base">{title}</p>
+            <p className="shrink-0 text-[10px] uppercase tracking-wider text-white/55">
+              {playbackStatus || (isLive ? "Live" : "Playing")} · Source {sourcePosition}/{sourceCount}
+            </p>
+          </div>
         )}
         {canScrub && (
           <div className="mb-2 flex items-center gap-2">
@@ -890,6 +951,22 @@ export function PlayerChrome({
               Next
             </button>
           )}
+          {(prevChannel || nextChannel) && (
+            <button
+              type="button"
+              className={`gls-player-btn ${guideOpen ? "is-active" : ""}`}
+              aria-label="Open channel guide"
+              aria-expanded={guideOpen}
+              tabIndex={showChrome ? 0 : -1}
+              onClick={() => {
+                setGuideOpen((open) => !open);
+                setSettingsOpen(false);
+                bump();
+              }}
+            >
+              Guide
+            </button>
+          )}
           <button
             type="button"
             className="gls-player-btn"
@@ -923,6 +1000,22 @@ export function PlayerChrome({
               onClick={toggleCaptions}
             >
               CC
+            </button>
+          )}
+          {(qualityOptions.length > 1 || audioOptions.length > 1 || hasCaptions) && (
+            <button
+              type="button"
+              className={`gls-player-btn ${settingsOpen ? "is-active" : ""}`}
+              aria-label="Playback settings"
+              aria-expanded={settingsOpen}
+              tabIndex={showChrome ? 0 : -1}
+              onClick={() => {
+                setSettingsOpen((open) => !open);
+                setGuideOpen(false);
+                bump();
+              }}
+            >
+              Settings
             </button>
           )}
           {shouldShowCastControl(format, castUrl) && (
@@ -969,6 +1062,49 @@ export function PlayerChrome({
             {isFs ? "Exit" : "Full"}
           </button>
         </div>
+        {guideOpen && (
+          <div className="gls-player-panel mt-3 grid gap-2 rounded-xl border border-white/15 bg-black/90 p-3 sm:grid-cols-3" data-tv-back-root>
+            {prevChannel ? (
+              <button type="button" className="gls-player-guide-item" onClick={() => goNeighbor(prevChannel)}>
+                <span>Previous channel</span><strong>{prevChannel.title}</strong>
+              </button>
+            ) : <div />}
+            <div className="gls-player-guide-current">
+              <span>Now playing</span><strong>{title || "GLS TV"}</strong>
+              <small>{playbackStatus || (isLive ? "Live" : "Playing")}</small>
+            </div>
+            {nextChannel ? (
+              <button type="button" className="gls-player-guide-item" onClick={() => goNeighbor(nextChannel)}>
+                <span>Next channel</span><strong>{nextChannel.title}</strong>
+              </button>
+            ) : <div />}
+          </div>
+        )}
+        {settingsOpen && (
+          <div className="gls-player-panel mt-3 flex flex-wrap items-end gap-4 rounded-xl border border-white/15 bg-black/90 p-3" data-tv-back-root>
+            {qualityOptions.length > 1 && onQualityChange && (
+              <label className="min-w-40 flex-1 text-xs font-semibold text-white/70">
+                Video quality
+                <select className="mt-1 w-full rounded-lg border border-white/15 bg-[#171717] px-3 py-2 text-sm text-white" value={qualityValue} onChange={(e) => onQualityChange(Number(e.target.value))}>
+                  {qualityOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                </select>
+              </label>
+            )}
+            {audioOptions.length > 1 && onAudioChange && (
+              <label className="min-w-40 flex-1 text-xs font-semibold text-white/70">
+                Audio track
+                <select className="mt-1 w-full rounded-lg border border-white/15 bg-[#171717] px-3 py-2 text-sm text-white" value={audioValue} onChange={(e) => onAudioChange(Number(e.target.value))}>
+                  {audioOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                </select>
+              </label>
+            )}
+            {hasCaptions && (
+              <button type="button" className={`gls-player-btn ${captionsOn ? "is-active" : ""}`} onClick={toggleCaptions}>
+                Subtitles {captionsOn ? "on" : "off"}
+              </button>
+            )}
+          </div>
+        )}
         {castHint && (
           <div
             className="mt-2 rounded-md bg-black/75 px-2.5 py-2 ring-1 ring-white/20"

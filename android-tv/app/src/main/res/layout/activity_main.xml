@@ -3,8 +3,7 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gls_black"
-    android:keepScreenOn="true">
+    android:background="@color/gls_black">
 
     <WebView
         android:id="@+id/webview"
@@ -23,6 +22,51 @@
         android:max="100"
         android:progressDrawable="@drawable/progress_bar"
         android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/offline_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/gls_black"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/offline_title"
+            android:textColor="@color/gls_white"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:maxWidth="560dp"
+            android:text="@string/offline_message"
+            android:textColor="@color/gls_muted"
+            android:textSize="17sp" />
+
+        <Button
+            android:id="@+id/retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/action_button"
+            android:focusable="true"
+            android:minWidth="160dp"
+            android:paddingStart="28dp"
+            android:paddingEnd="28dp"
+            android:text="@string/retry"
+            android:textAllCaps="false"
+            android:textColor="@color/gls_white"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/fullscreen_container"

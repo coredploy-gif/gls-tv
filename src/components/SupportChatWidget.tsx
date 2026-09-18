@@ -323,7 +323,7 @@ export function SupportChatWidget() {
         />
       )}
 
-      <div className="pointer-events-none fixed bottom-0 right-0 z-[70] flex flex-col items-end p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pr-[max(0.75rem,env(safe-area-inset-right))] sm:bottom-4 sm:right-4 sm:p-0">
+      <div className="gls-support-widget pointer-events-none fixed bottom-0 right-0 z-[70] flex flex-col items-end p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pr-[max(0.75rem,env(safe-area-inset-right))] sm:bottom-4 sm:right-4 sm:p-0">
         {open && (
           <div
             ref={panelRef}

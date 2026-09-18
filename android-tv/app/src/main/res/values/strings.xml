@@ -2,4 +2,7 @@
 <resources>
     <string name="app_name">GLS TV</string>
     <string name="app_banner_desc">GLS TV — cinematic live TV, series and movies</string>
+    <string name="offline_title">GLS TV is offline</string>
+    <string name="offline_message">Check your internet connection, then try again. Your account and saved list are safe.</string>
+    <string name="retry">Try again</string>
 </resources>

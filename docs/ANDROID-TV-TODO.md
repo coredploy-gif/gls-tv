@@ -17,6 +17,9 @@ Full plan: [ANDROID-TV-APK-PLAN.md](./ANDROID-TV-APK-PLAN.md) · Build steps: [`
 - [x] Docs: APK plan + series live vs VOD
 - [x] Fix post-sign-in hang on `/auth` (email + Message GLS) → hard nav to Who’s watching
 - [x] Web: Google OAuth on `/auth` and phone `/auth/tv-pair` (TV stays QR-primary); Google behind admin `oauth_google` flag (default off); Apple deferred — see [AUTH-OAUTH-SETUP.md](./AUTH-OAUTH-SETUP.md)
+- [x] Phase 4: separate TV/mobile flavors, TV-first QR launch, pairing app links, web-aware native Back
+- [x] Phase 5: native offline/retry screen, 5xx recovery, phone/TV chrome separation, release checklist
+- [x] Phase 6: hardware play/pause, seek, channel buttons, Media Session state and lock-screen progress
 
 ---
 
@@ -29,8 +32,8 @@ Full plan: [ANDROID-TV-APK-PLAN.md](./ANDROID-TV-APK-PLAN.md) · Build steps: [`
 - [ ] Create release keystore → `keystore.properties` (from example)
 - [ ] `assembleRelease` → sideload APK to testers
 - [ ] Replace vector `tv_banner` with real **320×180 PNG** brand banner
-- [ ] Optional: splash / offline error screen inside WebView
-- [ ] Optional: deep links (`glstv.site/watch/...` opens app)
+- [x] Native offline/retry screen outside WebView
+- [x] Deep links (`glstv.site/...` opens the app; production verification needs release fingerprints)
 
 ---
 

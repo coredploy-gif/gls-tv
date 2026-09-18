@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   directionalNavKey,
   isActivateKey,
+  isBackNavKey,
   isDirectionalNavKey,
   readTvOverrideFromSearch,
 } from "./tv-detect";
@@ -37,5 +38,12 @@ describe("tv-detect helpers", () => {
     expect(
       isActivateKey({ key: "Unidentified", keyCode: 23 } as KeyboardEvent),
     ).toBe(true);
+  });
+
+  it("detects browser and Android remote Back keys", () => {
+    expect(isBackNavKey({ key: "BrowserBack", keyCode: 0 } as KeyboardEvent)).toBe(true);
+    expect(isBackNavKey({ key: "GoBack", keyCode: 0 } as KeyboardEvent)).toBe(true);
+    expect(isBackNavKey({ key: "Unidentified", keyCode: 4 } as KeyboardEvent)).toBe(true);
+    expect(isBackNavKey({ key: "Enter", keyCode: 66 } as KeyboardEvent)).toBe(false);
   });
 });

@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   directionalNavKey,
   enableTvNavigation,
   isActivateKey,
+  isBackNavKey,
   isDirectionalNavKey,
   isTvLikeDevice,
   readTvOverrideFromSearch,
@@ -13,6 +15,7 @@ import {
 
 const SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), [data-tv-focus]';
+const FOCUS_MEMORY_PREFIX = "gls-tv-focus:";
 
 function isFocusable(el: Element | null): el is HTMLElement {
   return Boolean(el && (el as HTMLElement).matches?.(SELECTOR));
@@ -38,12 +41,40 @@ function syncTvDocumentMode(active: boolean) {
 
 function focusTarget(el: HTMLElement) {
   if (el === document.activeElement) return;
-  el.focus({ preventScroll: false });
+  el.focus({ preventScroll: true });
   el.scrollIntoView({
     block: "nearest",
-    inline: "nearest",
-    behavior: "smooth",
+    inline: "center",
+    behavior: "auto",
   });
+}
+
+function focusIdentity(el: HTMLElement): string | null {
+  const explicit = el.dataset.tvFocusKey;
+  if (explicit) return `key:${explicit}`;
+  if (el instanceof HTMLAnchorElement) {
+    const href = el.getAttribute("href");
+    if (href) return `href:${href}`;
+  }
+  const label = el.getAttribute("aria-label") || el.getAttribute("title");
+  if (label) return `label:${el.tagName}:${label}`;
+  return null;
+}
+
+function restoreFocus(pathname: string): boolean {
+  let identity: string | null = null;
+  try {
+    identity = window.sessionStorage.getItem(`${FOCUS_MEMORY_PREFIX}${pathname}`);
+  } catch {
+    /* private mode */
+  }
+  if (!identity) return false;
+  const target = [...document.querySelectorAll<HTMLElement>(SELECTOR)].find(
+    (element) => focusIdentity(element) === identity,
+  );
+  if (!target) return false;
+  focusTarget(target);
+  return true;
 }
 
 function firstBrowseTarget(): HTMLElement | null {
@@ -65,6 +96,8 @@ function closestFocusable(from: Element | null): HTMLElement | null {
  * draw a mouse cursor instead of sending Arrow keys (Netflix-style boxes).
  */
 export function RemoteNavigation() {
+  const pathname = usePathname();
+
   useEffect(() => {
     const applyTvMode = () => {
       if (isTvModeActive()) enableTvNavigation();
@@ -72,9 +105,13 @@ export function RemoteNavigation() {
     applyTvMode();
     const unsubscribe = subscribeTvLikeDevice(applyTvMode);
 
-    if (isTvModeActive() && !isFocusable(document.activeElement)) {
-      firstBrowseTarget()?.focus({ preventScroll: true });
-    }
+    const initialFocusTimer = window.setTimeout(() => {
+      if (!isTvModeActive()) return;
+      if (!restoreFocus(pathname) && !isFocusable(document.activeElement)) {
+        const first = firstBrowseTarget();
+        if (first) focusTarget(first);
+      }
+    }, 0);
 
     let lastPointerFocusAt = 0;
 
@@ -86,15 +123,17 @@ export function RemoteNavigation() {
         enableTvNavigation();
       }
 
-      const isBack =
-        event.key === "Escape" ||
-        event.key === "BrowserBack" ||
-        event.key === "GoBack" ||
-        (event.key === "Backspace" &&
-          !(document.activeElement as HTMLElement | null)?.matches?.(
-            "input, textarea, select, [contenteditable=true]",
-          ));
+      const inField = (document.activeElement as HTMLElement | null)?.matches?.(
+        "input, textarea, select, [contenteditable=true]",
+      );
+      const isBack = isBackNavKey(event) && !(event.key === "Backspace" && inField);
       if (isBack && isTvModeActive()) {
+        const playerBack = new CustomEvent("gls-tv-back", { cancelable: true });
+        window.dispatchEvent(playerBack);
+        if (playerBack.defaultPrevented) {
+          event.preventDefault();
+          return;
+        }
         const dialog = document.querySelector<HTMLElement>(
           '[role="dialog"][aria-modal="true"], [data-tv-back-root]',
         );
@@ -151,7 +190,10 @@ export function RemoteNavigation() {
       const origin = active.getBoundingClientRect();
       const ox = origin.left + origin.width / 2;
       const oy = origin.top + origin.height / 2;
-      const candidates = [...document.querySelectorAll<HTMLElement>(SELECTOR)]
+      const row = active.closest<HTMLElement>(".gls-row-scroll");
+      const candidateRoot =
+        row && (dir === "ArrowLeft" || dir === "ArrowRight") ? row : document;
+      const candidates = [...candidateRoot.querySelectorAll<HTMLElement>(SELECTOR)]
         .filter((element) => {
           if (element === active) return false;
           if (
@@ -166,6 +208,7 @@ export function RemoteNavigation() {
           }
           const tab = element.getAttribute("tabindex");
           if (tab === "-1") return false;
+          if (element.closest('[inert], [aria-hidden="true"]')) return false;
           return true;
         })
         .map((element) => {
@@ -205,6 +248,19 @@ export function RemoteNavigation() {
       }
     };
 
+    const onFocusIn = (event: FocusEvent) => {
+      if (!isTvModeActive()) return;
+      const target = event.target instanceof HTMLElement ? event.target : null;
+      if (!target || !isFocusable(target)) return;
+      const identity = focusIdentity(target);
+      if (!identity) return;
+      try {
+        window.sessionStorage.setItem(`${FOCUS_MEMORY_PREFIX}${pathname}`, identity);
+      } catch {
+        /* private mode */
+      }
+    };
+
     /**
      * Android TV Chrome often moves a mouse pointer. Treat the tile under
      * the pointer as the focused box so navigation feels Netflix-like even
@@ -240,14 +296,17 @@ export function RemoteNavigation() {
       capture: true,
     });
     document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener("focusin", onFocusIn, true);
 
     return () => {
+      window.clearTimeout(initialFocusTimer);
       unsubscribe();
       syncTvDocumentMode(false);
       document.removeEventListener("keydown", onKeyDown, true);
       document.removeEventListener("pointermove", onPointerMove, true);
       document.removeEventListener("pointerdown", onPointerDown, true);
+      document.removeEventListener("focusin", onFocusIn, true);
     };
-  }, []);
+  }, [pathname]);
   return null;
 }

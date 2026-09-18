@@ -5,8 +5,7 @@ import { HomeDiscoveryRail } from "@/components/HomeDiscoveryRail";
 import { HomeLibraryRows } from "@/components/HubExtras";
 import { LastChannelResume } from "@/components/LastChannelResume";
 import { getByType } from "@/data/catalog";
-import { TOP10, getPopularFirst, getUkTop } from "@/data/top10";
-import { VERIFIED_LIVE } from "@/data/verified";
+import { TOP10, getPopularFirst } from "@/data/top10";
 import {
   getAllChannels,
   getReligionChannels,
@@ -22,8 +21,6 @@ export default function BrowsePage() {
   const featured = TOP10.sports[0] ?? popular[0]!;
   const movies = getByType("movie");
   const series = getByType("series");
-  const demo = VERIFIED_LIVE.filter((c) => !c.isLive);
-  const uk = getUkTop();
   const recommended = getRelatedChannels(featured, 12);
   const allChannels = getAllChannels();
   const bySlug = new Map(allChannels.map((channel) => [channel.slug, channel]));
@@ -133,6 +130,20 @@ export default function BrowsePage() {
         />
 
         <ContentRow
+          title="Movies for tonight"
+          items={movies}
+          limit={12}
+          viewMoreHref="/movies"
+        />
+
+        <ContentRow
+          title="Binge-worthy series"
+          items={series}
+          limit={12}
+          viewMoreHref="/series"
+        />
+
+        <ContentRow
           title="Popular in South Africa"
           items={southAfricanPicks}
           limit={12}
@@ -174,13 +185,6 @@ export default function BrowsePage() {
         )}
 
         <ContentRow
-          title="Top 10 Sports"
-          items={[...TOP10.sports]}
-          ranked
-          limit={10}
-          viewMoreHref="/sports"
-        />
-        <ContentRow
           title="Top 10 News"
           items={[...TOP10.news]}
           ranked
@@ -195,36 +199,11 @@ export default function BrowsePage() {
           viewMoreHref="/food"
         />
         <ContentRow
-          title="Popular channels"
-          items={popular}
-          limit={12}
-          viewMoreHref="/live/more/popular"
-        />
-        <ContentRow
           title="Top 10 Kids · English"
           items={[...TOP10.kids]}
           ranked
           limit={10}
           viewMoreHref="/kids"
-        />
-        <ContentRow
-          title="UK picks"
-          items={uk}
-          limit={12}
-          viewMoreHref="/live/more/all?country=uk"
-        />
-        <ContentRow title="Player demo" items={demo} limit={6} />
-        <ContentRow
-          title="Movies"
-          items={movies}
-          limit={12}
-          viewMoreHref="/movies"
-        />
-        <ContentRow
-          title="Series"
-          items={series}
-          limit={12}
-          viewMoreHref="/series"
         />
       </div>
     </main>

@@ -5,7 +5,7 @@
         <item name="android:colorBackground">@color/gls_black</item>
         <item name="android:statusBarColor">@color/gls_black</item>
         <item name="android:navigationBarColor">@color/gls_black</item>
-        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowFullscreen">false</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="colorPrimary">@color/gls_red</item>
         <item name="colorPrimaryDark">@color/gls_black</item>

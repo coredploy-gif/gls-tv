@@ -1,0 +1,18 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "site.glstv.mobile",
+      "sha256_cert_fingerprints": ["MOBILE_RELEASE_CERTIFICATE_SHA256"]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "site.glstv.tv",
+      "sha256_cert_fingerprints": ["TV_RELEASE_CERTIFICATE_SHA256"]
+    }
+  }
+]

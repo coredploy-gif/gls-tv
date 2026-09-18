@@ -16,7 +16,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "site.glstv.tv"
+        applicationId = "site.glstv"
         minSdk = 21
         targetSdk = 35
         versionCode = 1
@@ -26,8 +26,28 @@ android {
         val baseUrl = (project.findProperty("glsBaseUrl") as String?)
             ?: "https://glstv.site"
         buildConfigField("String", "GLS_BASE_URL", "\"$baseUrl\"")
-        buildConfigField("String", "GLS_START_PATH", "\"/browse?tv=1\"")
-        buildConfigField("String", "GLS_USER_AGENT_SUFFIX", "\"GLSTV-AndroidTV/1.0\"")
+    }
+
+    flavorDimensions += "device"
+    productFlavors {
+        create("tv") {
+            dimension = "device"
+            applicationIdSuffix = ".tv"
+            versionNameSuffix = "-tv"
+            buildConfigField("Boolean", "GLS_TV_MODE", "true")
+            buildConfigField("String", "GLS_START_PATH", "\"/auth?tv=1&next=/profiles\"")
+            buildConfigField("String", "GLS_USER_AGENT_SUFFIX", "\"GLSTV-AndroidTV/1.0\"")
+            resValue("string", "app_name", "GLS TV")
+        }
+        create("mobile") {
+            dimension = "device"
+            applicationIdSuffix = ".mobile"
+            versionNameSuffix = "-mobile"
+            buildConfigField("Boolean", "GLS_TV_MODE", "false")
+            buildConfigField("String", "GLS_START_PATH", "\"/browse\"")
+            buildConfigField("String", "GLS_USER_AGENT_SUFFIX", "\"GLSTV-AndroidMobile/1.0\"")
+            resValue("string", "app_name", "GLS TV")
+        }
     }
 
     signingConfigs {
@@ -35,7 +55,8 @@ android {
             create("release") {
                 keyAlias = keystoreProperties["keyAlias"] as String
                 keyPassword = keystoreProperties["keyPassword"] as String
-                storeFile = file(keystoreProperties["storeFile"] as String)
+                // Resolve against the android-tv/ project root (where the .jks lives).
+                storeFile = rootProject.file(keystoreProperties["storeFile"] as String)
                 storePassword = keystoreProperties["storePassword"] as String
             }
         }
@@ -85,6 +106,6 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.activity:activity-ktx:1.9.3")
     implementation("androidx.webkit:webkit:1.12.1")
-    implementation("androidx.leanback:leanback:1.0.0")
+    "tvImplementation"("androidx.leanback:leanback:1.0.0")
     implementation("com.google.android.material:material:1.12.0")
 }

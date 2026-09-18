@@ -171,3 +171,15 @@ export function isActivateKey(event: KeyboardEvent): boolean {
   // 23 = DPAD_CENTER, 66 = ENTER
   return code === 23 || code === 66;
 }
+
+/** Browser/Android TV remote Back buttons, excluding Backspace inside fields. */
+export function isBackNavKey(event: KeyboardEvent): boolean {
+  const key = event.key;
+  if (key === "Escape" || key === "BrowserBack" || key === "GoBack") {
+    return true;
+  }
+  if (key === "Backspace") return true;
+  const code = event.keyCode || (event as KeyboardEvent & { which?: number }).which || 0;
+  // Android KEYCODE_BACK.
+  return code === 4;
+}

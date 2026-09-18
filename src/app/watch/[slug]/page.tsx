@@ -67,10 +67,10 @@ export default async function WatchPage({ params }: Props) {
       <BrowseNav />
 
       {/* Clear of fixed nav + mobile tab strip */}
-      <div className="mx-auto max-w-[1400px] px-4 pt-28 sm:px-8 sm:pt-28 lg:px-12 lg:pt-24">
+      <div className="gls-watch-shell mx-auto max-w-[1600px] px-4 pt-28 sm:px-8 sm:pt-28 lg:px-12 lg:pt-24">
         <WatchBackButton fallbackHref={fallbackHref} label="Back" />
 
-        <div className="mt-4 overflow-hidden rounded-sm border border-white/10 shadow-2xl shadow-black/60">
+        <div className="gls-watch-player mt-4 overflow-hidden rounded-sm border border-white/10 shadow-2xl shadow-black/60">
           <VideoPlayer
             item={item}
             prevChannel={prevChannel}

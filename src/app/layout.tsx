@@ -81,7 +81,7 @@ export default function RootLayout({
               <RemoteNavigation />
               <ReminderBanner />
               {children}
-              <footer className="mt-auto border-t border-white/10 px-4 py-8">
+              <footer className="gls-app-footer mt-auto border-t border-white/10 px-4 py-8">
                 <ManagedSystemLinks placement="footer" />
               </footer>
               <SupportChatWidget />

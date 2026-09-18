@@ -4,4 +4,5 @@
     <color name="gls_red">#FFE50914</color>
     <color name="gls_pink">#FFFF6B9D</color>
     <color name="gls_white">#FFFFFFFF</color>
+    <color name="gls_muted">#FFB3B3B3</color>
 </resources>

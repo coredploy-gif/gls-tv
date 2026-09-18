@@ -29,6 +29,9 @@
   --gls-glass-border: rgba(255, 255, 255, 0.14);
   --background: var(--gls-black);
   --foreground: var(--gls-ink);
+  --gls-tv-safe-x: max(3rem, env(safe-area-inset-left));
+  --gls-tv-safe-right: max(3rem, env(safe-area-inset-right));
+  --gls-tv-safe-y: max(2rem, env(safe-area-inset-top));
 }
 
 @theme inline {
@@ -95,6 +98,125 @@ html[data-tv="1"] *,
 html.gls-tv-nav,
 html.gls-tv-nav * {
   cursor: none !important;
+}
+
+/* Ten-foot sizing: Android/Google TV browsers commonly expose 1080p+ CSS viewports. */
+@media (min-width: 1600px) and (min-height: 800px) {
+  html[data-tv="1"],
+  html.gls-tv-nav {
+    font-size: clamp(16px, 1vw, 20px);
+  }
+}
+
+html[data-tv="1"] .gls-row-scroll,
+html.gls-tv-nav .gls-row-scroll {
+  scroll-padding-inline: max(3rem, env(safe-area-inset-left));
+  gap: clamp(0.75rem, 1vw, 1.25rem);
+  padding-left: var(--gls-tv-safe-x);
+  padding-right: var(--gls-tv-safe-right);
+  padding-bottom: 1.5rem;
+}
+
+html[data-tv="1"] .gls-row-scroll > .gls-tile,
+html.gls-tv-nav .gls-row-scroll > .gls-tile {
+  width: clamp(9.5rem, 13.5vw, 16rem);
+}
+
+html[data-tv="1"] .gls-row-heading,
+html.gls-tv-nav .gls-row-heading,
+html[data-tv="1"] .gls-home-discovery,
+html.gls-tv-nav .gls-home-discovery,
+html[data-tv="1"] .gls-hero-content,
+html.gls-tv-nav .gls-hero-content,
+html[data-tv="1"] .gls-watch-shell,
+html.gls-tv-nav .gls-watch-shell,
+html[data-tv="1"] .gls-app-footer,
+html.gls-tv-nav .gls-app-footer {
+  padding-left: var(--gls-tv-safe-x);
+  padding-right: var(--gls-tv-safe-right);
+}
+
+html[data-tv="1"] .gls-app-header-inner,
+html.gls-tv-nav .gls-app-header-inner {
+  max-width: none;
+  height: clamp(4.5rem, 7.5vh, 6rem);
+  padding-left: var(--gls-tv-safe-x);
+  padding-right: var(--gls-tv-safe-right);
+}
+
+html[data-tv="1"] .gls-desktop-nav,
+html.gls-tv-nav .gls-desktop-nav {
+  display: flex;
+  scroll-padding-inline: 1rem;
+}
+
+html[data-tv="1"] .gls-header-actions,
+html.gls-tv-nav .gls-header-actions {
+  padding-left: 0.5rem;
+  background: linear-gradient(90deg, transparent, rgba(7, 7, 11, 0.96) 18%);
+}
+
+html[data-tv="1"] .gls-hero,
+html.gls-tv-nav .gls-hero {
+  height: min(86vh, 60rem);
+  min-height: min(34rem, 82vh);
+}
+
+html[data-tv="1"] .gls-watch-shell,
+html.gls-tv-nav .gls-watch-shell {
+  padding-top: max(6.5rem, calc(var(--gls-tv-safe-y) + 4.5rem));
+}
+
+html[data-tv="1"] .gls-watch-player,
+html.gls-tv-nav .gls-watch-player {
+  border-radius: 0.75rem;
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.72);
+}
+
+html[data-tv="1"] input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+html[data-tv="1"] select,
+html[data-tv="1"] textarea,
+html.gls-tv-nav input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+html.gls-tv-nav select,
+html.gls-tv-nav textarea {
+  min-height: 3.25rem;
+  font-size: max(1rem, 16px);
+  padding-inline: 1rem;
+}
+
+html[data-tv="1"] [role="dialog"],
+html.gls-tv-nav [role="dialog"] {
+  max-width: min(82vw, 72rem);
+  max-height: 82vh;
+  border-radius: 1rem;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Text chat is a phone/desktop surface; TV users retain the full Support page. */
+html[data-tv="1"] .gls-support-widget,
+html.gls-tv-nav .gls-support-widget {
+  display: none;
+}
+
+@media (max-height: 760px) {
+  html[data-tv="1"] .gls-hero,
+  html.gls-tv-nav .gls-hero {
+    height: 92vh;
+    min-height: 32rem;
+  }
+
+  html[data-tv="1"] .gls-row-scroll > .gls-tile,
+  html.gls-tv-nav .gls-row-scroll > .gls-tile {
+    width: clamp(8.5rem, 12.5vw, 12rem);
+  }
+}
+
+@media (min-width: 2400px) {
+  html[data-tv="1"] .gls-row-scroll > .gls-tile,
+  html.gls-tv-nav .gls-row-scroll > .gls-tile {
+    width: clamp(15rem, 11vw, 21rem);
+  }
 }
 
 /* Don’t slap a generic outline on every control — use per-component bubbles. */
@@ -441,6 +563,29 @@ html.gls-tv-nav header button:focus-visible {
 .gls-row-scroll::-webkit-scrollbar-thumb {
   background: linear-gradient(90deg, var(--gls-red), var(--gls-pink));
   border-radius: 999px;
+}
+
+/* Mobile category navigation should feel like a streaming-app rail, not a browser pane. */
+.gls-nav-scroll {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 2rem), transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 2rem), transparent 100%);
+}
+
+.gls-nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 639px), (pointer: coarse) {
+  .gls-row-scroll {
+    scrollbar-width: none;
+  }
+
+  .gls-row-scroll::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .gls-tile {
@@ -888,6 +1033,79 @@ html.gls-tv-nav header button:focus-visible {
   height: 0.35rem;
   cursor: pointer;
   accent-color: var(--gls-red);
+}
+
+.gls-player-panel {
+  pointer-events: auto;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(18px);
+}
+
+.gls-player-guide-item,
+.gls-player-guide-current {
+  display: flex;
+  min-height: 4.75rem;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.2rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.8rem 1rem;
+  color: #fff;
+  text-align: left;
+}
+
+.gls-player-guide-item span,
+.gls-player-guide-current span {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.gls-player-guide-item strong,
+.gls-player-guide-current strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gls-player-guide-current {
+  border-color: rgba(229, 9, 20, 0.65);
+  background: rgba(229, 9, 20, 0.2);
+  text-align: center;
+}
+
+.gls-player-guide-current small {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.gls-player-guide-item:hover,
+.gls-player-guide-item:focus-visible {
+  border-color: #fff;
+  background: #fff;
+  color: #111;
+}
+
+html[data-tv="1"] .gls-player-bar,
+html.gls-tv-nav .gls-player-bar {
+  padding: 2rem var(--gls-tv-safe-right) max(2rem, env(safe-area-inset-bottom)) var(--gls-tv-safe-x);
+}
+
+html[data-tv="1"] .gls-player-btn,
+html.gls-tv-nav .gls-player-btn {
+  min-height: 3.25rem;
+  min-width: 3.25rem;
+  padding-inline: 1.15rem;
+  font-size: 0.8rem;
+}
+
+html[data-tv="1"] .gls-player-panel,
+html.gls-tv-nav .gls-player-panel {
+  max-height: min(34vh, 22rem);
+  overflow-y: auto;
 }
 
 .gls-player-status {

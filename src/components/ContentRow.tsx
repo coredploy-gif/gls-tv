@@ -41,6 +41,7 @@ export function ContentRow({
   if (!items.length) return null;
 
   const visible = items.slice(0, limit);
+  const remainingCount = Math.max(0, items.length - visible.length);
   const hasMore =
     Boolean(viewMoreHref) &&
     (alwaysShowViewMore || items.length > limit);
@@ -54,7 +55,7 @@ export function ContentRow({
 
   return (
     <section className="group/row relative z-10 mb-10 sm:mb-12">
-      <div className="mb-3 flex items-center justify-between gap-3 px-4 sm:px-8 lg:px-12">
+      <div className="gls-row-heading mb-3 flex items-center justify-between gap-3 px-4 sm:px-8 lg:px-12">
         <div className="flex min-w-0 items-baseline gap-3">
           <h2 className="truncate bg-gradient-to-r from-white via-white to-gls-pink-soft/80 bg-clip-text text-lg font-semibold tracking-[-0.02em] text-transparent sm:text-xl">
             {title}
@@ -62,6 +63,7 @@ export function ContentRow({
           {hasMore && (
             <Link
               href={viewMoreHref!}
+              aria-label={`View more ${title}`}
               className="shrink-0 text-sm font-medium text-gls-pink/80 transition hover:text-gls-pink-soft"
             >
               {viewMoreLabel}
@@ -145,13 +147,16 @@ export function ContentRow({
           {hasMore && (
             <Link
               href={viewMoreHref!}
-              className="gls-tile flex aspect-[2/3] w-[46vw] shrink-0 flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-white/25 bg-white/5 text-sm font-semibold text-white transition hover:border-gls-red hover:bg-gls-red/15 sm:w-[30vw] md:w-[20vw] lg:w-[15.5vw] xl:w-[13.8vw]"
+              aria-label={`View more ${title}`}
+              className="gls-tile group/more flex aspect-[2/3] w-[46vw] shrink-0 flex-col items-center justify-center gap-3 overflow-hidden rounded-md border border-white/15 bg-[radial-gradient(circle_at_50%_35%,rgba(255,107,157,0.22),transparent_38%),linear-gradient(145deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] text-sm font-semibold text-white shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition hover:border-gls-pink/55 sm:w-[30vw] md:w-[20vw] lg:w-[15.5vw] xl:w-[13.8vw]"
             >
-              <span className="text-2xl">›</span>
-              View more
-              <span className="text-xs font-normal text-gls-muted">
-                +{items.length - limit}
-              </span>
+              <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/25 text-3xl transition group-hover/more:scale-110 group-hover/more:bg-white group-hover/more:text-black">›</span>
+              <span>View more</span>
+              {remainingCount > 0 && (
+                <span className="text-xs font-normal text-gls-muted">
+                  +{remainingCount} titles
+                </span>
+              )}
             </Link>
           )}
         </div>

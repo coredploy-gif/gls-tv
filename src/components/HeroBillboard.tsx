@@ -9,13 +9,13 @@ type HeroBillboardProps = {
 
 export function HeroBillboard({ item }: HeroBillboardProps) {
   return (
-    <section className="relative h-[82vh] min-h-[560px] w-full overflow-hidden sm:h-[90vh] sm:min-h-[640px]">
+    <section className="gls-hero relative h-[82vh] min-h-[560px] w-full overflow-hidden sm:h-[90vh] sm:min-h-[640px]">
       <HeroBackdrop item={item} />
       <HeroPreview item={item} />
       <div className="gls-hero-mask absolute inset-0" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_15%,rgba(10,10,10,0.5)_100%)]" />
 
-      <div className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col justify-end px-4 pb-28 pt-28 sm:px-8 sm:pb-36 lg:px-12">
+      <div className="gls-hero-content relative z-10 mx-auto flex h-full max-w-[1600px] flex-col justify-end px-4 pb-28 pt-28 sm:px-8 sm:pb-36 lg:px-12">
         <div className="gls-animate-in max-w-2xl">
           {item.isLive && (
             <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-gls-pink/30 bg-gls-pink/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-gls-pink-soft backdrop-blur-md">

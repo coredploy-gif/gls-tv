@@ -1,84 +1,81 @@
-# GLS TV — Android TV APK
+# GLS TV — Android phone and TV apps
 
-Professional **leanback WebView shell** for Android TV / Google TV.  
-Loads the live GLS site (`https://glstv.site`) with `?tv=1` forced — same QR login, D-pad focus, and catalog as the web app, with a real TV launcher icon.
+One Android project produces two purpose-built apps backed by the live GLS TV site.
+
+| Variant | Package | Experience |
+|---|---|---|
+| TV | `site.glstv.tv` | Landscape, immersive, D-pad/remote-first, opens QR sign-in |
+| Mobile | `site.glstv.mobile` | Touch-first phone app, receives QR pairing links |
+
+The TV does not need a camera. It displays a QR code; the viewer scans it with a signed-in phone, approves the TV, and the TV completes sign-in.
 
 ## Requirements
 
-- [Android Studio](https://developer.android.com/studio) (Ladybug / 2024.2+ recommended)
-- JDK 17 (bundled with Android Studio)
-- Android SDK 35 + an Android TV emulator **or** a physical stick with USB/network debugging
+- Android Studio with JDK 17
+- Android SDK 35
+- Android TV emulator or physical TV/stick for remote testing
+- Phone/emulator for the mobile pairing flow
 
-This machine may not have the SDK installed — open the `android-tv/` folder in Android Studio on a build PC.
+Open the `android-tv/` folder in Android Studio and let Gradle sync. This checkout does not include the generated Gradle wrapper binary; Android Studio can use its configured Gradle installation or generate a wrapper.
 
-## Open & build
+## Build variants
 
-1. **File → Open** → select `android-tv/` (not the Next.js repo root).
-2. Let Gradle sync (first sync downloads the wrapper + deps).
-3. Create an **Android TV** virtual device (API 30+) or plug in a stick (`adb devices`).
-4. Run **app** (debug) or build release:
+Select a variant in **Build > Select Build Variant**:
 
-```bash
-cd android-tv
-# Debug APK
-./gradlew assembleDebug
+- `tvDebug` / `tvRelease`
+- `mobileDebug` / `mobileRelease`
 
-# Release APK (needs keystore.properties — see below)
-./gradlew assembleRelease
+With a generated Gradle wrapper, command-line builds are:
+
+```powershell
+gradlew.bat assembleTvDebug
+gradlew.bat assembleMobileDebug
+gradlew.bat bundleTvRelease
+gradlew.bat bundleMobileRelease
 ```
 
-Outputs:
+Typical APK outputs:
 
-- Debug: `app/build/outputs/apk/debug/app-debug.apk`
-- Release: `app/build/outputs/apk/release/app-release.apk`
+- `app/build/outputs/apk/tv/debug/app-tv-debug.apk`
+- `app/build/outputs/apk/mobile/debug/app-mobile-debug.apk`
+- `app/build/outputs/apk/tv/release/app-tv-release.apk`
+- `app/build/outputs/apk/mobile/release/app-mobile-release.apk`
 
-### Staging / local URL
+Override the production site for a preview build with `-PglsBaseUrl=https://your-preview.vercel.app`.
 
-```bash
-./gradlew assembleDebug -PglsBaseUrl=https://your-preview.vercel.app
-```
+## Test QR sign-in
 
-## Signing (release / sideload)
+1. Install and open the TV variant. It starts at `/auth?tv=1&next=/profiles`.
+2. Choose **Scan QR to sign in** if the QR is not already visible.
+3. Scan the code with the phone camera. The verified `https://glstv.site/...` link opens the mobile app when installed, or the browser otherwise.
+4. Sign in on the phone and approve the TV.
+5. Confirm the TV continues to profile selection and that Back closes overlays/player before leaving the app.
 
-```bash
-keytool -genkey -v -keystore gls-tv-release.jks -alias glstv \
-  -keyalg RSA -keysize 2048 -validity 10000
-```
+The web app owns the short-lived device code, approval, polling, and session exchange. The Android apps never place passwords in the QR code.
 
-Copy `keystore.properties.example` → `keystore.properties` and fill paths/passwords.  
-**Never commit** `.jks` or `keystore.properties`.
+## Offline recovery
 
-## Sideload on a TV stick
+If the initial page cannot load or production returns a server error, the app displays a native GLS TV recovery screen instead of the browser error page. **Try again** reloads the last safe GLS URL and is focusable from a TV remote. Account and saved-list data remain server-side.
 
-```bash
-adb connect <tv-ip>:5555
-adb install -r app/build/outputs/apk/release/app-release.apk
-```
+## Remote and media controls
 
-Find **GLS TV** on the Android TV home / Apps row (leanback banner).
+The TV shell normalizes common Android TV, soundbar, and Bluetooth controls. Play/Pause and Stop control playback; Rewind/Fast-forward seek on-demand video; Channel Up/Down and Previous/Next switch live channels when adjacent channels are available. Android Media Session metadata, playback state, and on-demand progress are also exposed to system and lock-screen controls.
 
-## What this APK includes
+## Verified app links
 
-| Feature | Detail |
-|---------|--------|
-| Package | `site.glstv.tv` |
-| Launcher | `LEANBACK_LAUNCHER` + phone `LAUNCHER` for testing |
-| Banner | `tv_banner` 320×180 leanback asset |
-| Start URL | `https://glstv.site/browse?tv=1` |
-| UA suffix | `GLSTV-AndroidTV/1.0` (web detects TV mode) |
-| Back | Web history, then exit; exits HTML5 fullscreen first |
-| Media | Autoplay allowed; immersive landscape |
-| Security | HTTPS only (`usesCleartextTraffic=false`) |
+Android requires `https://glstv.site/.well-known/assetlinks.json` before pairing links can open directly in the mobile app without a chooser. Use `assetlinks.json.example` as the template and replace each SHA-256 placeholder with the certificate fingerprint used to sign that package. Do not deploy the placeholders.
 
-## What stays on the web
+## Release signing
 
-Catalog, player, membership, QR TV login, remote focus CSS — all in Next.js.  
-Update the site → every installed APK picks it up (no store resubmit for content).
+Copy `keystore.properties.example` to `keystore.properties` and enter the release keystore values. Never commit the keystore, its passwords, or `keystore.properties`. Keep the same key for updates or Android will treat the build as a different app.
 
-## Play Store / Google TV (later)
+## TV quality checklist
 
-1. Build AAB: `./gradlew bundleRelease`
-2. Play Console → TV screenshots + banner + TV checklist
-3. Expect streaming / aggregator policy review
+- Navigate every visible control using only D-pad, Select, Back, Play/Pause, and Menu.
+- Verify focus never disappears off-screen and the focused tile is obvious at sofa distance.
+- Confirm QR sign-in on a fresh install and session restoration after restart.
+- Test 720p, 1080p, and 4K TV layouts plus a small phone.
+- Confirm HTML5 fullscreen exits before Back navigates away.
+- Test expired/invalid device codes and offline recovery.
 
-See also: `docs/ANDROID-TV-APK-PLAN.md`
+The current workstation does not have Java, Android SDK, Gradle, or ADB installed, so final APK compilation and device testing must be done in Android Studio or CI.

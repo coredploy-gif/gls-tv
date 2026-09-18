@@ -32,6 +32,7 @@ function NavLink({
     <Link
       href={href}
       data-tv-focus
+      data-tv-focus-key={`nav:${href}`}
       className={`gls-nav-link whitespace-nowrap text-sm ${
         active ? "is-active" : ""
       } ${className}`}
@@ -62,15 +63,16 @@ export function BrowseNav() {
 
   return (
     <header
+      data-tv-shell-header
       className={`fixed inset-x-0 top-0 z-40 transition-[background,box-shadow] duration-300 ${
         scrolled
           ? "border-b border-white/[0.06] bg-[#07070b]/80 shadow-[0_8px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl"
           : "gls-nav-blur"
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-4 px-4 sm:h-[68px] sm:gap-6 sm:px-8 lg:px-12">
+      <div className="gls-app-header-inner mx-auto flex h-16 max-w-[1600px] items-center gap-4 px-4 sm:h-[68px] sm:gap-6 sm:px-8 lg:px-12">
         <GlsLogo size="sm" href="/browse" glass />
-        <nav className="hidden items-center gap-3.5 lg:flex xl:gap-4.5">
+        <nav className="gls-desktop-nav gls-nav-scroll hidden min-w-0 flex-1 items-center gap-3.5 overflow-x-auto lg:flex xl:gap-4.5" aria-label="Primary navigation">
           {BROWSE_NAV.map((link) => {
             const active =
               pathname === link.href ||
@@ -85,7 +87,7 @@ export function BrowseNav() {
           })}
         </nav>
         <ManagedSystemLinks placement="nav" />
-        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+        <div className="gls-header-actions ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
           {isAdmin && (
             <Link
               href="/admin"
@@ -128,7 +130,7 @@ export function BrowseNav() {
           <HeaderRefreshButton />
         </div>
       </div>
-      <nav className="flex gap-4 overflow-x-auto px-4 pb-3 lg:hidden" aria-label="Browse categories">
+      <nav className="gls-nav-scroll flex gap-5 overflow-x-auto px-4 pb-3 lg:hidden" aria-label="Browse categories">
         {BROWSE_NAV.map((link) => {
           const active =
             pathname === link.href ||

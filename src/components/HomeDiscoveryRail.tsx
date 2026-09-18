@@ -41,7 +41,7 @@ const DESTINATIONS = [
 /** Compact Netflix-style destinations directly below the billboard. */
 export function HomeDiscoveryRail() {
   return (
-    <section className="relative z-20 px-4 pb-8 sm:px-8 lg:px-12">
+    <section className="gls-home-discovery relative z-20 px-4 pb-8 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-[1600px]">
         <div className="mb-3 flex items-end justify-between gap-4">
           <div>
@@ -52,8 +52,8 @@ export function HomeDiscoveryRail() {
               What are you in the mood for?
             </h2>
           </div>
-          <Link href="/search" className="text-sm text-white/65 transition hover:text-white">
-            Search everything →
+          <Link href="/search" className="shrink-0 text-sm text-white/65 transition hover:text-white">
+            <span className="hidden sm:inline">Search everything </span>→
           </Link>
         </div>
 
@@ -63,6 +63,7 @@ export function HomeDiscoveryRail() {
               key={item.href}
               href={item.href}
               data-tv-focus
+              data-tv-focus-key={`destination:${item.href}`}
               className="group relative h-28 min-w-[210px] flex-1 overflow-hidden rounded-xl border border-white/15 bg-white/[0.04] p-4 shadow-[0_12px_32px_rgba(0,0,0,0.35)] transition duration-300 hover:-translate-y-1 hover:border-white/35 hover:shadow-[0_18px_42px_rgba(0,0,0,0.5)] sm:min-w-[230px]"
             >
               <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-25 transition duration-300 group-hover:opacity-45`} />
