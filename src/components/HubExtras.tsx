@@ -16,6 +16,7 @@ import {
   filterByCountry,
   getHub,
   getHubChannels,
+  getRelatedChannels,
   popularFirst,
   type HubKey,
 } from "@/lib/hubs";
@@ -96,11 +97,24 @@ export function HomeLibraryRows() {
   const favorites = lib.favorites
     .map((s) => getChannelBySlug(s))
     .filter((i): i is CatalogItem => Boolean(i));
+  const recommendationSeed = favorites[0] || continueItems[0] || myList[0];
+  const excluded = new Set([
+    ...lib.favorites,
+    ...lib.myList,
+    ...lib.continueWatching.map((item) => item.slug),
+  ]);
+  const recommendations = recommendationSeed
+    ? getRelatedChannels(recommendationSeed, 24).filter(
+        (item) =>
+          !excluded.has(item.slug) &&
+          (item.categories.includes("Playable") ||
+            item.categories.includes("Verified") ||
+            item.sources.some((source) => Boolean(source.url))),
+      )
+    : [];
 
   return (
     <>
-      <MyLinksHomeRow />
-      <MyPlaylistHomeRow />
       {continueItems.length > 0 && (
         <ContentRow
           title="Continue Watching"
@@ -119,6 +133,16 @@ export function HomeLibraryRows() {
           viewMoreHref="/my-list?tab=favorites"
         />
       )}
+      {recommendations.length > 0 && recommendationSeed && (
+        <ContentRow
+          title={`Because you watched ${recommendationSeed.title}`}
+          items={recommendations}
+          viewMoreHref={`/search?q=${encodeURIComponent(recommendationSeed.categories[0] || recommendationSeed.title)}`}
+          viewMoreLabel="Explore more ›"
+        />
+      )}
+      <MyLinksHomeRow />
+      <MyPlaylistHomeRow />
     </>
   );
 }

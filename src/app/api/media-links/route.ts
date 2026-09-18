@@ -175,6 +175,7 @@ export async function PATCH(req: Request) {
     category?: string;
     is_favorite?: boolean;
     mark_watched?: boolean;
+    recheck?: boolean;
   };
   try {
     body = await req.json();
@@ -186,6 +187,34 @@ export async function PATCH(req: Request) {
   }
 
   const updates: Record<string, unknown> = {};
+  let recheckDetail: string | null = null;
+  if (body.recheck === true) {
+    const { data: existing, error: lookupError } = await supabase
+      .from("user_media_links")
+      .select("url, format, metadata")
+      .eq("id", body.id)
+      .eq("user_id", user.id)
+      .single();
+    if (lookupError || !existing) {
+      return NextResponse.json({ error: "Link not found" }, { status: 404 });
+    }
+
+    const probe = await probeMediaLinkReachability(
+      existing.url,
+      existing.format,
+      { requestOrigin: new URL(req.url).origin },
+    );
+    updates.status = probe.status;
+    updates.last_checked_at = new Date().toISOString();
+    updates.metadata = {
+      ...(existing.metadata && typeof existing.metadata === "object"
+        ? existing.metadata
+        : {}),
+      probe: probe.detail || (probe.ok ? "Reachable" : "Unreachable"),
+    };
+    if (probe.format) updates.format = probe.format;
+    recheckDetail = probe.detail || (probe.ok ? "Reachable" : "Unreachable");
+  }
   if (typeof body.title === "string") {
     const title = body.title.trim().slice(0, 200);
     if (!title) {
@@ -217,7 +246,7 @@ export async function PATCH(req: Request) {
   if (error || !data) {
     return NextResponse.json({ error: "Could not update link" }, { status: 500 });
   }
-  return NextResponse.json({ link: data });
+  return NextResponse.json({ link: data, probe: recheckDetail ? { detail: recheckDetail } : undefined });
 }
 
 export async function DELETE(req: Request) {

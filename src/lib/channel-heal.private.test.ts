@@ -5,8 +5,17 @@ import {
   isFragileHost,
   primaryPrivateHealUrl,
 } from "@/lib/channel-heal";
+import { isImportedPayLinearLink } from "@/lib/sports-packs";
 
 describe("private playlist open heals", () => {
+  it("keeps imported pay-linear links out of public staff picks", () => {
+    expect(isImportedPayLinearLink({ title: "TSN 1 _ Sports", category: "Imported" })).toBe(true);
+    expect(isImportedPayLinearLink({ title: "ESPN", category: "Imported" })).toBe(true);
+    expect(isImportedPayLinearLink({ title: "ESPN8 The Ocho", category: "Imported" })).toBe(false);
+    expect(isImportedPayLinearLink({ title: "TSN The Ocho", category: "Imported" })).toBe(false);
+    expect(isImportedPayLinearLink({ title: "TSN 1", category: "Licensed" })).toBe(false);
+  });
+
   it("exposes FTA packs for SABC / LN24 / Hope / WildEarth", () => {
     expect(healPackFor("sabc3-za-sd", "SABC 3")?.[0]?.url).toContain(
       "mangomolo.com",

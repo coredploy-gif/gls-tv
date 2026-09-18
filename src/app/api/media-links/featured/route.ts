@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountEntitlement } from "@/lib/membership/account";
+import { isImportedPayLinearLink } from "@/lib/sports-packs";
 
 /** Published admin-curated links for members (separate from licensed catalog). */
 export async function GET() {
@@ -27,7 +28,7 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    links: data ?? [],
+    links: (data ?? []).filter((link) => !isImportedPayLinearLink(link)),
     entitled: entitlement.allowed,
   });
 }

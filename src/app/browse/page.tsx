@@ -1,12 +1,17 @@
 import { BrowseNav } from "@/components/BrowseNav";
 import { ContentRow } from "@/components/ContentRow";
 import { HeroBillboard } from "@/components/HeroBillboard";
+import { HomeDiscoveryRail } from "@/components/HomeDiscoveryRail";
 import { HomeLibraryRows } from "@/components/HubExtras";
 import { LastChannelResume } from "@/components/LastChannelResume";
 import { getByType } from "@/data/catalog";
 import { TOP10, getPopularFirst, getUkTop } from "@/data/top10";
 import { VERIFIED_LIVE } from "@/data/verified";
-import { getAllChannels, getReligionChannels } from "@/lib/channels";
+import {
+  getAllChannels,
+  getReligionChannels,
+  getSportsChannels,
+} from "@/lib/channels";
 import { getRelatedChannels } from "@/lib/hubs";
 import { getMalawiBrowseItems, getAfricaRadioBrowseItems } from "@/lib/radio";
 import { getReligionBrowseItems } from "@/lib/religion";
@@ -79,16 +84,53 @@ export default function BrowsePage() {
   const malawiItems = getMalawiBrowseItems();
   const africaRadioItems = getAfricaRadioBrowseItems();
   const religionItems = getReligionBrowseItems(getReligionChannels());
+  const freeSportsPriority = [
+    "espn8-the-ocho",
+    "tsntheocho-ca-sd",
+    "beinsportsxtra-us-sd",
+    "red-bull-tv",
+    "fifaplus-uk-unitedstates",
+    "fifapluswomen-uk-english",
+    "tennischannel-us-sd",
+    "stadium-us-sd",
+    "floracing-us-hd",
+    "pgatour-us-sd",
+    "womenssportsnetwork-us-sd",
+    "worldpokertour-us-uk",
+  ];
+  const sports = getSportsChannels();
+  const freeSports = [
+    ...freeSportsPriority
+      .map((slug) => sports.find((channel) => channel.slug === slug))
+      .filter((channel): channel is NonNullable<typeof channel> => Boolean(channel)),
+    ...sports.filter(
+      (channel) =>
+        channel.categories.includes("Playable") &&
+        !freeSportsPriority.includes(channel.slug),
+    ),
+  ].filter(
+    (channel, index, list) =>
+      list.findIndex((candidate) => candidate.slug === channel.slug) === index,
+  );
 
   return (
-    <main className="min-h-screen bg-gls-black pb-20">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_80%_12%,rgba(229,9,20,0.12),transparent_26%),linear-gradient(180deg,#080808_0%,#0d0d0d_48%,#080808_100%)] pb-20">
       <BrowseNav />
       <HeroBillboard item={featured} />
       <div className="relative z-20 -mt-20 space-y-2">
         <div className="px-4 sm:px-8 lg:px-12">
           <LastChannelResume />
         </div>
+        <HomeDiscoveryRail />
         <HomeLibraryRows />
+
+        <ContentRow
+          title="Free live sports · On now"
+          items={freeSports}
+          limit={12}
+          viewMoreHref="/sports"
+          alwaysShowViewMore
+        />
 
         <ContentRow
           title="Popular in South Africa"

@@ -34,6 +34,7 @@ import {
   type LiveChannelKind,
 } from "@/lib/live-playback-policy";
 import { isRawMpegTsGateway } from "@/lib/media-path";
+import { buildPlaybackMetric, sendPlaybackMetric } from "@/lib/playback-telemetry";
 
 export type PlayerNeighbor = {
   href: string;
@@ -69,6 +70,7 @@ function requiresProxy(url: string) {
  * cleartext — /api/hls is required whenever the origin lacks CORS.
  */
 function canPlayCleartextDirect(_streamUrl: string) {
+  void _streamUrl;
   return false;
 }
 
@@ -419,6 +421,36 @@ export function VideoPlayer({
   const source = sources[sourceIndex];
 
   useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !source) return;
+    const startedAt = performance.now();
+    let startupSent = false;
+    let waitingAt: number | null = null;
+    const send = (event: "startup" | "rebuffer" | "media_error", durationMs = 0) =>
+      sendPlaybackMetric(buildPlaybackMetric({ event, slug: item.slug, durationMs, sourceIndex, mode }));
+    const onWaiting = () => { waitingAt = performance.now(); };
+    const onPlaying = () => {
+      const current = performance.now();
+      if (!startupSent) {
+        startupSent = true;
+        send("startup", current - startedAt);
+      } else if (waitingAt !== null && current - waitingAt >= 500) {
+        send("rebuffer", current - waitingAt);
+      }
+      waitingAt = null;
+    };
+    const onError = () => send("media_error");
+    video.addEventListener("waiting", onWaiting);
+    video.addEventListener("playing", onPlaying);
+    video.addEventListener("error", onError);
+    return () => {
+      video.removeEventListener("waiting", onWaiting);
+      video.removeEventListener("playing", onPlaying);
+      video.removeEventListener("error", onError);
+    };
+  }, [item.slug, mode, source, sourceIndex]);
+
+  useEffect(() => {
     const next = initialPick(item, sortedSources(item));
     queueMicrotask(() => {
       setSourceIndex(next.index);
@@ -477,10 +509,16 @@ export function VideoPlayer({
       navigator.mediaSession.setActionHandler("pause", () => {
         videoRef.current?.pause();
       });
+      navigator.mediaSession.setActionHandler("previoustrack", () => {
+        if (prevChannel) window.location.assign(prevChannel.href);
+      });
+      navigator.mediaSession.setActionHandler("nexttrack", () => {
+        if (nextChannel) window.location.assign(nextChannel.href);
+      });
     } catch {
       /* ignore */
     }
-  }, [item.title, item.poster, item.isLive]);
+  }, [item.title, item.poster, item.isLive, nextChannel, prevChannel]);
 
   // AirPlay / remote playback: allow wireless targets on Safari & Chromium
   useEffect(() => {
@@ -1513,6 +1551,7 @@ export function VideoPlayer({
     <div className="gls-player-stage relative aspect-video w-full overflow-hidden bg-black">
       <video
         ref={videoRef}
+        aria-label={`${item.title} video player`}
         className="h-full w-full bg-black"
         autoPlay
         playsInline
@@ -1595,6 +1634,24 @@ export function VideoPlayer({
                 Try again
               </button>
             )}
+            {prevChannel && (
+              <Link
+                href={prevChannel.href}
+                data-tv-focus
+                className="rounded border border-white/20 px-4 py-2 text-sm text-white hover:border-white"
+              >
+                ← {prevChannel.title}
+              </Link>
+            )}
+            {nextChannel && (
+              <Link
+                href={nextChannel.href}
+                data-tv-focus
+                className="rounded border border-white/20 px-4 py-2 text-sm text-white hover:border-white"
+              >
+                {nextChannel.title} →
+              </Link>
+            )}
           </div>
         </div>
       )}
@@ -1649,6 +1706,8 @@ export function VideoPlayer({
             videoRef={videoRef}
             isLive={Boolean(item.isLive)}
             title={item.title}
+            poster={item.poster}
+            telemetrySlug={item.slug}
             format={source?.format}
             prevChannel={prevChannel}
             nextChannel={nextChannel}

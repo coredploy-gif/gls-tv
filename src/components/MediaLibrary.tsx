@@ -537,6 +537,7 @@ function MediaLibraryInner() {
                 thumbnailUrl={link.thumbnail_url}
                 href={`/library/featured/${link.id}`}
                 badge="Staff"
+                sourceLabel="GLS pick"
                 onReport={() => void reportLink(link, "admin_media_link")}
               />
             ))}

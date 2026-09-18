@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   isLikelyIptvStreamPath,
   isRawMpegTsGateway,
+  shouldSkipUnboundedMediaBodyDownload,
 } from "@/lib/media-path";
 
 describe("media-path", () => {
@@ -30,5 +31,11 @@ describe("media-path", () => {
   it("still flags /live/ paths as IPTV stream paths", () => {
     expect(isLikelyIptvStreamPath("/live/user/pass/1")).toBe(true);
     expect(isLikelyIptvStreamPath("/play/a03o")).toBe(true);
+  });
+
+  it("only skips continuous transport streams, not HLS manifests", () => {
+    expect(shouldSkipUnboundedMediaBodyDownload("http://example.com/play/token123")).toBe(true);
+    expect(shouldSkipUnboundedMediaBodyDownload("http://example.com/live/index.m3u8")).toBe(false);
+    expect(shouldSkipUnboundedMediaBodyDownload("http://example.com/channels.m3u")).toBe(false);
   });
 });

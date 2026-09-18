@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogItem } from "@/data/types";
 import {
+  getAllChannels,
+  getChannelBySlug,
   getLiveMovieChannels,
   getLiveSeriesChannels,
   getLiveTvChannels,
@@ -10,6 +12,16 @@ import {
   isMovieFast,
   isSeriesFast,
 } from "@/lib/channels";
+
+describe("catalog watch links", () => {
+  it("resolves every catalog card slug to a watch-page item", () => {
+    const unresolved = getAllChannels()
+      .filter((item) => !getChannelBySlug(item.slug))
+      .map((item) => item.slug);
+
+    expect(unresolved).toEqual([]);
+  });
+});
 
 function stub(partial: Partial<CatalogItem> & Pick<CatalogItem, "slug" | "title" | "type">): CatalogItem {
   return {

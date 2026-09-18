@@ -12,6 +12,7 @@ import {
   CATALOG_COUNTRIES,
 } from "@/lib/catalog-facets";
 import type { CatalogItem } from "@/data/types";
+import { normalizeSearchText, searchQueryTerms } from "@/lib/search-aliases";
 
 const ALL = getSearchIndex();
 
@@ -32,15 +33,22 @@ const HINT_CHIPS = [
 ];
 
 function scoreItem(item: CatalogItem, q: string) {
-  const title = item.title.toLowerCase();
-  const cats = item.categories.join(" ").toLowerCase();
-  const desc = item.description.toLowerCase();
+  const title = normalizeSearchText(item.title);
+  const slug = normalizeSearchText(item.slug);
+  const cats = normalizeSearchText(item.categories.join(" "));
+  const desc = normalizeSearchText(item.description);
+  const terms = searchQueryTerms(q);
   let score = 0;
-  if (title === q) score += 100;
-  if (title.startsWith(q)) score += 50;
-  if (title.includes(q)) score += 30;
-  if (cats.includes(q)) score += 20;
-  if (desc.includes(q)) score += 5;
+  let matched = false;
+  for (const [index, term] of terms.entries()) {
+    const weight = index === 0 ? 1 : 0.72;
+    if (title === term) { score += 100 * weight; matched = true; }
+    if (title.startsWith(term)) { score += 50 * weight; matched = true; }
+    if (title.includes(term) || slug.includes(term)) { score += 30 * weight; matched = true; }
+    if (cats.includes(term)) { score += 20 * weight; matched = true; }
+    if (desc.includes(term)) { score += 5 * weight; matched = true; }
+  }
+  if (!matched) return 0;
   if (item.categories.includes("Popular")) score += 8;
   if (item.categories.includes("Verified") || item.id.startsWith("top-"))
     score += 10;
@@ -48,7 +56,7 @@ function scoreItem(item: CatalogItem, q: string) {
 }
 
 function searchLocal(query: string) {
-  const q = query.trim().toLowerCase();
+  const q = normalizeSearchText(query);
   if (!q) return [];
   const seen = new Set<string>();
   const scored: { item: CatalogItem; score: number }[] = [];
@@ -71,6 +79,7 @@ function toCard(r: {
   categories?: string[];
   countries?: string[];
   poster?: string;
+  hasStream?: boolean;
 }): CatalogItem {
   return {
     id: `db-${r.slug}`,
@@ -79,7 +88,12 @@ function toCard(r: {
     type: "live",
     description: "iptv-org catalog",
     countries: r.countries || ["world"],
-    categories: r.categories || ["IptvOrg"],
+    categories: [
+      ...(r.categories || ["IptvOrg"]),
+      ...(r.hasStream && !(r.categories || []).includes("Playable")
+        ? ["Playable"]
+        : []),
+    ],
     languages: [],
     poster:
       r.poster ||
@@ -103,6 +117,8 @@ function SearchInner() {
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [playableOnly, setPlayableOnly] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [personal, setPersonal] = useState<{
     playlists: Array<{ id: string; title: string; href: string }>;
     links: Array<{ id: string; title: string; href: string; category: string }>;
@@ -112,15 +128,30 @@ function SearchInner() {
   const localResults = useMemo(() => {
     // Name search: only keep local hits that match title/slug (don't pollute with Popular pack)
     if (country || category) return [];
-    const query = q.trim().toLowerCase();
+    const query = normalizeSearchText(q);
     if (!query) return [];
-    return searchLocal(query).filter(
-      (item) =>
-        item.title.toLowerCase().includes(query) ||
-        item.slug.toLowerCase().includes(query.replace(/\s+/g, "-")) ||
-        item.slug.toLowerCase().includes(query.replace(/\s+/g, "")),
-    );
+    return searchLocal(query);
   }, [q, country, category]);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("gls-recent-searches-v1") || "[]");
+      if (Array.isArray(saved)) queueMicrotask(() => setRecentSearches(saved.slice(0, 6).map(String)));
+    } catch { /* ignore invalid local preference */ }
+  }, []);
+
+  useEffect(() => {
+    const value = q.trim();
+    if (value.length < 2) return;
+    const timer = setTimeout(() => {
+      setRecentSearches((current) => {
+        const next = [value, ...current.filter((item) => item.toLowerCase() !== value.toLowerCase())].slice(0, 6);
+        localStorage.setItem("gls-recent-searches-v1", JSON.stringify(next));
+        return next;
+      });
+    }, 900);
+    return () => clearTimeout(timer);
+  }, [q]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -161,6 +192,7 @@ function SearchInner() {
           categories?: string[];
           countries?: string[];
           poster?: string;
+          hasStream?: boolean;
         }>;
         const mapped = rows.map(toCard);
         setRemote((prev) => (append ? [...prev, ...mapped] : mapped));
@@ -184,7 +216,9 @@ function SearchInner() {
   useEffect(() => {
     const query = q.trim();
     if (query.length < 2 || country || category) {
-      setPersonal({ playlists: [], links: [], staff: [] });
+      queueMicrotask(() =>
+        setPersonal({ playlists: [], links: [], staff: [] }),
+      );
       return;
     }
     const t = setTimeout(() => {
@@ -213,8 +247,10 @@ function SearchInner() {
       seen.add(item.slug);
       out.push(item);
     }
-    return out;
-  }, [localResults, remote]);
+    return playableOnly
+      ? out.filter((item) => item.sources.some((source) => Boolean(source.url)) || item.categories.includes("Playable"))
+      : out;
+  }, [localResults, remote, playableOnly]);
 
   const browsing = Boolean(q.trim() || country || category);
 
@@ -283,10 +319,51 @@ function SearchInner() {
             Clear filters
           </button>
         )}
+        <button
+          type="button"
+          aria-pressed={playableOnly}
+          onClick={() => setPlayableOnly((value) => !value)}
+          className={`self-end rounded border px-3 py-2.5 text-sm font-semibold transition ${
+            playableOnly
+              ? "border-emerald-400/50 bg-emerald-400/15 text-emerald-200"
+              : "border-white/15 text-gls-muted hover:border-white/35 hover:text-white"
+          }`}
+        >
+          {playableOnly ? "✓ Playable only" : "Playable only"}
+        </button>
       </div>
 
       {!browsing && (
         <>
+          {recentSearches.length > 0 && (
+            <div className="mt-8">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-white">Recent searches</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRecentSearches([]);
+                    localStorage.removeItem("gls-recent-searches-v1");
+                  }}
+                  className="text-xs text-gls-muted hover:text-white"
+                >
+                  Clear
+                </button>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {recentSearches.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setQ(item)}
+                    className="rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5 text-xs text-white/70 transition hover:border-gls-red/60 hover:text-white"
+                  >
+                    ↗ {item}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="mt-8">
             <p className="text-sm text-gls-muted">Quick categories</p>
             <div className="mt-3 flex flex-wrap gap-2">

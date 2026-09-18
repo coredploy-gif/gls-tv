@@ -5,7 +5,6 @@ import {
 } from "@/lib/iptv";
 import {
   isIndividualPlaylistUrl,
-  shouldSkipUnboundedMediaBodyDownload,
 } from "@/lib/media-path";
 import type { SecureFetchOptions, SecureFetchResult } from "@/lib/secure-url";
 
@@ -19,9 +18,19 @@ export type M3uImportValidateUrl = (
   allowedHost?: (hostname: string) => boolean,
 ) => Promise<unknown>;
 
-/** @see {@link shouldSkipUnboundedMediaBodyDownload} */
+/**
+ * Import preview treats an individual stream URL as a single card and avoids
+ * downloading its body. Publication still goes through the stricter media-link
+ * reachability probe, which fetches HLS manifests and rejects HTTP failures.
+ */
 export function shouldSkipM3uBodyDownload(raw: string) {
-  return shouldSkipUnboundedMediaBodyDownload(raw);
+  try {
+    const path = new URL(raw).pathname.toLowerCase();
+    if (path.endsWith(".m3u") && !path.endsWith(".m3u8")) return false;
+    return isIndividualPlaylistUrl(raw);
+  } catch {
+    return false;
+  }
 }
 
 export function singleStreamM3uPreview(

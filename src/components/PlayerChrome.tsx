@@ -12,6 +12,7 @@ import {
   absoluteStreamUrl,
   castFeedbackForResult,
   castLikelyWorks,
+  isSafariLike,
   promptCastOrAirPlay,
   shouldShowCastControl,
 } from "@/lib/remote-playback";
@@ -20,6 +21,9 @@ import {
   getSeekableWindow,
   seekBySeconds,
 } from "@/lib/live-playback-policy";
+import { readPlayerVolume, writePlayerVolume } from "@/lib/player-preferences";
+import { castStreamToGoogleTv } from "@/lib/google-cast";
+import { buildPlaybackMetric, sendPlaybackMetric } from "@/lib/playback-telemetry";
 
 const IDLE_MS = 2800;
 /** Ignore sub-second HLS stalls so live edge waits don't pin chrome open. */
@@ -37,6 +41,8 @@ type PlayerChromeProps = {
   videoRef: RefObject<HTMLVideoElement | null>;
   isLive?: boolean;
   title?: string;
+  poster?: string;
+  telemetrySlug?: string;
   /** Current source format — gates Cast/AirPlay. */
   format?: string;
   /**
@@ -78,6 +84,8 @@ export function PlayerChrome({
   videoRef,
   isLive = false,
   title,
+  poster,
+  telemetrySlug,
   format,
   castUrl = null,
   forceVisible = false,
@@ -94,6 +102,8 @@ export function PlayerChrome({
   const [seekMin, setSeekMin] = useState(0);
   const [seekMax, setSeekMax] = useState(0);
   const [isFs, setIsFs] = useState(false);
+  const [isPip, setIsPip] = useState(false);
+  const [canPip, setCanPip] = useState(false);
   const [muted, setMuted] = useState(false);
   const [volume, setVolume] = useState(1);
   const [hasCaptions, setHasCaptions] = useState(false);
@@ -113,9 +123,11 @@ export function PlayerChrome({
   const rootRef = useRef<HTMLDivElement>(null);
   const lastVolRef = useRef(1);
 
-  forceVisibleRef.current = forceVisible;
-  bufferingRef.current = buffering;
-  castHintRef.current = Boolean(castHint);
+  useEffect(() => {
+    forceVisibleRef.current = forceVisible;
+    bufferingRef.current = buffering;
+    castHintRef.current = Boolean(castHint);
+  }, [buffering, castHint, forceVisible]);
 
   const clearIdle = useCallback(() => {
     if (idleTimer.current) clearTimeout(idleTimer.current);
@@ -220,6 +232,7 @@ export function PlayerChrome({
     }
     setMuted(el.muted || el.volume === 0);
     setVolume(el.muted ? 0 : el.volume);
+    writePlayerVolume(el.muted ? 0 : el.volume);
     bump();
   }, [bump, videoRef]);
 
@@ -233,6 +246,7 @@ export function PlayerChrome({
       if (v > 0) lastVolRef.current = v;
       setVolume(v);
       setMuted(el.muted);
+      writePlayerVolume(v);
       bump();
     },
     [bump, videoRef],
@@ -324,6 +338,18 @@ export function PlayerChrome({
     bump();
   }, [bump, videoRef]);
 
+  const togglePictureInPicture = useCallback(async () => {
+    const el = videoRef.current;
+    if (!el || !document.pictureInPictureEnabled) return;
+    try {
+      if (document.pictureInPictureElement) await document.exitPictureInPicture();
+      else await el.requestPictureInPicture();
+    } catch {
+      /* unavailable for this stream/device */
+    }
+    bump();
+  }, [bump, videoRef]);
+
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
@@ -387,7 +413,13 @@ export function PlayerChrome({
       bump();
     };
     const onTrackChange = () => syncCaptions();
+    const onEnterPip = () => setIsPip(true);
+    const onLeavePip = () => setIsPip(false);
 
+    const savedVolume = readPlayerVolume();
+    el.volume = savedVolume;
+    el.muted = savedVolume === 0;
+    setCanPip(Boolean(document.pictureInPictureEnabled && el.requestPictureInPicture));
     sync();
     el.addEventListener("play", onPlay);
     el.addEventListener("pause", onPause);
@@ -401,6 +433,8 @@ export function PlayerChrome({
     document.addEventListener("fullscreenchange", syncFs);
     el.addEventListener("webkitbeginfullscreen", syncFs);
     el.addEventListener("webkitendfullscreen", syncFs);
+    el.addEventListener("enterpictureinpicture", onEnterPip);
+    el.addEventListener("leavepictureinpicture", onLeavePip);
     el.textTracks?.addEventListener("addtrack", onTrackChange);
     el.textTracks?.addEventListener("change", onTrackChange);
 
@@ -418,6 +452,8 @@ export function PlayerChrome({
       document.removeEventListener("fullscreenchange", syncFs);
       el.removeEventListener("webkitbeginfullscreen", syncFs);
       el.removeEventListener("webkitendfullscreen", syncFs);
+      el.removeEventListener("enterpictureinpicture", onEnterPip);
+      el.removeEventListener("leavepictureinpicture", onLeavePip);
       el.textTracks?.removeEventListener("addtrack", onTrackChange);
       el.textTracks?.removeEventListener("change", onTrackChange);
     };
@@ -425,11 +461,11 @@ export function PlayerChrome({
 
   useEffect(() => {
     if (forceVisible) {
-      setVisible(true);
+      queueMicrotask(() => setVisible(true));
       clearIdle();
       return;
     }
-    bump();
+    queueMicrotask(() => bump());
   }, [bump, clearIdle, forceVisible]);
 
   useEffect(() => {
@@ -472,6 +508,8 @@ export function PlayerChrome({
           "J",
           "l",
           "L",
+          "ChannelUp",
+          "ChannelDown",
         ].includes(e.key)
       ) {
         show();
@@ -512,6 +550,14 @@ export function PlayerChrome({
       if ((e.key === "f" || e.key === "F") && !inField) {
         void toggleFullscreen();
       }
+      if (e.key === "ChannelUp" && prevChannel && !inField) {
+        e.preventDefault();
+        router.push(prevChannel.href);
+      }
+      if (e.key === "ChannelDown" && nextChannel && !inField) {
+        e.preventDefault();
+        router.push(nextChannel.href);
+      }
       if (e.key === "Escape") {
         const webkit = el as HTMLVideoElement & {
           webkitDisplayingFullscreen?: boolean;
@@ -547,10 +593,14 @@ export function PlayerChrome({
   }, [
     bump,
     hasCaptions,
+    nextChannel,
+    prevChannel,
+    router,
     skip,
     toggleCaptions,
     toggleFullscreen,
     toggleMute,
+    togglePictureInPicture,
     videoRef,
   ]);
 
@@ -640,6 +690,27 @@ export function PlayerChrome({
       return;
     }
     showCastFeedback("Looking for Cast / AirPlay devices…");
+    const googleUrl = absoluteStreamUrl(castUrl);
+    if (googleUrl && !isSafariLike()) {
+      const googleResult = await castStreamToGoogleTv({
+        url: googleUrl,
+        format,
+        title: title || "GLS TV",
+        poster,
+      });
+      if (googleResult === "ok") {
+        if (telemetrySlug) {
+          sendPlaybackMetric(buildPlaybackMetric({ event: "cast_started", slug: telemetrySlug }));
+        }
+        showCastFeedback("Playing on your Google Cast TV.");
+        return;
+      }
+      if (googleResult === "cancelled") {
+        clearCastHintTimer();
+        setCastHint(null);
+        return;
+      }
+    }
     const result = await promptCastOrAirPlay(el, { format, castUrl });
     const feedback = castFeedbackForResult(result, { format, castUrl });
     if (feedback) {
@@ -846,6 +917,18 @@ export function PlayerChrome({
               onClick={() => void onCast()}
             >
               Cast
+            </button>
+          )}
+          {canPip && (
+            <button
+              type="button"
+              className={`gls-player-btn ${isPip ? "is-active" : ""}`}
+              aria-label={isPip ? "Exit picture in picture" : "Picture in picture"}
+              aria-pressed={isPip}
+              tabIndex={showChrome ? 0 : -1}
+              onClick={() => void togglePictureInPicture()}
+            >
+              {isPip ? "Exit PiP" : "PiP"}
             </button>
           )}
           <button

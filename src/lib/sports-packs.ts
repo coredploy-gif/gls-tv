@@ -40,6 +40,17 @@ export function isNumberedLinearSlot(item: {
   );
 }
 
+/** Imported pay-linear rows are not durable, openly publishable staff picks. */
+export function isImportedPayLinearLink(item: {
+  title: string;
+  category?: string | null;
+}): boolean {
+  return (
+    /^imported$/i.test((item.category || "").trim()) &&
+    isNumberedLinearSlot({ slug: "", title: item.title })
+  );
+}
+
 /**
  * Open FAST HTTPS only allowed on the matching FAST slug —
  * not as a silent remap of TSN 1 / Fox 1 / ESPN.

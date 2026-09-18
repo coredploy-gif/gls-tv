@@ -41,6 +41,8 @@ export function WatchBackButton({ fallbackHref, label = "Back" }: Props) {
   return (
     <button
       type="button"
+      data-tv-focus
+      aria-label={label}
       onClick={goBack}
       className="inline-flex items-center gap-2 rounded-sm border border-white/25 bg-black/70 px-3 py-2 text-sm font-semibold text-white shadow-lg backdrop-blur-md transition hover:border-white hover:bg-white/10"
     >

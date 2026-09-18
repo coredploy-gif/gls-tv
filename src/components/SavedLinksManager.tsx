@@ -16,6 +16,8 @@ type ApiResponse = {
   links?: UserMediaLink[];
   entitled?: boolean;
   error?: string;
+  link?: UserMediaLink;
+  probe?: { detail?: string };
 };
 
 export function SavedLinksManager() {
@@ -236,6 +238,37 @@ export function SavedLinksManager() {
     setSuccess("Report submitted. Thanks — our team will review it.");
   };
 
+  const recheckLink = async (link: UserMediaLink) => {
+    setBusy(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await fetch("/api/media-links", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: link.id, recheck: true }),
+      });
+      const data = (await res.json()) as ApiResponse;
+      if (!res.ok || !data.link) {
+        throw new Error(data.error || "Could not check link");
+      }
+      setLinks((prev) =>
+        prev.map((row) => (row.id === data.link!.id ? data.link! : row)),
+      );
+      const statusLabel =
+        data.link.status === "active"
+          ? "Live"
+          : data.link.status === "error"
+            ? "Degraded"
+            : "Offline";
+      setSuccess(`${statusLabel}: ${data.probe?.detail || link.title}`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Link check failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="space-y-10">
       <section className="overflow-hidden rounded-sm border border-white/10 bg-[linear-gradient(135deg,rgba(229,9,20,0.18),rgba(10,10,10,0.9)_45%,rgba(26,26,26,0.95))] shadow-2xl shadow-black/50">
@@ -325,7 +358,11 @@ export function SavedLinksManager() {
                 onMoveCategory={(next) => void moveCategory(link, next)}
                 onRemove={() => void removeLink(link)}
                 onReport={() => void reportLink(link)}
+                onRecheck={() => void recheckLink(link)}
                 busy={busy}
+                status={link.status}
+                lastCheckedAt={link.last_checked_at}
+                sourceLabel="Personal"
               />
             ))}
           </div>
@@ -347,8 +384,12 @@ export function SavedLinksManager() {
                 href={`/library/watch/${link.id}`}
                 favorite={link.is_favorite}
                 onFavorite={() => void toggleFavorite(link)}
+                onRecheck={() => void recheckLink(link)}
                 busy={busy}
                 badge="Recent"
+                status={link.status}
+                lastCheckedAt={link.last_checked_at}
+                sourceLabel="Personal"
               />
             ))}
           </div>
@@ -479,7 +520,11 @@ export function SavedLinksManager() {
                   onMoveCategory={(next) => void moveCategory(link, next)}
                   onRemove={() => void removeLink(link)}
                   onReport={() => void reportLink(link)}
+                  onRecheck={() => void recheckLink(link)}
                   busy={busy}
+                  status={link.status}
+                  lastCheckedAt={link.last_checked_at}
+                  sourceLabel="Personal"
                 />
               ))}
             </div>
@@ -519,7 +564,11 @@ export function SavedLinksManager() {
                         onMoveCategory={(next) => void moveCategory(link, next)}
                         onRemove={() => void removeLink(link)}
                         onReport={() => void reportLink(link)}
+                        onRecheck={() => void recheckLink(link)}
                         busy={busy}
+                        status={link.status}
+                        lastCheckedAt={link.last_checked_at}
+                        sourceLabel="Personal"
                       />
                     ))}
                   </div>

@@ -105,7 +105,7 @@ describe("isIndividualPlaylistUrl", () => {
 });
 
 describe("shouldSkipUnboundedMediaBodyDownload", () => {
-  it("skips /play/ and .m3u8 but not multi-channel .m3u lists", () => {
+  it("skips continuous /play/ transport streams but validates playlist bodies", () => {
     expect(
       shouldSkipUnboundedMediaBodyDownload(
         "http://103.253.18.58:8000/play/a03o",
@@ -115,7 +115,7 @@ describe("shouldSkipUnboundedMediaBodyDownload", () => {
       shouldSkipUnboundedMediaBodyDownload(
         "http://40.160.24.55/TSN_5/index.m3u8",
       ),
-    ).toBe(true);
+    ).toBe(false);
     expect(
       shouldSkipUnboundedMediaBodyDownload(
         "https://lists.example.org/channels.m3u",

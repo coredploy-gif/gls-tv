@@ -52,18 +52,13 @@ export function isIndividualPlaylistUrl(raw: string) {
 }
 
 /**
- * Individual streams (`.m3u8`, `/play/…` gateways) may return unbounded media
- * (live MPEG-TS) or announce a huge Content-Length — never buffer the body.
- * Multi-channel `.m3u` lists still need a playlist body download.
+ * Continuous transport-stream gateways may return an unbounded body or announce
+ * a huge Content-Length, so they must not be buffered. HLS `.m3u8` URLs are
+ * deliberately not skipped: their small manifest must be fetched and checked,
+ * otherwise a dead URL that merely has an HLS-looking suffix is accepted.
  */
 export function shouldSkipUnboundedMediaBodyDownload(raw: string) {
-  try {
-    const path = new URL(raw).pathname.toLowerCase();
-    if (path.endsWith(".m3u") && !path.endsWith(".m3u8")) return false;
-    return isIndividualPlaylistUrl(raw);
-  } catch {
-    return false;
-  }
+  return isRawMpegTsGateway(raw);
 }
 
 /**

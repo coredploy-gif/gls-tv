@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChannelNamePlate } from "@/components/ChannelNamePlate";
 import {
   MEDIA_FORMAT_META,
   resolveMediaLinkThumbnail,
@@ -13,6 +14,14 @@ function hostOf(url: string) {
   } catch {
     return url;
   }
+}
+
+function checkedLabel(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Checked recently";
+  return `Checked ${new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+  }).format(date)}`;
 }
 
 export function MediaLinkCard({
@@ -29,8 +38,12 @@ export function MediaLinkCard({
   onMoveCategory,
   onRemove,
   onReport,
+  onRecheck,
   busy,
   badge,
+  status,
+  lastCheckedAt,
+  sourceLabel,
 }: {
   title: string;
   url: string;
@@ -45,8 +58,12 @@ export function MediaLinkCard({
   onMoveCategory?: (next: string) => void;
   onRemove?: () => void;
   onReport?: () => void;
+  onRecheck?: () => void;
   busy?: boolean;
   badge?: string;
+  status?: "active" | "checking" | "dead" | "error";
+  lastCheckedAt?: string | null;
+  sourceLabel?: "Personal" | "GLS pick" | "Official";
 }) {
   const meta = MEDIA_FORMAT_META[format];
   const poster = resolveMediaLinkThumbnail({
@@ -55,6 +72,14 @@ export function MediaLinkCard({
     format,
     thumbnailUrl,
   });
+  const health = status
+    ? {
+        active: { label: "Live", className: "bg-emerald-500/90 text-white" },
+        checking: { label: "Checking", className: "bg-sky-500/90 text-white" },
+        dead: { label: "Offline", className: "bg-red-600/95 text-white" },
+        error: { label: "Degraded", className: "bg-amber-500/95 text-black" },
+      }[status]
+    : null;
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
       <div
@@ -76,13 +101,21 @@ export function MediaLinkCard({
           </span>
         )}
         {badge ? (
-          <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/90">
+          <span className="absolute left-2 top-2 z-[3] rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/90">
             {badge}
           </span>
         ) : null}
+        {health ? (
+          <span className={`absolute right-2 top-2 z-[3] inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${health.className}`}>
+            <span className="h-1.5 w-1.5 rounded-full bg-current" />
+            {health.label}
+          </span>
+        ) : null}
+        <ChannelNamePlate title={title} compact />
         <Link
           href={href}
-          className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/45 group-hover:opacity-100"
+          aria-label={`Play ${title}`}
+          className="absolute inset-0 z-[4] flex items-end justify-center bg-black/0 pb-3 opacity-0 transition group-hover:bg-black/45 group-hover:opacity-100 focus-visible:bg-black/45 focus-visible:opacity-100"
         >
           <span className="rounded-full bg-gls-red px-4 py-2 text-sm font-semibold text-white shadow-lg">
             Play
@@ -104,6 +137,12 @@ export function MediaLinkCard({
           ) : null}
         </div>
         <p className="truncate text-xs text-gls-muted">{hostOf(url)}</p>
+        <p className="text-[11px] text-white/50">
+          {sourceLabel || "Personal"}
+          {lastCheckedAt
+            ? ` · ${checkedLabel(lastCheckedAt)}`
+            : " · Not checked recently"}
+        </p>
         <div className="mt-auto flex flex-wrap gap-2 pt-2">
           <span
             className="rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
@@ -165,6 +204,16 @@ export function MediaLinkCard({
               className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-gls-muted hover:text-white"
             >
               Report
+            </button>
+          ) : null}
+          {onRecheck ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onRecheck}
+              className="rounded-lg border border-emerald-400/25 px-3 py-1.5 text-xs text-emerald-200 hover:border-emerald-300 disabled:opacity-45"
+            >
+              {busy ? "Checking…" : "Recheck"}
             </button>
           ) : null}
         </div>

@@ -84,9 +84,8 @@ describe("media-links-probe trusted app media", () => {
   });
 
   it("rejects loopback HLS that is not trusted app media", async () => {
-    // .m3u8 uses skip-body path → validatePublicUrl only.
     secureFetchBuffered.mockClear();
-    validatePublicUrl.mockRejectedValueOnce(
+    secureFetchBuffered.mockRejectedValueOnce(
       new Error("Private or reserved network targets are blocked"),
     );
     const probe = await probeMediaLinkReachability(
@@ -97,7 +96,7 @@ describe("media-links-probe trusted app media", () => {
     expect(probe.detail).toMatch(
       /Private or reserved|Host is not allowed|localhost/i,
     );
-    expect(secureFetchBuffered).not.toHaveBeenCalled();
+    expect(secureFetchBuffered).toHaveBeenCalled();
   });
 });
 
@@ -109,21 +108,30 @@ describe("media-links-probe IPTV gateway skip", () => {
     const probe = await probeMediaLinkReachability(GATEWAY, "hls");
 
     expect(probe.ok).toBe(true);
-    expect(probe.format).toBe("hls");
+    expect(probe.format).toBe("mpegts");
     expect(probe.detail).toMatch(/body probe skipped/i);
     expect(secureFetchBuffered).not.toHaveBeenCalled();
     expect(validatePublicUrl).toHaveBeenCalledWith(GATEWAY);
   });
 
-  it("does not buffer individual .m3u8 bodies", async () => {
+  it("fetches and validates individual .m3u8 manifests", async () => {
     secureFetchBuffered.mockClear();
-    validatePublicUrl.mockReset().mockResolvedValue({});
+    secureFetchBuffered.mockResolvedValueOnce({
+      status: 404,
+      body: Buffer.from("not found"),
+      headers: { "content-type": "text/plain" },
+      finalUrl: "http://40.160.24.55/TSN_5/index.m3u8",
+    });
     const stream = "http://40.160.24.55/TSN_5/index.m3u8";
 
     const probe = await probeMediaLinkReachability(stream, "hls");
 
-    expect(probe.ok).toBe(true);
-    expect(secureFetchBuffered).not.toHaveBeenCalled();
-    expect(validatePublicUrl).toHaveBeenCalledWith(stream);
+    expect(probe.ok).toBe(false);
+    expect(probe.status).toBe("dead");
+    expect(probe.detail).toMatch(/HTTP 404/);
+    expect(secureFetchBuffered).toHaveBeenCalledWith(
+      stream,
+      expect.objectContaining({ maxBytes: 64_000 }),
+    );
   });
 });

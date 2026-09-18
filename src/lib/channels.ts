@@ -306,6 +306,7 @@ export function getLiveTvByCountry(code: string) {
 export function getChannelBySlug(slug: string): CatalogItem | undefined {
   const lists = [
     top10,
+    GLS_TV_ORIGINALS,
     CURATED_AFRICA,
     CURATED_MALAWI_TV,
     CURATED_RADIO_ZA,

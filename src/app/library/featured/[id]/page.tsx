@@ -14,6 +14,7 @@ import {
   type AdminMediaLink,
   type MediaLinkFormat,
 } from "@/lib/media-links";
+import { isImportedPayLinearLink } from "@/lib/sports-packs";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -65,6 +66,7 @@ export default async function FeaturedMediaWatchPage({ params }: Props) {
 
   if (!row) notFound();
   const link = row as AdminMediaLink;
+  if (isImportedPayLinearLink(link)) notFound();
   const embedUrl = resolveMediaEmbedUrl(link);
 
   return (

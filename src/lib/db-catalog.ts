@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import overridesJson from "@/data/generated/channel-overrides.json";
 import { isArenaPayLinear } from "@/lib/channel-heal";
 import { isExcludedBuiltinChannel } from "@/lib/builtin-catalog-policy";
+import { isNumberedLinearSlot } from "@/lib/sports-packs";
 
 const overrides = overridesJson as Record<
   string,
@@ -52,7 +53,8 @@ export function catalogFromDbChannel(ch: DbChannel): CatalogItem | null {
   const linearPay =
     cats.includes("LinearPay") ||
     cats.includes("Rights") ||
-    isArenaPayLinear(ch.slug, ch.title);
+    isArenaPayLinear(ch.slug, ch.title) ||
+    isNumberedLinearSlot(ch);
   // Linear pay tiles stay visible for discovery even when HLS is intentionally empty
   if (!url && !linearPay) return null;
   const rightsBlocked = linearPay || ch.health_status === "dead";

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CatalogItem } from "@/data/types";
 import { PosterArt } from "./PosterArt";
+import { ChannelNamePlate } from "./ChannelNamePlate";
 
 type TitleCardProps = {
   item: CatalogItem;
@@ -29,6 +30,10 @@ export function TitleCard({
     >
       <div className="gls-poster-frame relative aspect-[2/3] overflow-hidden rounded-md bg-gls-elevated shadow-[0_8px_24px_rgba(0,0,0,0.55)] ring-1 ring-white/10 transition duration-300 group-hover:z-10 group-hover:scale-[1.06] group-hover:shadow-[0_16px_40px_rgba(0,0,0,0.55),0_0_28px_rgba(255,107,157,0.22)] group-hover:ring-gls-pink/45 group-focus-within:z-10 group-focus-within:scale-[1.06]">
         <PosterArt item={item} priority={priority} />
+
+        {(item.type === "live" || item.isLive) && (
+          <ChannelNamePlate title={item.title} />
+        )}
 
         {item.isLive && (
           <span className="absolute left-2 top-2 z-[2] inline-flex items-center gap-1 rounded bg-gls-red px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-md">

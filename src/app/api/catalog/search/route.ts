@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { searchDbCatalog } from "@/lib/db-catalog";
+import { databaseSearchQuery } from "@/lib/search-aliases";
 
 /**
  * Search / browse the full seeded catalog (iptv-org index in Supabase).
@@ -8,7 +9,7 @@ import { searchDbCatalog } from "@/lib/db-catalog";
  */
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const q = searchParams.get("q") || "";
+  const q = databaseSearchQuery(searchParams.get("q") || "");
   const country = searchParams.get("country") || "";
   const category = searchParams.get("category") || "";
   const limit = Number(searchParams.get("limit") || "48");
