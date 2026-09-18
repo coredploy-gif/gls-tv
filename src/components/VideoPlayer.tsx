@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { CatalogItem, MediaSource } from "@/data/types";
 import type HlsType from "hls.js";
@@ -327,6 +327,14 @@ function bufferedAhead(el: HTMLVideoElement): number {
   return buffered.end(buffered.length - 1) - currentTime;
 }
 
+function formatLiveDelay(seconds: number): string {
+  const safe = Math.max(0, Math.round(seconds));
+  if (safe < 60) return `${safe}s`;
+  const minutes = Math.floor(safe / 60);
+  const remainder = safe % 60;
+  return remainder > 0 ? `${minutes}m ${remainder}s` : `${minutes}m`;
+}
+
 /**
  * Heal playhead vs buffer mismatches without replaying old media.
  *
@@ -407,6 +415,9 @@ export function VideoPlayer({
   const behindLiveRef = useRef(false);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const deepBufferRef = useRef(false);
+  const liveConfirmationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const controlHintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasShownControlHintRef = useRef(false);
 
   const sources = useMemo(() => sortedSources(item), [item]);
 
@@ -416,8 +427,9 @@ export function VideoPlayer({
   const [status, setStatus] = useState<string>("Starting…");
   const [behindLive, setBehindLive] = useState(false);
   const [playerChromeVisible, setPlayerChromeVisible] = useState(true);
+  const [liveConfirmation, setLiveConfirmation] = useState(false);
+  const [controlHintVisible, setControlHintVisible] = useState(false);
   const [lagSec, setLagSec] = useState(0);
-  const [aheadSec, setAheadSec] = useState(0);
   const [qualityOptions, setQualityOptions] = useState<PlayerTrackOption[]>([]);
   const [qualityValue, setQualityValue] = useState(-1);
   const [audioOptions, setAudioOptions] = useState<PlayerTrackOption[]>([]);
@@ -462,7 +474,8 @@ export function VideoPlayer({
       setMode(isHardGeo(item) ? "direct" : next.mode);
       setBehindLive(false);
       behindLiveRef.current = false;
-      setAheadSec(0);
+      setLagSec(0);
+      setLiveConfirmation(false);
       setError(null);
       deepBufferRef.current = false;
       setQualityOptions([]);
@@ -490,6 +503,24 @@ export function VideoPlayer({
   useEffect(() => {
     behindLiveRef.current = behindLive;
   }, [behindLive]);
+
+  useEffect(() => () => {
+    if (liveConfirmationTimerRef.current) clearTimeout(liveConfirmationTimerRef.current);
+    if (controlHintTimerRef.current) clearTimeout(controlHintTimerRef.current);
+  }, []);
+
+  const handleChromeVisibilityChange = useCallback((visible: boolean) => {
+    setPlayerChromeVisible(visible);
+    if (visible) {
+      setControlHintVisible(false);
+      if (controlHintTimerRef.current) clearTimeout(controlHintTimerRef.current);
+      return;
+    }
+    if (!isTvLikeDevice() || hasShownControlHintRef.current) return;
+    hasShownControlHintRef.current = true;
+    setControlHintVisible(true);
+    controlHintTimerRef.current = setTimeout(() => setControlHintVisible(false), 2800);
+  }, []);
 
   // Wake Lock — keep screen on while watching
   useEffect(() => {
@@ -1259,7 +1290,6 @@ export function VideoPlayer({
           // Tiny overshoot nudge only — never rewind seconds of video.
           snapPlayheadIntoBuffer(el, "overshoot");
           const ahead = bufferedAhead(el);
-          setAheadSec(Math.round(Math.max(0, ahead)));
           if (ahead >= 3) {
             saveGood();
             deepenBuffer(instance, url);
@@ -1446,7 +1476,6 @@ export function VideoPlayer({
           deepenBuffer(instance, url);
           // Do NOT restore/update pin here — stalls re-fire "playing" and
           // would rewind into already-watched media (the repeat loop).
-          setAheadSec(Math.round(Math.max(0, bufferedAhead(el))));
           if (item.isLive && behindLiveRef.current) {
             setStatus("Behind live");
           } else {
@@ -1470,7 +1499,6 @@ export function VideoPlayer({
             }
           }
           const ahead = bufferedAhead(el);
-          setAheadSec(Math.round(Math.max(0, ahead)));
           if (!item.isLive) return;
 
           if (!kind.myLinks && deepLive && primedPlay) {
@@ -1611,6 +1639,11 @@ export function VideoPlayer({
     };
     el?.__glsJumpLive?.();
     setStatus("Live");
+    setLiveConfirmation(true);
+    if (liveConfirmationTimerRef.current) clearTimeout(liveConfirmationTimerRef.current);
+    liveConfirmationTimerRef.current = setTimeout(() => {
+      setLiveConfirmation(false);
+    }, 2200);
   };
 
   const markBehindUi = () => {
@@ -1656,6 +1689,12 @@ export function VideoPlayer({
     /buffer|starting|reconnect|recover|smooth|switch|getting ready|tap play/i.test(
       status,
     );
+  const statusVisible = playerChromeVisible || statusBusy || liveConfirmation;
+  const viewerStatus = liveConfirmation
+    ? "You’re live"
+    : item.isLive && behindLive
+      ? `Behind live${lagSec > 0 ? ` · ${formatLiveDelay(lagSec)}` : ""}`
+      : status;
 
   return (
     <div className="gls-player-stage relative aspect-video w-full overflow-hidden bg-black">
@@ -1777,7 +1816,7 @@ export function VideoPlayer({
             className={`gls-player-status absolute left-4 z-[15] flex flex-wrap items-center gap-2 transition-opacity duration-300 ${
               healBanner ? "top-12" : "top-4"
             } ${
-              statusBusy ? "opacity-100" : "pointer-events-none opacity-0"
+              statusVisible ? "opacity-100" : "pointer-events-none opacity-0"
             }`}
           >
             {statusBusy && (
@@ -1787,12 +1826,7 @@ export function VideoPlayer({
               {item.isLive && !behindLive && (
                 <span className="gls-live-dot h-1.5 w-1.5 rounded-full bg-gls-red" />
               )}
-              {status}
-              {(aheadSec >= 5) && (
-                <span className="normal-case tracking-normal text-emerald-300/90">
-                  · {aheadSec}s ahead
-                </span>
-              )}
+              {viewerStatus}
               {item.categories.includes("Geo") && (
                 <span className="normal-case tracking-normal text-amber-200/80">
                   · regional availability
@@ -1815,8 +1849,15 @@ export function VideoPlayer({
               }`}
             >
               Back to live
-              {lagSec > 0 ? ` · ${lagSec}s` : ""}
+              {lagSec > 0 ? ` · ${formatLiveDelay(lagSec)}` : ""}
             </button>
+          )}
+          {controlHintVisible && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-10 z-[32] flex justify-center px-4">
+              <span className="rounded-full border border-white/20 bg-black/75 px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-xl backdrop-blur-sm">
+                Press OK for controls
+              </span>
+            </div>
           )}
           <PlayerChrome
             videoRef={videoRef}
@@ -1827,7 +1868,7 @@ export function VideoPlayer({
             format={source?.format}
             prevChannel={prevChannel}
             nextChannel={nextChannel}
-            playbackStatus={status}
+            playbackStatus={viewerStatus}
             sourcePosition={Math.min(sourceIndex + 1, sources.length)}
             sourceCount={Math.max(1, sources.length)}
             qualityOptions={qualityOptions}
@@ -1840,7 +1881,7 @@ export function VideoPlayer({
               // Rewind / scrub within DVR — stay behind live, never auto-return.
               markBehindUi();
             }}
-            onVisibilityChange={setPlayerChromeVisible}
+            onVisibilityChange={handleChromeVisibilityChange}
             castUrl={
               source
                 ? // Fetchable playlist/progressive URL only — never the MSE blob.
