@@ -70,6 +70,8 @@ type PlayerChromeProps = {
   onAudioChange?: (value: number) => void;
   /** Called when the user rewinds / scrubs live DVR (stay behind live). */
   onUserSeekLive?: () => void;
+  /** Mirrors the chrome auto-hide state for related player overlays. */
+  onVisibilityChange?: (visible: boolean) => void;
 };
 
 function formatTime(seconds: number) {
@@ -115,6 +117,7 @@ export function PlayerChrome({
   audioValue = -1,
   onAudioChange,
   onUserSeekLive,
+  onVisibilityChange,
 }: PlayerChromeProps) {
   const router = useRouter();
   const [visible, setVisible] = useState(true);
@@ -822,6 +825,11 @@ export function PlayerChrome({
 
   const showChrome =
     visible || forceVisible || paused || buffering || Boolean(castHint);
+
+  useEffect(() => {
+    onVisibilityChange?.(showChrome);
+  }, [onVisibilityChange, showChrome]);
+
   const canScrub = seekMax > seekMin + 1;
   const scrubValue = Math.min(Math.max(current, seekMin), seekMax || current);
 

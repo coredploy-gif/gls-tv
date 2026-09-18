@@ -415,6 +415,7 @@ export function VideoPlayer({
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("Starting…");
   const [behindLive, setBehindLive] = useState(false);
+  const [playerChromeVisible, setPlayerChromeVisible] = useState(true);
   const [lagSec, setLagSec] = useState(0);
   const [aheadSec, setAheadSec] = useState(0);
   const [qualityOptions, setQualityOptions] = useState<PlayerTrackOption[]>([]);
@@ -1803,8 +1804,14 @@ export function VideoPlayer({
             <button
               type="button"
               onClick={goLive}
-              className={`absolute left-4 z-[15] rounded bg-gls-red px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+              aria-hidden={!playerChromeVisible}
+              tabIndex={playerChromeVisible ? 0 : -1}
+              className={`absolute left-4 z-[31] rounded bg-gls-red px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg transition-[opacity,filter] duration-300 hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
                 healBanner ? "top-24" : "top-14"
+              } ${
+                playerChromeVisible
+                  ? "opacity-100"
+                  : "pointer-events-none opacity-0"
               }`}
             >
               Back to live
@@ -1833,6 +1840,7 @@ export function VideoPlayer({
               // Rewind / scrub within DVR — stay behind live, never auto-return.
               markBehindUi();
             }}
+            onVisibilityChange={setPlayerChromeVisible}
             castUrl={
               source
                 ? // Fetchable playlist/progressive URL only — never the MSE blob.
